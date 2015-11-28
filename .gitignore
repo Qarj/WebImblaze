@@ -1,1 +1,5 @@
 #WebInject Files to ignore
+
+http.log
+results.html
+results.xml

@@ -14,6 +14,7 @@ WebInject is very easy to setup and run. An example is test included.
 2. Install Strawberry Perl.
     * Navigate to http://strawberryperl.com/
     * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+
 3. Install the Error package from CPAN
     * Open the Command Prompt up as an Administrator
         * Press the Windows Key
@@ -26,8 +27,10 @@ That's it! You are now ready to run WebInject for the first time.
 ### Run the example WebInject test
 
 1. Open the Command Prompt up as an Administrator
+
 2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called WebInject, then
     * `CD C:\WebInject\webinject.pl` then press 'Enter'
+
 3. Now just type 'webinject.pl' and hit 'Enter'
 
 If everything worked ok, then you'll see something like the following:
