@@ -1,0 +1,21 @@
+<testcases repeat="1">
+
+
+<case
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="get"
+    url="http://www.totaljobs.com"
+    verifypositive="Job Ads"
+/>
+
+<case
+    id="20"
+    description1="Get Totaljobs Search Results"
+    method="get"
+    url="https://www.totaljobs.com/JobSearch/Results.aspx?Keywords=webdriver"
+    verifypositive="Automation"
+/>
+
+
+</testcases>
