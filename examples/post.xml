@@ -1,6 +1,16 @@
 <testcases repeat="1">
 
 <!--
+With a post request, it is typical to first get a web page with something on it (for example, a form) first.
+
+In this example, we get a a dummy form on a website especially created for WebInject examples.
+
+Then we post to the website. The website responds with a simple confirmation page. 
+
+Note that in this example, the website URL is defined with a local test variable.
+-->
+
+<!--
 <testvar varname="RIMATTEST">http://localhost:54822</testvar>
  -->
 <testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>

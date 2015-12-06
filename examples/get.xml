@@ -1,0 +1,23 @@
+<testcases repeat="1">
+
+<!--
+The {TOTALJOBS} substitution is defined in config.xml in the same folder webinject.pl is located
+
+http:// is not included as part of the substitution in this example. This is because the website
+also uses https://
+
+It would be awkward to two substitutions, with a second one called {TOTALJOBSHTTPS} (for example)
+containing much the same information.
+
+Defining substitutions of {HTTP} and {HTTPS} would be just silly.
+-->
+
+<case
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="get"
+    url="http://{TOTALJOBS}"
+    verifypositive="recommended"
+/>
+
+</testcases>
