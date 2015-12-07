@@ -1,0 +1,32 @@
+<testcases repeat="1">
+
+<!--
+So long as your verifypostive starts with verifypositive, you can have as many as you want.
+You can use numbers or letters to make distinct verifications.
+
+The verifypositiveHTML example shows the use of regular expressions for the verification.
+In this example, . matches any single character.
+
+The other important point to note is the verification is against the raw response.
+This means when you get an html page as a response, the verification is against the html
+and not the rendered version of the html you would see in a browser.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive="automated testing examples"
+    verifypositive1="WebInject"
+    verifypositiveHTML="h2.Getting started..h2"
+/>
+
+
+
+</testcases>
