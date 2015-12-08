@@ -1,0 +1,38 @@
+<testcases repeat="1">
+
+<!--
+So long as your verifynegative starts with verifynegative, you can have as many as you want.
+You can use numbers or letters to make distinct verifications.
+
+verifynegative is typically used for asserting that things that should not be there, are not.
+
+Bugs are a good candidate for the use of verifynegative. When a bug appears, put in a verifynegative
+that highlights the existence of a bug. When the bug is fixed, the check will start passing again.
+
+Bugs that have appeared before a likely to appear again!
+
+verifynegative is also great for detecting the existence of environmental issues.
+
+The other important point to note is the verification is against the raw response.
+This means when you get an html page as a response, the verification is against the html
+and not the rendered version of the html you would see in a browser.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifynegative="Server too busy"
+    verifynegative1="Search Recipes"
+    verifynegativeBUG3521="Exammple"
+/>
+
+
+
+</testcases>
