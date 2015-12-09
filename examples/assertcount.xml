@@ -1,0 +1,23 @@
+<testcases repeat="1">
+
+<!--
+assertcount checks that the existence of a given regular expression appears the specified
+number of times in the response.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    assertcount="example|||3"
+/>
+
+
+
+</testcases>
