@@ -1,0 +1,31 @@
+<testcases repeat="1">
+
+<!--
+When you set the method to command, then it is possible to run an operating system command, or any program.
+
+This is done through the perl backtick method.
+
+If the command you run writes to the console, WebInject will capture it. This means you can run assertions against it.
+
+Potential uses in automated tests:
+* ftping files
+* checking the system application error log
+* parsing folders containing emails to send (in test environments, emails are not normally sent, but rather are available in a Pickup folder
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get the directory listing of the current folder"
+    method="cmd"
+    command="dir"
+    verifypositive="webinject.pl"
+/>
+
+
+
+</testcases>
