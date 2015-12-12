@@ -90,15 +90,12 @@ Save your changes then just run `webinject.pl` again. The three files in output 
 
 ## The Manual
 
-Head over to http://www.webinject.org/manual.html
+[The WebInject Manual](MANUAL.md)
 
-Note that the manual there is for version 1.41 of WebInject.
-
-WebInject 1.42 is mostly backwards compatible with 1.41. Note that there is one major change though. Where the manual says to use something like `{PARSEDRESULT1}`, just use `{1}` instead. `{PARSEDRESULT2}` is `{2}` and so on. `{PARSEDRESULT}` is simply `{}`.
 
 ## Coming Soon ...
 
-* A new manual covering everything in WebInject 1.42
+* Further additions to the Manual 
 * Many working examples you can try straight away
 * Information on how to use Selenium WebDriver with WebInject
 
