@@ -120,18 +120,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [parseresponse1](#tcparamparse1)
 
-[parseresponse2](#tcparamparse2)
-
-
-[parseresponse3](#tcparamparse3)
-
-[parseresponse4](#tcparamparse4)
-
-[parseresponse5](#tcparamparse5)
-
-[... and so on up to ...](#tcparamparse6)
-
-[parseresponse40](#tcparamparse40)
+[parseresponseUSERID](#tcparamparseUSERID)
 
 [sleep](#tcparamsleep)
 
@@ -328,8 +317,8 @@ badly, then there will be no more than 50 retry attempts rather than 120.
 example: `<globalretry>50</globalretry>`
     
 <a name="cfgglobalconstants"></a>
-####global1 to global20
-Allows you to specify up to 20 custom global constants for use across all test case files.
+####global1 to global5
+Allows you to specify up to 5 custom global constants for use across all test case files.
 
 example: `<global1>20</global1>`
 You could use it in a test case as the sleep time (for example):
@@ -615,11 +604,13 @@ Example: `postbody="file=>soap_payload.xml"`
 Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
 Example: 
-`command="echo _S24_{PARSEDRESULT24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{PARSEDRESULT30}_Setup.txt"`
+
+`command="echo _S24_{24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{30}_Setup.txt"`
 
 Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
 
 Example - use 3 types of quotes on the one line:
+
 `command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
 
 In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
@@ -666,8 +657,11 @@ Example - check for "Saved OK" in response:
 `verifypositive='Saved OK'`
 
 Example - check for various webtrends tags in response, and output a custom message if it isn't found:
+
 `verifypositive='WT897234|||Webtrends Profile Saved tag not found'`
+
 `verifypositive1='WT897264|||Webtrends New User tag not found'`
+
 `verifypositive2='WT897292|||Webtrends Full Profile tag not found'`
 
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
@@ -848,7 +842,7 @@ Example - the {5,60} specifies that the number of characters matched must be bet
 `parseresponse='_chkSearch" type="checkbox" name="(.{5,60}?)".{5,100}?LocSrch_{TEAM}{WSX}_{OUTSUM}|regex|decode' `
 
 Example - in this regex, the .* at the front tells it to return the last match, rather than the first:
-`parseresponse=".*EntitlementCompanyId.{PARSEDRESULT9}.{20,30}?ExpiryTime.(.*?)\<|regex|decode"`
+`parseresponse='.*UserId="(.*?)"\<|regex|decode'`
 
 Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
 `parseresponse='([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9])|regex|'`
@@ -863,37 +857,20 @@ Example - find the inetpub location:
 `command1="echo _START_&type config\inetpub.txt&echo _END_"`
 `parseresponse="_START_.{0,5}?\x0A(.*?)_END_|regex|"`
 
-
+`parseresponse` is referred to simply with `{}`.
 
 <a name="tcparamparse1"></a> 
 ####parseresponse1
-Additional parameter for response parsing.
-    
-<a name="tcparamparse2"></a>
-####parseresponse2
-Additional parameter for response parsing.
-    
-<a name="tcparamparse3"></a>
-####parseresponse3
+Additional parameter for response parsing. There is no limit to the number of parseresponse you can have, you can
+append any number you want like parseresponse5000 or whatever.
 
-Additional parameter for response parsing.
+`parseresponse1` would be referred to as `{1}`, and `parseresponse5000` as `{5000}`.
     
-<a name="tcparamparse4"></a> 
-####parseresponse4
-Additional parameter for response parsing.
-    
-<a name="tcparamparse5"></a>
-####parseresponse5
-Additional parameter for response parsing.
-
-  
-<a name="tcparamparse6"></a>
-... and so on up to ...
-
-<a name="tcparamparse40"></a>
-####parseresponse40
-Additional parameter for response parsing.
-    
+<a name="tcparamparseUSERID"></a>
+####parseresponseUSERID
+Additional parameter for response parsing. You can also append an alpha numeric string to the end of parseresponse to create
+additional parseresponses. This example would be referred to with `{USERID}`.
+   
 <a name="tcparamsleep"></a>
 ####sleep
 
@@ -1048,7 +1025,7 @@ Example:
 Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
 
 Example:
-`parms="__SALMIN__={PARSEDRESULT20}&__SALMAX__={PARSEDRESULT21}"`
+`parms="__SALMIN__={20}&__SALMAX__={21}"`
 
 Allows you to create a xml template file then easily substitute in dynamic values at test run time.
 
@@ -1067,8 +1044,6 @@ Sample test cases using multiple parameters:
     postbody="username=corey&amp;password=welcome"
     verifypositive="verify this string exists"
     verifynegative="verify this string does not exist"
-    logrequest="yes"
-    logresponse="yes"
     sleep="3"
 />
 
@@ -1079,7 +1054,6 @@ Sample test cases using multiple parameters:
     method="get"
     url="http://myserver/test/send.jsp?value={TIMESTAMP}"
     verifypositive="verify this string exists"
-    verifynextpositive="{TIMESTAMP}"
 />
 ```
 
@@ -1094,8 +1068,6 @@ Here is a sample test case showing a "multipart/form-data" encoded form-based fi
     url="http://cgi-lib.berkeley.edu/ex/fup.cgi" 
     postbody="( upfile => ['config.xml'], note => 'MYCOMMENT' )" 
     posttype="multipart/form-data" 
-    logrequest="yes" 
-    logresponse="yes" 
     verifypositive="MYCOMMENT" 
 />
 ```
@@ -1269,30 +1241,13 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 **{CWD}** : Substituted with the current working directory
 
 
-**{PARSEDRESULT}** : Substituted with the result of the response parsing from a 'parseresponse' test case parameter
+**{}** : Substituted with the result of the response parsing from a 'parseresponse' test case parameter
 
+**{1}** : Substituted with the result of the response parsing from a 'parseresponse1' test case parameter
 
-**{PARSEDRESULT1}** : Substituted with the result of the response parsing from a 'parseresponse1' test case parameter
+**{5000}** : Substituted with the result of the response parsing from a 'parseresponse5000' test case parameter
 
-
-**{PARSEDRESULT2}** : Substituted with the result of the response parsing from a 'parseresponse2' test case parameter
-
-
-
-**{PARSEDRESULT3}** : Substituted with the result of the response parsing from a 'parseresponse3' test case parameter
-
-
-**{PARSEDRESULT4}** : Substituted with the result of the response parsing from a 'parseresponse4' test case parameter
-
-
-**{PARSEDRESULT5}** : Substituted with the result of the response parsing from a 'parseresponse5' test case parameter
-
-
-... and so on up to ...
-
-
-**{PARSEDRESULT30}** : Substituted with the result of the response parsing from a 'parseresponse30' test case parameter
-    
+**{ANYTHING}** : Substituted with the result of the response parsing from a 'parseresponseANYTHING' test case parameter
 
 
 (See the "Parsing Response Data &amp; Embedded Session ID's" section for details and examples on how to use these {PARSEDRESULT} variables)
@@ -1315,12 +1270,6 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 
 **{BASEURL5}** : Substituted with the value for 'baseurl5' specified in your config file
 
-
-... all the way up to ...
-
-
-**{BASEURL30}** : Substituted with the value for 'baseurl30' specified in your config file
-    
 
 {BASEURL} Example:
 
@@ -1378,12 +1327,8 @@ In each test case, you can set Verifications that will pass or fail depending on
 'verifynegative' - This Verification fails if the string you specified exists in the HTTP response you receive.
 
 
-'verifypositive1', 'verifypositive2', 'verifypositive3', 'verifynegative1', 'verifynegative2', 'verifynegative3'  
+'verifypositive5000', 'verifypositiveANYTHING', 'verifynegative1234', 'verifynegativeWHATEVERYOUWANT',  
 work the same way.
-
-
-'verifynextpositive' and 'verifynextnegative' work the same way, but the verification takes place on the next test case 
-rather than the current one.
 
 
 <a name="passfailhttpresp"></a>
@@ -1485,17 +1430,23 @@ ID string must be sent back to the server so it can identify the request and mat
 storing internally.  The client sends the string embedded in the URL or embedded in the post body data of each HTTP request.
 
 In order to do this, WebInject provides a method of parsing data from an HTTP response to be resent in subsequent requests.  This
-is done using the 'parseresponse' parameter and the '{PARSEDRESULT}' variable in your test cases.
+is done using the 'parseresponse' parameter and the '{}' variable in your test cases.
 
 
-There are also 5 additional parsing parameters/variables available if you need to parse multiple values from a single response.  
-They work the same as these and are named:
-parseresponse1/{PARSEDRESULT1}
-parseresponse2/{PARSEDRESULT2}
-parseresponse3/{PARSEDRESULT3} 
-parseresponse4/{PARSEDRESULT4}
-parseresponse5/{PARSEDRESULT5}
+There are also any number of additional parsing parameters/variables available if you need to parse multiple values from a single response.  
+They work the same as these and here are some examples:
 
+parseresponse1/{1}
+
+parseresponse5000/{5000}
+
+parseresponseUSERNAME/{USERNAME} 
+
+parseresponseUSERGUID/{USERGUID}
+
+parseresponseCOMPANYID/{COMPANYID}
+
+parseresponsePARSEDRESULT3/{PARSEDRESULT3}
 
 Note: This parsing mechanism may be used for any situation where you need to resend data to the server that was sent to you in 
 a previous response.  There are other circumstances besides maintaining session where this may be useful.
@@ -1526,15 +1477,15 @@ following parameter to your test case:
 
 
 This will grab whatever is between the left boundary (__VIEWSTATE" value=") and the right boundary (") and assign to the system variable 
-named {PARSEDRESULT}.  Since the 'escape' argument was used, it will also escape all of the non-alphanumeric characters with 
+named {}.  Since the 'escape' argument was used, it will also escape all of the non-alphanumeric characters with 
 their url hex values (.NET requires this).  (Notice I switched to using single quotes for the parameter value so it wouldn't get confused 
 with the double quotes I was using in my boundaries.)
 
 
-Whenever you use the {PARSEDRESULT} variable in a subsequent test case, it will be substituted with the last value you parsed:
+Whenever you use the {} variable in a subsequent test case, it will be substituted with the last value you parsed:
 
 
-`postbody="value=123&amp;__VIEWSTATE={PARSEDRESULT}"`
+`postbody="value=123&amp;__VIEWSTATE={}"`
 
 
 Will be sent to the server as:
@@ -1562,14 +1513,14 @@ You would add the following parameter to your test case:
 
 
 This will grab whatever is between the left boundary (JSESSIONID=) and the right boundary (;) and 
-assign to the system variable named {PARSEDRESULT}.
+assign to the system variable named {}.
 
 
 
-Now whenever you use the {PARSEDRESULT} variable in a subsequent test case, it will be substituted with the last value you parsed:
+Now whenever you use the {} variable in a subsequent test case, it will be substituted with the last value you parsed:
 
 
-`url="http://myserver/search.jsp?value=123&amp;;JSESSIONID={PARSEDRESULT}"`
+`url="http://myserver/search.jsp?value=123&amp;;JSESSIONID={}"`
 
 
 Will be sent to the server as: 
