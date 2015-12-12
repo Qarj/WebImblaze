@@ -222,7 +222,7 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 <a name="archdiagram"></a>
 ###1.1 - Architecture Diagram
 
-![alt text](https://github.com/Qarj/WebInject/tree/master/images/webinject_arch.gif "Architecture Diagram")
+![Alt text](/images/webinject_arch.gif?raw=true "Architecture Diagram")
 
 <a name="archsummary"></a>
 ###1.2 - Summary
