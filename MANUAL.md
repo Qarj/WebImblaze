@@ -1,6 +1,6 @@
 #Manual for WebInject version 1.42
 
-Udated from the original manual written by Corey Goldberg - find it at www.webinject.org
+Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
 ##Table of Contents
 
@@ -18,7 +18,7 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 
 [HTTP Authentication (httpauth)](#cfghttpauth)
 
-[Base URL (baseurl, baseurl1, baseurl2, ..., baseurl30)](#cfgbaseurl)
+[Base URL (baseurl, baseurl1, baseurl2, baseurl3, baseurl4, baseurl5)](#cfgbaseurl)
 
 [HTTP Logging (globalhttplog)](#cfghttplog)
 
@@ -26,13 +26,9 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 
 [Response Delay Timeout (timeout)](#cfgtimeout)
 
-[Plugin Mode (reporttype)](#cfgreporttype)
-
-[Global Timeout (globaltimeout)](#cfgglobaltimeout)
-
 [Global Retry (globalretry)](#cfgglobalretry)
 
-[Global constants (global1, global2, ..., global20)](#cfgglobalconstants)
+[Global constants (global1, global2, global3, global4, global5)](#cfgglobalconstants)
 
 [Test Only (testonly)](#cfgtestonly)
 
@@ -76,7 +72,7 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 
 [... and so on up to ...](#tcparamcommand2)
 
-[command15](#tcparamcommand15)
+[command20](#tcparamcommand20)
 
 [verifyresponsecode](#tcparamvercode)
 
@@ -86,29 +82,13 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 
 [verifypositive1](#tcparamverpos1)
 
-[verifypositive2](#tcparamverpos2)
-
-[verifypositive3](#tcparamverpos3)
-
-[... and so on up to ...](#tcparamverpos4)
-
-[verifypositive20](#tcparamverpos20)
+[verifypositiveHTML](#tcparamverposHTML)
 
 [verifynegative](#tcparamverneg)
 
 [verifynegative1](#tcparamverneg1)
 
-[verifynegative2](#tcparamverneg2)
-
-[verifynegative3](#tcparamverneg3)
-
-[... and so on up to ...](#tcparamverneg4)
-
-[verifynegative20](#tcparamverneg20)
-
-[verifynextpositive](#tcparamverposnext)
-
-[verifynextnegative](#tcparamvernegnext)
+[verifynegativeHTML](#tcparamvernegHTML)
 
 [assertcount](#tcparamassertcount)
 
@@ -292,10 +272,6 @@ example: `<baseurl>http://myserver</baseurl>`
 
 Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
-####baseurl2
-Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
-in the same way as the 'baseurl' example above.
-
  
 ... and so on up to ...
 
@@ -321,7 +297,7 @@ are written to the http.log file.  The available values you can set this to are:
 
 
 Note: If you also turn on logging for any individual test cases, it will produce duplicate log entries for the same 
-request/response.  Also, output logging is suppressed when running in a Plugin Mode (reporttype).
+request/response.
     
 <a name="cfgcomment"></a>
 ####comment
@@ -341,15 +317,6 @@ is 180 seconds.
 example: `<timeout>10</timeout>`
 
 Note: This timeout setting may not always work when using SSL/HTTPS.
-    
-<a name="cfgglobaltimeout"></a>
-####globaltimeout
-This setting is used when running in Nagios Plugin Mode (in combination with nagios reporttype).  The value [given in seconds] 
-will be compared to the global time elapsed to run all the tests. If the tests have all been successful, but have taken more 
-time than the 'globaltimeout' value, a warning message is sent back to Nagios.
-
-
-example: `<globaltimeout>10</globaltimeout>`
     
 <a name="cfgglobalretry"></a>
 ####globalretry
@@ -666,10 +633,10 @@ Additional command that will be run in the same Test Step, after "command" (if p
   
 
 ... and so on up to ...
-<a name="tcparamcommand15"></a>
-####command15
+<a name="tcparamcommand20"></a>
+####command20
 
-Additional command that will be run in the same Test Step, after "command14" (if present).
+Additional command that will be run in the same Test Step, after "command19" (if present).
     
 <a name="tcparamvercode"></a>
 ####verifyresponsecode
@@ -710,25 +677,16 @@ backslash:  `{}[]()^$.|*+?\`
 <a name="tcparamverpos1"></a>
 ####verifypositive1
 Additional positive verification. This works the same as 'verifypositive'.
-    
-<a name="tcparamverpos2"></a>
-####verifypositive2
-Additional positive verification. This works the same as 'verifypositive'.
-    
-<a name="tcparamverpos3"></a>
-####verifypositive3
 
-Additional positive verification. This works the same as 'verifypositive'.
+There is no limit to the number of verifypositives available, you can have verifypositive20, verifypositive5000 or whatever.
     
-<a name="tcparamverpos4"></a>
-  
-
-... and so on up to ...
-<a name="tcparamverpos20"></a>
-####verifypositive20
-
+<a name="tcparamverposHTML"></a>
+####verifypositiveHTML
 Additional positive verification. This works the same as 'verifypositive'.
 
+You can also put a text string at the end of a verifypositive to get additional verifypositives. You can put anything you like,
+for example verifypositiveWEBTRENDSTAG. Remember it will need to be XML compliant attribute name.
+    
 <a name="tcparamverneg"></a>
 ####verifynegative
 String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
@@ -743,35 +701,11 @@ backslash:  `{}[]()^$.|*+?\`
 <a name="tcparamverneg1"></a>
 ####verifynegative1
 
-Additional negative verification. This works the same as 'verifynegative'.
+Additional negative verification. This works the same as 'verifynegative'. See verifypositive1 for additional explanation.
     
-<a name="tcparamverneg2"></a>
-####verifynegative2
-Additional negative verification. This works the same as 'verifynegative'.
-    
-<a name="tcparamverneg3"></a>
-####verifynegative3
-Additional negative verification. This works the same as 'verifynegative'.
-    
-<a name="tcparamverneg4"></a>
-  
-
-... and so on up to ...
-    
-<a name="tcparamverneg20"></a>
-####verifynegative20
-Additional negative verification. This works the same as 'verifynegative'.
-    
-<a name="tcparamverposnext"></a>
-####verifynextpositive
-
-String in response for positive verification on next test case. Verification fails if this string does not exist in the 
-HTTP response of the next test case that is executed.
-    
-<a name="tcparamvernegnext"></a>
-####verifynextnegative
-String in response for negative verification on next test case. Verification fails if this string exists in the HTTP 
-response of the next test case that is executed.
+<a name="tcparamvernegHTML"></a>
+####verifynegativeHTML
+Additional negative verification. This works the same as 'verifynegative'. See verifypositiveHTML for additional explanation.
 
 <a name="tcparamassertcount"></a>
 ####assertcount
@@ -1118,10 +1052,6 @@ Example:
 
 Allows you to create a xml template file then easily substitute in dynamic values at test run time.
 
-
-
-
-
 <a name="tcfullexamp"></a>
 ###3.4 - Full Examples
 
@@ -1153,8 +1083,6 @@ Sample test cases using multiple parameters:
 />
 ```
 
-
-
 Here is a sample test case showing a "multipart/form-data" encoded form-based file upload:
 
 ```
@@ -1185,7 +1113,6 @@ Here is a sample test case showing usage of the "cmd" method:
 />
 ```
 
-
 <a name="tcnumcases"></a>
 ###3.5 - Numbering Test Cases and Execution Order
 
@@ -1194,14 +1121,10 @@ these numbers, not the physical position of the Test Case within your file.  You
 numbering and have them in any order in the file.
 
 
-
-
-
 <a name="tcxmltags"></a>
 ###3.6 - Parent XML Tags and Attributes (repeating test case files)
 
 Make sure your entire set of test cases is wrapped with the proper parent tags:
-
 
 
 Your file should begin with:
@@ -1218,11 +1141,9 @@ There is also a "repeat" attribute you can set within the parent tag to specify 
 like a file of test cases to run.
 
 
-
 For example, to have a test case file run 5 times, your file should open with:
 
 `<testcases repeat="5">`
-
 
 
 <a name="tcvalidxml"></a>
@@ -1232,7 +1153,6 @@ You may only use valid XML in your test cases.  Malformed XML or mixed content w
 that is used to read the test cases.
 
 
-
 However, you may find it necessary to use such characters within an XML Attribute to define your test case.  Most 
 of these situations are handled programmatically behind the scenes for you as a user.  For example, the "&amp;" 
 character would normally not be acceptable to an XML parser since it is a reserved character.  Since this character 
@@ -1240,9 +1160,7 @@ is used in URL query strings (which are necessary in many/most test cases), it i
 may use them within your test case XML.
 
 
-
 There are two special cases to be aware of:
-
 
 ####less than (<) character:
 
@@ -1250,11 +1168,9 @@ Anywhere you use this character in your test cases (except of course, enclosing 
 with a backslash (failure to do so will make the test case parser croak).
 
 
-
 For example, the following testcase parameter will not work like this:
 
 `verifypositive="<OPTION SELECTED>APPLE"`
-
 
 
 Instead, it should be written like:
@@ -1283,13 +1199,11 @@ is valid
 
 
 
-
 <a name="tcvarconst"></a>
 ###3.8 - Variables and Constants
 
 Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case 
 as a keyword contained within curly braces, and are evaluated/substituted at runtime.
-
 
     
 **{TIMESTAMP}** : Substituted with the current timestamp (floating seconds since the epoch, accurate to microseconds)
@@ -1381,11 +1295,7 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
     
 
 
-
-
 (See the "Parsing Response Data &amp; Embedded Session ID's" section for details and examples on how to use these {PARSEDRESULT} variables)
-
-
 
     
 **{BASEURL}** : Substituted with the value for 'baseurl' specified in your config file
@@ -1412,8 +1322,6 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 **{BASEURL30}** : Substituted with the value for 'baseurl30' specified in your config file
     
 
-
-
 {BASEURL} Example:
 
 If you a have a test case that uses the parameter:
@@ -1428,7 +1336,6 @@ This is helpful if you want to point your tests at different environments by cha
 
 You may also set constants in your test case file that you can reference from your test cases.  This makes it 
 convenient to change data in a single place that is easy to reference from multiple test cases. 
-
 
 
 The following example of a test case file shows how you can use them:
@@ -1456,12 +1363,8 @@ The following example of a test case file shows how you can use them:
 ```
 
 
-
-
 <a name="passfailcrit"></a>
 ##4 - Pass/Fail Criteria
-
-
 
 
 <a name="passfailverf"></a>
@@ -1471,21 +1374,16 @@ The following example of a test case file shows how you can use them:
 In each test case, you can set Verifications that will pass or fail depending on the existence of a specified text string 
 (or regex) in the content of the HTTP response you receive.
 
-
 'verifypositive' - This Verification fails if the string you specified does not exist in the HTTP response you receive. 
 'verifynegative' - This Verification fails if the string you specified exists in the HTTP response you receive.
-
 
 
 'verifypositive1', 'verifypositive2', 'verifypositive3', 'verifynegative1', 'verifynegative2', 'verifynegative3'  
 work the same way.
 
 
-
 'verifynextpositive' and 'verifynextnegative' work the same way, but the verification takes place on the next test case 
 rather than the current one.
-
-
 
 
 <a name="passfailhttpresp"></a>
@@ -1494,17 +1392,13 @@ rather than the current one.
 In each test case, you can set a Verifications that will pass or fail depending on the HTTP response code.
 
 
-
 'verifyresponsecode' - This Verification fails if the HTTP response code you specified does not match the HTTP response code 
 you receive.
-
 
 
 If you do not specify this test case parameter, the HTTP Response Code Verification is marked as "Failed" if the HTTP request 
 returns an HTTP response code that is not in the success range (100-399).  It is marked as "Passed" if the HTTP 
 Response Code is in the success range (100-399).
-
-
 
 
 <a name="passfailcases"></a>
@@ -1516,14 +1410,8 @@ HTTP Response Code Verification passes, the test case is marked as "PASSED".  Th
 real-time during execution.
 
 
-
-
-
-
-
 <a name="output"></a>
 ##5 - Output/Results/Reporting
-
 
 <a name="outputhtml"></a>
 ###5.1 - Results File in HTML format (results.html)
@@ -1536,12 +1424,6 @@ well as information generated from the test engine (test case pass/fail status, 
 This is where the most detailed results data can be found.
 
 
-Note: Most output logging is suppressed when running in a Plugin Mode (reporttype).
-
-
-
-
-
 <a name="outputxml"></a>
 ###5.2 - Results File in XML format (results.xml)
 
@@ -1551,22 +1433,12 @@ The file contains data passed from the test case file (test case identifiers/des
 well as information generated from the test engine (test case pass/fail status, execution times, etc).
 
 
-Note: Most output logging is suppressed when running in a Plugin Mode (reporttype).
-
-
-
-
-
 <a name="outputstdout"></a>
 ###5.3 - Results in STDOUT
 
 If you are running the WebInject Engine (webinject.pl) as a standalone test runner (text/console application),
 results are sent [in plain text format] to the STDOUT channel as the tests execute.  The same level of detail that 
 is written to results.html is also written here.
-
-
-Note: The results sent to STDOUT will be different if when running in a Plugin Mode (reporttype).
-
 
 
 <a name="outputhttp"></a>
@@ -1580,16 +1452,11 @@ test case.  See the "Configuration - Configuration File (config.xml)" and "Test 
 sections of this manual for more information on logging to the http.log file.
 
 
-Note: Most output logging is suppressed when running in a Plugin Mode (reporttype).
 Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoing HTTP POST requests, but are not shown in http.log.  
-
-
-
 
 
 <a name="sessstate"></a>
 ##6 - Session Handling and State Management
-
 
 
 <a name="sesssummary"></a>
@@ -1601,16 +1468,12 @@ client connections to be tracked and connection-specific data to be maintained. 
 state during a session, then your test tool must be able to handle this as well.
 
 
-
-
 <a name="sesscookie"></a>
 ###6.2 - Cookies
 
 One way to maintain session state is with HTTP Cookies.  WebInject automatically handles Cookies for you (like a browser would). 
 When a "Set-Cookie" is sent back in the HTTP header from the web server, the Cookie is automatically stored and sent back with 
 subsequent requests to the domain it was set from.
-
-
 
 
 <a name="sessid"></a>
@@ -1621,12 +1484,8 @@ to the content of the HTTP response that is sent to the client.  When the client
 ID string must be sent back to the server so it can identify the request and match it with a unique session variable it is 
 storing internally.  The client sends the string embedded in the URL or embedded in the post body data of each HTTP request.
 
-
-
 In order to do this, WebInject provides a method of parsing data from an HTTP response to be resent in subsequent requests.  This
 is done using the 'parseresponse' parameter and the '{PARSEDRESULT}' variable in your test cases.
-
-
 
 
 There are also 5 additional parsing parameters/variables available if you need to parse multiple values from a single response.  
@@ -1638,12 +1497,8 @@ parseresponse4/{PARSEDRESULT4}
 parseresponse5/{PARSEDRESULT5}
 
 
-
 Note: This parsing mechanism may be used for any situation where you need to resend data to the server that was sent to you in 
 a previous response.  There are other circumstances besides maintaining session where this may be useful.
-
-
-
 
 
 ####Example of maintaining the ViewState with ASP.NET:
@@ -1676,9 +1531,7 @@ their url hex values (.NET requires this).  (Notice I switched to using single q
 with the double quotes I was using in my boundaries.)
 
 
-
 Whenever you use the {PARSEDRESULT} variable in a subsequent test case, it will be substituted with the last value you parsed:
-
 
 
 `postbody="value=123&amp;__VIEWSTATE={PARSEDRESULT}"`
@@ -1690,13 +1543,10 @@ Will be sent to the server as:
 `value=123&amp;__VIEWSTATE=dDwtNTA4NzczMzUxMjs6Ps1HmLfiYGewI%2b2JaAxhcpiCtj52`
 
 
-
-
 ####Example of parsing the Session ID from an HTTP response header and sending it as part of the URL:
 
 You may receive a Session ID in a HTTP response header that needs to be parsed 
 and resent to the server as part of a URL rather than in a cookie.
-
 
 
 To parse the Session ID from a header that contains:
