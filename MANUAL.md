@@ -4,152 +4,217 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 
 ##Table of Contents
 
-[1.1 - Architecture Diagram](#archdiagram)
+###[1.1 - Architecture Diagram](#archdiagram)
 
-    [1.2 - Summary](#archsummary)
+###[1.2 - Summary](#archsummary)
 
-[2 - Configuration](#cfg)
+##[2 - Configuration](#cfg)
 
-    [2.1 - Configuration File (config.xml)](#cfgfile)
+###[2.1 - Configuration File (config.xml)](#cfgfile)
 
-        [Proxy Server (proxy)](#cfgproxy)
-        [User-Agent (useragent)](#cfguseragent)
-        [HTTP Authentication (httpauth)](#cfghttpauth)
-        [Base URL (baseurl, baseurl1, baseurl2, ..., baseurl30)](#cfgbaseurl)
-        [HTTP Logging (globalhttplog)](#cfghttplog)
-        
-        [Comments (comment)](#cfgcomment)
-        [Response Delay Timeout (timeout)](#cfgtimeout)
-        [Plugin Mode (reporttype)](#cfgreporttype)
-        [Global Timeout (globaltimeout)](#cfgglobaltimeout)
-        [Global Retry (globalretry)](#cfgglobalretry)
-        [Plotter Path (gnuplot)](#cfggnuplot)
-        [Standalone Mode Plotting (standaloneplot)](#cfgstandaloneplot)
-        [Global constants (global1, global2, ..., global20)](#cfgglobalconstants)
-        [Test Only (testonly)](#cfgtestonly)
+[Proxy Server (proxy)](#cfgproxy)
 
-    [2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
-    [2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
-        [Available Command Line Options](#cfgavailopts)
+[User-Agent (useragent)](#cfguseragent)
 
-        [Passing a Test Case Filename](#cfgpassingfile)
-        [XPath/XNode](#cfgxpathxnode)
-        [More Examples of Command Line Usage](#cfgcmdlinexampls)
+[HTTP Authentication (httpauth)](#cfghttpauth)
 
-        [3 - Test Case Setup](#tcsetup)
-            [3.1 - Summary](#tcsummary)
-            [3.2 - Minimal Example](#tcminexamp)
-            [3.3 - Available Parameters](#tcavailparams)
+[Base URL (baseurl, baseurl1, baseurl2, ..., baseurl30)](#cfgbaseurl)
 
-                    [id](#tcparamid)
-                    [description1](#tcparamdesc1)
-                    [description2](#tcparamdesc2)
-                    [method](#tcparammethod)
-                    [url](#tcparamurl)
+[HTTP Logging (globalhttplog)](#cfghttplog)
 
-                    [posttype](#tcparamposttype)
-                    [postbody](#tcparampostbody)
-                    [command](#tcparamcommand)
-                    [command1](#tcparamcommand1)
-                    [... and so on up to ...](#tcparamcommand2)
-                    [command15](#tcparamcommand15)
-                    [verifyresponsecode](#tcparamvercode)
-                    [retryresponsecode](#tcparamretryresponsecode)
-                    [verifypositive](#tcparamverpos)
-                    [verifypositive1](#tcparamverpos1)
-                    [verifypositive2](#tcparamverpos2)
+[Comments (comment)](#cfgcomment)
 
-                    [verifypositive3](#tcparamverpos3)
-                    [... and so on up to ...](#tcparamverpos4)
-                    [verifypositive20](#tcparamverpos20)
-                    [verifynegative](#tcparamverneg)
-                    [verifynegative1](#tcparamverneg1)
-                    [verifynegative2](#tcparamverneg2)
-                    [verifynegative3](#tcparamverneg3)
-                    [... and so on up to ...](#tcparamverneg4)
-                    [verifynegative20](#tcparamverneg20)
-                    [verifynextpositive](#tcparamverposnext)
-                    [verifynextnegative](#tcparamvernegnext)
-                    [assertcount](#tcparamassertcount)
-                    [searchimage](#tcparamsearchimage)
-                    [searchimage1](#tcparamsearchimage1)
-                    [... and so on up to ...](#tcparamsearchimage2)
-                    [searchimage5](#tcparamsearchimage5)
-                    [verifytext](#tcparamverifytext)
-                    [checkpositive](#tcparamcheckpositive)
-                    [checknegative](#tcparamchecknegative)
-                    [checkresponsecode](#tcparamcheckresponsecode)
-                    [ignorehttpresponsecode](#tcparamignorehttpresponsecode)
-                    [screenshot](#tcparamscreenshot)
-                    [logrequest](#tcparamlogreq)
-                    [logresponse](#tcparamlogresp)
-                    [parseresponse](#tcparamparse)
-                    [parseresponse1](#tcparamparse1)
-                    [parseresponse2](#tcparamparse2)
+[Response Delay Timeout (timeout)](#cfgtimeout)
 
-                    [parseresponse3](#tcparamparse3)
-                    [parseresponse4](#tcparamparse4)
-                    [parseresponse5](#tcparamparse5)
-                    [... and so on up to ...](#tcparamparse6)
-                    [parseresponse40](#tcparamparse40)
-                    [sleep](#tcparamsleep)
-                    [errormessage](#tcparamerrmsg)
-                    [addcookie](#tcparamaddcookie)
-                    [addheader](#tcparamaddheader)
-                    [retry](#tcparamretry)
-                    [sanitycheck](#tcparamsanitycheck)
-                    [testonly](#tcparamtestonly)
-                    [autocontrolleronly](#tcparamautocontrolleronly)
-                    [logastext](#tcparamlogastext)
-                    [formatxml](#tcparamformatxml)
-                    [logresponseasfile](#tcparamlogresponseasfile)
-                    [section](#tcparamsection)
-                    [parms](#tcparamparms)
+[Plugin Mode (reporttype)](#cfgreporttype)
 
-            [3.4 - Full Examples](#tcfullexamp)
-            [3.5 - Numbering Test Cases and Execution Order](#tcnumcases)
-            [3.6 - Parent XML Tags and Attributes (repeating test case files)](#tcxmltags)
-            [3.7 - Valid XML and Using Reserved XML Characters](#tcvalidxml)
-            [3.8 - Variables and Constants](#tcvarconst)
+[Global Timeout (globaltimeout)](#cfgglobaltimeout)
 
-        [4 - Pass/Fail Criteria](#passfailcrit)
-            [4.1 - Verifications](#passfailverf)
-            [4.2 - HTTP Response Code Verification](#passfailhttpresp)
+[Global Retry (globalretry)](#cfgglobalretry)
 
-            [4.3 - Test Case Pass/Fail Status](#passfailcases)
+[Global constants (global1, global2, ..., global20)](#cfgglobalconstants)
 
-        [5 - Output/Results/Reporting](#output)
-            [5.1 - Results Display in the User Interface (Status, Monitor, RT Graph)](#outputui)
-            [5.2 - Results File in HTML format (results.html)](#outputhtml)
-            [5.3 - Results File in XML format (results.xml)](#outputxml)
-            [5.4 - Results in STDOUT](#outputstdout)
-            [5.5 - HTTP Log File (http.log)](#outputhttp)
+[Test Only (testonly)](#cfgtestonly)
 
-        [6 - Session Handling and State Management](#sessstate)
-            [6.1 - Summary](#sesssummary)
-            [6.2 - Cookies](#sesscookie)
-            [6.3 - Parsing Response Data & Embedded Session ID's (Cookieless)](#sessid)
+###[2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
 
-        [7 - User Interface (GUI)](#userinterface)
-            [7.1 - General](#uigeneral)
-                    [Summary](#uisummary)
-                    [Status Bar](#uistatusbar)
-                    [Engine Status Window](#uienginestatus)
-                    [Status Light](#uistatuslight)
-                    [Disable Monitor](#uidisablemon)
-            [7.2 - Status Window](#uistatuswin)
-                    [Minimal Output](#uiminoutput)
-                    [Response Timer Output](#uitimeroutput)
+###[2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
 
-            [7.3 - Monitor Window](#uimonwindow)
-                    [Response Time Graph](#uirtgraph)
-                    [Response Times](#uiresptime)
-                    [Runtime Counts](#uiruncount)
+[Available Command Line Options](#cfgavailopts)
 
-                    [Line Graph](#uilinegraph)
-                    [Impulse Graph](#uiimpulsegraph)
-                    [No Graph](#uinograph)
-                    [Clear Graph](#uicleargraph)
+[Passing a Test Case Filename](#cfgpassingfile)
+
+[XPath/XNode](#cfgxpathxnode)
+
+[More Examples of Command Line Usage](#cfgcmdlinexampls)
+
+##[3 - Test Case Setup](#tcsetup)
+
+###[3.1 - Summary](#tcsummary)
+
+###[3.2 - Minimal Example](#tcminexamp)
+
+###[3.3 - Available Parameters](#tcavailparams)
+
+[id](#tcparamid)
+
+[description1](#tcparamdesc1)
+
+[description2](#tcparamdesc2)
+
+[method](#tcparammethod)
+
+[url](#tcparamurl)
+
+[posttype](#tcparamposttype)
+
+[postbody](#tcparampostbody)
+
+[command](#tcparamcommand)
+
+[command1](#tcparamcommand1)
+
+[... and so on up to ...](#tcparamcommand2)
+
+[command15](#tcparamcommand15)
+
+[verifyresponsecode](#tcparamvercode)
+
+[retryresponsecode](#tcparamretryresponsecode)
+
+[verifypositive](#tcparamverpos)
+
+[verifypositive1](#tcparamverpos1)
+
+[verifypositive2](#tcparamverpos2)
+
+[verifypositive3](#tcparamverpos3)
+
+[... and so on up to ...](#tcparamverpos4)
+
+[verifypositive20](#tcparamverpos20)
+
+[verifynegative](#tcparamverneg)
+
+[verifynegative1](#tcparamverneg1)
+
+[verifynegative2](#tcparamverneg2)
+
+[verifynegative3](#tcparamverneg3)
+
+[... and so on up to ...](#tcparamverneg4)
+
+[verifynegative20](#tcparamverneg20)
+
+[verifynextpositive](#tcparamverposnext)
+
+[verifynextnegative](#tcparamvernegnext)
+
+[assertcount](#tcparamassertcount)
+
+[searchimage](#tcparamsearchimage)
+
+[searchimage1](#tcparamsearchimage1)
+
+[... and so on up to ...](#tcparamsearchimage2)
+
+[searchimage5](#tcparamsearchimage5)
+
+[verifytext](#tcparamverifytext)
+
+[checkpositive](#tcparamcheckpositive)
+
+[checknegative](#tcparamchecknegative)
+
+[checkresponsecode](#tcparamcheckresponsecode)
+
+[ignorehttpresponsecode](#tcparamignorehttpresponsecode)
+
+[screenshot](#tcparamscreenshot)
+
+[logrequest](#tcparamlogreq)
+
+[logresponse](#tcparamlogresp)
+
+[parseresponse](#tcparamparse)
+
+[parseresponse1](#tcparamparse1)
+
+[parseresponse2](#tcparamparse2)
+
+
+[parseresponse3](#tcparamparse3)
+
+[parseresponse4](#tcparamparse4)
+
+[parseresponse5](#tcparamparse5)
+
+[... and so on up to ...](#tcparamparse6)
+
+[parseresponse40](#tcparamparse40)
+
+[sleep](#tcparamsleep)
+
+[errormessage](#tcparamerrmsg)
+
+[addcookie](#tcparamaddcookie)
+
+[addheader](#tcparamaddheader)
+
+[retry](#tcparamretry)
+
+[sanitycheck](#tcparamsanitycheck)
+
+[testonly](#tcparamtestonly)
+
+[autocontrolleronly](#tcparamautocontrolleronly)
+
+[logastext](#tcparamlogastext)
+
+[formatxml](#tcparamformatxml)
+
+[logresponseasfile](#tcparamlogresponseasfile)
+
+[section](#tcparamsection)
+
+[parms](#tcparamparms)
+
+###[3.4 - Full Examples](#tcfullexamp)
+
+###[3.5 - Numbering Test Cases and Execution Order](#tcnumcases)
+
+###[3.6 - Parent XML Tags and Attributes (repeating test case files)](#tcxmltags)
+
+###[3.7 - Valid XML and Using Reserved XML Characters](#tcvalidxml)
+
+###[3.8 - Variables and Constants](#tcvarconst)
+
+##[4 - Pass/Fail Criteria](#passfailcrit)
+
+###[4.1 - Verifications](#passfailverf)
+
+###[4.2 - HTTP Response Code Verification](#passfailhttpresp)
+
+###[4.3 - Test Case Pass/Fail Status](#passfailcases)
+
+##[5 - Output/Results/Reporting](#output)
+
+###[5.1 - Results File in HTML format (results.html)](#outputhtml)
+
+###[5.2 - Results File in XML format (results.xml)](#outputxml)
+
+###[5.3 - Results in STDOUT](#outputstdout)
+
+###[5.4 - HTTP Log File (http.log)](#outputhttp)
+
+##[6 - Session Handling and State Management](#sessstate)
+
+###[6.1 - Summary](#sesssummary)
+
+###[6.2 - Cookies](#sesscookie)
+
+###[6.3 - Parsing Response Data & Embedded Session ID's (Cookieless)](#sessid)
+
 
 <a name="archsoft"></a>
 ##1 - Software Architecture
@@ -157,7 +222,7 @@ Udated from the original manual written by Corey Goldberg - find it at www.webin
 <a name="archdiagram"></a>
 ###1.1 - Architecture Diagram
 
-<img src="images/webinject_arch.gif" alt="architecture" />
+![alt text](https://github.com/qarj/WebInject/images/webinject_arch.gif "architecture")
 
 <a name="archsummary"></a>
 ###1.2 - Summary
@@ -182,195 +247,135 @@ All settings and constants must be enclosed in the proper tags, and simply need 
 
 Available config settings are:
 
-        <a name="cfgproxy"></a>
-        ####proxy
-        Specifies a proxy server to route all HTTP requests through.
+<a name="cfgproxy"></a>
+####proxy
+Specifies a proxy server to route all HTTP requests through.
 
-        example: `<proxy>http://127.0.0.1:8080</proxy>`
+example: `<proxy>http://127.0.0.1:8080</proxy>`
 
-        You can also do proxy authentication like this:
+You can also do proxy authentication like this:
 
-        example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
-            
-        <a name="cfguseragent"></a>
+example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
+    
+<a name="cfguseragent"></a>
 
-        ####useragent
-        Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default 
-        User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
+####useragent
+Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default 
+User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
 
-        example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>`
-            
-        <a name="cfghttpauth"></a>
-        ####httpauth
+example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>`
+    
+<a name="cfghttpauth"></a>
+####httpauth
 
-        Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response 
-        authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication 
-        information.  This configuration parameter takes a list of 5 colon delimited values that correspond to:
-        <em>servername:portnumber:realm-name:username:password</em>
-        
-        example: `<httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>`
-        
-        You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
-        
-        example: `<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>`
-        
-        Note: You may include multiple <httpauth></httpauth> elements in your config files to support multiple sets of HTTP 
-        Authentication credentials.
-            
-        <a name="cfgbaseurl"></a>
+Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response 
+authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication 
+information.  This configuration parameter takes a list of 5 colon delimited values that correspond to:
+<em>servername:portnumber:realm-name:username:password</em>
 
-        ####baseurl
-        Creates the constant {BASEURL} which can be used in test cases (see 'Variables and Constants' section below).
-        
-        example: `<baseurl>http://myserver</baseurl>`
-        ####baseurl1
+example: `<httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>`
 
-        Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
-        in the same way as the 'baseurl' example above.
-        ####baseurl2
-        Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
-        in the same way as the 'baseurl' example above.
+You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
 
-         
-        ... and so on up to ...
+example: `<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>`
 
-        ####baseurl5
-        Creates the constant {BASEURL5} which can be used in test cases (see 'Variables and Constants' section below).  This works
-        in the same way as the 'baseurl' example above.
-            
-        <a name="cfghttplog"></a>
-        ####globalhttplog
-        Enables logging of HTTP requests/responses for all test cases.  The HTTP requests sent and HTTP responses received 
-        are written to the http.log file.  The available values you can set this to are:
-        
-            
+Note: You may include multiple <httpauth></httpauth> elements in your config files to support multiple sets of HTTP 
+Authentication credentials.
+    
+<a name="cfgbaseurl"></a>
 
-                **yes** - log HTTP for all test cases
-                example: `<globalhttplog>yes</globalhttplog>`
-            
-            
-                **onfail** - log HTTP for test cases that fail only
+####baseurl
+Creates the constant {BASEURL} which can be used in test cases (see 'Variables and Constants' section below).
 
-                example: `<globalhttplog>onfail</globalhttplog>`
-            
-        
-        
-        Note: If you also turn on logging for any individual test cases, it will produce duplicate log entries for the same 
-        request/response.  Also, output logging is suppressed when running in a Plugin Mode (reporttype).
-            
-        <a name="cfgcomment"></a>
-        ####comment
+example: `<baseurl>http://myserver</baseurl>`
+####baseurl1
 
-        Allows you to comment out parts of your config file.  Anything contained within comment tags will not be processed.
-        (I know it is braindead that we don't allow regular XML-style comments here.. sorry)
-        
-        example: `<comment>this will be ignored</comment>`
-            
-        <a name="cfgtimeout"></a>
-        ####timeout
-        Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than 
-        this threshold, the HTTP request times out and the case is marked as failed.  The default timeout if you do not specify one
-        is 180 seconds.
+Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
+in the same way as the 'baseurl' example above.
+####baseurl2
+Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
+in the same way as the 'baseurl' example above.
 
-        
-        example: `<timeout>10</timeout>`
-        
-        Note: This timeout setting may not always work when using SSL/HTTPS.
-            
-        <a name="cfgreporttype"></a>
-        ####reporttype
-        This setting is used to enable output formatting that is compatible for use with specific external programs. 
-        The available values you can set this to are:
+ 
+... and so on up to ...
 
-        
-        
-            
-                **nagios** - Output of WebInject in console mode will be compatible for use as a plugin for the 
-                Nagios monitoring program.
-                Example: `<reporttype>nagios</reporttype>`
+####baseurl5
+Creates the constant {BASEURL5} which can be used in test cases (see 'Variables and Constants' section below).  This works
+in the same way as the 'baseurl' example above.
+    
+<a name="cfghttplog"></a>
+####globalhttplog
+Enables logging of HTTP requests/responses for all test cases.  The HTTP requests sent and HTTP responses received 
+are written to the http.log file.  The available values you can set this to are:
 
-            
-            
-                **mrtg** - Output of WebInject in console mode will be compatible for use as a plugin (external
-                monitoring script) for the MRTG (Multi Router Traffic Grapher) program.
-                Example: `<reporttype>mrtg</reporttype>`
-            
+    
 
-            
-                **external** - Calls an external Perl module for post processing.  You may write a Perl module that
-                will be called after WebInject is finished running.  Your module may access any of WebInject's global variables.  This can
-                be used to integrate with other external programs or to do any type of data processing at the end of your test run.
-                Example: `<reporttype>standard:Plugin.pm</reporttype>`
-                Sample Plugin.pm - this will send an email after WebInject runs:
-                `$message = "Passed: $casepassedcount,  Failed: $casefailedcount"; 
-exec(qq~ echo $message | mailx -s "WebInject Results" corey\@webinject.org ~);` <!-- keep far left indented -->
+        **yes** - log HTTP for all test cases
+        example: `<globalhttplog>yes</globalhttplog>`
+    
+    
+        **onfail** - log HTTP for test cases that fail only
+
+        example: `<globalhttplog>onfail</globalhttplog>`
+    
 
 
-            
-            
-                **standard** - Standard formatted output mode (omitting this setting 
-                defaults to 'standard' mode).
-                Example: `<reporttype>standard</reporttype>`
+Note: If you also turn on logging for any individual test cases, it will produce duplicate log entries for the same 
+request/response.  Also, output logging is suppressed when running in a Plugin Mode (reporttype).
+    
+<a name="cfgcomment"></a>
+####comment
 
-            
-        
-        
-        Note: Most output logging is suppressed when running in a Plugin Mode (reporttype).
-            
-        <a name="cfgglobaltimeout"></a>
-        ####globaltimeout
-        This setting is used when running in Nagios Plugin Mode (in combination with nagios reporttype).  The value [given in seconds] 
-        will be compared to the global time elapsed to run all the tests. If the tests have all been successful, but have taken more 
-        time than the 'globaltimeout' value, a warning message is sent back to Nagios.
-        
+Allows you to comment out parts of your config file.  Anything contained within comment tags will not be processed.
+(I know it is braindead that we don't allow regular XML-style comments here.. sorry)
 
-        example: `<globaltimeout>10</globaltimeout>`
-            
-        <a name="cfgglobalretry"></a>
-        ####globalretry
-        This setting is used along with the retry parameter in a test case. It limits the number of retry attempts in a test run.
-        For example, consider 3 test cases each set to retry 40 times, along with a globalretry value of 50. If the test run is going
-        badly, then there will be no more than 50 retry attempts rather than 120.
-        
-
-        example: `<globalretry>50</globalretry>`
-
-        <a name="cfggnuplot"></a>
-        ####gnuplot
-        Defines the path/location of the gnuplot executable on your system.  This is only necessary to set if would like to have 
-        WebInject use gnuplot to create response time graphs and you have gnuplot installed somewhere on your system that is not 
-        on your PATH.
-        
-        example: `<gnuplot>/usr/bin/gnuplot</gnuplot>`
-
-            
-        <a name="cfgstandaloneplot"></a>
-        ####standaloneplot
-        Tells WebInject to create response time graphs when running in standalone/console mode (webinject.pl).  Unless this is set to 
-        'on', plotting/graphing is only available in GUI mode.  A PNG image (plot.png) is generated in the current [webinject] directory.
-        
-        example: `<standaloneplot>on</standaloneplot>`
-
-            
-        <a name="cfgglobalconstants"></a>
-        ####global1 to global20
-        Allows you to specify up to 20 custom global constants for use across all test case files.
-        
-        example: `<global1>20</global1>`
-        You could use it in a test case as the sleep time (for example):
-        `sleep="{GLOBAL1}"`
-
-        <a name="cfgtestonly"></a>
-        ####testonly
-        Used in conjunction with the testonly test case parameter. If this configuration item is present
-        and set to any value, the test cases with the testonly parameter set will be run.
-        
-        example: `<testonly>Allow</testonly>`
-        To use this feature, specify this value in your test config files, and leave it out of your
-        config files for your live servers.
+example: `<comment>this will be ignored</comment>`
+    
+<a name="cfgtimeout"></a>
+####timeout
+Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than 
+this threshold, the HTTP request times out and the case is marked as failed.  The default timeout if you do not specify one
+is 180 seconds.
 
 
+example: `<timeout>10</timeout>`
 
+Note: This timeout setting may not always work when using SSL/HTTPS.
+    
+<a name="cfgglobaltimeout"></a>
+####globaltimeout
+This setting is used when running in Nagios Plugin Mode (in combination with nagios reporttype).  The value [given in seconds] 
+will be compared to the global time elapsed to run all the tests. If the tests have all been successful, but have taken more 
+time than the 'globaltimeout' value, a warning message is sent back to Nagios.
+
+
+example: `<globaltimeout>10</globaltimeout>`
+    
+<a name="cfgglobalretry"></a>
+####globalretry
+This setting is used along with the retry parameter in a test case. It limits the number of retry attempts in a test run.
+For example, consider 3 test cases each set to retry 40 times, along with a globalretry value of 50. If the test run is going
+badly, then there will be no more than 50 retry attempts rather than 120.
+
+
+example: `<globalretry>50</globalretry>`
+    
+<a name="cfgglobalconstants"></a>
+####global1 to global20
+Allows you to specify up to 20 custom global constants for use across all test case files.
+
+example: `<global1>20</global1>`
+You could use it in a test case as the sleep time (for example):
+`sleep="{GLOBAL1}"`
+
+<a name="cfgtestonly"></a>
+####testonly
+Used in conjunction with the testonly test case parameter. If this configuration item is present
+and set to any value, the test cases with the testonly parameter set will be run.
+
+example: `<testonly>Allow</testonly>`
+To use this feature, specify this value in your test config files, and leave it out of your
+config files for your live servers.
 
 
 <a name="cfgfilenamescfg"></a>
@@ -388,9 +393,11 @@ files are processed in the order they appear in your config file.
 A configuration file listing 3 test case files to process (tests_1.xml, tests_2.xml, tests_3.xml) may look something like:
 
 
-`<testcasefile>tests_1.xml</testcasefile>
+```
+<testcasefile>tests_1.xml</testcasefile>
 <testcasefile>tests_2.xml</testcasefile>
-<testcasefile>tests_3.xml</testcasefile>`
+<testcasefile>tests_3.xml</testcasefile>
+````
 
 
 Note: You can also use relative path names to point to test case files located in other directories or subdirectories.
@@ -401,16 +408,11 @@ Note: You can also use relative path names to point to test case files located i
 <a name="cfgcmdlineopts"></a>
 ###2.3 - Command Line Options and Specifying Alternate Test Case/Config Files
 
-You can run the WebInject Engine (webinject.pl) in standalone/console mode by calling it directly from the command line rather 
-than from the [webinjectgui] GUI.  When you do this, you can optionally pass it a test case file name and several command line 
-options.
-
-
+WebInject is called from the command line and has several command line options.
 
 Usage:
 
-`webinject.pl [-c|--config config_file] [-o|--output output_location] 
-             [-n|--no-output] [testcase_file [XPath]]`
+`webinject.pl [-c|--config config_file] [-o|--output output_location] [-n|--no-output] [testcase_file [XPath]]`
 
 
 
@@ -424,51 +426,45 @@ Usage:
 <a name="cfgavailopts"></a>
 ####Available Command Line Options
 
-    **-c** or **--config** : This option is followed by a config file name.  This is used to specify an 
-                                        alternate configuration file besides the default (config.xml).  To specify a config file in a different 
-                                        directory, you must use the relative path to it.
+**-c** or **--config** : This option is followed by a config file name.  This is used to specify an 
+alternate configuration file besides the default (config.xml).  To specify a config file in a different 
+directory, you must use the relative path to it.
 
-                                        Note: relative path from the webinject directory.
-    **-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output 
-                                        files.  This is used to specify the location for writing output files (http.log, results.html, and 
-                                        results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to 
-                                        add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted, 
-                                        it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination 
-                                        of a directory and prefix.
+Note: relative path from the webinject directory.
+**-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output 
+files.  This is used to specify the location for writing output files (http.log, results.html, and 
+results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to 
+add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted, 
+it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination 
+of a directory and prefix.
                                         
-                                        To clarify, here are some examples:
-                                        
-
-                                        To have all your output files written to the /foo directory: 
-                                        `perl webinject.pl -o /foo/`
-                                        
-                                        To have all your output files written to the foo subdirectory under your WebInject home directory:
-                                        `perl webinject.pl -o ./foo/`
-                                        
-                                        To create a prefix for your output files (this will create output files named foohttp.log, fooresults.html, 
-                                        and fooresults.xml in the WebInject home directory):
-                                        `perl webinject.pl -o foo`
-                                        
-                                        To use a combination of a directory and a prefix (this will create output files named foohttp.log, 
-                                        fooresults.html, and fooresults.xml in the /bar directory): 
-                                        `perl webinject.pl -o /bar/foo`
-
-                                        
-                                        Note: MS Windows style directory naming also works. 
-                                        Note: You must still have write access to the directory where WebInject resides, even when writing output 
-                                        elsewhere.
-                                        
-    **-n** or **--no-output** : Suppresses all output to STDOUT except the results summary.
-    **-a** or **--autocontroller** : Specifies to run autocontrolleronly testcases.
-    **-v** or **--version** : Displays the version number and other information.
+To clarify, here are some examples:
 
 
+To have all your output files written to the /foo directory: 
+`perl webinject.pl -o /foo/`
 
+To have all your output files written to the foo subdirectory under your WebInject home directory:
+`perl webinject.pl -o ./foo/`
+
+To create a prefix for your output files (this will create output files named foohttp.log, fooresults.html, 
+and fooresults.xml in the WebInject home directory):
+`perl webinject.pl -o foo`
+
+To use a combination of a directory and a prefix (this will create output files named foohttp.log, 
+fooresults.html, and fooresults.xml in the /bar directory): 
+`perl webinject.pl -o /bar/foo`
+
+
+Note: MS Windows style directory naming also works. 
+Note: You must still have write access to the directory where WebInject resides, even when writing output 
+elsewhere.
+                                        
+**-n** or **--no-output** : Suppresses all output to STDOUT except the results summary.
+**-a** or **--autocontroller** : Specifies to run autocontrolleronly testcases.
+**-v** or **--version** : Displays the version number and other information.
 
 Note: Command line options are only available when launching the WebInject Engine (webinject.pl) on its own, not from the GUI.
-
-
-
 
 <a name="cfgpassingfile"></a>
 ####Passing a Test Case Filename
@@ -593,536 +589,534 @@ A minimal test case may look something like:
 <a name="tcavailparams"></a>
 ###3.3 - Available Parameters
 
-<div class="manuallist">
+<a name="tcparamid"></a>
+####id
+Test case identifier used to identify the test case and set it's execution order.
     
-    <a name="tcparamid"></a>
-    ####id
-    Test case identifier used to identify the test case and set it's execution order.
-        
-    <a name="tcparamdesc1"></a>
-    ####description1
+<a name="tcparamdesc1"></a>
+####description1
 
-    Text description for results report.
-        
-    <a name="tcparamdesc2"></a>
-    ####description2
-    Text description for results report.
-        
-    <a name="tcparammethod"></a>
-    ####method
-    HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
+Text description for results report.
     
-    A special methhod of "cmd" is also supported, which will run a shell command through the backtick method. See the
-    full examples section for an example.
-        
-    <a name="tcparamurl"></a>
-    ####url
+<a name="tcparamdesc2"></a>
+####description2
+Text description for results report.
+    
+<a name="tcparammethod"></a>
+####method
+HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
 
-    Full HTTP URL to request.  You can use an IP Address or Host Name.
-        
-    <a name="tcparamposttype"></a>
-    ####posttype
-    This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
-    in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
+A special methhod of "cmd" is also supported, which will run a shell command through the backtick method. See the
+full examples section for an example.
     
-        "application/x-www-form-urlencoded"
-        "multipart/form-data"
-        "text/xml"
-        "application/soap+xml"
-        "application/json"
-    
-    Defaults to "application/x-www-form-urlencoded" if this parameter is omitted.
-        
-    <a name="tcparampostbody"></a>
-    ####postbody
-    This is the data (body) of the request to be sent to the server.  This is only used in an HTTP POST (method="post").
-    
-    If you are sending "application/x-www-form-urlencoded" data, this parameter contains the string of text data you wish to send.
+<a name="tcparamurl"></a>
+####url
 
+Full HTTP URL to request.  You can use an IP Address or Host Name.
     
-    If you are sending "multipart/form-data" (used for form-based file upload as specified in RFC 1867), this parameter contains
-    a string that represents the Perl code used to define the "Content" parameter of the Perl "POST" function. This string
-    will be evaluated by the Perl interpreter using "eval".  More details about the syntax can be found in the Perl documentation
-    of the HTTP::Request::Common module. (sorry if this is a little cryptic, the example below should help).
-    
-    If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file 
-    that contains the text (xml payload) that will be sent in the body of your request.  This is done using the `file=>` syntax.
-    Example: `postbody="file=>soap_payload.xml"`
+<a name="tcparamposttype"></a>
+####posttype
+This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
+in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
 
-    <a name="tcparamcommand"></a>
-    ####command
-    Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
+    "application/x-www-form-urlencoded"
+    "multipart/form-data"
+    "text/xml"
+    "application/soap+xml"
+    "application/json"
+
+Defaults to "application/x-www-form-urlencoded" if this parameter is omitted.
     
-    Example: 
-    `command="echo _S24_{PARSEDRESULT24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{PARSEDRESULT30}_Setup.txt"`
-    
-    Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
-    
-    Example - use 3 types of quotes on the one line:
-    `command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
-    
-    In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
+<a name="tcparampostbody"></a>
+####postbody
+This is the data (body) of the request to be sent to the server.  This is only used in an HTTP POST (method="post").
+
+If you are sending "application/x-www-form-urlencoded" data, this parameter contains the string of text data you wish to send.
 
 
-    <a name="tcparamcommand1"></a>
-    ####command1
-    Additional command that will be run in the same Test Step, after "command" (if present).
+If you are sending "multipart/form-data" (used for form-based file upload as specified in RFC 1867), this parameter contains
+a string that represents the Perl code used to define the "Content" parameter of the Perl "POST" function. This string
+will be evaluated by the Perl interpreter using "eval".  More details about the syntax can be found in the Perl documentation
+of the HTTP::Request::Common module. (sorry if this is a little cryptic, the example below should help).
 
-    <a name="tcparamcommand2"></a>
-      
+If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file 
+that contains the text (xml payload) that will be sent in the body of your request.  This is done using the `file=>` syntax.
+Example: `postbody="file=>soap_payload.xml"`
 
-    ... and so on up to ...
-    <a name="tcparamcommand15"></a>
-    ####command15
+<a name="tcparamcommand"></a>
+####command
+Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
-    Additional command that will be run in the same Test Step, after "command14" (if present).
-        
-    <a name="tcparamvercode"></a>
-    ####verifyresponsecode
-    HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
-    code you receive.
-        
-    <a name="tcparamretryresponsecode"></a>
-    ####retryresponsecode
-    If a retry is present, retry if we get this reponse code, even if it is an error code.
-    
-    When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
-    However sometimes we need to override this behaviour.
-    
-    Example: 
-    `retryresponsecode="500"`
+Example: 
+`command="echo _S24_{PARSEDRESULT24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{PARSEDRESULT30}_Setup.txt"`
 
-    <a name="tcparamverpos"></a>
-    ####verifypositive
-    String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched 
-    as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
-    
-    You can also specify that a custom message be output if the verification fails by placing ||| then your message on the right hand side
-    of the verifypositive. This is really useful if you need to verify a number of really cryptic strings in a test case. You are able
-    to specify a custom message for each verification that fails. See the examples.
-    
-    Example - check for "Saved OK" in response:
-    `verifypositive='Saved OK'`
-    
-    Example - check for various webtrends tags in response, and output a custom message if it isn't found:
-    `verifypositive='WT897234|||Webtrends Profile Saved tag not found'`
-    `verifypositive1='WT897264|||Webtrends New User tag not found'`
-    `verifypositive2='WT897292|||Webtrends Full Profile tag not found'`
-    
-    Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
-    backslash:  `{}[]()^$.|*+?\`
+Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
 
-        
-    <a name="tcparamverpos1"></a>
-    ####verifypositive1
-    Additional positive verification. This works the same as 'verifypositive'.
-        
-    <a name="tcparamverpos2"></a>
-    ####verifypositive2
-    Additional positive verification. This works the same as 'verifypositive'.
-        
-    <a name="tcparamverpos3"></a>
-    ####verifypositive3
+Example - use 3 types of quotes on the one line:
+`command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
 
-    Additional positive verification. This works the same as 'verifypositive'.
-        
-    <a name="tcparamverpos4"></a>
-      
-
-    ... and so on up to ...
-    <a name="tcparamverpos20"></a>
-    ####verifypositive20
-
-    Additional positive verification. This works the same as 'verifypositive'.
-
-    <a name="tcparamverneg"></a>
-    ####verifynegative
-    String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
-    as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
-    
-    As with verifypositive, you can specify a custom message if a particular verification fails. Check the verifypositive section for
-    more information.
-    
-    Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
-    backslash:  `{}[]()^$.|*+?\`
-        
-    <a name="tcparamverneg1"></a>
-    ####verifynegative1
-
-    Additional negative verification. This works the same as 'verifynegative'.
-        
-    <a name="tcparamverneg2"></a>
-    ####verifynegative2
-    Additional negative verification. This works the same as 'verifynegative'.
-        
-    <a name="tcparamverneg3"></a>
-    ####verifynegative3
-    Additional negative verification. This works the same as 'verifynegative'.
-        
-    <a name="tcparamverneg4"></a>
-      
-
-    ... and so on up to ...
-        
-    <a name="tcparamverneg20"></a>
-    ####verifynegative20
-    Additional negative verification. This works the same as 'verifynegative'.
-        
-    <a name="tcparamverposnext"></a>
-    ####verifynextpositive
-
-    String in response for positive verification on next test case. Verification fails if this string does not exist in the 
-    HTTP response of the next test case that is executed.
-        
-    <a name="tcparamvernegnext"></a>
-    ####verifynextnegative
-    String in response for negative verification on next test case. Verification fails if this string exists in the HTTP 
-    response of the next test case that is executed.
-
-    <a name="tcparamassertcount"></a>
-    ####assertcount
-    Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
-    if the assertion fails.
-    
-    Example:
-    `assertcount="Distance:|||1|||Should only be one job shown"`
-
-    <a name="tcparamsearchimage"></a>
-    ####searchimage
-    Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
-    the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
-    operating system, but tested on another.
-    
-    Example:
-    `searchimage="RunningMan_Company_Logo.png"` 
-    
-    The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
-    subfolder that has the same name as the testcase you are running. 
-    
-    For example, refering to the example above, RunningMan_Company_Logo.png can be found at 
-    C:\webinject\Build\testcases\totaljobs\baseline\Client1\RunningMan_Company_Logo.png
-
-    <a name="tcparamsearchimage1"></a>
-    ####searchimage1
-    Additional image to look for.
-
-    <a name="tcparamsearchimage2"></a>
-      
-
-    ... and so on up to ...
-    <a name="tcparamsearchimage5"></a>
-    ####searchimage5
-
-    Additional image to look for.
-
-    <a name="tcparamverifytext"></a>
-    ####verifytext
-    Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
-    Or perhaps you just want those details to appear in the http.log.
-    
-    Separate additional items with commas. Example:
-    `verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"`
-        
-    <a name="tcparamcheckpositive"></a>
-    ####checkpositive
-    Example:
-    `checkpositive="8"`
-     In this example, this test step will not be run, unless the most recent verifypositive8 passed.
-     Allows us to skip test steps where we know they will fail since a previous dependent step failed.
-
-    <a name="tcparamchecknegative"></a>
-    ####checknegative
-    Example:
-    `checknegative="3"`
-     In this example, this test step will not be run, unless the most recent verifynegative3 passed.
-
-    <a name="tcparamcheckresponsecode"></a>
-    ####checkresponsecode
-    Example:
-    `checkresponsecode="200"`
-     In this example, this test step will not be run, unless the responsecode of the previous test
-    step was 200 (if that test step was run).
-
-    <a name="tcparamignorehttpresponsecode"></a>
-    ####ignorehttpresponsecode
-    Example:
-    `ignorehttpresponsecode="true"`
-     Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
-    Specifying this parameter allows us to ignore this verification.
-
-    <a name="tcparamscreenshot"></a>
-    ####screenshot
-    Example:
-    `screenshot="false"`
-     Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
-    pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
-     By specifying this parameter, a page grab will not be taken. Instead, a very fast screenshot of the visible
-    portion of the web page will be taken. This fast screenshot will only be taken for interactive sessions. If the test
-    is being run by a service account, there is no window handle with which to work with.
-     A better name for this parameter would have been "pagegrab".
-    
-    <a name="tcparamlogreq"></a>
-    ####logrequest
-    Set to "yes" to log (in http.log) the HTTP request sent for the current test case. Logging disabled if this parameter is 
-    omitted or not equal to "yes".
-        
-    <a name="tcparamlogresp"></a>
-    ####logresponse
-
-    Set to "yes" to log (in http.log) the HTTP response received for the current test case.  Logging disabled if this parameter 
-    is omitted or not equal to "yes".
-        
-    <a name="tcparamparse"></a>
-    ####parseresponse
-    Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
-    used for passing Session ID's, but can be applied to any case where you need to pass a 
-    dynamically generated value.  It takes the arguments in the format 
-    "leftboundary|rightboundary", and one of two optional third arguments.
-    
-    Use "leftboundary|rightboundary|escape" when you want to force escaping of all 
-    non-alphanumeric characters. See the "Session Handling and State 
-    Management - Parsing Response Data &amp; Embedded Session ID's" 
-    section of this manual for details and examples on how to use this parameter.
-    
-    Use "leftboundary|rightboundary|decode" when you want to decode html entities - for example
-    converting &amp;amp; back to &amp; and &amp;lt; back to < - which you may need to do in some circumstances.
-    
-    If you specify the text "regex" as the right boundary, the left boundary will be treated as a custom regular expression.
-    
-    Note: You will need to prepend a backslash before these reserved characters when parsing:
-    `{}[]()^$.|*+?\`
-    
-    
-    Note: Newlines (\n) are also valid boundaries and are useful when you need to use the end of the line as a boundary.
-    
-    Example - match from the first instance of START until END is found:
-    `parseresponse='START|END|'`
-    
-    Example - match from the first instance of START until END is found, then escape the matched text:
-    `parseresponse='START|END|escape'`
-    
-    Example - match the shortest possible amount of text between START and END:
-    `parseresponse='START((?:(?!START).)*)END|regex|'`
-    
-    This last example is useful when you are sure the END text is unique, but the START text is not unique. This typically
-    occurs when you have a drop down and you know the display text but not the id which is usually on the left.
-    
-    Example - custom regex - parsed characters are the ones matched inside the parentheses:
-    `parseresponse='a id=".*?" class="first" href="/careers-advice/(.*?)"|regex|escape'`
-    
-    Example - when what we know is on the RHS - this method extracts option values:
-    `parseresponse='option value="([0-9]+)".AutoTESavedSearch1|regex|escape'`
-    
-    Example - keep on matching characters matching until you find an unwanted one - in this case < (< has to be escaped as \<):
-    `parseresponse='litEmail..([^\<]+)|regex|'`
-    
-    Example - the {5,60} specifies that the number of characters matched must be between 5 and 60:
-    `parseresponse='_chkSearch" type="checkbox" name="(.{5,60}?)".{5,100}?LocSrch_{TEAM}{WSX}_{OUTSUM}|regex|decode' `
-    
-    Example - in this regex, the .* at the front tells it to return the last match, rather than the first:
-    `parseresponse=".*EntitlementCompanyId.{PARSEDRESULT9}.{20,30}?ExpiryTime.(.*?)\<|regex|decode"`
-    
-    Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
-    `parseresponse='([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9])|regex|'`
-    
-    Example - match the ctl number for a field:
-    `parseresponse='ctl(\d\d).ctl00.btnApplyOnline|regex|'`
-    
-    Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
-    `parseresponse="[a-z0-9\-]{36,36}?|regex|"`
-    
-    Example - find the inetpub location:
-    `command1="echo _START_&type config\inetpub.txt&echo _END_"`
-    `parseresponse="_START_.{0,5}?\x0A(.*?)_END_|regex|"`
+In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
 
 
-    
-    <a name="tcparamparse1"></a> 
-    ####parseresponse1
-    Additional parameter for response parsing.
-        
-    <a name="tcparamparse2"></a>
-    ####parseresponse2
-    Additional parameter for response parsing.
-        
-    <a name="tcparamparse3"></a>
-    ####parseresponse3
+<a name="tcparamcommand1"></a>
+####command1
+Additional command that will be run in the same Test Step, after "command" (if present).
 
-    Additional parameter for response parsing.
-        
-    <a name="tcparamparse4"></a> 
-    ####parseresponse4
-    Additional parameter for response parsing.
-        
-    <a name="tcparamparse5"></a>
-    ####parseresponse5
-    Additional parameter for response parsing.
+<a name="tcparamcommand2"></a>
+  
 
-      
-    <a name="tcparamparse6"></a>
-    ... and so on up to ...
+... and so on up to ...
+<a name="tcparamcommand15"></a>
+####command15
 
-    <a name="tcparamparse40"></a>
-    ####parseresponse40
-    Additional parameter for response parsing.
-        
-    <a name="tcparamsleep"></a>
-    ####sleep
+Additional command that will be run in the same Test Step, after "command14" (if present).
+    
+<a name="tcparamvercode"></a>
+####verifyresponsecode
+HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
+code you receive.
+    
+<a name="tcparamretryresponsecode"></a>
+####retryresponsecode
+If a retry is present, retry if we get this reponse code, even if it is an error code.
 
-    Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
-    throttle the rate it sends requests.
-    
-    Note:  The WebInject GUI runs in a single process/thread.  
-    Therefore, the GUI will not be responsive during the time it is "sleeping".
-        
-    <a name="tcparamerrmsg"></a>
-    ####errormessage
-    If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
-    (on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
-    test means, like "couldn't connect to the application" or "couldn't access the login page".
-    
-    <a name="tcparamaddcookie"></a>
-    ####addcookie
+When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
+However sometimes we need to override this behaviour.
 
-    This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
-    The cookie will be added for the current step only.
-    
-    Example: `addcookie="JBM_COOKIE=4830075"`
-    
+Example: 
+`retryresponsecode="500"`
 
-    <a name="tcparamaddheader"></a>
-    ####addheader
+<a name="tcparamverpos"></a>
+####verifypositive
+String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched 
+as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
-    This is used to add an addition header to an outgoing HTTP request.
-    
-    Example: `addheader="SOAPAction: urn:example-org:demos#Method"`
-    
-    You may add multiple headers, separating each with a pipe character.
-    
-    Example: `addheader="Foo: bar|Boo: far"`
+You can also specify that a custom message be output if the verification fails by placing ||| then your message on the right hand side
+of the verifypositive. This is really useful if you need to verify a number of really cryptic strings in a test case. You are able
+to specify a custom message for each verification that fails. See the examples.
 
-    <a name="tcparamretry"></a>
-    ####retry
+Example - check for "Saved OK" in response:
+`verifypositive='Saved OK'`
 
-    This is used to retry a test case that has failed. You specify the maximum number of times
-    to retry the test case. Use this parameter if you need to wait for a database to update in
-    an asynchronous manner, but you don't know how long it will take.
-    
-    Example:
-    `retry="40"`
-    
-    You need to use this parameter in conjunction with the sleep parameter so that there is a pause
-    before the test case is tried again.
-     
-    Example:
-    `sleep="20"`
-    
-    If one of the verifynegatives fail (except for verifynegativenext), the test case will not be
-    retried further. The logic is that you are prepared to wait for something you expect to see
-    (verifypositive etc), but if you find something you don't want to see (like an error page), there is
-    no point retrying further.
-    
-    If you do want to do a retry on a verifynegative, encode it as a verifypositive instead. The following example
-    shows how to do this: 
-    `verifypositive20="^((?!Error.aspx).)*$|||An error has occurred"`
-    
-    Note that you can specify a global retry limit to prevent more than a specified number of retries
-    in a run. This is useful if you would like to specify the retry parameter in many test cases. If, when running,
-    things are going badly, the global limit will be enforced preventing your test run from taking
-    (seemingly) forever. See the Configuration File section to see how to set this up.
+Example - check for various webtrends tags in response, and output a custom message if it isn't found:
+`verifypositive='WT897234|||Webtrends Profile Saved tag not found'`
+`verifypositive1='WT897264|||Webtrends New User tag not found'`
+`verifypositive2='WT897292|||Webtrends Full Profile tag not found'`
 
-    <a name="tcparamsanitycheck"></a>
-    ####sanitycheck
+Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
+backslash:  `{}[]()^$.|*+?\`
 
-    Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
-    test case fails, the test run is aborted.
     
-    This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
-    like getting the home page, fails, then there little point running the rest of the tests.
+<a name="tcparamverpos1"></a>
+####verifypositive1
+Additional positive verification. This works the same as 'verifypositive'.
     
-    Example:
-    `sanitycheck="true"`
-        
-    <a name="tcparamtestonly"></a>
-    ####testonly
+<a name="tcparamverpos2"></a>
+####verifypositive2
+Additional positive verification. This works the same as 'verifypositive'.
+    
+<a name="tcparamverpos3"></a>
+####verifypositive3
 
-    If you run your test cases against both test and live environments, you can specify that selected
-    test cases are skipped when run against your live config file. See the configuration file section
-    for information on how to configure the config file.
+Additional positive verification. This works the same as 'verifypositive'.
     
-    Example:
-    `testonly="true"`
+<a name="tcparamverpos4"></a>
+  
 
-    <a name="tcparamautocontrolleronly"></a>
-    ####autocontrolleronly
+... and so on up to ...
+<a name="tcparamverpos20"></a>
+####verifypositive20
 
-    You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
-    a command line option to indicate you are invoking it from the automation controller. Webinject will
-    then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
-    
-    Example:<br >
-    `autocontrolleronly="true"`
-    
-    It is probably quite rare that you would have a need for this feature. One example is that you may have a
-    website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
-    this works, you might have a test case that uploads a document containing an industry standard test virus.
-    However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
-    immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
-    controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
-    the virus checking test cases on your automation controller. This is a real example of how this feature is used.
-    
-    See the Command Line Options section for the command line option syntax.
+Additional positive verification. This works the same as 'verifypositive'.
 
-    <a name="tcparamlogastext"></a>
-    ####logastext
+<a name="tcparamverneg"></a>
+####verifynegative
+String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
+as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
-    Putting this paramater on a test case will put tags around the test case in http.log file.
-    
-    Example:
-    `logastext="true"`
-    
-    This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
-    parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
-    than html.
+As with verifypositive, you can specify a custom message if a particular verification fails. Check the verifypositive section for
+more information.
 
-    <a name="tcparamformatxml"></a>
-    ####formatxml
-
-    Improves readability of xml responses.
+Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
+backslash:  `{}[]()^$.|*+?\`
     
-    Example:
-    `formatxml="true"`
-    
-    Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read.
-     Specifying this parameter puts a carriage return between every >< found in the response.
+<a name="tcparamverneg1"></a>
+####verifynegative1
 
-    <a name="tcparamlogresponseasfile"></a>
-    ####logresponseasfile
-
-    Saves the test step response as file.
+Additional negative verification. This works the same as 'verifynegative'.
     
-    Example:
-    `logresponseasfile="CandidateSearch.css"`
+<a name="tcparamverneg2"></a>
+####verifynegative2
+Additional negative verification. This works the same as 'verifynegative'.
     
-    In the example given, we capture the Candidate Search css so we can better format the captured html of Candidate Search for later viewing.
-
-    <a name="tcparamsection"></a>
-    ####section
-
-    Puts a section break in the test case results xml file. In the section break you can put a description of the upcoming test steps.
+<a name="tcparamverneg3"></a>
+####verifynegative3
+Additional negative verification. This works the same as 'verifynegative'.
     
-    Example:
-    `section="Jobs on map"`
+<a name="tcparamverneg4"></a>
+  
 
-    <a name="tcparamparms"></a>
-    ####parms
+... and so on up to ...
+    
+<a name="tcparamverneg20"></a>
+####verifynegative20
+Additional negative verification. This works the same as 'verifynegative'.
+    
+<a name="tcparamverposnext"></a>
+####verifynextpositive
 
-    Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
+String in response for positive verification on next test case. Verification fails if this string does not exist in the 
+HTTP response of the next test case that is executed.
     
-    Example:
-    `parms="__SALMIN__={PARSEDRESULT20}&__SALMAX__={PARSEDRESULT21}"`
+<a name="tcparamvernegnext"></a>
+####verifynextnegative
+String in response for negative verification on next test case. Verification fails if this string exists in the HTTP 
+response of the next test case that is executed.
+
+<a name="tcparamassertcount"></a>
+####assertcount
+Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
+if the assertion fails.
+
+Example:
+`assertcount="Distance:|||1|||Should only be one job shown"`
+
+<a name="tcparamsearchimage"></a>
+####searchimage
+Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
+the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
+operating system, but tested on another.
+
+Example:
+`searchimage="RunningMan_Company_Logo.png"` 
+
+The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
+subfolder that has the same name as the testcase you are running. 
+
+For example, refering to the example above, RunningMan_Company_Logo.png can be found at 
+C:\webinject\Build\testcases\totaljobs\baseline\Client1\RunningMan_Company_Logo.png
+
+<a name="tcparamsearchimage1"></a>
+####searchimage1
+Additional image to look for.
+
+<a name="tcparamsearchimage2"></a>
+  
+
+... and so on up to ...
+<a name="tcparamsearchimage5"></a>
+####searchimage5
+
+Additional image to look for.
+
+<a name="tcparamverifytext"></a>
+####verifytext
+Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
+Or perhaps you just want those details to appear in the http.log.
+
+Separate additional items with commas. Example:
+`verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"`
     
-    Allows you to create a xml template file then easily substitute in dynamic values at test run time.
+<a name="tcparamcheckpositive"></a>
+####checkpositive
+Example:
+`checkpositive="8"`
+ In this example, this test step will not be run, unless the most recent verifypositive8 passed.
+ Allows us to skip test steps where we know they will fail since a previous dependent step failed.
+
+<a name="tcparamchecknegative"></a>
+####checknegative
+Example:
+`checknegative="3"`
+ In this example, this test step will not be run, unless the most recent verifynegative3 passed.
+
+<a name="tcparamcheckresponsecode"></a>
+####checkresponsecode
+Example:
+`checkresponsecode="200"`
+ In this example, this test step will not be run, unless the responsecode of the previous test
+step was 200 (if that test step was run).
+
+<a name="tcparamignorehttpresponsecode"></a>
+####ignorehttpresponsecode
+Example:
+`ignorehttpresponsecode="true"`
+ Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
+Specifying this parameter allows us to ignore this verification.
+
+<a name="tcparamscreenshot"></a>
+####screenshot
+Example:
+`screenshot="false"`
+ Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
+pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
+ By specifying this parameter, a page grab will not be taken. Instead, a very fast screenshot of the visible
+portion of the web page will be taken. This fast screenshot will only be taken for interactive sessions. If the test
+is being run by a service account, there is no window handle with which to work with.
+ A better name for this parameter would have been "pagegrab".
+
+<a name="tcparamlogreq"></a>
+####logrequest
+Set to "yes" to log (in http.log) the HTTP request sent for the current test case. Logging disabled if this parameter is 
+omitted or not equal to "yes".
+    
+<a name="tcparamlogresp"></a>
+####logresponse
+
+Set to "yes" to log (in http.log) the HTTP response received for the current test case.  Logging disabled if this parameter 
+is omitted or not equal to "yes".
+    
+<a name="tcparamparse"></a>
+####parseresponse
+Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
+used for passing Session ID's, but can be applied to any case where you need to pass a 
+dynamically generated value.  It takes the arguments in the format 
+"leftboundary|rightboundary", and one of two optional third arguments.
+
+Use "leftboundary|rightboundary|escape" when you want to force escaping of all 
+non-alphanumeric characters. See the "Session Handling and State 
+Management - Parsing Response Data &amp; Embedded Session ID's" 
+section of this manual for details and examples on how to use this parameter.
+
+Use "leftboundary|rightboundary|decode" when you want to decode html entities - for example
+converting &amp;amp; back to &amp; and &amp;lt; back to < - which you may need to do in some circumstances.
+
+If you specify the text "regex" as the right boundary, the left boundary will be treated as a custom regular expression.
+
+Note: You will need to prepend a backslash before these reserved characters when parsing:
+`{}[]()^$.|*+?\`
+
+
+Note: Newlines (\n) are also valid boundaries and are useful when you need to use the end of the line as a boundary.
+
+Example - match from the first instance of START until END is found:
+`parseresponse='START|END|'`
+
+Example - match from the first instance of START until END is found, then escape the matched text:
+`parseresponse='START|END|escape'`
+
+Example - match the shortest possible amount of text between START and END:
+`parseresponse='START((?:(?!START).)*)END|regex|'`
+
+This last example is useful when you are sure the END text is unique, but the START text is not unique. This typically
+occurs when you have a drop down and you know the display text but not the id which is usually on the left.
+
+Example - custom regex - parsed characters are the ones matched inside the parentheses:
+`parseresponse='a id=".*?" class="first" href="/careers-advice/(.*?)"|regex|escape'`
+
+Example - when what we know is on the RHS - this method extracts option values:
+`parseresponse='option value="([0-9]+)".AutoTESavedSearch1|regex|escape'`
+
+Example - keep on matching characters matching until you find an unwanted one - in this case < (< has to be escaped as \<):
+`parseresponse='litEmail..([^\<]+)|regex|'`
+
+Example - the {5,60} specifies that the number of characters matched must be between 5 and 60:
+`parseresponse='_chkSearch" type="checkbox" name="(.{5,60}?)".{5,100}?LocSrch_{TEAM}{WSX}_{OUTSUM}|regex|decode' `
+
+Example - in this regex, the .* at the front tells it to return the last match, rather than the first:
+`parseresponse=".*EntitlementCompanyId.{PARSEDRESULT9}.{20,30}?ExpiryTime.(.*?)\<|regex|decode"`
+
+Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
+`parseresponse='([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9])|regex|'`
+
+Example - match the ctl number for a field:
+`parseresponse='ctl(\d\d).ctl00.btnApplyOnline|regex|'`
+
+Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
+`parseresponse="[a-z0-9\-]{36,36}?|regex|"`
+
+Example - find the inetpub location:
+`command1="echo _START_&type config\inetpub.txt&echo _END_"`
+`parseresponse="_START_.{0,5}?\x0A(.*?)_END_|regex|"`
+
+
+
+<a name="tcparamparse1"></a> 
+####parseresponse1
+Additional parameter for response parsing.
+    
+<a name="tcparamparse2"></a>
+####parseresponse2
+Additional parameter for response parsing.
+    
+<a name="tcparamparse3"></a>
+####parseresponse3
+
+Additional parameter for response parsing.
+    
+<a name="tcparamparse4"></a> 
+####parseresponse4
+Additional parameter for response parsing.
+    
+<a name="tcparamparse5"></a>
+####parseresponse5
+Additional parameter for response parsing.
+
+  
+<a name="tcparamparse6"></a>
+... and so on up to ...
+
+<a name="tcparamparse40"></a>
+####parseresponse40
+Additional parameter for response parsing.
+    
+<a name="tcparamsleep"></a>
+####sleep
+
+Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
+throttle the rate it sends requests.
+
+Note:  The WebInject GUI runs in a single process/thread.  
+Therefore, the GUI will not be responsive during the time it is "sleeping".
+    
+<a name="tcparamerrmsg"></a>
+####errormessage
+If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
+(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
+test means, like "couldn't connect to the application" or "couldn't access the login page".
+
+<a name="tcparamaddcookie"></a>
+####addcookie
+
+This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
+The cookie will be added for the current step only.
+
+Example: `addcookie="JBM_COOKIE=4830075"`
+
+
+<a name="tcparamaddheader"></a>
+####addheader
+
+This is used to add an addition header to an outgoing HTTP request.
+
+Example: `addheader="SOAPAction: urn:example-org:demos#Method"`
+
+You may add multiple headers, separating each with a pipe character.
+
+Example: `addheader="Foo: bar|Boo: far"`
+
+<a name="tcparamretry"></a>
+####retry
+
+This is used to retry a test case that has failed. You specify the maximum number of times
+to retry the test case. Use this parameter if you need to wait for a database to update in
+an asynchronous manner, but you don't know how long it will take.
+
+Example:
+`retry="40"`
+
+You need to use this parameter in conjunction with the sleep parameter so that there is a pause
+before the test case is tried again.
+ 
+Example:
+`sleep="20"`
+
+If one of the verifynegatives fail (except for verifynegativenext), the test case will not be
+retried further. The logic is that you are prepared to wait for something you expect to see
+(verifypositive etc), but if you find something you don't want to see (like an error page), there is
+no point retrying further.
+
+If you do want to do a retry on a verifynegative, encode it as a verifypositive instead. The following example
+shows how to do this: 
+`verifypositive20="^((?!Error.aspx).)*$|||An error has occurred"`
+
+Note that you can specify a global retry limit to prevent more than a specified number of retries
+in a run. This is useful if you would like to specify the retry parameter in many test cases. If, when running,
+things are going badly, the global limit will be enforced preventing your test run from taking
+(seemingly) forever. See the Configuration File section to see how to set this up.
+
+<a name="tcparamsanitycheck"></a>
+####sanitycheck
+
+Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
+test case fails, the test run is aborted.
+
+This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
+like getting the home page, fails, then there little point running the rest of the tests.
+
+Example:
+`sanitycheck="true"`
+    
+<a name="tcparamtestonly"></a>
+####testonly
+
+If you run your test cases against both test and live environments, you can specify that selected
+test cases are skipped when run against your live config file. See the configuration file section
+for information on how to configure the config file.
+
+Example:
+`testonly="true"`
+
+<a name="tcparamautocontrolleronly"></a>
+####autocontrolleronly
+
+You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
+a command line option to indicate you are invoking it from the automation controller. Webinject will
+then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
+
+Example:<br >
+`autocontrolleronly="true"`
+
+It is probably quite rare that you would have a need for this feature. One example is that you may have a
+website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
+this works, you might have a test case that uploads a document containing an industry standard test virus.
+However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
+immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
+controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
+the virus checking test cases on your automation controller. This is a real example of how this feature is used.
+
+See the Command Line Options section for the command line option syntax.
+
+<a name="tcparamlogastext"></a>
+####logastext
+
+Putting this paramater on a test case will put tags around the test case in http.log file.
+
+Example:
+`logastext="true"`
+
+This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
+parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
+than html.
+
+<a name="tcparamformatxml"></a>
+####formatxml
+
+Improves readability of xml responses.
+
+Example:
+`formatxml="true"`
+
+Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read.
+ Specifying this parameter puts a carriage return between every >< found in the response.
+
+<a name="tcparamlogresponseasfile"></a>
+####logresponseasfile
+
+Saves the test step response as file.
+
+Example:
+`logresponseasfile="CandidateSearch.css"`
+
+In the example given, we capture the Candidate Search css so we can better format the captured html of Candidate Search for later viewing.
+
+<a name="tcparamsection"></a>
+####section
+
+Puts a section break in the test case results xml file. In the section break you can put a description of the upcoming test steps.
+
+Example:
+`section="Jobs on map"`
+
+<a name="tcparamparms"></a>
+####parms
+
+Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
+
+Example:
+`parms="__SALMIN__={PARSEDRESULT20}&__SALMAX__={PARSEDRESULT21}"`
+
+Allows you to create a xml template file then easily substitute in dynamic values at test run time.
 
 
 
@@ -1298,92 +1292,92 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 
 
     
-        **{TIMESTAMP}** : Substituted with the current timestamp (floating seconds since the epoch, accurate to microseconds)
-    
-    
-        **{STARTTIME}** : Substituted with the webinject start time, similar to {TIMESTAMP} - but remains constant during a run
-    
-    
-        **{OUTPUT}** : Substituted with the webinject output directory name, or "no output" if output is suppressed
-    
-    
-        **{HOSTNAME}** : Substituted with the name of the computer currently running WebInject
-    
-    
-        **{TESTNUM}** : Substituted with the number of the current test step
-    
-    
-        **{CONCURRENCY}** : Substituted with the name of the temporary folder (not full path) for the current tests
-    
-    
-        **{LENGTH}** : Substituted with the length of the response for the previous test step
-    
-    
-        **{AMPERSAND}** : Gives you a &amp;
-    
-    
-        **{LESSTHAN}** : Gives you a <
-    
-    
-        **{ELAPSED_SECONDS}** : The elapsed seconds so far - always rounded up
-    
-    
-        **{ELAPSED_MINUTES}** : The elapsed minutes so far - always rounded up
-    
-    
-        **{TESTSTEPTIME:510}** : Latency for test step number 510
-    
-    
-        **{DAY}** : The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
-    
-    
-        **{MONTH}** : The month number of the year at run start with leading 0, e.g. 05 [denoting May]
-    
-    
-        **{YEAR}** : The year at run start as 4 digits, e.g. 2013
-    
-    
-        **{HH}** : The run start hour in 24hr time with leading 0, e.g. 15 
-    
-    
-        **{MM}** : The run start minute with leading 0, e.g. 09
-    
-    
-        **{SS}** : The run start second with leading 0
-    
-    
-        **{WEEKOFMONTH}** : The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
-    
-    
-        **{COUNTER}** : What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
-    
-    
-        **{CWD}** : Substituted with the current working directory
-    
-    
-        **{PARSEDRESULT}** : Substituted with the result of the response parsing from a 'parseresponse' test case parameter
-    
-    
-        **{PARSEDRESULT1}** : Substituted with the result of the response parsing from a 'parseresponse1' test case parameter
-    
-    
-        **{PARSEDRESULT2}** : Substituted with the result of the response parsing from a 'parseresponse2' test case parameter
-    
+**{TIMESTAMP}** : Substituted with the current timestamp (floating seconds since the epoch, accurate to microseconds)
 
-    
-        **{PARSEDRESULT3}** : Substituted with the result of the response parsing from a 'parseresponse3' test case parameter
-    
-    
-        **{PARSEDRESULT4}** : Substituted with the result of the response parsing from a 'parseresponse4' test case parameter
-    
-    
-        **{PARSEDRESULT5}** : Substituted with the result of the response parsing from a 'parseresponse5' test case parameter
-    
-    
-        ... and so on up to ...
-    
-    
-        **{PARSEDRESULT30}** : Substituted with the result of the response parsing from a 'parseresponse30' test case parameter
+
+**{STARTTIME}** : Substituted with the webinject start time, similar to {TIMESTAMP} - but remains constant during a run
+
+
+**{OUTPUT}** : Substituted with the webinject output directory name, or "no output" if output is suppressed
+
+
+**{HOSTNAME}** : Substituted with the name of the computer currently running WebInject
+
+
+**{TESTNUM}** : Substituted with the number of the current test step
+
+
+**{CONCURRENCY}** : Substituted with the name of the temporary folder (not full path) for the current tests
+
+
+**{LENGTH}** : Substituted with the length of the response for the previous test step
+
+
+**{AMPERSAND}** : Gives you a &amp;
+
+
+**{LESSTHAN}** : Gives you a <
+
+
+**{ELAPSED_SECONDS}** : The elapsed seconds so far - always rounded up
+
+
+**{ELAPSED_MINUTES}** : The elapsed minutes so far - always rounded up
+
+
+**{TESTSTEPTIME:510}** : Latency for test step number 510
+
+
+**{DAY}** : The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
+
+
+**{MONTH}** : The month number of the year at run start with leading 0, e.g. 05 [denoting May]
+
+
+**{YEAR}** : The year at run start as 4 digits, e.g. 2013
+
+
+**{HH}** : The run start hour in 24hr time with leading 0, e.g. 15 
+
+
+**{MM}** : The run start minute with leading 0, e.g. 09
+
+
+**{SS}** : The run start second with leading 0
+
+
+**{WEEKOFMONTH}** : The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
+
+
+**{COUNTER}** : What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
+
+
+**{CWD}** : Substituted with the current working directory
+
+
+**{PARSEDRESULT}** : Substituted with the result of the response parsing from a 'parseresponse' test case parameter
+
+
+**{PARSEDRESULT1}** : Substituted with the result of the response parsing from a 'parseresponse1' test case parameter
+
+
+**{PARSEDRESULT2}** : Substituted with the result of the response parsing from a 'parseresponse2' test case parameter
+
+
+
+**{PARSEDRESULT3}** : Substituted with the result of the response parsing from a 'parseresponse3' test case parameter
+
+
+**{PARSEDRESULT4}** : Substituted with the result of the response parsing from a 'parseresponse4' test case parameter
+
+
+**{PARSEDRESULT5}** : Substituted with the result of the response parsing from a 'parseresponse5' test case parameter
+
+
+... and so on up to ...
+
+
+**{PARSEDRESULT30}** : Substituted with the result of the response parsing from a 'parseresponse30' test case parameter
     
 
 
@@ -1394,28 +1388,28 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 
 
     
-        **{BASEURL}** : Substituted with the value for 'baseurl' specified in your config file
-    
-    
-        **{BASEURL1}** : Substituted with the value for 'baseurl1' specified in your config file
-    
-    
-        **{BASEURL2}** : Substituted with the value for 'baseurl2' specified in your config file
-    
-    
-        **{BASEURL3}** : Substituted with the value for 'baseurl3' specified in your config file
-    
-    
-        **{BASEURL4}** : Substituted with the value for 'baseurl4' specified in your config file
-    
-    
-        **{BASEURL5}** : Substituted with the value for 'baseurl5' specified in your config file
-    
-    
-        ... all the way up to ...
-    
-    
-        **{BASEURL30}** : Substituted with the value for 'baseurl30' specified in your config file
+**{BASEURL}** : Substituted with the value for 'baseurl' specified in your config file
+
+
+**{BASEURL1}** : Substituted with the value for 'baseurl1' specified in your config file
+
+
+**{BASEURL2}** : Substituted with the value for 'baseurl2' specified in your config file
+
+
+**{BASEURL3}** : Substituted with the value for 'baseurl3' specified in your config file
+
+
+**{BASEURL4}** : Substituted with the value for 'baseurl4' specified in your config file
+
+
+**{BASEURL5}** : Substituted with the value for 'baseurl5' specified in your config file
+
+
+... all the way up to ...
+
+
+**{BASEURL30}** : Substituted with the value for 'baseurl30' specified in your config file
     
 
 
@@ -1531,20 +1525,8 @@ real-time during execution.
 ##5 - Output/Results/Reporting
 
 
-
-<a name="outputui"></a>
-###5.1 - Results Display in the User Interface (Status, Monitor, RT Graph)
-
-Results of the test execution are displayed in tabbed windows on the User Interface if you are running the WebInject GUI.  
-Not all of the status details displayed in 'results.html' are shown in the Status window on the UI.  Response times, runtime 
-statistics, and a response time graph (when gnuplot is configured) are displayed in the Monitor window on the UI.
-
-
-
-
-
 <a name="outputhtml"></a>
-###5.2 - Results File in HTML format (results.html)
+###5.1 - Results File in HTML format (results.html)
 
 
 An HTML file (results.html) is generated to display detailed results of the test execution.
@@ -1561,7 +1543,7 @@ Note: Most output logging is suppressed when running in a Plugin Mode (reporttyp
 
 
 <a name="outputxml"></a>
-###5.3 - Results File in XML format (results.xml)
+###5.2 - Results File in XML format (results.xml)
 
 An XML file (results.xml) is generated to display results of the test execution.
 It is written into the directory that WebInject runs from and is overwritten each time the tool runs.
@@ -1576,7 +1558,7 @@ Note: Most output logging is suppressed when running in a Plugin Mode (reporttyp
 
 
 <a name="outputstdout"></a>
-###5.4 - Results in STDOUT
+###5.3 - Results in STDOUT
 
 If you are running the WebInject Engine (webinject.pl) as a standalone test runner (text/console application),
 results are sent [in plain text format] to the STDOUT channel as the tests execute.  The same level of detail that 
@@ -1588,7 +1570,7 @@ Note: The results sent to STDOUT will be different if when running in a Plugin M
 
 
 <a name="outputhttp"></a>
-###5.5 - HTTP Log File (http.log)
+###5.4 - HTTP Log File (http.log)
 
 
 A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system 
@@ -1745,174 +1727,4 @@ Will be sent to the server as:
 
 
 `http://myserver/search.jsp?value=123&amp;;JSESSIONID=16CD67F723A6D2218CE73AEAEA899FD9`
-
-
-
-
-
-
-
-<a name="userinterface"></a>
-##7 - User Interface (GUI)
-
-
-
-<a name="uigeneral"></a>
-###7.1 - General
-
-
-
-<a name="uisummary"></a>
-####Summary
-
-The User Interface (webinjectgui.pl or webinject.exe) is a small [Perl/Tk] GUI wrapper used to run the WebInject Engine 
-(webinject.pl).
-
-
-
-
-<a name="uistatusbar"></a>
-####Status Bar
-
-The status bar shows visual progress of the current iteration of the test case file being processed.  If you are using 
-the "repeat" attribute to run multiple iterations of a test case file, the status bar will reset as each iteration starts. 
-If you have multiple test case files configured to run, the status bar will reset as each new test case file is loaded for 
-execution.
-
-
-
-
-<a name="uienginestatus"></a>
-####Engine Status Window
-
-This window shows the status of the WebInject engine as it runs.  It displays when execution begins, the current test case file 
-it is processing, and when execution finishes.
-
-
-
-<a name="uistatuslight"></a>
-####Status Light
-
-The status light is the small box next to the status bar.  While your tests are running, the light will turn amber.  
-After your tests complete, the status light will turn either red or green.  If all test cases passed, the light 
-turns green.  If any verifications failed, it turns red.
-
-
-
-
-<a name="uidisablemon"></a>
-####Disable Monitor
-
-This checkbox is used to completely disable the Monitor Window and all of it's underlying real-time monitoring 
-functionality (including graph generation).  This can not be selected during a test run.  It must be enabled or 
-disabled before execution begins.
-
-
-
-<a name="uistatuswin"></a>
-###7.2 - Status Window
-
-
-
-<a name="uiminoutput"></a>
-####Minimal Output
-
-Selecting this option before you run your test cases will suppress details of each test case from being displayed 
-in the output window.  The only information displayed for each case is "PASSED" or "FAILED".
-
-
-
-
-<a name="uitimeroutput"></a>
-####Response Timer Output
-
-Selecting this option before you run your test cases will display the server response time for each case 
-as it runs.
-
-
-
-
-<a name="uimonwindow"></a>
-###7.3 - Monitor Window
-
-
-
-<a name="uirtgraph"></a>
-####Response Time Graph
-
-
-This graph displays response times in seconds for TTLB (time to last byte) of HTTP requests sent during 
-execution.  The timer contains the round trip time for the request/response.  As responses are received, 
-a new graph is generated and displayed to the Monitor Window in real-time, replacing the previous one.
-
-
-
-The x-axis represents response time in seconds
-
-
-
-The y-axis represents the time of day.  Initially the values shown correspond to the minutes after 
-the hour, but then adjust to the appropriate setting as time elapses.
-
-
-
-The scale of the axes adjusts automatically to fit the data being displayed.
-
-
-
-<a name="uiresptime"></a>
-####Response Times
-
-This shows response times in seconds for TTLB (time to last byte) of HTTP requests sent during execution.
-The timer contains the round trip time for the request/response.  Values for Min, Max, and Avg responses 
-are displayed.
-
-
-
-
-<a name="uiruncount"></a>
-####Runtime Counts
-
-This shows counter values for the current execution.  Values for the total number of test cases run (total),
-passed, and failed are displayed.
-
-
-
-<a name="uilinegraph"></a>
-####Line Graph
-
-Selecting this changes the graph style to a line graph.  It is effective as of the next time the graph image 
-is updated.  This is the default graph style.
-
-
-
-
-<a name="uiimpulsegraph"></a>
-####Impulse Graph
-
-Selecting this changes the graph style to an impulse graph.  It is effective as of the next time the graph image
-is updated.
-
-
-
-
-<a name="uinograph"></a>
-####No Graph
-
-Selecting this turns off generation and display of the graph.  Normally, as responses are received 
-a new graph is generated and displayed to the Monitor Window in real-time, replacing the previous one.
-This can take time and resources (CPU), especially when there is a large data set to be plotted.  Resource 
-usage will be most apparent when response times are quick, as the graph will need to be re-generated at a 
-faster rate.  If you do not want any time and resources spent creating the graphs, you may select this 
-"No Graph" option.  It can be changed during execution to turn on and off graphing as necessary.  Response time 
-data is still collected while this option is selected.
-
-
-
-<a name="uicleargraph"></a>
-####Clear Graph
-
-Clicking this button clears (resets) the graph.  It is effective as of the next time the graph image is updated.
-
-
 
