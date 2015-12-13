@@ -199,8 +199,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 <a name="archsummary"></a>
 ###1.2 - Summary
 
-WebInject consists of the WebInject Engine (test runner) and an optional User Interface (GUI).  The WebInject Engine 
-can be run on its own from the command line, or called from the GUI.
+WebInject is a HTTP level test automation tool initiated from the command line. WebInject sends
+HTTP GET or POST requests to the target web site (System Under Test), and runs assertions against the response.
 
 <a name="cfg"></a>
 ##2 - Configuration
@@ -340,8 +340,7 @@ config files for your live servers.
 <a name="cfgfilenamescfg"></a>
 ###2.2 - Test Case Files (specifying in configuration file)
 
-If you are using the GUI (webinjectgui.pl or webinjectgui.exe) to run your tests, you can not pass a test case filename from 
-the command line (or use any other command line options).  Instead, they are read out of config.xml.  One of the configuration 
+One of the configuration 
 file settings in config.xml is used to name the test case files which you have created.  You may specify any amount of test case 
 files to process by placing each file name inside the proper (<testcasefile>) xml tags.  If there is no configuration setting 
 used to name your test case file(s), it will default to using a file named 'testcases.xml' in the current [webinject] directory.  The 
@@ -422,8 +421,6 @@ elsewhere.
 **-n** or **--no-output** : Suppresses all output to STDOUT except the results summary.
 **-a** or **--autocontroller** : Specifies to run autocontrolleronly testcases.
 **-v** or **--version** : Displays the version number and other information.
-
-Note: Command line options are only available when launching the WebInject Engine (webinject.pl) on its own, not from the GUI.
 
 <a name="cfgpassingfile"></a>
 ####Passing a Test Case Filename
@@ -1045,9 +1042,6 @@ However sometimes we need to override this behaviour.
 
 Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
 throttle the rate it sends requests.
-
-Note:  The WebInject GUI runs in a single process/thread.  
-Therefore, the GUI will not be responsive during the time it is "sleeping".
 
 Sleep 5 seconds before proceeding:
 ```
