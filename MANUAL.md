@@ -854,15 +854,20 @@ parseresponse1, parseresponse5000 and parseresponseUSERID.
 ####command command1 ... command20
 Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
-Example: 
-
-`command="echo _S24_{24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{30}_Setup.txt"`
+```
+    command="type test_data_file.txt"
+    parseresponseUSERNAME='USERNAME5="|"|'
+    parseresponsePASSWORD='PASSWORD5="|"|'
+```
 
 Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
 
-Example - use 3 types of quotes on the one line:
+It is even possible to run a line of Perl code in the current context.
+Note that in this example three types of quotes are used on the one line:
 
-`command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
+```
+    command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'
+```
 
 In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
 
@@ -875,7 +880,9 @@ In this last example, qq| is indicating that | should be used as a quote in this
 This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
 The cookie will be added for the current step only.
 
-Example: `addcookie="JBM_COOKIE=4830075"`
+```
+    addcookie="LASTVIEWEDJOB_COOKIE=4830075"
+```
 
 <br />
 
@@ -885,24 +892,33 @@ Example: `addcookie="JBM_COOKIE=4830075"`
 
 This is used to add an addition header to an outgoing HTTP request.
 
-Example: `addheader="SOAPAction: urn:example-org:demos#Method"`
+```
+    addheader="SOAPAction: urn:example-org:demos#Method"
+```
 
 You may add multiple headers, separating each with a pipe character.
 
-Example: `addheader="Foo: bar|Boo: far"`
+```
+    addheader="Foo: bar|Boo: far"
+```
+
+Note that when you use addheader, any existing header cookies will be clobbered.
+
+<br />
+
 
 <a name="tcparamparms"></a>
 ####parms
 
 Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
 
-Example:
+```
     parms="__SALMIN__={SALMIN}&__SALMAX__={SALMAX}"
+```
 
 Allows you to create a xml template file then easily substitute in dynamic values at test run time.
 
-
-Full Example:
+**Full Example:**
 ```
 <case
     id="40"
@@ -948,8 +964,9 @@ When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swappe
 Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
 if the assertion fails.
 
-Example:
-`assertcount="Distance:|||1|||Should only be one job shown"`
+```
+    assertcount="Distance:|||1|||Should only be one job shown"
+```
 
 <br />
 
@@ -958,6 +975,10 @@ Example:
 ####verifyresponsecode
 HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
 code you receive.
+
+```
+    verifyresponsecode="500"
+```
 
 <br />
 
@@ -972,23 +993,30 @@ This is used to retry a test case that has failed. You specify the maximum numbe
 to retry the test case. Use this parameter if you need to wait for a database to update in
 an asynchronous manner, but you don't know how long it will take.
 
-Example:
-`retry="40"`
+```
+    retry="5"
+```
 
-You need to use this parameter in conjunction with the sleep parameter so that there is a pause
+You normally would use this parameter in conjunction with the sleep parameter so that there is a pause
 before the test case is tried again.
  
-Example:
-`sleep="20"`
+In this example, if any of the verifypositives fail, or the assertcount fails, then WebInject
+will wait 5 seconds, then retry the test step - up to 10 times. (After each failure, WebInject will
+wait 5 seconds.) If and when the test step passes, WebInject will not wait 5 seconds before proceeding.
+```
+    retry="10"
+    sleep="5"
+```
 
-If one of the verifynegatives fail (except for verifynegativenext), the test case will not be
-retried further. The logic is that you are prepared to wait for something you expect to see
-(verifypositive etc), but if you find something you don't want to see (like an error page), there is
-no point retrying further.
+If one of the verifynegatives fail, the test case will not be retried further. The logic is that you are
+prepared to wait for something you expect to see (verifypositive etc), but if you find something you 
+don't want to see (like an error page), there is no point retrying further. This is called fail fast.
 
 If you do want to do a retry on a verifynegative, encode it as a verifypositive instead. The following example
 shows how to do this: 
-`verifypositive20="^((?!Error.aspx).)*$|||An error has occurred"`
+```
+    verifypositive20="^((?!ErrorPage.aspx).)*$|||Error detected"
+```
 
 Note that you can specify a global retry limit to prevent more than a specified number of retries
 in a run. This is useful if you would like to specify the retry parameter in many test cases. If, when running,
@@ -1005,8 +1033,9 @@ If a retry is present, retry if we get this reponse code, even if it is an error
 When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
 However sometimes we need to override this behaviour.
 
-Example: 
-`retryresponsecode="500"`
+```
+    retryresponsecode="500"
+```
 
 <br />
 
@@ -1020,6 +1049,19 @@ throttle the rate it sends requests.
 Note:  The WebInject GUI runs in a single process/thread.  
 Therefore, the GUI will not be responsive during the time it is "sleeping".
 
+Sleep 5 seconds before proceeding:
+```
+    sleep="5"
+```
+
+Since there is a retry parameter present in this example, WebInject will only sleep 5 seconds
+if the test step fails any of the verifypositives or the assertcount.
+```
+    sleep="5"
+    retry="5"
+```
+
+
 <br />
 
 
@@ -1031,33 +1073,49 @@ Therefore, the GUI will not be responsive during the time it is "sleeping".
 
 Putting this paramater on a test case will put tags around the test case in http.log file.
 
-Example:
+```
     logastext="true"
+```
 
 This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
 parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
 than html.
+
+<br />
+
 
 <a name="tcparamformatxml"></a>
 ####formatxml
 
 Improves readability of xml responses.
 
-Example:
-    formatxml="true"    
+```
+    formatxml="true"
+```
 
 Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read. 
 Specifying this parameter puts a carriage return between every >< found in the response.
 
+<br />
+
+
 <a name="tcparamlogresponseasfile"></a>
 ####logresponseasfile
 
-Saves the test step response as file.
+Saves the test step response in a file.
 
 Example:
-    logresponseasfile="CandidateSearch.css"
 
-In the example given, we capture the Candidate Search css so we can better format the captured html of Candidate Search for later viewing.
+```
+<case
+    id="2050"
+    description1="Get Responsive.css"
+    method="get"
+    url="https://www.example.com/resources/css/Responsive.css"
+    logastext="true"
+    logresponseasfile="Captured.css"
+/>
+```
 
 <br />
 
@@ -1065,11 +1123,13 @@ In the example given, we capture the Candidate Search css so we can better forma
 <a name="tcparamsection"></a>
 ####section
 
-Puts a section break in the test case results xml file. In the section break you can put a description of the upcoming test steps.
+Indicates in the results.xml that a section break occurs before this test.
 
-Example:
-`section="Jobs on map"`
+Use in your Test Automation Framework when displaying the results.xml with a stylesheet.
 
+```
+    section="Ensure it is not possible to apply for the same job twice"
+```
 <br />
 
 
@@ -1078,6 +1138,12 @@ Example:
 If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
 (on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
 test means, like "couldn't connect to the application" or "couldn't access the login page".
+
+```
+    retry="20"
+    sleep="5"
+    errormessage="Job still not in index after 20 tries, perhaps indexer is offline"
+```
 
 <br />
 
@@ -1092,8 +1158,15 @@ If you run your test cases against both test and live environments, you can spec
 test cases are skipped when run against your live config file. See the configuration file section
 for information on how to configure the config file.
 
-Example:
+```
     testonly="true"
+```
+
+In your config.xml, you would have the following line:
+
+```
+    <testonly>Allow</testonly> 
+```
 
 <br />
 
@@ -1104,8 +1177,9 @@ You can flag test cases as being "autocontrolleronly". Then when you invoke webi
 a command line option to indicate you are invoking it from the automation controller. Webinject will
 then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
 
-Example:
+```
     autocontrolleronly="true"
+```
 
 It is probably quite rare that you would have a need for this feature. One example is that you may have a
 website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
@@ -1115,7 +1189,11 @@ immediately. You might be able to negotiate an exemption to virus checking for a
 controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
 the virus checking test cases on your automation controller. This is a real example of how this feature is used.
 
-See the Command Line Options section for the command line option syntax.
+When you start WebInject, you will need to specify the -a parameter, otherwise test steps with the autocontrolleronly
+parameter will be skipped:
+```
+webinject.pl -a
+```
 
 <br />
 
@@ -1125,18 +1203,24 @@ See the Command Line Options section for the command line option syntax.
 
 <a name="tcparamcheckpositive"></a>
 ####checkpositive
-Example:
+
+```
     checkpositive="8"
- In this example, this test step will not be run, unless the most recent verifypositive8 passed.
- Allows us to skip test steps where we know they will fail since a previous dependent step failed.
+```
+
+In this example, this test step will not be run, unless the most recent verifypositive8 passed.
+Allows us to skip test steps where we know they will fail since a previous dependent step failed.
 
 <br />
 
 
 <a name="tcparamchecknegative"></a>
 ####checknegative
-Example:
+
+```
     checknegative="3"
+```
+
 In this example, this test step will not be run, unless the most recent verifynegative3 passed.
 
 <br />
@@ -1144,8 +1228,10 @@ In this example, this test step will not be run, unless the most recent verifyne
 
 <a name="tcparamcheckresponsecode"></a>
 ####checkresponsecode
-Example:
+```
     checkresponsecode="200"
+```
+
 In this example, this test step will not be run, unless the responsecode of the previous test
 step was 200 (if that test step was run).
 
@@ -1154,8 +1240,10 @@ step was 200 (if that test step was run).
 
 <a name="tcparamignorehttpresponsecode"></a>
 ####ignorehttpresponsecode
-Example:
+```
     ignorehttpresponsecode="true"
+```
+
 Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
 Specifying this parameter allows us to ignore this verification.
 
@@ -1166,13 +1254,14 @@ Specifying this parameter allows us to ignore this verification.
 ####sanitycheck
 
 Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
-test case fails, the test run is aborted.
+test case fails, or any previous test has failed, then the test run is aborted.
 
 This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
 like getting the home page, fails, then there little point running the rest of the tests.
 
-Example:
-`sanitycheck="true"`
+```
+    sanitycheck="true"
+```
 
 <br />
 
@@ -1184,8 +1273,10 @@ Example:
 
 <a name="tcparamscreenshot"></a>
 ####screenshot
-Example:
+```
     screenshot="false"
+```
+
 Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
 pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
 
@@ -1198,11 +1289,11 @@ is being run by a service account, there is no window handle with which to work 
 
 <a name="tcparamsearchimage"></a>
 ####searchimage searchimage1 ... searchimage5
+
 Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
 the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
 operating system, but tested on another.
 
-Example:
 ```
     searchimage="RunningMan_Company_Logo.png"` 
 ```
@@ -1210,8 +1301,10 @@ Example:
 The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
 subfolder that has the same name as the testcase you are running. 
 
-For example, refering to the example above, RunningMan_Company_Logo.png can be found at 
-    <testcasefolder>\baseline\Client1\RunningMan_Company_Logo.png
+For example, refering to the example above, RunningMan_Company_Logo.png can be found at
+```
+    mywebinjectestsfolder\baseline\mytestname\RunningMan_Company_Logo.png
+```
 
 <br />
 
@@ -1223,23 +1316,11 @@ Or perhaps you just want those details to appear in the http.log.
 
 Separate additional items with commas. Example:
 
+```
     verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"
-    
+```
+ 
 <br />
-
-
-
-
-
-
-
-    
-
-
-
-    
-
-
 
 
 <a name="tcfullexamp"></a>
