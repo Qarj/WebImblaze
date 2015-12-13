@@ -52,11 +52,11 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ###[3.3 - Available Parameters](#tcavailparams)
 
+####[3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#tccore)
+
 [id](#tcparamid)
 
-[description1](#tcparamdesc1)
-
-[description2](#tcparamdesc2)
+[description1 description2](#tcparamdesc1)
 
 [method](#tcparammethod)
 
@@ -66,79 +66,51 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [postbody](#tcparampostbody)
 
-[command](#tcparamcommand)
-
-[command1](#tcparamcommand1)
-
-[... and so on up to ...](#tcparamcommand2)
-
-[command20](#tcparamcommand20)
-
-[verifyresponsecode](#tcparamvercode)
-
-[retryresponsecode](#tcparamretryresponsecode)
-
 [verifypositive](#tcparamverpos)
-
-[verifypositive1](#tcparamverpos1)
-
-[verifypositiveHTML](#tcparamverposHTML)
 
 [verifynegative](#tcparamverneg)
 
-[verifynegative1](#tcparamverneg1)
-
-[verifynegativeHTML](#tcparamvernegHTML)
-
-[assertcount](#tcparamassertcount)
-
-[searchimage](#tcparamsearchimage)
-
-[searchimage1](#tcparamsearchimage1)
-
-[... and so on up to ...](#tcparamsearchimage2)
-
-[searchimage5](#tcparamsearchimage5)
-
-[verifytext](#tcparamverifytext)
-
-[checkpositive](#tcparamcheckpositive)
-
-[checknegative](#tcparamchecknegative)
-
-[checkresponsecode](#tcparamcheckresponsecode)
-
-[ignorehttpresponsecode](#tcparamignorehttpresponsecode)
-
-[screenshot](#tcparamscreenshot)
-
-[logrequest](#tcparamlogreq)
-
-[logresponse](#tcparamlogresp)
-
 [parseresponse](#tcparamparse)
 
-[parseresponse1](#tcparamparse1)
 
-[parseresponseUSERID](#tcparamparseUSERID)
+####[3.3.2 - Additional Test Driver Parameters](#tcdriver)
 
-[sleep](#tcparamsleep)
-
-[errormessage](#tcparamerrmsg)
+[command command1 ... command20](#tcparamcommand)
 
 [addcookie](#tcparamaddcookie)
 
 [addheader](#tcparamaddheader)
 
+[parms](#tcparamparms)
+
+
+####[3.3.3 - Additional Assertion Parameters](#tcasserts)
+
+[assertcount](#tcparamassertcount)
+
+[verifyresponsecode](#tcparamvercode)
+
+[ignorehttpresponsecode](#tcparamignorehttpresponsecode)
+
+
+####[3.3.4 - Retry Failed Test Step Parameters](#tcretry)
+
+[retryresponsecode](#tcparamretryresponsecode)
+
 [retry](#tcparamretry)
 
-[sanitycheck](#tcparamsanitycheck)
+[retryfromstep](#tcretryfromstep)
 
-[testonly](#tcparamtestonly)
+[restartbrowseronfail](#tcrestartbrowseronfail)
 
-[autocontrolleronly](#tcparamautocontrolleronly)
+[sleep](#tcparamsleep)
+
+
+####[3.3.5 - Test Response Output Control Parameters](#tcoutput)
 
 [logastext](#tcparamlogastext)
+
+[formatjson](#tcparamformatjson)
 
 [formatxml](#tcparamformatxml)
 
@@ -146,7 +118,38 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [section](#tcparamsection)
 
-[parms](#tcparamparms)
+[errormessage](#tcparamerrmsg)
+
+
+####[3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
+
+[liveonly](#tcparamliveonly)
+
+[testonly](#tcparamtestonly)
+
+[autocontrolleronly](#tcparamautocontrolleronly)
+
+
+####[3.3.7 - Parameters to skip test steps if previous test steps failed](#tcsanity)
+
+[checkpositive](#tcparamcheckpositive)
+
+[checknegative](#tcparamchecknegative)
+
+[checkresponsecode](#tcparamcheckresponsecode)
+
+[sanitycheck](#tcparamsanitycheck)
+
+
+####[3.3.8 - Parameters to control Selenium WebDriver Test Execution](#tcwebdriver)
+
+[screenshot](#tcparamscreenshot)
+
+[searchimage searchimage1 ... searchimage5](#tcparamsearchimage)
+
+[verifytext](#tcparamverifytext)
+
+
 
 ###[3.4 - Full Examples](#tcfullexamp)
 
@@ -275,13 +278,13 @@ are written to the http.log file.  The available values you can set this to are:
 
     
 
-        **yes** - log HTTP for all test cases
-        example: `<globalhttplog>yes</globalhttplog>`
-    
-    
-        **onfail** - log HTTP for test cases that fail only
+**yes** - log HTTP for all test cases
+example: `<globalhttplog>yes</globalhttplog>`
 
-        example: `<globalhttplog>onfail</globalhttplog>`
+
+**onfail** - log HTTP for test cases that fail only
+
+example: `<globalhttplog>onfail</globalhttplog>`
     
 
 
@@ -353,7 +356,7 @@ A configuration file listing 3 test case files to process (tests_1.xml, tests_2.
 <testcasefile>tests_1.xml</testcasefile>
 <testcasefile>tests_2.xml</testcasefile>
 <testcasefile>tests_3.xml</testcasefile>
-````
+```
 
 
 Note: You can also use relative path names to point to test case files located in other directories or subdirectories.
@@ -535,114 +538,159 @@ See the "Pass/Fail Critera" section of this manual for more information.
 A minimal test case may look something like:
 
 
-`<case
+```
+<case
     id="1"
     url="http://myserver/test/test.html"
-/>`
-
+/>
+```
 
 
 <a name="tcavailparams"></a>
 ###3.3 - Available Parameters
 
+<a name="tccore"></a>
+###3.3.1 - Core Parameters - Learn these first, for most tests these will be enough
+
 <a name="tcparamid"></a>
 ####id
-Test case identifier used to identify the test case and set it's execution order.
-    
+Test case identifier used to identify the test case and set its execution order. If you number the test steps like 10, 20, 30...
+then it gives you room to insert additional steps (e.g. 15, 25) without having to renumber all the ids.
+
+```
+    id="10"
+```
+
+<br />    
+
+
 <a name="tcparamdesc1"></a>
-####description1
+####description1 description2
 
 Text description for results report.
     
-<a name="tcparamdesc2"></a>
-####description2
-Text description for results report.
-    
+```
+    description1="Get Search Form"
+    description2="(soft logged in)"
+```
+
+Both parameters are optional, but it is highly recommended to always use description1.
+
+<br />    
+
+
 <a name="tcparammethod"></a>
 ####method
 HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
 
-A special methhod of "cmd" is also supported, which will run a shell command through the backtick method. See the
+```
+    method="get"
+```
+
+```
+    method="post"
+    postbody="txtUsername=admin&txtPassword=password1"
+```
+
+A special method of "cmd" is also supported, which will run a shell command through the backtick method. See the
 full examples section for an example.
+
+```
+    method="cmd"
+    command="dir C:\"
+```
+
+<br />
+
     
 <a name="tcparamurl"></a>
 ####url
 
 Full HTTP URL to request.  You can use an IP Address or Host Name.
+
+```
+    url="http://www.example.com/search.aspx"
+```
+
+<br />
+
     
 <a name="tcparamposttype"></a>
 ####posttype
 This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
 in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
 
-    "application/x-www-form-urlencoded"
-    "multipart/form-data"
-    "text/xml"
-    "application/soap+xml"
-    "application/json"
+```
+    posttype="application/x-www-form-urlencoded"
+```
+
+```
+    posttype="multipart/form-data"
+```
+
+```
+    posttype="text/xml"
+```
+
+```
+    posttype="application/soap+xml"
+```
+
+```
+    posttype="application/json"
+```
 
 Defaults to "application/x-www-form-urlencoded" if this parameter is omitted.
-    
+
+<br />
+
+
 <a name="tcparampostbody"></a>
 ####postbody
 This is the data (body) of the request to be sent to the server.  This is only used in an HTTP POST (method="post").
 
 If you are sending "application/x-www-form-urlencoded" data, this parameter contains the string of text data you wish to send.
 
+```
+    method="post"
+    posttype="application/x-www-form-urlencoded"
+    postbody="txtUsername=admin&txtPassword=password1"
+```
 
 If you are sending "multipart/form-data" (used for form-based file upload as specified in RFC 1867), this parameter contains
 a string that represents the Perl code used to define the "Content" parameter of the Perl "POST" function. This string
 will be evaluated by the Perl interpreter using "eval".  More details about the syntax can be found in the Perl documentation
-of the HTTP::Request::Common module. (sorry if this is a little cryptic, the example below should help).
+of the HTTP::Request::Common module.
+
+```
+    method="post"
+    posttype="multipart/form-data" 
+	postbody=" ( 'companyName' => 'Example', 'companyId' => '55201', 'companyLogo' => ['testdata\logos\Example.jpg'] ) "
+```
+
+When sending JSON, you may need to change the overall quotes from double quote to single quote so you can use double
+quotes within the postbody itself for the JSON.
+
+```
+    method="post"
+    posttype="application/json"
+    postbody='{"application": "search", "searchtype": "postcode", "criteria": "WC1X 8TG"}'
+```
+
 
 If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file 
 that contains the text (xml payload) that will be sent in the body of your request.  This is done using the `file=>` syntax.
 Example: `postbody="file=>soap_payload.xml"`
 
-<a name="tcparamcommand"></a>
-####command
-Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
+```
+    method="post"
+    posttype="text/xml"
+    postbody="file=>testdata\GetJobs.xml"
+    addheader='SOAPAction: "http://www.example.com/ns/1.0/GetNewJobs"'
+```
 
-Example: 
+<br />
 
-`command="echo _S24_{24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{30}_Setup.txt"`
-
-Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
-
-Example - use 3 types of quotes on the one line:
-
-`command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
-
-In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
-
-
-<a name="tcparamcommand1"></a>
-####command1
-Additional command that will be run in the same Test Step, after "command" (if present).
-
-<a name="tcparamcommand2"></a>
-  
-
-... and so on up to ...
-<a name="tcparamcommand20"></a>
-####command20
-
-Additional command that will be run in the same Test Step, after "command19" (if present).
-    
-<a name="tcparamvercode"></a>
-####verifyresponsecode
-HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
-code you receive.
-    
-<a name="tcparamretryresponsecode"></a>
-####retryresponsecode
-If a retry is present, retry if we get this reponse code, even if it is an error code.
-
-When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
-However sometimes we need to override this behaviour.
-
-Example: 
-`retryresponsecode="500"`
 
 <a name="tcparamverpos"></a>
 ####verifypositive
@@ -658,142 +706,45 @@ Example - check for "Saved OK" in response:
 
 Example - check for various webtrends tags in response, and output a custom message if it isn't found:
 
-`verifypositive='WT897234|||Webtrends Profile Saved tag not found'`
-
-`verifypositive1='WT897264|||Webtrends New User tag not found'`
-
-`verifypositive2='WT897292|||Webtrends Full Profile tag not found'`
+```
+    verifypositive='WT897234|||Webtrends Profile Saved tag not found'
+    verifypositive1='WT897264|||Webtrends New User tag not found'
+    verifypositive2='WT897292|||Webtrends Full Profile tag not found'
+```
 
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
 backslash:  `{}[]()^$.|*+?\`
 
-    
-<a name="tcparamverpos1"></a>
-####verifypositive1
-Additional positive verification. This works the same as 'verifypositive'.
+You can have as many verifypositive parameters as you want, so long as they start with verifypositive. For example, you can have
+verifypositive20, verifypositive5000, verifypositiveHTML or whatever. 
 
-There is no limit to the number of verifypositives available, you can have verifypositive20, verifypositive5000 or whatever.
-    
-<a name="tcparamverposHTML"></a>
-####verifypositiveHTML
-Additional positive verification. This works the same as 'verifypositive'.
-
-You can also put a text string at the end of a verifypositive to get additional verifypositives. You can put anything you like,
-for example verifypositiveWEBTRENDSTAG. Remember it will need to be XML compliant attribute name.
+<br />
+   
     
 <a name="tcparamverneg"></a>
 ####verifynegative
 String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
-As with verifypositive, you can specify a custom message if a particular verification fails. Check the verifypositive section for
-more information.
-
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
 backslash:  `{}[]()^$.|*+?\`
-    
-<a name="tcparamverneg1"></a>
-####verifynegative1
 
-Additional negative verification. This works the same as 'verifynegative'. See verifypositive1 for additional explanation.
-    
-<a name="tcparamvernegHTML"></a>
-####verifynegativeHTML
-Additional negative verification. This works the same as 'verifynegative'. See verifypositiveHTML for additional explanation.
+As per verifypositive, you can have as many verifynegatives as you want, so long as they all start with verifynegative.
 
-<a name="tcparamassertcount"></a>
-####assertcount
-Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
-if the assertion fails.
+```
+    verifynegative="The system cannot find the file specified"
+    verifynegative1="OutOfMemoryException"
+```
 
-Example:
-`assertcount="Distance:|||1|||Should only be one job shown"`
+And also as per verifypositive, you can specify a custom message if that verification fails.
 
-<a name="tcparamsearchimage"></a>
-####searchimage
-Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
-the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
-operating system, but tested on another.
+```
+    verifynegative="additional-search-results-btn|||Additional Search Results button should not be shown"
+```
 
-Example:
-`searchimage="RunningMan_Company_Logo.png"` 
+<br />
 
-The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
-subfolder that has the same name as the testcase you are running. 
 
-For example, refering to the example above, RunningMan_Company_Logo.png can be found at 
-C:\webinject\Build\testcases\totaljobs\baseline\Client1\RunningMan_Company_Logo.png
-
-<a name="tcparamsearchimage1"></a>
-####searchimage1
-Additional image to look for.
-
-<a name="tcparamsearchimage2"></a>
-  
-
-... and so on up to ...
-<a name="tcparamsearchimage5"></a>
-####searchimage5
-
-Additional image to look for.
-
-<a name="tcparamverifytext"></a>
-####verifytext
-Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
-Or perhaps you just want those details to appear in the http.log.
-
-Separate additional items with commas. Example:
-`verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"`
-    
-<a name="tcparamcheckpositive"></a>
-####checkpositive
-Example:
-`checkpositive="8"`
- In this example, this test step will not be run, unless the most recent verifypositive8 passed.
- Allows us to skip test steps where we know they will fail since a previous dependent step failed.
-
-<a name="tcparamchecknegative"></a>
-####checknegative
-Example:
-`checknegative="3"`
- In this example, this test step will not be run, unless the most recent verifynegative3 passed.
-
-<a name="tcparamcheckresponsecode"></a>
-####checkresponsecode
-Example:
-`checkresponsecode="200"`
- In this example, this test step will not be run, unless the responsecode of the previous test
-step was 200 (if that test step was run).
-
-<a name="tcparamignorehttpresponsecode"></a>
-####ignorehttpresponsecode
-Example:
-`ignorehttpresponsecode="true"`
- Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
-Specifying this parameter allows us to ignore this verification.
-
-<a name="tcparamscreenshot"></a>
-####screenshot
-Example:
-`screenshot="false"`
- Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
-pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
- By specifying this parameter, a page grab will not be taken. Instead, a very fast screenshot of the visible
-portion of the web page will be taken. This fast screenshot will only be taken for interactive sessions. If the test
-is being run by a service account, there is no window handle with which to work with.
- A better name for this parameter would have been "pagegrab".
-
-<a name="tcparamlogreq"></a>
-####logrequest
-Set to "yes" to log (in http.log) the HTTP request sent for the current test case. Logging disabled if this parameter is 
-omitted or not equal to "yes".
-    
-<a name="tcparamlogresp"></a>
-####logresponse
-
-Set to "yes" to log (in http.log) the HTTP response received for the current test case.  Logging disabled if this parameter 
-is omitted or not equal to "yes".
-    
 <a name="tcparamparse"></a>
 ####parseresponse
 Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
@@ -818,73 +769,105 @@ Note: You will need to prepend a backslash before these reserved characters when
 Note: Newlines (\n) are also valid boundaries and are useful when you need to use the end of the line as a boundary.
 
 Example - match from the first instance of START until END is found:
-`parseresponse='START|END|'`
+```
+    parseresponse='START|END|'
+```
 
 Example - match from the first instance of START until END is found, then escape the matched text:
-`parseresponse='START|END|escape'`
-
-Example - match the shortest possible amount of text between START and END:
-`parseresponse='START((?:(?!START).)*)END|regex|'`
-
-This last example is useful when you are sure the END text is unique, but the START text is not unique. This typically
-occurs when you have a drop down and you know the display text but not the id which is usually on the left.
+```
+    parseresponse='START|END|escape'
+```
 
 Example - custom regex - parsed characters are the ones matched inside the parentheses:
-`parseresponse='a id=".*?" class="first" href="/careers-advice/(.*?)"|regex|escape'`
+```
+    parseresponse='a id="\w*" class="first" href="/careers-advice/(\d*)"|regex|escape'
+```
 
 Example - when what we know is on the RHS - this method extracts option values:
-`parseresponse='option value="([0-9]+)".AutoTESavedSearch1|regex|escape'`
+```
+    parseresponse='option value="([0-9]+)".AutoTESavedSearch1|regex|escape'
+```
 
-Example - keep on matching characters matching until you find an unwanted one - in this case < (< has to be escaped as \<):
-`parseresponse='litEmail..([^\<]+)|regex|'`
+Example - Will find user@example.com in a response containing <email>user@example.com</email>
+```
+    parseresponse='email.([^\<]+)|regex|'
+```
 
 Example - the {5,60} specifies that the number of characters matched must be between 5 and 60:
-`parseresponse='_chkSearch" type="checkbox" name="(.{5,60}?)".{5,100}?LocSrch_{TEAM}{WSX}_{OUTSUM}|regex|decode' `
+```
+    parseresponse='name="(.{5,60}?)"|regex|'
+```
 
 Example - in this regex, the .* at the front tells it to return the last match, rather than the first:
-`parseresponse='.*UserId="(.*?)"\<|regex|decode'`
+```
+    parseresponse='.*UserId="(.*?)"\<|regex|'
+```
 
 Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
-`parseresponse='([0-9][0-9]/[0-9][0-9]/[0-9][0-9][0-9][0-9])|regex|'`
+```
+    parseresponse='([\d][\d]/[\d][\d]/[\d]{4,4})|regex|'
+```
 
 Example - match the ctl number for a field:
-`parseresponse='ctl(\d\d).ctl00.btnApplyOnline|regex|'`
+```
+    parseresponse='ctl(\d\d).ctl00.btnApplyOnline|regex|'
+```
 
 Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
-`parseresponse="[a-z0-9\-]{36,36}?|regex|"`
+```
+    parseresponse="[a-z0-9\-]{36,36}?|regex|"
+```
 
-Example - find the inetpub location:
-`command1="echo _START_&type config\inetpub.txt&echo _END_"`
-`parseresponse="_START_.{0,5}?\x0A(.*?)_END_|regex|"`
+**Referencing the results of a parseresponse in later test steps**
 
-`parseresponse` is referred to simply with `{}`.
+`parseresponse1` would be referred to as `{1}`,  `parseresponse5000` as `{5000}` and `parseresponseUSERID` as
+`{USERID}`. `parseresponse` is referred to simply with `{}`.
 
-<a name="tcparamparse1"></a> 
-####parseresponse1
-Additional parameter for response parsing. There is no limit to the number of parseresponse you can have, you can
-append any number you want like parseresponse5000 or whatever.
+Full Example - parse the redirect location from the response header
+```
+<case
+    id="50"
+    description1="Search for WebDriver Jobs"
+    method="get"
+    url="http://www.example.com/JobSearch/Results.aspx?Keywords=WebDriver"
+    parseresponseREDIRECT="Location: |\n|decode"
+/>
 
-`parseresponse1` would be referred to as `{1}`, and `parseresponse5000` as `{5000}`.
-    
-<a name="tcparamparseUSERID"></a>
-####parseresponseUSERID
-Additional parameter for response parsing. You can also append an alpha numeric string to the end of parseresponse to create
-additional parseresponses. This example would be referred to with `{USERID}`.
-   
-<a name="tcparamsleep"></a>
-####sleep
+<case
+    id="60"
+    description1="(redirect) Get search results"
+    method="get"
+    url="http://www.example.com{REDIRECT}"
+/>
+```
 
-Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
-throttle the rate it sends requests.
+You can have as many parseresponses as you want, so long as they all start with parseresponse. Examples are
+parseresponse1, parseresponse5000 and parseresponseUSERID.
 
-Note:  The WebInject GUI runs in a single process/thread.  
-Therefore, the GUI will not be responsive during the time it is "sleeping".
-    
-<a name="tcparamerrmsg"></a>
-####errormessage
-If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
-(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
-test means, like "couldn't connect to the application" or "couldn't access the login page".
+<br />
+
+
+<a name="tcdriver"></a>
+###3.3.2 - Additional Test Driver Parameters
+
+<a name="tcparamcommand"></a>
+####command command1 ... command20
+Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
+
+Example: 
+
+`command="echo _S24_{24}_E24_ {DAY}.{MONTH}.{YEAR} {HH}:{MM}:{SS}> storedvalues\tjuk_{30}_Setup.txt"`
+
+Also used with method="selenium" for the Selenium 2.0 / WebDriver test steps.
+
+Example - use 3 types of quotes on the one line:
+
+`command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'`
+
+In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
+
+<br />
+
 
 <a name="tcparamaddcookie"></a>
 ####addcookie
@@ -893,6 +876,8 @@ This is used to add an additional cookie to an outgoing HTTP request without ove
 The cookie will be added for the current step only.
 
 Example: `addcookie="JBM_COOKIE=4830075"`
+
+<br />
 
 
 <a name="tcparamaddheader"></a>
@@ -905,6 +890,80 @@ Example: `addheader="SOAPAction: urn:example-org:demos#Method"`
 You may add multiple headers, separating each with a pipe character.
 
 Example: `addheader="Foo: bar|Boo: far"`
+
+<a name="tcparamparms"></a>
+####parms
+
+Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
+
+Example:
+    parms="__SALMIN__={SALMIN}&__SALMAX__={SALMAX}"
+
+Allows you to create a xml template file then easily substitute in dynamic values at test run time.
+
+
+Full Example:
+```
+<case
+    id="40"
+    description1="Add Unique Job"
+    url="https://www.example.com/XMLJobLoad/jobloader.aspx"
+    method="post"
+    postbody="file=>testdata\AddJob.xml"
+    posttype="text/xml"
+    parms="__SALMIN__=20000&__SALMAX__=35000"
+    verifypositive1="Job Loaded Successfully"
+    logastext="true"
+/>
+```
+
+testdata\AddJob.xml might look like:
+```
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<FILE>
+	<JOB	
+		JOBID="333211"
+		TITLE="Test Automation Engineer"
+		DESCRIPTION="Great new test automation opportunity"
+		LOCATION="London"
+		SALARYTYPE="ANNUAL"
+		SALARYMIN="__SALMIN__"
+		SALARYMAX="__SALMAX__"
+		SALARYDESC="Great Benefits" 
+	/>
+</FILE>
+```
+
+When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swapped with
+20000 and 35000 respectively.
+
+<br />
+
+
+<a name="tcasserts"></a>
+###3.3.3 - Additional Assertion Parameters
+
+<a name="tcparamassertcount"></a>
+####assertcount
+Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
+if the assertion fails.
+
+Example:
+`assertcount="Distance:|||1|||Should only be one job shown"`
+
+<br />
+
+
+<a name="tcparamvercode"></a>
+####verifyresponsecode
+HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
+code you receive.
+
+<br />
+
+
+<a name="tcretry"></a>
+###3.3.4 - Retry Failed Test Step Parameters
 
 <a name="tcparamretry"></a>
 ####retry
@@ -936,47 +995,36 @@ in a run. This is useful if you would like to specify the retry parameter in man
 things are going badly, the global limit will be enforced preventing your test run from taking
 (seemingly) forever. See the Configuration File section to see how to set this up.
 
-<a name="tcparamsanitycheck"></a>
-####sanitycheck
+<br />
 
-Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
-test case fails, the test run is aborted.
 
-This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
-like getting the home page, fails, then there little point running the rest of the tests.
+<a name="tcparamretryresponsecode"></a>
+####retryresponsecode
+If a retry is present, retry if we get this reponse code, even if it is an error code.
 
-Example:
-`sanitycheck="true"`
-    
-<a name="tcparamtestonly"></a>
-####testonly
+When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
+However sometimes we need to override this behaviour.
 
-If you run your test cases against both test and live environments, you can specify that selected
-test cases are skipped when run against your live config file. See the configuration file section
-for information on how to configure the config file.
+Example: 
+`retryresponsecode="500"`
 
-Example:
-`testonly="true"`
+<br />
 
-<a name="tcparamautocontrolleronly"></a>
-####autocontrolleronly
 
-You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
-a command line option to indicate you are invoking it from the automation controller. Webinject will
-then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
+<a name="tcparamsleep"></a>
+####sleep
 
-Example:<br >
-`autocontrolleronly="true"`
+Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
+throttle the rate it sends requests.
 
-It is probably quite rare that you would have a need for this feature. One example is that you may have a
-website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
-this works, you might have a test case that uploads a document containing an industry standard test virus.
-However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
-immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
-controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
-the virus checking test cases on your automation controller. This is a real example of how this feature is used.
+Note:  The WebInject GUI runs in a single process/thread.  
+Therefore, the GUI will not be responsive during the time it is "sleeping".
 
-See the Command Line Options section for the command line option syntax.
+<br />
+
+
+<a name="tcoutput"></a>
+###3.3.5 - Test Response Output Control Parameters
 
 <a name="tcparamlogastext"></a>
 ####logastext
@@ -984,7 +1032,7 @@ See the Command Line Options section for the command line option syntax.
 Putting this paramater on a test case will put tags around the test case in http.log file.
 
 Example:
-`logastext="true"`
+    logastext="true"
 
 This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
 parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
@@ -996,10 +1044,10 @@ than html.
 Improves readability of xml responses.
 
 Example:
-`formatxml="true"`
+    formatxml="true"    
 
-Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read.
- Specifying this parameter puts a carriage return between every >< found in the response.
+Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read. 
+Specifying this parameter puts a carriage return between every >< found in the response.
 
 <a name="tcparamlogresponseasfile"></a>
 ####logresponseasfile
@@ -1007,9 +1055,12 @@ Sometimes when you receive a response in xml format, the response comes back wit
 Saves the test step response as file.
 
 Example:
-`logresponseasfile="CandidateSearch.css"`
+    logresponseasfile="CandidateSearch.css"
 
 In the example given, we capture the Candidate Search css so we can better format the captured html of Candidate Search for later viewing.
+
+<br />
+
 
 <a name="tcparamsection"></a>
 ####section
@@ -1019,15 +1070,177 @@ Puts a section break in the test case results xml file. In the section break you
 Example:
 `section="Jobs on map"`
 
-<a name="tcparamparms"></a>
-####parms
+<br />
 
-Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
+
+<a name="tcparamerrmsg"></a>
+####errormessage
+If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
+(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
+test means, like "couldn't connect to the application" or "couldn't access the login page".
+
+<br />
+
+
+<a name="tcskip"></a>
+###3.3.6 - Parameters to skip test steps depending on target environment
+
+<a name="tcparamtestonly"></a>
+####testonly
+
+If you run your test cases against both test and live environments, you can specify that selected
+test cases are skipped when run against your live config file. See the configuration file section
+for information on how to configure the config file.
 
 Example:
-`parms="__SALMIN__={20}&__SALMAX__={21}"`
+    testonly="true"
 
-Allows you to create a xml template file then easily substitute in dynamic values at test run time.
+<br />
+
+<a name="tcparamautocontrolleronly"></a>
+####autocontrolleronly
+
+You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
+a command line option to indicate you are invoking it from the automation controller. Webinject will
+then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
+
+Example:
+    autocontrolleronly="true"
+
+It is probably quite rare that you would have a need for this feature. One example is that you may have a
+website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
+this works, you might have a test case that uploads a document containing an industry standard test virus.
+However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
+immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
+controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
+the virus checking test cases on your automation controller. This is a real example of how this feature is used.
+
+See the Command Line Options section for the command line option syntax.
+
+<br />
+
+
+<a name="tcsanity"></a>
+###3.3.7 - Parameters to skip test steps if previous test steps failed
+
+<a name="tcparamcheckpositive"></a>
+####checkpositive
+Example:
+    checkpositive="8"
+ In this example, this test step will not be run, unless the most recent verifypositive8 passed.
+ Allows us to skip test steps where we know they will fail since a previous dependent step failed.
+
+<br />
+
+
+<a name="tcparamchecknegative"></a>
+####checknegative
+Example:
+    checknegative="3"
+In this example, this test step will not be run, unless the most recent verifynegative3 passed.
+
+<br />
+
+
+<a name="tcparamcheckresponsecode"></a>
+####checkresponsecode
+Example:
+    checkresponsecode="200"
+In this example, this test step will not be run, unless the responsecode of the previous test
+step was 200 (if that test step was run).
+
+<br />
+
+
+<a name="tcparamignorehttpresponsecode"></a>
+####ignorehttpresponsecode
+Example:
+    ignorehttpresponsecode="true"
+Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
+Specifying this parameter allows us to ignore this verification.
+
+<br />
+
+
+<a name="tcparamsanitycheck"></a>
+####sanitycheck
+
+Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
+test case fails, the test run is aborted.
+
+This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
+like getting the home page, fails, then there little point running the rest of the tests.
+
+Example:
+`sanitycheck="true"`
+
+<br />
+
+
+<a name="tcwebdriver"></a>
+###3.3.8 - Parameters to control Selenium WebDriver Test Execution
+
+<br />
+
+<a name="tcparamscreenshot"></a>
+####screenshot
+Example:
+    screenshot="false"
+Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
+pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
+
+By specifying this parameter, a page grab will not be taken. Instead, a very fast screenshot of the visible
+portion of the web page will be taken. This fast screenshot will only be taken for interactive sessions. If the test
+is being run by a service account, there is no window handle with which to work with.
+
+<br />
+
+
+<a name="tcparamsearchimage"></a>
+####searchimage searchimage1 ... searchimage5
+Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
+the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
+operating system, but tested on another.
+
+Example:
+```
+    searchimage="RunningMan_Company_Logo.png"` 
+```
+
+The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
+subfolder that has the same name as the testcase you are running. 
+
+For example, refering to the example above, RunningMan_Company_Logo.png can be found at 
+    <testcasefolder>\baseline\Client1\RunningMan_Company_Logo.png
+
+<br />
+
+
+<a name="tcparamverifytext"></a>
+####verifytext
+Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
+Or perhaps you just want those details to appear in the http.log.
+
+Separate additional items with commas. Example:
+
+    verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"
+    
+<br />
+
+
+
+
+
+
+
+    
+
+
+
+    
+
+
+
 
 <a name="tcfullexamp"></a>
 ###3.4 - Full Examples
