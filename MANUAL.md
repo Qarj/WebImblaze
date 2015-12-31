@@ -1546,12 +1546,18 @@ with a backslash (failure to do so will make the test case parser croak).
 
 For example, the following testcase parameter will not work like this:
 
-`verifypositive="<OPTION SELECTED>APPLE"`
+```
+    verifypositive="<OPTION SELECTED>APPLE"
+```
 
 
 Instead, it should be written like:
 
-`verifypositive="\<OPTION SELECTED>APPLE"`
+```
+    verifypositive="\<OPTION SELECTED>APPLE"
+```
+
+<br />
 
 ####quotes (single or double):
 
@@ -1573,6 +1579,7 @@ is valid
 `verifypositive=' "this" '`
 is valid
 
+<br />
 
 
 <a name="tcvarconst"></a>
@@ -1674,16 +1681,30 @@ as a keyword contained within curly braces, and are evaluated/substituted at run
 
 **{BASEURL5}** : Substituted with the value for 'baseurl5' specified in your config file
 
+<br />
 
-{BASEURL} Example:
+
+**{BASEURL} Example:**
 
 If you a have a test case that uses the parameter:
-`url="http://myserver/test/login.jsp"`
+```
+    url="http://myserver/test/login.jsp"
+```
+
 You could create this line in your config.xml file:
-`<baseurl>http://myserver</baseurl>`
+```
+    <baseurl>http://myserver</baseurl>
+```
+
 You can then rewrite the test case parameter as:
-`url="{BASEURL}/test/login.jsp"`
+```
+    url="{BASEURL}/test/login.jsp"
+```
+
 This is helpful if you want to point your tests at different environments by changing a single setting.
+
+<br />
+
 
 ####Setting Variables/Constants Within Test Case Files:
 
@@ -1834,26 +1855,25 @@ ID string must be sent back to the server so it can identify the request and mat
 storing internally.  The client sends the string embedded in the URL or embedded in the post body data of each HTTP request.
 
 In order to do this, WebInject provides a method of parsing data from an HTTP response to be resent in subsequent requests.  This
-is done using the 'parseresponse' parameter and the '{}' variable in your test cases.
+is done using the `parseresponse` parameter and the `{}` variable in your test cases.
 
+You can use additional parsing parameters if you need to parse multiple values from a single response.  
 
-There are also any number of additional parsing parameters/variables available if you need to parse multiple values from a single response.  
-They work the same as these and here are some examples:
+Here are some examples:
 
-parseresponse1/{1}
-
-parseresponse5000/{5000}
-
-parseresponseUSERNAME/{USERNAME} 
-
-parseresponseUSERGUID/{USERGUID}
-
-parseresponseCOMPANYID/{COMPANYID}
-
-parseresponsePARSEDRESULT3/{PARSEDRESULT3}
+Parse Parameter | Corresponding Variable
+--------------- | ----------------------
+parseresponse1 |{1}
+parseresponse5000 | {5000}
+parseresponseUSERNAME | {USERNAME} 
+parseresponseUSERGUID | {USERGUID}
+parseresponseCOMPANYID | {COMPANYID}
+parseresponsePARSEDRESULT3 | {PARSEDRESULT3}
 
 Note: This parsing mechanism may be used for any situation where you need to resend data to the server that was sent to you in 
 a previous response.  There are other circumstances besides maintaining session where this may be useful.
+
+<br />
 
 
 ####Example of maintaining the ViewState with ASP.NET:
@@ -1877,7 +1897,9 @@ To maintain state, you need to grab this value so you can resend it in subsequen
 following parameter to your test case:
 
 
-`parseresponse='__VIEWSTATE" value="|"|escape'`
+```
+    parseresponse='__VIEWSTATE" value="|"|escape'
+```
 
 
 This will grab whatever is between the left boundary (__VIEWSTATE" value=") and the right boundary (") and assign to the system variable 
@@ -1889,13 +1911,17 @@ with the double quotes I was using in my boundaries.)
 Whenever you use the {} variable in a subsequent test case, it will be substituted with the last value you parsed:
 
 
-`postbody="value=123&amp;__VIEWSTATE={}"`
+```
+    postbody="value=123&__VIEWSTATE={}"
+```
 
 
 Will be sent to the server as:
 
 
-`value=123&amp;__VIEWSTATE=dDwtNTA4NzczMzUxMjs6Ps1HmLfiYGewI%2b2JaAxhcpiCtj52`
+`value=123&__VIEWSTATE=dDwtNTA4NzczMzUxMjs6Ps1HmLfiYGewI%2b2JaAxhcpiCtj52`
+
+<br />
 
 
 ####Example of parsing the Session ID from an HTTP response header and sending it as part of the URL:
@@ -1913,7 +1939,9 @@ To parse the Session ID from a header that contains:
 You would add the following parameter to your test case:
 
 
-`parseresponse="JSESSIONID=|;"`
+```
+    parseresponse="JSESSIONID=|;"
+```
 
 
 This will grab whatever is between the left boundary (JSESSIONID=) and the right boundary (;) and 
@@ -1924,12 +1952,12 @@ assign to the system variable named {}.
 Now whenever you use the {} variable in a subsequent test case, it will be substituted with the last value you parsed:
 
 
-`url="http://myserver/search.jsp?value=123&amp;;JSESSIONID={}"`
+```
+    url="http://myserver/search.jsp?value=123&JSESSIONID={}"
+```
 
 
 Will be sent to the server as: 
 
-
-
-`http://myserver/search.jsp?value=123&amp;;JSESSIONID=16CD67F723A6D2218CE73AEAEA899FD9`
+`http://myserver/search.jsp?value=123&JSESSIONID=16CD67F723A6D2218CE73AEAEA899FD9`
 
