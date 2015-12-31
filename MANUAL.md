@@ -464,10 +464,7 @@ files to process by placing each file name inside the proper (<testcasefile>) xm
 used to name your test case file(s), it will default to using a file named 'testcases.xml' in the current [webinject] directory.  The 
 files are processed in the order they appear in your config file.
 
-
-
 A configuration file listing 3 test case files to process (tests_1.xml, tests_2.xml, tests_3.xml) may look something like:
-
 
 ```
 <testcasefile>tests_1.xml</testcasefile>
@@ -475,8 +472,9 @@ A configuration file listing 3 test case files to process (tests_1.xml, tests_2.
 <testcasefile>tests_3.xml</testcasefile>
 ```
 
-
 Note: You can also use relative path names to point to test case files located in other directories or subdirectories.
+
+<br />
 
 
 <a name="cfgcmdlineopts"></a>
@@ -486,21 +484,21 @@ WebInject is called from the command line and has several command line options.
 
 Usage:
 
-`webinject.pl [-c|--config config_file] [-o|--output output_location] [-n|--no-output] [testcase_file [XPath]]`
-
-
+`webinject.pl [-c|--config config_file] [-o|--output output_location] [-n|--no-output] [-A|--autocontroller] [testcase_file [XPath]]`
 
 &nbsp;&nbsp;&nbsp;or
 
-
 `webinject.pl --version|-v`
 
+<br />
 
 
 <a name="cfgavailopts"></a>
 ####Available Command Line Options
 
-**-c** or **--config** : This option is followed by a config file name.  This is used to specify an 
+**-c** or **--config**
+
+This option is followed by a config file name.  This is used to specify an 
 alternate configuration file besides the default (config.xml).  To specify a config file in a different 
 directory, you must use the relative path to it.
 
@@ -529,14 +527,25 @@ To use a combination of a directory and a prefix (this will create output files 
 fooresults.html, and fooresults.xml in the /bar directory): 
 `perl webinject.pl -o /bar/foo`
 
-
 Note: MS Windows style directory naming also works. 
+
 Note: You must still have write access to the directory where WebInject resides, even when writing output 
 elsewhere.
                                         
-**-n** or **--no-output** : Suppresses all output to STDOUT except the results summary.
-**-a** or **--autocontroller** : Specifies to run autocontrolleronly testcases.
-**-v** or **--version** : Displays the version number and other information.
+**-n** or **--no-output**
+
+Suppresses all output to STDOUT except the results summary.
+
+**-a** or **--autocontroller**
+
+Specifies to run autocontrolleronly testcases.
+
+**-v** or **--version**
+
+Displays the version number and other information.
+
+<br />
+
 
 <a name="cfgpassingfile"></a>
 ####Passing a Test Case Filename
@@ -548,16 +557,15 @@ file in the directory that webinject.pl resides in.
 `perl webinject.pl mytests.xml`
 
 
-If no filename is passed from the command line, it will look in config.xml for testcasefile declarations.  If no files 
-are specified, it will look for a default file named 'testcases.xml' in the current [webinject] directory.  If none of these are 
+If no filename is passed from the command line, it will look in config.xml for `testcasefile` declarations.  If no files 
+are specified, it will look for a default file named 'testcases.xml' in the current [WebInject] directory.  If none of these are 
 found, the engine will stop and give you an error.
-
 
 
 Note: If you pass a test case filename from the command line and also have testcasefile declarations in your
 config file, the files specified in the config file will not be processed (but all other config options are still used).
 
-
+<br />
 
 
 <a name="cfgxpathxnode"></a>
@@ -566,13 +574,11 @@ config file, the files specified in the config file will not be processed (but a
 When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a 
 single XPath/XNode.  This will only execute the test case residing in the XPath/XNode you supply.
 
-
-
 For example, to run only testcase 2 from your file named mytests.xml, you would call it like this:
-
 
 `perl webinject.pl mytests.xml testcases/case[2]`
 
+<br />
 
 
 <a name="cfgcmdlinexampls"></a>
@@ -615,15 +621,11 @@ your test case file and config file are located in a subdirectory named 'myfiles
 
 `perl webinject.pl ./myfiles/mytests.pl -c ./myfiles/myconfig.xml`
 
-
-
-
+<br />
 
 
 <a name="tcsetup"></a>
 ##3 - Test Case Setup
-
-
 
 <a name="tcsummary"></a>
 ###3.1 - Summary
@@ -633,30 +635,32 @@ for execution against the application/service under test. This abstracts the int
 implementation away from the non-technical tester, while using an open architecture [written in Perl] 
 for those that require more customization or modifications.
 
-
-
 There are several parameters (attributes) you can use in your cases, depending on what you are trying to 
 accomplish.  The only required parameters are the 'id' and the 'url'.  If no verification parameters 
 (verifypositive, verifynegative, verifyresponsecode, etc) are provided, the test case will be marked as 
 "FAILED" if the HTTP request returns an HTTP Response Code that is not in the 100-399 range.  
 See the "Pass/Fail Critera" section of this manual for more information.
 
-
-
+<br />
 
 
 <a name="tcminexamp"></a>
 ###3.2 - Minimal Example
 
-A minimal test case may look something like:
-
+A minimal test case xml file may look something like:
 
 ```
+<testcases repeat="1">
+
 <case
     id="1"
     url="http://myserver/test/test.html"
 />
+
+</testcases>
 ```
+
+<br />
 
 
 <a name="tcavailparams"></a>
@@ -1442,7 +1446,7 @@ Sample test case file using multiple parameters:
 <testcases repeat="1">
 
 <case
-    id="1"
+    id="10"
     description1="short description"
     description2="long description"
     method="post"
@@ -1454,7 +1458,7 @@ Sample test case file using multiple parameters:
 />
 
 <case
-    id="2"
+    id="20"
     description1="short description"
     description2="long description"
     method="get"
@@ -1469,7 +1473,7 @@ Here is a sample test case showing a "multipart/form-data" encoded form-based fi
 
 ```
 <case 
-    id="1" 
+    id="10" 
     description1="sample test case - POST" 
     description2="verify file upload" 
     method="post" 
@@ -1486,7 +1490,7 @@ Here is a sample test case showing usage of the "cmd" method:
 
 ```
 <case 
-    id="1"
+    id="10"
     description1="Prepare JobFile with unique ids that will be accessible from webinject"
     method="cmd"
     command="ssed -e s/__TIME__/{STARTTIME}/g testdata\JobFileTemplate.xml > {OUTPUT}JobFile.xml"
@@ -1627,101 +1631,77 @@ is also valid.
 Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case 
 as a keyword contained within curly braces, and are evaluated/substituted at runtime.
 
-    
-**{TIMESTAMP}** : Substituted with the current timestamp (floating seconds since the epoch, accurate to microseconds)
+The first set of variables are the most dynamic. They can change each time a test case is retried as
+a result of the invocation of the `retry` parameter.
 
-
-**{STARTTIME}** : Substituted with the webinject start time, similar to {TIMESTAMP} - but remains constant during a run
-
-
-**{OUTPUT}** : Substituted with the webinject output directory name, or "no output" if output is suppressed
-
-
-**{HOSTNAME}** : Substituted with the name of the computer currently running WebInject
-
-
-**{TESTNUM}** : Substituted with the number of the current test step
-
-
-**{CONCURRENCY}** : Substituted with the name of the temporary folder (not full path) for the current tests
-
-
-**{LENGTH}** : Substituted with the length of the response for the previous test step
-
-
-**{AMPERSAND}** : Gives you a &amp;
-
-
-**{LESSTHAN}** : Gives you a <
-
-
-**{ELAPSED_SECONDS}** : The elapsed seconds so far - always rounded up
-
-
-**{ELAPSED_MINUTES}** : The elapsed minutes so far - always rounded up
-
-
-**{TESTSTEPTIME:510}** : Latency for test step number 510
-
-
-**{DAY}** : The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
-
-
-**{MONTH}** : The month number of the year at run start with leading 0, e.g. 05 [denoting May]
-
-
-**{YEAR}** : The year at run start as 4 digits, e.g. 2013
-
-
-**{HH}** : The run start hour in 24hr time with leading 0, e.g. 15 
-
-
-**{MM}** : The run start minute with leading 0, e.g. 09
-
-
-**{SS}** : The run start second with leading 0
-
-
-**{WEEKOFMONTH}** : The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
-
-
-**{COUNTER}** : What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
-
-
-**{CWD}** : Substituted with the current working directory
-
-
-**{}** : Substituted with the result of the response parsing from a 'parseresponse' test case parameter
-
-**{1}** : Substituted with the result of the response parsing from a 'parseresponse1' test case parameter
-
-**{5000}** : Substituted with the result of the response parsing from a 'parseresponse5000' test case parameter
-
-**{ANYTHING}** : Substituted with the result of the response parsing from a 'parseresponseANYTHING' test case parameter
-
-
-(See the "Parsing Response Data &amp; Embedded Session ID's" section for details and examples on how to use these {PARSEDRESULT} variables)
-
-    
-**{BASEURL}** : Substituted with the value for 'baseurl' specified in your config file
-
-
-**{BASEURL1}** : Substituted with the value for 'baseurl1' specified in your config file
-
-
-**{BASEURL2}** : Substituted with the value for 'baseurl2' specified in your config file
-
-
-**{BASEURL3}** : Substituted with the value for 'baseurl3' specified in your config file
-
-
-**{BASEURL4}** : Substituted with the value for 'baseurl4' specified in your config file
-
-
-**{BASEURL5}** : Substituted with the value for 'baseurl5' specified in your config file
+Dynamic Variable | Description
+:--------------- | :----------
+**{RETRY}** | How many times the current test case has been retried. E.g. 0, 1, 2, 3 ...
+**{ELAPSED_SECONDS}** | Elapsed seconds so far - always rounded up
+**{ELAPSED_MINUTES}** | Elapsed minutes so far - always rounded up
+**{NOW}** | Current date and time in format day/month/year_hour:minute:second
 
 <br />
 
+
+The next set of variables can hold different values between test cases, but will not change
+between retries while a test case is being run.
+
+Variable | Description
+:------- | :----------
+**{TIMESTAMP}** | Current timestamp (floating seconds since the epoch, accurate to microseconds)
+**{TESTNUM}** | Id number of the current test step
+**{LENGTH}** | Length of the response for the previous test step
+**{TESTSTEPTIME:510}** | Latency for test step number 510
+**{COUNTER}** | What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
+**{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
+**{}** | Result of the response parsing from a 'parseresponse' test case parameter
+**{1}** | Result of the response parsing from a 'parseresponse1' test case parameter
+**{5000}** | Result of the response parsing from a 'parseresponse5000' test case parameter
+**{ANYTHING}** | Result of the response parsing from a 'parseresponseANYTHING' test case parameter
+
+(See the "Parsing Response Data & Embedded Session ID's" section for details and examples on how to use these variables
+created by means of a `parseresponse`.)
+
+<br />
+
+
+The values of the constants are set at the run start time. They will not change while the test case file is being run. 
+
+Constant | Description
+:------- | :----------
+**{STARTTIME}** | WebInject start time, similar to {TIMESTAMP} - but remains constant during a run
+**{AMPERSAND}** | Gives you a &
+**{LESSTHAN}** | Gives you a <
+**{SINGLEQUOTE}** | Gives you a '
+**{DAY}** | The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
+**{MONTH}** | The month number of the year at run start with leading 0, e.g. 05 [denoting May]
+**{YEAR}** | The year at run start as 4 digits, e.g. 2016
+**{YY}** | The year at run start as 2 digits, e.g. 16
+**{HH}** | The run start hour in 24hr time with leading 0, e.g. 15 
+**{MM}** | The run start minute with leading 0, e.g. 09
+**{SS}** | The run start second with leading 0
+**{WEEKOFMONTH}** | The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
+**{DATETIME}** | The run start date and time without formatting - yearmonthdayhourminutesecond
+**{FORMATDATETIME}** | The run start date and time with formatting - day/month/year_hour:minute:second
+**{CWD}** | Current working directory
+**{OUTPUT}** | WebInject output directory name, or "no output" if output is suppressed
+**{HOSTNAME}** | Name of the computer currently running WebInject
+**{CONCURRENCY}** | Output folder name only - not the full path
+**{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder 
+**{TESTFILENAME}** | Test file name
+**{PROXYRULES}** | What proxy option was specified via the command line to webinject.pl
+**{GLOBAL1}** | Value of 'global1' specified in your config file
+**{GLOBAL2}** | Value of 'global1' specified in your config file
+**{GLOBAL3}** | Value of 'global1' specified in your config file
+**{GLOBAL4}** | Value of 'global1' specified in your config file
+**{GLOBAL5}** | Value of 'global1' specified in your config file
+**{BASEURL}** | Value of 'baseurl' specified in your config file
+**{BASEURL1}** | Value of 'baseurl1' specified in your config file
+**{BASEURL2}** | Value of 'baseurl2' specified in your config file
+**{BASEURL3}** | Value of 'baseurl3' specified in your config file
+**{BASEURL4}** | Value of 'baseurl4' specified in your config file
+**{BASEURL5}** | Value of 'baseurl5' specified in your config file
 
 **{BASEURL} Example:**
 
@@ -1775,6 +1755,7 @@ The following example of a test case file shows how you can use them:
 </testcases>
 ```
 
+<br />
 
 <a name="passfailcrit"></a>
 ##4 - Pass/Fail Criteria
@@ -1787,12 +1768,15 @@ The following example of a test case file shows how you can use them:
 In each test case, you can set Verifications that will pass or fail depending on the existence of a specified text string 
 (or regex) in the content of the HTTP response you receive.
 
-'verifypositive' - This Verification fails if the string you specified does not exist in the HTTP response you receive. 
-'verifynegative' - This Verification fails if the string you specified exists in the HTTP response you receive.
+`verifypositive` - This Verification fails if the string you specified does not exist in the HTTP response you receive.
+
+`verifynegative` - This Verification fails if the string you specified exists in the HTTP response you receive.
 
 
-'verifypositive5000', 'verifypositiveANYTHING', 'verifynegative1234', 'verifynegativeWHATEVERYOUWANT',  
+`verifypositive5000`, `verifypositiveANYTHING`, `verifynegative1234`, `verifynegativeWHATEVERYOUWANT`,  
 work the same way.
+
+<br />
 
 
 <a name="passfailhttpresp"></a>
@@ -1800,14 +1784,24 @@ work the same way.
 
 In each test case, you can set a Verifications that will pass or fail depending on the HTTP response code.
 
-
-'verifyresponsecode' - This Verification fails if the HTTP response code you specified does not match the HTTP response code 
+`verifyresponsecode` - This Verification fails if the HTTP response code you specified does not match the HTTP response code 
 you receive.
-
 
 If you do not specify this test case parameter, the HTTP Response Code Verification is marked as "Failed" if the HTTP request 
 returns an HTTP response code that is not in the success range (100-399).  It is marked as "Passed" if the HTTP 
 Response Code is in the success range (100-399).
+
+If you are testing an error page, you will need to use this parameter.
+
+```
+    verifyresponsecode="404"
+```
+
+```
+    verifyresponsecode="500"
+```
+
+<br />
 
 
 <a name="passfailcases"></a>
@@ -1818,6 +1812,8 @@ the test case is marked as "FAILED".  If all of the Verifications defined within
 HTTP Response Code Verification passes, the test case is marked as "PASSED".  These items are updated in 
 real-time during execution.
 
+<br />
+
 
 <a name="output"></a>
 ##5 - Output/Results/Reporting
@@ -1825,12 +1821,13 @@ real-time during execution.
 <a name="outputhtml"></a>
 ###5.1 - Results File in HTML format (results.html)
 
-
 An HTML file (results.html) is generated to display detailed results of the test execution.
-It is written into the directory that WebInject runs from and is overwritten each time the tool runs.
+It is written into the WebInject output folder and is overwritten each time the tool runs.
+
 The file contains data passed from the test case file (test case identifiers/descriptions, etc) as 
 well as information generated from the test engine (test case pass/fail status, execution times, etc).
-This is where the most detailed results data can be found.
+
+<br />
 
 
 <a name="outputxml"></a>
@@ -1838,21 +1835,24 @@ This is where the most detailed results data can be found.
 
 An XML file (results.xml) is generated to display results of the test execution.
 It is written into the directory that WebInject runs from and is overwritten each time the tool runs.
+
 The file contains data passed from the test case file (test case identifiers/descriptions, etc) as 
 well as information generated from the test engine (test case pass/fail status, execution times, etc).
+
+If you put an xsl stylesheet against this file, you can get a customised display of the test run results.
+
+<br />
 
 
 <a name="outputstdout"></a>
 ###5.3 - Results in STDOUT
 
-If you are running the WebInject Engine (webinject.pl) as a standalone test runner (text/console application),
-results are sent [in plain text format] to the STDOUT channel as the tests execute.  The same level of detail that 
-is written to results.html is also written here.
+Results are also sent [in plain text format] to the STDOUT channel as the tests execute.
 
+<br />
 
 <a name="outputhttp"></a>
 ###5.4 - HTTP Log File (http.log)
-
 
 A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system 
 under test and HTTP responses that are received from the system under test.  Whether or not HTTP logging is 
@@ -1860,8 +1860,9 @@ turned on depends on a setting in the configuration file and if you have logging
 test case.  See the "Configuration - Configuration File (config.xml)" and "Test Case Setup - Available Parameters"
 sections of this manual for more information on logging to the http.log file.
 
-
 Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoing HTTP POST requests, but are not shown in http.log.  
+
+<br />
 
 
 <a name="sessstate"></a>
@@ -1876,6 +1877,8 @@ stateless nature of the protocol itself, web applications or services use variou
 client connections to be tracked and connection-specific data to be maintained.  If your server requires the client to maintain 
 state during a session, then your test tool must be able to handle this as well.
 
+<br />
+
 
 <a name="sesscookie"></a>
 ###6.2 - Cookies
@@ -1883,6 +1886,8 @@ state during a session, then your test tool must be able to handle this as well.
 One way to maintain session state is with HTTP Cookies.  WebInject automatically handles Cookies for you (like a browser would). 
 When a "Set-Cookie" is sent back in the HTTP header from the web server, the Cookie is automatically stored and sent back with 
 subsequent requests to the domain it was set from.
+
+<br />
 
 
 <a name="sessid"></a>
