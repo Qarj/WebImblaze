@@ -1436,9 +1436,11 @@ Separate additional items with commas. Example:
 <a name="tcfullexamp"></a>
 ###3.4 - Full Examples
 
-Sample test cases using multiple parameters:
+Sample test case file using multiple parameters:
 
 ```
+<testcases repeat="1">
+
 <case
     id="1"
     description1="short description"
@@ -1459,6 +1461,8 @@ Sample test cases using multiple parameters:
     url="http://myserver/test/send.jsp?value={TIMESTAMP}"
     verifypositive="verify this string exists"
 />
+
+</testcases>
 ```
 
 Here is a sample test case showing a "multipart/form-data" encoded form-based file upload:
@@ -1489,12 +1493,17 @@ Here is a sample test case showing usage of the "cmd" method:
 />
 ```
 
+<br />
+
+
 <a name="tcnumcases"></a>
 ###3.5 - Numbering Test Cases and Execution Order
 
-Test Cases are numbered using the "id=" parameter.  They will be sorted and executed in sequential order based on 
+Test Cases are numbered using the `id=` parameter.  They will be sorted and executed in sequential order based on 
 these numbers, not the physical position of the Test Case within your file.  You are allowed to leave gaps in the 
 numbering and have them in any order in the file.
+
+<br />
 
 
 <a name="tcxmltags"></a>
@@ -1520,6 +1529,8 @@ like a file of test cases to run.
 For example, to have a test case file run 5 times, your file should open with:
 
 `<testcases repeat="5">`
+
+<br />
 
 
 <a name="tcvalidxml"></a>
@@ -1557,7 +1568,21 @@ Instead, it should be written like:
     verifypositive="\<OPTION SELECTED>APPLE"
 ```
 
+Or you could just leave it out altogether for a cleaner look:
+
+```
+    verifypositive="OPTION SELECTED>APPLE"
+```
+
+In fact you can get away with just writing a dot instead of any special character.
+In regular expressions, a single dot, i.e. `.` will match any single character.
+
+```
+    verifypositive="OPTION SELECTED.APPLE"
+```
+
 <br />
+
 
 ####quotes (single or double):
 
@@ -1569,15 +1594,29 @@ your attribute (both single and double quotes are valid to encapsulate an XML at
 
 For example:
 
-`verifypositive=" "this" "`
+```
+    verifypositive=" "this" "
+```
 
-will not work
-`verifypositive=' 'this' '`
-will not work
-`verifypositive=" 'this' "`
-is valid
-`verifypositive=' "this" '`
-is valid
+will not work.
+
+```
+    verifypositive=' 'this' '
+```
+
+will not work.
+
+```
+    verifypositive=" 'this' "
+```
+
+is valid.
+
+```
+    verifypositive=' "this" '
+```
+
+is also valid.
 
 <br />
 
