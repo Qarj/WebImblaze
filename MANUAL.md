@@ -103,13 +103,15 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ####[3.3.4 - Retry Failed Test Step Parameters](#tcretry)
 
-[retryresponsecode](#tcparamretryresponsecode)
-
 [retry](#tcparamretry)
 
 [retryfromstep](#tcretryfromstep)
 
+[retryresponsecode](#tcparamretryresponsecode)
+
 [restartbrowseronfail](#tcrestartbrowseronfail)
+
+[restartbrowser](#tcrestartbrowser)
 
 [sleep](#tcparamsleep)
 
@@ -1142,6 +1144,37 @@ things are going badly, the global limit will be enforced preventing your test r
 
 <br />
 
+<a name="tcretryfromstep"></a>
+####retryfromstep
+Works in much the same way as the `retry` paramater, however execution will continue from the specified step
+rather than the current step.
+
+```
+<case
+    id="10"
+    description1="Get Home page"
+    url="http://{BASEURL}"
+    method="get"
+    verifypositive="Please log in"
+/>
+
+<case
+    id="20"
+    description1="Submit login details"
+    url="http://{BASEURL}"
+    method="post"
+    postbody="username=admin&password=12345"
+    verifypositive="Welcome admin"
+    retryfromstep="10"
+/>
+```
+
+In this example, if the message "Welcome admin" is not found, then execution will continue from step 10
+without failing step 20. This will continue to happen until "Welcome admin" is found, or up to the
+globaljumpbacks setting in the config file (defaulted to 20 if not present).
+
+<br />
+
 
 <a name="tcparamretryresponsecode"></a>
 ####retryresponsecode
@@ -1153,6 +1186,52 @@ However sometimes we need to override this behaviour.
 ```
     retryresponsecode="500"
 ```
+
+<br />
+
+
+<a name="tcrestartbrowseronfail"></a>
+####restartbrowseronfail
+When present, will restart the WebInject session if any of the verifications fail.
+
+If a Selenium WebDriver browser session is also present, that will be restarted too.
+
+```
+    restartbrowseronfail="true"
+```
+
+This has the effect of dumping all cookies and getting the session back to a known state.
+
+This is particularly important if you are trying to log in and something went wrong. It could be
+that you are logged in successfully, but something else went wrong so you need to retry the test case
+from a not logged in state.
+
+```
+<case
+    id="20"
+    description1="Submit login details"
+    url="http://{BASEURL}"
+    method="post"
+    postbody="username=admin&password=12345"
+    verifypositive="Welcome admin"
+    retryfromstep="10"
+    restartbrowseronfail="true"
+/>
+```
+
+<br />
+
+<a name="tcrestartbrowser"></a>
+####restartbrowser
+Will restart the WebInject session after execution of the current step.
+
+If a Selenium WebDriver browser session is also present, that will be restarted too.
+
+```
+    restartbrowser="true"
+```
+
+All cookies will be dumped.
 
 <br />
 
@@ -1194,6 +1273,19 @@ Putting this paramater on a test case will put tags around the test case in http
 This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
 parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
 than html.
+
+<br />
+
+<a name="tcparamformatjson"></a>
+####formatjson
+
+Improves readability of json responses.
+
+```
+    formatjson="true"
+```
+
+Inserts carriage returns at various places using a simple regular expression.
 
 <br />
 
@@ -1283,6 +1375,24 @@ In your config.xml, you would have the following line:
 ```
 
 <br />
+
+<a name="tcparamliveonly"></a>
+####liveonly
+
+Works exactly the same was as testonly.
+
+```
+    liveonly="true"
+```
+
+In your config.xml, you would have the following line:
+
+```
+    <liveonly>Allow</liveonly> 
+```
+
+<br />
+
 
 <a name="tcparamautocontrolleronly"></a>
 ####autocontrolleronly
