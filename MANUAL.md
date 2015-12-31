@@ -1862,7 +1862,7 @@ You can use additional parsing parameters if you need to parse multiple values f
 Here are some examples:
 
 Parse Parameter | Corresponding Variable
---------------- | ----------------------
+:-------------- | :---------------------
 parseresponse1 |{1}
 parseresponse5000 | {5000}
 parseresponseUSERNAME | {USERNAME} 
