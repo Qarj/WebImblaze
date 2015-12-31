@@ -433,7 +433,7 @@ It is possible to specify assertions that run automatically on every single test
 
 A possible usage is to check that you have not obtained an error page.
 
-```
+```xml
 <autoassertions> 
    <autoassertion1>^((?!error.stacktrace).)*$|||A java stacktrace has occurred</autoassertion1> 
    <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2> 
@@ -973,7 +973,7 @@ parseresponse1, parseresponse5000 and parseresponseUSERID.
 ####command command1 ... command20
 Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
-```
+```xml
     command="type test_data_file.txt"
     parseresponseUSERNAME='USERNAME5="|"|'
     parseresponsePASSWORD='PASSWORD5="|"|'
