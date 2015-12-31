@@ -1653,7 +1653,7 @@ Variable | Description
 **{TESTNUM}** | Id number of the current test step
 **{LENGTH}** | Length of the response for the previous test step
 **{TESTSTEPTIME:510}** | Latency for test step number 510
-**{COUNTER}** | What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
+**{COUNTER}** | What loop number we are on - corresponding to the `repeat="5"` (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
 **{}** | Result of the response parsing from a `parseresponse` test case parameter
 **{1}** | Result of the response parsing from a `parseresponse1` test case parameter
@@ -1692,10 +1692,10 @@ Constant | Description
 **{TESTFILENAME}** | Test file name
 **{PROXYRULES}** | What proxy option was specified via the command line to webinject.pl
 **{GLOBAL1}** | Value of `global1` specified in your config file
-**{GLOBAL2}** | Value of `global1` specified in your config file
-**{GLOBAL3}** | Value of `global1` specified in your config file
-**{GLOBAL4}** | Value of `global1` specified in your config file
-**{GLOBAL5}** | Value of `global1` specified in your config file
+**{GLOBAL2}** | Value of `global2` specified in your config file
+**{GLOBAL3}** | Value of `global3` specified in your config file
+**{GLOBAL4}** | Value of `global4` specified in your config file
+**{GLOBAL5}** | Value of `global5` specified in your config file
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file
 **{BASEURL2}** | Value of `baseurl2` specified in your config file
