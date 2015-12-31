@@ -1655,10 +1655,10 @@ Variable | Description
 **{TESTSTEPTIME:510}** | Latency for test step number 510
 **{COUNTER}** | What loop number we are on - corresponding to the repeat="5" (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
-**{}** | Result of the response parsing from a 'parseresponse' test case parameter
-**{1}** | Result of the response parsing from a 'parseresponse1' test case parameter
-**{5000}** | Result of the response parsing from a 'parseresponse5000' test case parameter
-**{ANYTHING}** | Result of the response parsing from a 'parseresponseANYTHING' test case parameter
+**{}** | Result of the response parsing from a `parseresponse` test case parameter
+**{1}** | Result of the response parsing from a `parseresponse1` test case parameter
+**{5000}** | Result of the response parsing from a `parseresponse5000` test case parameter
+**{ANYTHING}** | Result of the response parsing from a `parseresponseANYTHING` test case parameter
 
 (See the "Parsing Response Data & Embedded Session ID's" section for details and examples on how to use these variables
 created by means of a `parseresponse`.)
@@ -1691,17 +1691,17 @@ Constant | Description
 **{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder 
 **{TESTFILENAME}** | Test file name
 **{PROXYRULES}** | What proxy option was specified via the command line to webinject.pl
-**{GLOBAL1}** | Value of 'global1' specified in your config file
-**{GLOBAL2}** | Value of 'global1' specified in your config file
-**{GLOBAL3}** | Value of 'global1' specified in your config file
-**{GLOBAL4}** | Value of 'global1' specified in your config file
-**{GLOBAL5}** | Value of 'global1' specified in your config file
-**{BASEURL}** | Value of 'baseurl' specified in your config file
-**{BASEURL1}** | Value of 'baseurl1' specified in your config file
-**{BASEURL2}** | Value of 'baseurl2' specified in your config file
-**{BASEURL3}** | Value of 'baseurl3' specified in your config file
-**{BASEURL4}** | Value of 'baseurl4' specified in your config file
-**{BASEURL5}** | Value of 'baseurl5' specified in your config file
+**{GLOBAL1}** | Value of `global1` specified in your config file
+**{GLOBAL2}** | Value of `global1` specified in your config file
+**{GLOBAL3}** | Value of `global1` specified in your config file
+**{GLOBAL4}** | Value of `global1` specified in your config file
+**{GLOBAL5}** | Value of `global1` specified in your config file
+**{BASEURL}** | Value of `baseurl` specified in your config file
+**{BASEURL1}** | Value of `baseurl1` specified in your config file
+**{BASEURL2}** | Value of `baseurl2` specified in your config file
+**{BASEURL3}** | Value of `baseurl3` specified in your config file
+**{BASEURL4}** | Value of `baseurl4` specified in your config file
+**{BASEURL5}** | Value of `baseurl5` specified in your config file
 
 **{BASEURL} Example:**
 
