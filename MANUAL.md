@@ -28,9 +28,17 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Global Retry (globalretry)](#cfgglobalretry)
 
+[Global Jumpbacks (globaljumpbacks)](#cfgglobaljumpbacks)
+
 [Global constants (global1, global2, global3, global4, global5)](#cfgglobalconstants)
 
 [Test Only (testonly)](#cfgtestonly)
+
+[Auto Controller Only (autocontrolleronly)](#cfgautocontrolleronly)
+
+[User Defined (userdefined)](#cfguserdefined)
+
+[Auto Assertions (autoassertions)](#cfgautoassertions)
 
 ###[2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
 
@@ -219,6 +227,9 @@ All settings and constants must be enclosed in the proper tags, and simply need 
 
 Available config settings are:
 
+<br />
+
+
 <a name="cfgproxy"></a>
 ####proxy
 Specifies a proxy server to route all HTTP requests through.
@@ -231,12 +242,18 @@ example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
     
 <a name="cfguseragent"></a>
 
+<br />
+
+
 ####useragent
 Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default 
 User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
 
 example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>`
     
+<br />
+
+
 <a name="cfghttpauth"></a>
 ####httpauth
 
@@ -256,10 +273,17 @@ Authentication credentials.
     
 <a name="cfgbaseurl"></a>
 
+<br />
+
+
 ####baseurl
 Creates the constant {BASEURL} which can be used in test cases (see 'Variables and Constants' section below).
 
 example: `<baseurl>http://myserver</baseurl>`
+
+<br />
+
+
 ####baseurl1
 
 Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
@@ -267,10 +291,16 @@ in the same way as the 'baseurl' example above.
  
 ... and so on up to ...
 
+<br />
+
+
 ####baseurl5
 Creates the constant {BASEURL5} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
     
+<br />
+
+
 <a name="cfghttplog"></a>
 ####globalhttplog
 Enables logging of HTTP requests/responses for all test cases.  The HTTP requests sent and HTTP responses received 
@@ -285,12 +315,13 @@ example: `<globalhttplog>yes</globalhttplog>`
 **onfail** - log HTTP for test cases that fail only
 
 example: `<globalhttplog>onfail</globalhttplog>`
-    
-
 
 Note: If you also turn on logging for any individual test cases, it will produce duplicate log entries for the same 
 request/response.
     
+<br />
+
+
 <a name="cfgcomment"></a>
 ####comment
 
@@ -298,6 +329,9 @@ Allows you to comment out parts of your config file.  Anything contained within 
 (I know it is braindead that we don't allow regular XML-style comments here.. sorry)
 
 example: `<comment>this will be ignored</comment>`
+
+<br />
+
     
 <a name="cfgtimeout"></a>
 ####timeout
@@ -310,6 +344,9 @@ example: `<timeout>10</timeout>`
 
 Note: This timeout setting may not always work when using SSL/HTTPS.
     
+<br />
+
+
 <a name="cfgglobalretry"></a>
 ####globalretry
 This setting is used along with the retry parameter in a test case. It limits the number of retry attempts in a test run.
@@ -319,6 +356,19 @@ badly, then there will be no more than 50 retry attempts rather than 120.
 
 example: `<globalretry>50</globalretry>`
     
+<br />
+
+
+<a name="cfgglobaljumpbacks"></a>
+####globaljumpbacks
+
+Limits the number of times the retryfromstep parameter is followed. Stops tests potentially running forever.
+
+If not present, defaulted to 20.
+
+<br />
+
+
 <a name="cfgglobalconstants"></a>
 ####global1 to global5
 Allows you to specify up to 5 custom global constants for use across all test case files.
@@ -326,6 +376,9 @@ Allows you to specify up to 5 custom global constants for use across all test ca
 example: `<global1>20</global1>`
 You could use it in a test case as the sleep time (for example):
 `sleep="{GLOBAL1}"`
+
+<br />
+
 
 <a name="cfgtestonly"></a>
 ####testonly
@@ -335,6 +388,71 @@ and set to any value, the test cases with the testonly parameter set will be run
 example: `<testonly>Allow</testonly>`
 To use this feature, specify this value in your test config files, and leave it out of your
 config files for your live servers.
+
+In the test step that you only want to run on test environments, specify the parameter `testonly="true"`
+
+<a name="cfgautocontrolleronly"></a>
+
+<br />
+
+
+####autocontrolleronly
+Similar to testonly. Allows you to designate certain servers as an automation controller.
+This enables you to specify that certain test steps should only be run from the automation controller.
+
+example: `<automationcontrolleronly>Allow</automationcontrolleronly>`
+
+In the test step that you only want to run on automation controllers, specify the parameter `automationcontrolleronly="true"`
+
+<br />
+
+
+<a name="cfguserdefined"></a>
+####userdefined
+You can create your own abitrary config values that can be accessed as constants in the test steps.
+
+It is recommened to do this rather than using global1 to global5 since you can give meaningful names to your config.
+
+```
+<userdefined> 
+    <adminuser>admin@example.com</adminuser> 
+    <adminpass>topsecret</adminpass> 
+</userdefined>
+```
+
+In this example, you would refer to the constants in your test steps as {ADMINUSER} and {ADMINPASS}.
+
+<br />
+
+
+<a name="cfgautoassertions"></a>
+####autoassertions
+It is possible to specify assertions that run automatically on every single test step.
+
+A possible usage is to check that you have not obtained an error page.
+
+```
+<autoassertions> 
+   <autoassertion1>^((?!error.stacktrace).)*$|||A java stacktrace has occurred</autoassertion1> 
+   <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2> 
+</autoassertions> 
+```
+
+In the example above, the regular expression is constructed in such a way that the assertion will
+pass if the search text is not found. For autoassertion1, `error.stacktrace` is the string that should
+not be found in the response. After the three bars, i.e. `|||`, the optional error message that should be shown
+on failure is specified.
+
+<br />
+```
+<autoassertions> 
+   <autoassertion1>Copyright Example Company 2016</autoassertion1> 
+</autoassertions> 
+```
+
+This second example automatically asserts that this copyright message appears in every response.
+
+<br />
 
 
 <a name="cfgfilenamescfg"></a>
@@ -359,8 +477,6 @@ A configuration file listing 3 test case files to process (tests_1.xml, tests_2.
 
 
 Note: You can also use relative path names to point to test case files located in other directories or subdirectories.
-
-
 
 
 <a name="cfgcmdlineopts"></a>
