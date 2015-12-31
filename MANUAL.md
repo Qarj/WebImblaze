@@ -415,7 +415,7 @@ You can create your own abitrary config values that can be accessed as constants
 
 It is recommened to do this rather than using global1 to global5 since you can give meaningful names to your config.
 
-```
+```xml
 <userdefined> 
     <adminuser>admin@example.com</adminuser> 
     <adminpass>topsecret</adminpass> 
@@ -446,7 +446,7 @@ not be found in the response. After the three bars, i.e. `|||`, the optional err
 on failure is specified.
 
 <br />
-```
+```xml
 <autoassertions> 
    <autoassertion1>Copyright Example Company 2016</autoassertion1> 
 </autoassertions> 
@@ -468,7 +468,7 @@ files are processed in the order they appear in your config file.
 
 A configuration file listing 3 test case files to process (tests_1.xml, tests_2.xml, tests_3.xml) may look something like:
 
-```
+```xml
 <testcasefile>tests_1.xml</testcasefile>
 <testcasefile>tests_2.xml</testcasefile>
 <testcasefile>tests_3.xml</testcasefile>
@@ -651,7 +651,7 @@ See the "Pass/Fail Critera" section of this manual for more information.
 
 A minimal test case xml file may look something like:
 
-```
+```xml
 <testcases repeat="1">
 
 <case
@@ -943,7 +943,7 @@ Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
 `{USERID}`. `parseresponse` is referred to simply with `{}`.
 
 Full Example - parse the redirect location from the response header
-```
+```xml
 <case
     id="50"
     description1="Search for WebDriver Jobs"
@@ -1038,7 +1038,7 @@ Subtitutes dummy fields in an xml file with actual values. Used in conjunction w
 Allows you to create a xml template file then easily substitute in dynamic values at test run time.
 
 **Full Example:**
-```
+```xml
 <case
     id="40"
     description1="Add Unique Job"
@@ -1053,7 +1053,7 @@ Allows you to create a xml template file then easily substitute in dynamic value
 ```
 
 testdata\AddJob.xml might look like:
-```
+```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <FILE>
 	<JOB	
@@ -1149,7 +1149,7 @@ things are going badly, the global limit will be enforced preventing your test r
 Works in much the same way as the `retry` paramater, however execution will continue from the specified step
 rather than the current step.
 
-```
+```xml
 <case
     id="10"
     description1="Get Home page"
@@ -1206,7 +1206,7 @@ This is particularly important if you are trying to log in and something went wr
 that you are logged in successfully, but something else went wrong so you need to retry the test case
 from a not logged in state.
 
-```
+```xml
 <case
     id="20"
     description1="Submit login details"
@@ -1312,7 +1312,7 @@ Saves the test step response in a file.
 
 Example:
 
-```
+```xml
 <case
     id="2050"
     description1="Get Responsive.css"
@@ -1370,7 +1370,7 @@ for information on how to configure the config file.
 
 In your config.xml, you would have the following line:
 
-```
+```xml
     <testonly>Allow</testonly> 
 ```
 
@@ -1387,7 +1387,7 @@ Works exactly the same was as testonly.
 
 In your config.xml, you would have the following line:
 
-```
+```xml
     <liveonly>Allow</liveonly> 
 ```
 
@@ -1552,7 +1552,7 @@ Separate additional items with commas. Example:
 
 Sample test case file using multiple parameters:
 
-```
+```xml
 <testcases repeat="1">
 
 <case
@@ -1581,7 +1581,7 @@ Sample test case file using multiple parameters:
 
 Here is a sample test case showing a "multipart/form-data" encoded form-based file upload:
 
-```
+```xml
 <case 
     id="10" 
     description1="sample test case - POST" 
@@ -1598,7 +1598,7 @@ Here is a sample test case showing a "multipart/form-data" encoded form-based fi
 Here is a sample test case showing usage of the "cmd" method:
 
 
-```
+```xml
 <case 
     id="10"
     description1="Prepare JobFile with unique ids that will be accessible from webinject"
@@ -1843,7 +1843,7 @@ convenient to change data in a single place that is easy to reference from multi
 
 The following example of a test case file shows how you can use them:
 
-```
+```xml
 <testcases repeat="1">
 
     <testvar varname="LOGIN_URL">http://myserver/login.php</testvar>
@@ -2036,7 +2036,7 @@ ASP.NET may use a "__VIEWSTATE" variable to maintain state between requests.  Wh
 as a hidden form field within the HTML source:
 
 
-```
+```xml
 <html>
 ...
 <form method="post" action="default.aspx">
