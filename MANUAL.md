@@ -85,6 +85,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [command command1 ... command20](#tcparamcommand)
 
+[commandonerror](#commandonerror)
+
 [addcookie](#tcparamaddcookie)
 
 [addheader](#tcparamaddheader)
@@ -98,7 +100,13 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [verifyresponsecode](#tcparamvercode)
 
+[verifyresponsetime](#tcverifyresponsetime)
+
+[ignoreautoassertions](#tcignoreautoassertions)
+
 [ignorehttpresponsecode](#tcparamignorehttpresponsecode)
+
+[assertionskipsmessage](#tcassertionskipsmessage)
 
 
 ####[3.3.4 - Retry Failed Test Step Parameters](#tcretry)
@@ -118,17 +126,25 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ####[3.3.5 - Test Response Output Control Parameters](#tcoutput)
 
-[logastext](#tcparamlogastext)
+[errormessage](#tcparamerrmsg)
 
 [formatjson](#tcparamformatjson)
 
 [formatxml](#tcparamformatxml)
 
+[gethrefs](#gethrefs)
+
+[getsrcs](#getsrcs)
+
+[logastext](#tcparamlogastext)
+
+[logresponse](#tclogresponse)
+
 [logresponseasfile](#tcparamlogresponseasfile)
 
-[section](#tcparamsection)
+[logrequest](#tclogrequest)
 
-[errormessage](#tcparamerrmsg)
+[section](#tcparamsection)
 
 
 ####[3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
@@ -993,6 +1009,18 @@ In this last example, qq| is indicating that | should be used as a quote in this
 <br />
 
 
+<a name="commandonerror"></a>
+####commandonerror
+
+Will run the specified command only if the test step fails for some reason.
+
+```
+    commandonerror="emailsupportteam.bat"
+```
+
+<br />
+
+
 <a name="tcparamaddcookie"></a>
 ####addcookie
 
@@ -1098,6 +1126,60 @@ code you receive.
 ```
     verifyresponsecode="500"
 ```
+
+<br />
+
+
+<a name="tcverifyresponsetime"></a>
+####verifyresponsetime
+Asserts that the response time is no greater than the specified time.
+
+```
+    verifyresponsetime="2.505" 
+```
+
+In this example, the assertion will fail if the response time is greater than 2.505 seconds.
+
+<br />
+
+
+<a name="tcignoreautoassertions"></a>
+####ignoreautoassertions
+```
+    ignoreautoassertions="true"
+```
+
+Enables you to turn off the auto assertions for various test cases when needed.
+
+<br />
+
+
+<a name="tcparamignorehttpresponsecode"></a>
+####ignorehttpresponsecode
+```
+    ignorehttpresponsecode="true"
+```
+
+Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
+Specifying this parameter allows us to ignore this verification.
+
+<br />
+
+
+<a name="tcassertionskipsmessage"></a>
+####assertionskipsmessage
+
+Sometimes you might need to temporarily disable some of the assertions on a test for various reasons.
+Rather than removing the assertion from the test, you can disable it - see verifypositive, verifynegative and assertcount
+to find out how to do this.
+
+This parameter also allows you to specify a message to be written to the log as to why one or more assertions
+are skipped for this test step.
+
+```
+    assertionskipsmessage="Production Issue - the copyright message is out of date"
+```
+
 
 <br />
 
@@ -1261,20 +1343,20 @@ if the test step fails any of the verifypositives or the assertcount.
 <a name="tcoutput"></a>
 ###3.3.5 - Test Response Output Control Parameters
 
-<a name="tcparamlogastext"></a>
-####logastext
-
-Putting this paramater on a test case will put tags around the test case in http.log file.
+<a name="tcparamerrmsg"></a>
+####errormessage
+If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
+(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
+test means, like "couldn't connect to the application" or "couldn't access the login page".
 
 ```
-    logastext="true"
+    retry="20"
+    sleep="5"
+    errormessage="Job still not in index after 20 tries, perhaps indexer is offline"
 ```
-
-This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
-parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
-than html.
 
 <br />
+
 
 <a name="tcparamformatjson"></a>
 ####formatjson
@@ -1305,6 +1387,61 @@ Specifying this parameter puts a carriage return between every >< found in the r
 <br />
 
 
+<a name="gethrefs"></a>
+####gethrefs
+
+Gets the hrefs referred to in the html response, and writes them to the output folder.
+
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+
+```
+	gethrefs=".css|.less"
+```
+
+<br />
+
+
+<a name="getsrcs"></a>
+####getsrcs
+
+Gets the srcs referred to in the html response, and writes them to the output folder.
+
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+
+```
+	getsrcs=".jpg|.png|.js"
+```
+
+<br />
+
+
+<a name="tcparamlogastext"></a>
+####logastext
+
+Putting this paramater on a test case will put tags around the test case in http.log file.
+
+```
+    logastext="true"
+```
+
+This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
+parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
+than html.
+
+<br />
+
+
+<a name="tclogresponse"></a>
+####logresponse
+Specifies to log the response. In the case that you have automatic logging turned on, the response will be logged twice.
+
+```
+    logresponse="yes"
+```
+
+<br />
+
+
 <a name="tcparamlogresponseasfile"></a>
 ####logresponseasfile
 
@@ -1326,6 +1463,17 @@ Example:
 <br />
 
 
+<a name="tclogrequest"></a>
+####logrequest
+Specifies to log the request. In the case that you have automatic logging turned on, the request will be logged twice.
+
+```
+    logrequest="yes"
+```
+
+<br />
+
+
 <a name="tcparamsection"></a>
 ####section
 
@@ -1336,21 +1484,6 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 ```
     section="Ensure it is not possible to apply for the same job twice"
 ```
-<br />
-
-
-<a name="tcparamerrmsg"></a>
-####errormessage
-If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
-(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
-test means, like "couldn't connect to the application" or "couldn't access the login page".
-
-```
-    retry="20"
-    sleep="5"
-    errormessage="Job still not in index after 20 tries, perhaps indexer is offline"
-```
-
 <br />
 
 
@@ -1458,18 +1591,6 @@ In this example, this test step will not be run, unless the most recent verifyne
 
 In this example, this test step will not be run, unless the responsecode of the previous test
 step was 200 (if that test step was run).
-
-<br />
-
-
-<a name="tcparamignorehttpresponsecode"></a>
-####ignorehttpresponsecode
-```
-    ignorehttpresponsecode="true"
-```
-
-Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
-Specifying this parameter allows us to ignore this verification.
 
 <br />
 
