@@ -19,7 +19,7 @@ After execution of step 10, WebInject waits 2 seconds.
 />
 
 <case
-    id="10"
+    id="20"
     description1="Get Home page again"
     method="get"
     url="${RIMATTEST}"
