@@ -851,7 +851,14 @@ Note: Because your verification string is used as a regex, the following charact
 backslash:  `{}[]()^$.|*+?\`
 
 You can have as many verifypositive parameters as you want, so long as they start with verifypositive. For example, you can have
-verifypositive20, verifypositive5000, verifypositiveHTML or whatever. 
+verifypositive20, verifypositive5000, verifypositiveHTML or whatever.
+
+It is also possible to disable an assertion without removing it. This is useful if you have a temporary problem. You do this by adding
+another three `|||` and writing any message after the custom error message.
+
+```
+    verifypositive="Record 5520|||Record 5520 is within 15 miles so should show|||Production Bug"
+```
 
 <br />
    
@@ -875,6 +882,13 @@ And also as per verifypositive, you can specify a custom message if that verific
 
 ```
     verifynegative="additional-search-results-btn|||Additional Search Results button should not be shown"
+```
+
+As with verifypositive, it is possible to disable a negative assertion without removing it. You do this by adding
+another three `|||` and writing any message after the custom error message.
+
+```
+    verifynegative="Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221"
 ```
 
 <br />
@@ -1113,6 +1127,13 @@ if the assertion fails.
 
 ```
     assertcount="Distance:|||1|||Should only be one job shown"
+```
+
+`assertcount` can be disabled without removing it. You do this by adding
+another three `|||` and writing any message after the custom error message.
+
+```
+    assertcount="uniquedata1092311|||2|||Expect 2 records only|||Production Bug"
 ```
 
 <br />
