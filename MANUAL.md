@@ -1057,6 +1057,10 @@ This is used to add an addition header to an outgoing HTTP request.
     addheader="SOAPAction: urn:example-org:demos#Method"
 ```
 
+```
+    addheader="Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1"
+```
+
 You may add multiple headers, separating each with a pipe character.
 
 ```
