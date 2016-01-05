@@ -1,0 +1,38 @@
+<testcases repeat="1">
+
+<!--
+Step 10 shows retry in action. After the first 3 failed attempts, WebInject will slept 3 seconds.
+On the final failed attempt, since we are not retrying further, WebInject will not sleep.
+
+Step 20 passes on the first attempt, so the sleep parameter is ignored.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    description2="Will fail and sleep 2 seconds after each fail except the final fail"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject Test Tool"
+    retry="3"
+    sleep="2"
+/>
+
+<case
+    id="20"
+    description1="Get Home page"
+    description2="Test will pass on first attempt, sleep of 2 seconds will be ignored"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject"
+    retry="3"
+    sleep="2"
+/>
+
+
+</testcases>
