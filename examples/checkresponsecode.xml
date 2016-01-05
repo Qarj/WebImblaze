@@ -1,0 +1,30 @@
+<testcases repeat="1">
+
+<!--
+Where used, will automatically fail the test step if the response code of the previous test
+step does not match the response code specified.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get page that does not exist"
+    description2="will cause a 404"
+    method="get"
+    url="${RIMATTEST}/pagedoesnotexist"
+/>
+
+<case
+    id="20"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    checkresponsecode="200"
+    verifypositive1="WebInject"
+/>
+
+</testcases>
