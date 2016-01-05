@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+Normally a 404 will fail a test step automatically. However if you specify
+what response code you are expecting, and it matches, then the test will
+not fail.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get a page that does not exist"
+    method="get"
+    url="${RIMATTEST}/pagedoesnotexist"
+    verifyresponsecode="404"
+/>
+
+
+
+</testcases>
