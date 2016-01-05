@@ -1,0 +1,35 @@
+<testcases repeat="1">
+
+<!--
+This example shows that you can specify more than one command to run in a test step.
+
+They will run in the following order:
+    command
+    command1
+    command2
+    ...
+    command20
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get the directory listing of the current folder"
+    method="cmd"
+    command="dir"
+    command1="echo output of command 1"
+    command2="dir /?"
+    command20="find /?"
+    verifypositive="webinject.pl"
+    verifypositive1="output of command 1"
+    verifypositive5="list of files|||dir /? should show help"
+    verifypositiveFIND="Searches for a text"
+/>
+
+
+
+</testcases>
