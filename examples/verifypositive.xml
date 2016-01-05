@@ -27,6 +27,4 @@ and not the rendered version of the html you would see in a browser.
     verifypositiveHTML="h2.Getting started..h2"
 />
 
-
-
 </testcases>
