@@ -1,0 +1,37 @@
+<testcases repeat="1">
+
+<!--
+In this example checkpositive in step 20 says to look at the most recent result of verifypositive2. If
+it failed, then this test step, step 20, will be automatically failed without being run.
+
+The point of this is to stop a long running test step from running if we know from a previous
+test step failure that it has no chance of working. Sometimes timeouts can be very long.
+This gives us a way of failing fast.
+
+Note that due to a minor bug, the execution time of the automatically failed test step will
+be shown as the same as the previous test step.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive2="WebInject Test Tool"
+/>
+
+<case
+    id="20"
+    description1="Get Home page again"
+    method="get"
+    url="${RIMATTEST}"
+    checkpositive="2"
+    verifypositive1="WebInject"
+/>
+
+</testcases>
