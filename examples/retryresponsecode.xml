@@ -1,0 +1,26 @@
+<testcases repeat="1">
+
+<!--
+Normally a 404 will stop a retry from retrying. However if you specify to retry
+on 404, then the retry will be processed.
+
+In this example, the test will never actually pass since the specified page
+will not come into existence.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get a page that does not exist"
+    method="get"
+    url="${RIMATTEST}/pagedoesnotexist"
+    verifypositive="text that will not be found"
+    retryresponsecode="404"
+    retry="3"
+/>
+
+</testcases>
