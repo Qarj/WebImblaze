@@ -1,0 +1,35 @@
+<testcases repeat="1">
+
+<!--
+Step 20 fails so we retry from step 10.
+
+In fact in this example step 20 fails every time, so retryfromstep will be repeatedly executed
+until the globaljumpbacks limit is met - set in the config.xml file
+
+Note how the {JUMPBACKS} variable increases each time retryfromstep is executed.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page - jumpbacks so far: {JUMPBACKS}"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject"
+/>
+
+<case
+    id="20"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject Test Tool"
+    retryfromstep="10"
+/>
+
+
+</testcases>
