@@ -3,3 +3,4 @@
 http.log
 results.html
 results.xml
+*.tmp

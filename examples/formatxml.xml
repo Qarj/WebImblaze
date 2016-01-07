@@ -1,0 +1,33 @@
+<testcases repeat="1">
+
+<!--
+formatxml makes it easier to read xml that has no carriage returns in it, by adding in a
+carriage return between every ><
+
+After running this example, type output\http.log to see the difference between step 10 and 20.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Echo some xml"
+    method="cmd"
+    command="type examples\testdata\samplexml.xml"
+    verifypositive="testcasefile"
+/>
+
+<case
+    id="20"
+    description1="Echo some xml"
+    method="cmd"
+    command="type examples\testdata\samplexml.xml"
+    verifypositive="testcasefile"
+    formatxml="true"
+/>
+
+
+</testcases>
