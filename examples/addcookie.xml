@@ -1,0 +1,25 @@
+<testcases repeat="1">
+
+<!--
+addcookie will add a cookie for this step only.
+
+It will not clobber existing cookies (unlike addheader).
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Mobile Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject"
+    addcookie="MobileWebsite=1"
+/>
+
+
+
+</testcases>
