@@ -1,0 +1,27 @@
+<testcases repeat="1">
+
+<!--
+The section parameter writes a tag to the test output in the xml results file.
+
+You may have a test case file with many test steps. The section break allows
+you to organise your tests into sections.
+
+The primary intention of this is to make the results display cleaner in the
+WebInject Framework.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    section="Check Home Page functionality"
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject"
+/>
+
+</testcases>
