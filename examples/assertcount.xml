@@ -18,6 +18,20 @@ number of times in the response.
     assertcount="example|||3"
 />
 
+<case
+    id="20"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    assertcount="example|||2"
+/>
 
+<case
+    id="30"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    assertcount="example|||2|||The word example should appear 3 times in the html source"
+/>
 
 </testcases>
