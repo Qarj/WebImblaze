@@ -20,7 +20,7 @@ complicated workflow.
     description1="Get Home page"
     method="get"
     url="${RIMATTEST}"
-    verifypositive="automated testing examples"
+    verifypositive="text that will not be found"
     sanitycheck="true"
 />
 
