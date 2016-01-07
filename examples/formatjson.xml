@@ -1,0 +1,33 @@
+<testcases repeat="1">
+
+<!--
+formatjson makes it easier to read json that has no carriage returns in it, by adding in 
+carriage returns here and there.
+
+After running this example, type output\http.log to see the difference between step 10 and 20.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Echo some json"
+    method="cmd"
+    command="type examples\testdata\samplejson.json"
+    verifypositive="example book"
+/>
+
+<case
+    id="20"
+    description1="Echo some json"
+    method="cmd"
+    command="type examples\testdata\samplejson.json"
+    verifypositive="example book"
+    formatjson="true"
+/>
+
+
+</testcases>
