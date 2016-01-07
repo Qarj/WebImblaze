@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+logresponseasfile takes the content of the response (not the headers) and saves it in a file of
+your choosing.
+
+In this example, you can type output\HomePage.html to see the file.
+-->
+
+<!--
+<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+ -->
+<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+
+<case
+    id="10"
+    description1="Get Home page"
+    method="get"
+    url="${RIMATTEST}"
+    verifypositive1="WebInject"
+    logresponseasfile="HomePage.html"
+/>
+
+</testcases>
