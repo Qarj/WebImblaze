@@ -12,4 +12,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="20"
+    description1="verifynegative"
+    method="cmd"
+    command="webinject.pl -o selftest\output\verifynegative selftest\verifynegative.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

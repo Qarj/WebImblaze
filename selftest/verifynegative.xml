@@ -1,0 +1,19 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<case
+    id="10"
+    description1="verifynegative"
+    method="cmd"
+    command="webinject.pl -o selftest\output\verifynegativesub selftest\substeps\verifynegative.xml"
+    assertcount="Passed Negative Verification|||5|||Only Step 10 should have passed negative verifications"
+    assertcount1="TEST CASE FAILED|||2|||Steps 20 and 30 should fail"
+    assertcount2="Failed Negative Verification|||6|||Should be failed negative verifications in steps 20 and 30"
+    verifypositive="Should not find text but did"
+    verifypositive1="Skipped Negative Verification 0 - Production Bug"
+/>
+
+</testcases>
