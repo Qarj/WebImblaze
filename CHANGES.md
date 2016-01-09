@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.44 - Jan 9, 2016
+* Fixed a bug with the sleep conditions for retryfromstep
+
 ### Version 1.43 - Jan 9, 2016
 * Now support any number of assertcount - e.g. assertcount5000, assertcountDISTANCE
 

@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.43";
+our $version="1.44";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -772,7 +772,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         $stop = 'no';
                         return;  #break from sub
                     }
-                    if (($isfailure < 1) && ($case{retry}))
+                    if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
                     {
                         ## ignore the sleep if the test case worked and it is a retry test case
                     }
@@ -780,9 +780,9 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     {   
                         if ($case{sleep})
                         {
-                            if (($isfailure > 0) && ($retry < 1))
+                            if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
                             {
-                                ## do not sleep if the test case failed and we have run out of retries
+                                ## do not sleep if the test case failed and we have run out of retries or jumpbacks
                             } 
                             else 
                             {
