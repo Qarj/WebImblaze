@@ -92,4 +92,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="120"
+    description1="retryfromstep"
+    method="cmd"
+    command="webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
