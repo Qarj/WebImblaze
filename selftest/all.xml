@@ -1,0 +1,15 @@
+<testcases repeat="1">
+
+<!--
+Run all self tests
+-->
+
+<case
+    id="10"
+    description1="verifypositive"
+    method="cmd"
+    command="webinject.pl -o selftest\output\verifypositive selftest\verifypositive.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
+</testcases>
