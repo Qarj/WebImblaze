@@ -1,0 +1,36 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Parse some text"
+    method="cmd"
+    command="echo Some example text to parse with the parse response parameter"
+    command1="echo one two three four five six seven eight nine ten"
+    command2='echo P_^"^&^&^&^"_P'
+    command3='echo A_^&amp;^&amp;^&amp;_A'
+    parseresponse="Some example | with the parse|"
+    parseresponse1="one two (\w*) four|regex|"
+    parseresponse5000="P_|_P|escape"
+    parseresponseDECODE="A_|_A|decode"
+/>
+
+<case
+    id="20"
+    description1="Have a look at the parsed text"
+    method="cmd"
+    command="echo parseresponse:{}"
+    command1="echo parseresponse1:{1}"
+    command2="echo parseresponse5000:{5000}"
+    command3="echo parseresponseDECODE:{DECODE}"
+    verifypositive="parseresponse:text to parse"
+    verifypositive1="parseresponse1:three"
+    verifypositive2="parseresponse5000:%5e%22%5e%26%5e%26%5e%26%5e%22"
+    verifypositive3="parseresponseDECODE:\&\&\&"
+/>
+
+</testcases>

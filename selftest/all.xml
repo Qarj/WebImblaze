@@ -20,4 +20,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="30"
+    description1="parseresponse"
+    method="cmd"
+    command="webinject.pl -o selftest\output\parseresponse selftest\parseresponse.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
