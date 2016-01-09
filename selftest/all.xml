@@ -44,4 +44,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="60"
+    description1="verifyresponsecode"
+    method="cmd"
+    command="webinject.pl -o selftest\output\verifyresponsecode selftest\verifyresponsecode.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

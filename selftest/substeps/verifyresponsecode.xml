@@ -1,0 +1,41 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!-- Note - method of cmd always generates a response code of 100 -->
+<case
+    id="10"
+    description1="verifyresponsecode should pass"
+    method="cmd"
+    command="echo hello world > NUL"
+    verifyresponsecode="100"
+/>
+
+<case
+    id="20"
+    description1="verifyresponsecode should fail"
+    method="cmd"
+    command="echo hello world > NUL"
+    verifyresponsecode="404"
+/>
+
+<case
+    id="30"
+    description1="verifyresponsecode should pass"
+    method="get"
+    url="http://{RAN}/pagedoesnotexist"
+    verifyresponsecode="404"
+/>
+
+<case
+    id="40"
+    description1="verifyresponsecode should pass"
+    method="get"
+    url="http://{RAN}"
+    verifyresponsecode="200"
+/>
+
+</testcases>
