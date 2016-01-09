@@ -36,4 +36,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="50"
+    description1="commandonerror"
+    method="cmd"
+    command="webinject.pl -o selftest\output\commandonerror selftest\commandonerror.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

@@ -1,0 +1,18 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">commandonerror</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command1="type selftest\output\${feature}subhttp.log"
+    verifypositive="commandonerror in step 10 was run"
+    verifynegative="commandonerror in step 20 was run"
+/>
+
+</testcases>
