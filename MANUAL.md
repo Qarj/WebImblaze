@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.42
+#Manual for WebInject version 1.43
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -1132,6 +1132,17 @@ if the assertion fails.
 ```
     assertcount="Distance:|||1|||Should only be one job shown"
 ```
+
+You can have as many assertcount parameters as you want.
+
+```
+    assertcount5000="Distance:|||1|||Should only be one job shown"
+```
+
+```
+    assertcountDISTANCE="Distance:|||1|||Should only be one job shown"
+```
+
 
 `assertcount` can be disabled without removing it. You do this by adding
 another three `|||` and writing any message after the custom error message.

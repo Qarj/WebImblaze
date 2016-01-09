@@ -1,10 +1,15 @@
 #WebInject change log
 
-Copyright 2004, 2005, 2006 Corey Goldberg (corey@goldb.org)
+Up to version 1.41 - Copyright 2004, 2005, 2006 Corey Goldberg (corey@goldb.org)
 For information and documentation on version 1.41, visit the website at http://www.webinject.org
+
+Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 
 ---------------------------------
 ##Release History:
+
+###Version 1.43 - Jan 9, 2016
+* Now support any number of assertcount - e.g. assertcount5000, assertcountDISTANCE
 
 ###Version 1.42 - Nov 28, 2015
 * Include additional info about which testcase is being run - just after the log file separator

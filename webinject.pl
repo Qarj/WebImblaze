@@ -4,7 +4,7 @@ use warnings;
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
-#    Extensive updates 2015 Tim Buckland
+#    Extensive updates 2015-2016 Tim Buckland
 #
 #    This file is part of WebInject.
 #
@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.42";
+our $version="1.43";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -2376,59 +2376,66 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             }
         }
     }
-        
+
     if ($entrycriteriaOK) {
-         if ($case{assertcount}) { ## assertcount
-             @verifycountparms = split(/\|\|\|/, $case{assertcount}); #index 0 contains the actual string to verify
-             $count=0;
-             $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
-             while ($tempstring =~ m|$verifycountparms[0]|ig) { $count++;
-             }
-            if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                    print RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
-                    print STDOUT "Skipped Assertion Count - $verifycountparms[2] \n";
+        foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+            if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
+                $verifynum = $testAttrib; ## determine index verifypositive index
+                #print STDOUT "$testAttrib\n"; ##DEBUG
+                $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
+                if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
+                @verifycountparms = split(/\|\|\|/, $case{$testAttrib});
+                $count=0;
+                $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
+
+                while ($tempstring =~ m|$verifycountparms[0]|ig) { $count++;} ## count how many times string is found
+
+                if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
+                    unless ($reporttype) {  #we suppress most logging when running in a plugin mode
+                        print RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
+                        print STDOUT "Skipped Assertion Count - $verifycountparms[2] \n";
+                    }
+                    $assertionskips++;
                 }
-                $assertionskips++;
-            }
-            else {
-                 if ($count == $verifycountparms[1]) {
+                else {
+                    if ($count == $verifycountparms[1]) {
                         unless ($reporttype) {  #we suppress most logging when running in a plugin mode
                             print RESULTS qq|<span class="pass">Passed Count Assertion of $verifycountparms[1]</span><br />\n|;
-                            print RESULTSXML qq|            <assertcount-success>true</assertcount-success>\n|;
+                            print RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
                         }
                         unless ($nooutput) { #skip regular STDOUT output 
                             print STDOUT "Passed Count Assertion of $verifycountparms[1] \n";
                         }
                         $passedcount++;
                         $retrypassedcount++;
-                 }
-                 else {
+                    }
+                    else {
                         unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                            print RESULTSXML qq|            <assertcount-success>false</assertcount-success>\n|;
+                            print RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
                             if ($verifycountparms[2]) {## if there is a custom message, write it out
-                               print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                               print RESULTS qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
-                               print RESULTSXML qq|            <assertcount-message>$verifycountparms[2] [got $count]</assertcount-message>\n|;
+                                print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
+                                print RESULTS qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
+                                print RESULTSXML qq|            <$testAttrib-message>$verifycountparms[2] [got $count]</$testAttrib-message>\n|;
                             }
                             else {# we make up a standard message
-                               print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                               print RESULTSXML qq|            <assertcount-message>Failed Count Assertion of $verifycountparms[1], got $count</assertcount-message>\n|;
+                                print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
+                                print RESULTSXML qq|            <$testAttrib-message>Failed Count Assertion of $verifycountparms[1], got $count</$testAttrib-message>\n|;
                             }    
-                        }
-                        unless ($nooutput) { #skip regular STDOUT output  
+                         }
+                         unless ($nooutput) { #skip regular STDOUT output  
                             print STDOUT "Failed Count Assertion of $verifycountparms[1], got $count \n";         
                             if ($verifycountparms[2]) {
-                               print STDOUT "$verifycountparms[2] \n";
+                                print STDOUT "$verifycountparms[2] \n";
                             }         
+                            $failedcount++;
+                            $retryfailedcount++;
+                            $isfailure++;
                         }
-                        $failedcount++;
-                        $retryfailedcount++;
-                        $isfailure++;
-                }
-             }
-         }
-    }
+                    } ## end else verifycountparms[2]
+                } ## end else verifycountparms[3]
+            } ## end if assertcount
+        } ## end foreach
+    } ## end if entrycriteriaOK
        
     if ($entrycriteriaOK) {
          if ($case{verifyresponsetime}) { ## verify that the response time is less than or equal to given amount in seconds
