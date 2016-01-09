@@ -68,4 +68,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="90"
+    description1="ignorehttpresponsecode"
+    method="cmd"
+    command="webinject.pl -o selftest\output\ignorehttpresponsecode selftest\ignorehttpresponsecode.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

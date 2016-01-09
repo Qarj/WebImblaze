@@ -1,0 +1,23 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="should fail"
+    method="get"
+    url="http://{RAN}/pagedoesnotexist"
+/>
+
+<case
+    id="20"
+    description1="should pass"
+    method="get"
+    url="http://{RAN}/pagedoesnotexist"
+    ignorehttpresponsecode="true"
+/>
+
+</testcases>
