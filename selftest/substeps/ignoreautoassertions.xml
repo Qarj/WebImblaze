@@ -1,0 +1,34 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Should fail due to auto assertions defined in ignoreautoassertionsconfig.xml"
+    method="cmd"
+    command="echo one two three four"
+    command1="echo one fish three fish"
+/>
+
+<case
+    id="20"
+    description1="Should pass - autoassertions are ignored"
+    method="cmd"
+    command="echo one two three four"
+    command1="echo one fish three fish"
+    ignoreautoassertions="true"
+/>
+
+<case
+    id="30"
+    description1="Should pass - autoassertions are satisfied"
+    method="cmd"
+    command="echo one two two one"
+    command1="echo one fish two fish"
+/>
+
+
+</testcases>

@@ -60,4 +60,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="80"
+    description1="ignoreautoassertions"
+    method="cmd"
+    command="webinject.pl -o selftest\output\ignoreautoassertions selftest\ignoreautoassertions.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
