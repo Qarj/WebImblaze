@@ -1,0 +1,37 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Should pass assertcount"
+    method="cmd"
+    command="echo one one one > NUL"
+    assertcount="one|||3"
+    assertcount1="one|||3|||Should have one 3 times"
+    assertcountONE="o.e|||3|||Should have one 3 times"
+/>
+
+<case
+    id="20"
+    description1="Should fail assertcount"
+    method="cmd"
+    command="echo one one one one > NUL"
+    assertcount="one|||3"
+    assertcount1="one|||3|||Should have one 3 times"
+    assertcountONE="o.e|||3|||Should have one 3 times"
+/>
+
+<case
+    id="30"
+    description1="Assertion should be ignored"
+    method="cmd"
+    command="echo one one one one > NUL"
+    assertcount="one|||3|||Should have one 3 times|||Production Bug"
+/>
+
+
+</testcases>

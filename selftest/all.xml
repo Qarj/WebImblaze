@@ -28,4 +28,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="40"
+    description1="assertcount"
+    method="cmd"
+    command="webinject.pl -o selftest\output\assertcount selftest\assertcount.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
