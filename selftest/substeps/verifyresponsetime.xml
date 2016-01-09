@@ -1,0 +1,25 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Should pass verifyresponsetime"
+    method="cmd"
+    command="echo this will be quick > NUL"
+    verifyresponsetime="10"
+/>
+
+<case
+    id="20"
+    description1="Should fail verifyresponsetime"
+    method="cmd"
+    command="echo this will be slow > NUL"
+    command1='@CHOICE /T 2 /C YN /D Y /M "%date% %time% Waiting 2 seconds"'
+    verifyresponsetime="1"
+/>
+
+</testcases>

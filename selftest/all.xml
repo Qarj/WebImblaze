@@ -52,4 +52,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="70"
+    description1="verifyresponsetime"
+    method="cmd"
+    command="webinject.pl -o selftest\output\verifyresponsetime selftest\verifyresponsetime.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
