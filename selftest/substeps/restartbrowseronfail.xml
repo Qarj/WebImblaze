@@ -1,0 +1,62 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!-- Note - method of cmd always generates a response code of 100 -->
+<case
+    id="10"
+    description1="Get login page sets __RequestVerificationToken cookie"
+    method="get"
+    url="http://{RAN}/Account/Login"
+    verifypositive="Set-Cookie: __RequestVerificationToken"
+/>
+
+<case
+    id="20"
+    description1="Get login page again does not set the same cookie again - it is already set"
+    description2="Step will fail"
+    method="get"
+    url="http://{RAN}/Account/Login"
+    verifypositive="Set-Cookie: __RequestVerificationToken"
+/>
+
+<case
+    id="30"
+    description1="Browser is restarted due to an error"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="Some text that is not there"
+    restartbrowseronfail="true"
+/>
+
+<case
+    id="40"
+    description1="Get login page sets __RequestVerificationToken cookie since all cookies are gone"
+    method="get"
+    url="http://{RAN}/Account/Login"
+    verifypositive="Set-Cookie: __RequestVerificationToken"
+/>
+
+<case
+    id="50"
+    description1="Browser is not restarted since the test step passes"
+    method="cmd"
+    command="echo Some text that is there"
+    verifypositive="Some text that is there"
+    restartbrowseronfail="true"
+/>
+
+<case
+    id="60"
+    description1="Get login page already has __RequestVerificationToken cookie"
+    description2="Step will fail"
+    method="get"
+    url="http://{RAN}/Account/Login"
+    verifypositive="Set-Cookie: __RequestVerificationToken"
+/>
+
+
+</testcases>
