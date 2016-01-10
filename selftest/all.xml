@@ -124,4 +124,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="160"
+    description1="errormessage"
+    method="cmd"
+    command="webinject.pl -o selftest\output\errormessage selftest\errormessage.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
