@@ -1,0 +1,20 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">checkpositive</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 4"
+    verifypositive1="last verifypositive1 failed"
+    verifypositive2="last verifypositive0 failed"
+    assertcount="ENTRY CRITERIA NOT MET \.\.\.|||2"
+    assertcount1="TEST CASE PASSED|||2"
+/>
+
+</testcases>

@@ -1,0 +1,57 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="verifypositive1 fails"
+    method="cmd"
+    command="NOP"
+    verifypositive1="Text that is not there"
+/>
+
+<case
+    id="20"
+    description1="Test step is automatically failed without executing it - entrance critera not met"
+    method="cmd"
+    command="echo This text will not be seen"
+    checkpositive="1"
+/>
+
+<case
+    id="30"
+    description1="verifypositive fails"
+    method="cmd"
+    command="NOP"
+    verifypositive="Text that is not there"
+/>
+
+<case
+    id="40"
+    description1="Test step is automatically failed without executing it - entrance critera not met"
+    method="cmd"
+    command="echo This text will not be seen"
+    checkpositive="0"
+/>
+
+<case
+    id="50"
+    description1="verifypositive1 passes"
+    method="cmd"
+    command="echo text present"
+    verifypositive1="text present"
+/>
+
+<case
+    id="60"
+    description1="Test step runs - last verifypositive1 passed"
+    method="cmd"
+    command="echo This text will be seen"
+    checkpositive="1"
+/>
+
+
+</testcases>
