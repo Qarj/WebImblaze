@@ -1,0 +1,32 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">section</testvar>
+<case
+    id="10"
+    description1="${feature} - filename prefix included as part of output path"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Register a new self service account"
+/>
+
+<case
+    id="20"
+    description1="view xml results.xml file"
+    method="cmd"
+    command1="type selftest\output\${feature}subresults.xml"
+    verifypositive="section.Register a new self service account"
+/>
+
+<case
+    id="30"
+    description1="view html results.html file"
+    method="cmd"
+    command1="type selftest\output\${feature}subresults.html"
+    verifypositive="Register a new self service account"
+/>
+
+</testcases>
