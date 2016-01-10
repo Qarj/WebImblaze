@@ -116,4 +116,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="150"
+    description1="restartbrowser"
+    method="cmd"
+    command="webinject.pl -o selftest\output\restartbrowser selftest\restartbrowser.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
