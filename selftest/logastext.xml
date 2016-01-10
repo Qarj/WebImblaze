@@ -1,0 +1,25 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">logastext</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+/>
+
+<case
+    id="20"
+    description1="view http.log"
+    method="cmd"
+    command1="type selftest\output\${feature}subhttp.log"
+    verifypositive="log as text used.*logastext.*GET http.*logastext.*LOG SEPARATOR"
+/>
+
+
+
+</testcases>

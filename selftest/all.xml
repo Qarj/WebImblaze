@@ -132,4 +132,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="170"
+    description1="logastext"
+    method="cmd"
+    command="webinject.pl -o selftest\output\logastext selftest\logastext.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
