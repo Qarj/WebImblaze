@@ -1,0 +1,34 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Step passes"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="NOP"
+    sanitycheck="true"
+/>
+
+<case
+    id="20"
+    description1="Step fails - execution will be aborted"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="No Operation"
+    sanitycheck="true"
+/>
+
+<case
+    id="30"
+    description1="Test step will not be run"
+    method="cmd"
+    command="echo Will not be seen"
+/>
+
+
+</testcases>

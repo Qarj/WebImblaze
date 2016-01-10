@@ -1,0 +1,18 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">sanitycheck</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 1"
+    verifypositive1="Test Cases Run: 2"
+    verifypositive2="SANITY CHECK FAILED ... Aborting"
+/>
+
+</testcases>

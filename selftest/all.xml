@@ -204,4 +204,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="260"
+    description1="sanitycheck"
+    method="cmd"
+    command="webinject.pl -o selftest\output\sanitycheck selftest\sanitycheck.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
