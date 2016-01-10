@@ -90,12 +90,30 @@ Save your changes then just run `webinject.pl` again. The three files in output 
 
 ## The Manual
 
-[The WebInject Manual](MANUAL.md)
+The manual contains extensive details on how to use WebInject.
+
+[WebInject Manual - MANUAL.md](MANUAL.md)
 
 
-## Coming Soon ...
+## Examples
 
-* Further additions to the Manual 
-* Many working examples you can try straight away
-* Information on how to use Selenium WebDriver with WebInject
+There are many working examples in the examples folder.
+
+## WebInject Self Test
+
+WebInject uses WebInject to test itself. The self tests are organised by feature name. 
+If you study the self tests for a feature you are interested, you will learn more about
+how that feature works.
+
+You can run all the self tests with the following command:
+
+```
+webinject.pl selftest\all.xml
+```
+
+Or you can run just one self test like this:
+
+```
+webinject.pl selftest\verifypositive.xml
+```
 
