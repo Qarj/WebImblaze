@@ -1,0 +1,25 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">liveonly</testvar>
+<case
+    id="10"
+    description1="${feature} - with liveonly config"
+    method="cmd"
+    command="webinject.pl -c selftest\substeps\${feature}config.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 2"
+/>
+
+<case
+    id="20"
+    description1="${feature} - with testonly config"
+    method="cmd"
+    command="webinject.pl -c selftest\substeps\testonlyconfig.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 1"
+    verifypositive1="Skipping Test Case 20... \(LIVEONLY\)"
+/>
+
+</testcases>
