@@ -1,0 +1,45 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!--
+For commands, the response code is always set to 100.
+
+For http tests, you will be dealing with 200, 404, 500, etc...
+-->
+
+<case
+    id="10"
+    description1="response code is 100"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="20"
+    description1="Test step is automatically failed without executing it - entrance critera not met"
+    method="cmd"
+    command="echo NOP"
+    checkresponsecode="121"
+/>
+
+<case
+    id="30"
+    description1="response code is 100"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="40"
+    description1="Test step runs - last response code matches"
+    method="cmd"
+    command="echo This text will be seen"
+    checkresponsecode="100"
+/>
+
+
+</testcases>
