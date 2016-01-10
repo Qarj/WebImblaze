@@ -3042,7 +3042,8 @@ sub httplog {  #write requests and responses to http.log file
         }
             
         if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
-            open(RESPONSEASFILE, ">$output/$case{logresponseasfile}");  #open in clobber mode
+            my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+            open(RESPONSEASFILE, ">$responsefoldername/$case{logresponseasfile}");  #open in clobber mode
             print RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
             close(RESPONSEASFILE);
         }

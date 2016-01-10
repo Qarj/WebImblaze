@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.45 - Jan 10, 2016
+* Fixed a bug logresponseasfile when used with output folder filename prefix
+
 ### Version 1.44 - Jan 9, 2016
 * Fixed a bug with the sleep conditions for retryfromstep
 
