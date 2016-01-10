@@ -1,0 +1,42 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">logresponseasfile</testvar>
+<case
+    id="10"
+    description1="${feature} - filename prefix included as part of output path"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+/>
+
+<case
+    id="20"
+    description1="view RIMATTEST_Home_Page.html"
+    method="cmd"
+    command1="type selftest\output\RIMATTEST_Home_Page.html"
+    verifypositive="RimAttest is a web site for automated testing examples"
+    verifypositive1="html.*head.*body"
+/>
+
+<case
+    id="30"
+    description1="${feature} - filename prefix not included as part of output path"
+    method="cmd"
+    command="if not exist selftest\output\temp mkdir selftest\output\temp"
+    command1="webinject.pl -o selftest\output\temp\ selftest\substeps\${feature}.xml"
+/>
+
+<case
+    id="40"
+    description1="view RIMATTEST_Home_Page.html"
+    method="cmd"
+    command1="type selftest\output\temp\RIMATTEST_Home_Page.html"
+    verifypositive="RimAttest is a web site for automated testing examples"
+    verifypositive1="html.*head.*body"
+/>
+
+
+</testcases>

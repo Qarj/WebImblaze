@@ -140,4 +140,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="180"
+    description1="logresponseasfile"
+    method="cmd"
+    command="webinject.pl -o selftest\output\logresponseasfile selftest\logresponseasfile.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

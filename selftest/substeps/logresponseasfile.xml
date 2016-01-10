@@ -1,0 +1,16 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="logresponse as file"
+    method="get"
+    url="http://{RAN}"
+    logresponseasfile="RIMATTEST_Home_Page.html"
+/>
+
+</testcases>
