@@ -172,4 +172,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="220"
+    description1="automationcontrolleronly"
+    method="cmd"
+    command="webinject.pl -o selftest\output\automationcontrolleronly selftest\automationcontrolleronly.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

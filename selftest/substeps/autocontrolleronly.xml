@@ -1,0 +1,35 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Can be executed from any desktop or server"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<!--
+Let's say you are testing that your website detects a file uploaded to it with
+a test virus. Unfortunately your desktop probably has a virus scanner on it
+that cannot be disabled.
+
+However you may agree with Corporate IT that a certain directory on one of your 
+servers - the automation controller - can have a folder with an exclusion on
+it for virus checking.
+
+This feature allows you to skip running a test case on your desktop that is
+doomed to failure, but allow it to run from your test controller server.
+-->
+<case
+    id="20"
+    description1="Can only be executed from the test automation controller"
+    method="cmd"
+    command="echo NOP"
+    autocontrolleronly="true"
+/>
+
+</testcases>

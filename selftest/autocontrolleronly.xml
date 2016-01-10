@@ -1,0 +1,26 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">autocontrolleronly</testvar>
+<case
+    id="10"
+    description1="${feature} - specifying that this is the automation controller"
+    method="cmd"
+    command="webinject.pl --autocontroller -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 2"
+/>
+
+<case
+    id="20"
+    description1="${feature} - without specifying that this is the automation controller"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 1"
+    verifypositive1="Skipping Test Case 20"
+    verifypositive2="This is not the automation controller"
+/>
+
+</testcases>
