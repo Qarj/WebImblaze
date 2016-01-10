@@ -1,0 +1,23 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Can be executed in any environment"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="20"
+    description1="Can be executed in the test environment only"
+    method="cmd"
+    command="echo NOP"
+    testonly="true"
+/>
+
+</testcases>
