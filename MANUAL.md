@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.45
+#Manual for WebInject version 1.46
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -135,6 +135,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [gethrefs](#gethrefs)
 
 [getsrcs](#getsrcs)
+
+[getbackgroundimages](#getbackgroundimages)
 
 [logastext](#tcparamlogastext)
 
@@ -1446,6 +1448,26 @@ Multiple patterns are separated with a `|`. The pattern specifies the end of the
 
 ```
 	getsrcs=".jpg|.png|.js"
+```
+
+<br />
+
+
+<a name="getbackgroundimages"></a>
+#### getbackgroundimages
+
+Gets the background images referred to in the html response, and writes them to the output folder.
+
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+
+```
+    getbackgroundimages=".jpg"
+```
+
+This will match css background images that look like this in the html source:
+
+```
+<div style="background-image: url(/site-assets/teacup.jpg);" class="product-image item active"></div>
 ```
 
 <br />

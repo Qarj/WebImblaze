@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.44";
+our $version="1.46";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -402,7 +402,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
                 ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
                 ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "logrequest", "logresponse", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "assertionskipsmessage",
-                ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs");
+                ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages");
                 ##
                 ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
 
@@ -581,6 +581,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     gethrefs(); ## get specified web page href assets
                     getsrcs(); ## get specified web page src assets
+                    getbackgroundimages(); ## get specified web page src assets
 
                     httplog();  #write to http.log file
                     
@@ -1459,7 +1460,10 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
 sub gethrefs { ## get page href assets matching a list of ending patterns, separate multiple with |
                ## gethrefs=".less|.css"
     if ($case{gethrefs}) {
-        getassets ("href",$case{gethrefs});
+        my $match = "href=";
+        my $delim = "\x22"; #"
+        getassets ($match,$delim,$delim,$case{gethrefs});
+        #getassets ("href",$case{gethrefs});
     }
 }
 
@@ -1467,18 +1471,34 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
 sub getsrcs { ## get page src assets matching a list of ending patterns, separate multiple with |
               ## getsrcs=".js|.png|.jpg|.gif"
     if ($case{getsrcs}) {
-        getassets ("src",$case{getsrcs});
+        my $match = "src=";
+        my $delim = '"';
+        getassets ($match, $delim, $delim, $case{getsrcs});
+        #getassets ("src",$case{getsrcs});
+    }
+}
+
+#------------------------------------------------------------------
+sub getbackgroundimages { ## style="background-image: url( )"
+
+    if ($case{getbackgroundimages}) {
+        my $match = 'style="background-image: url';
+        my $leftdelim = '\(';
+        my $rightdelim = '\)';
+        getassets ($match,$leftdelim,$rightdelim,$case{getbackgroundimages});
     }
 }
 
 #------------------------------------------------------------------
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ("href",".less|.css")
-    my $assettype = $_[0];            
-    my $assetlist = $_[1];
+    my $match = $_[0];
+    my $leftdelim = $_[1];            
+    my $rightdelim = $_[2];            
+    my $assetlist = $_[3];
     
     my ($startassetrequest, $endassetrequest, $assetlatency);
-    my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse);
+    my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse, $cachecontrol);
     
     my $page = $response->as_string;
     
@@ -1486,7 +1506,9 @@ sub getassets { ## get page assets matching a list for a reference type
 
     foreach my $extension (@extensions) {
 
-        while ($page =~ m~$assettype="([^"]*$extension)"~g) ##" Iterate over all the matches to this extension
+        #while ($page =~ m~$assettype="([^"]*$extension)["\?]~g) ##" Iterate over all the matches to this extension
+        print "\n $match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?] \n";
+        while ($page =~ m~$match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?]~g) ##" Iterate over all the matches to this extension
         { 
             $startassetrequest = time();
 
@@ -1506,13 +1528,20 @@ sub getassets { ## get page assets matching a list for a reference type
             $assetresponse = $useragent->request($assetrequest);
             
             open(RESPONSEASFILE, ">$output/$filename"); #open in clobber mode
-            binmode RESPONSEASFILE;
-            print RESPONSEASFILE $assetresponse->content, ""; #content just outputs the content, whereas as_string includes the response header
+            binmode RESPONSEASFILE; ## set binary mode
+            print RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
             close(RESPONSEASFILE);
 
             $endassetrequest = time();
             $assetlatency = (int(1000 * ($endassetrequest - $startassetrequest)) / 1000);  ## elapsed time rounded to thousandths 
             print STDOUT " $assetlatency s\n";
+            
+            #print STDOUT $assetresponse->headers()->as_string(), "\n\n\n";
+            
+            #$assetresponse->headers()->as_string() =~ m!^Cache-Control: ([\w]*)$!;
+            #$cachecontrol = $1;
+            #print STDOUT " Cache-Control: $cachecontrol\n";
+            
 
         } ## end while
         

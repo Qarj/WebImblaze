@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.46 - Jan 11, 2016
+* refactored gethrefs and getsrcs, added getbackgroundimages
+
 ### Version 1.45 - Jan 10, 2016
 * Fixed a bug logresponseasfile when used with output folder filename prefix
 
