@@ -40,6 +40,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Auto Assertions (autoassertions)](#cfgautoassertions)
 
+[Smart Assertions (smartassertions)](#smartassertions)
+
 ###[2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
 
 ###[2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
@@ -103,6 +105,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [verifyresponsetime](#tcverifyresponsetime)
 
 [ignoreautoassertions](#tcignoreautoassertions)
+
+[ignoresmartassertions](#ignoresmartassertions)
 
 [ignorehttpresponsecode](#tcparamignorehttpresponsecode)
 
@@ -471,6 +475,35 @@ on failure is specified.
 ```
 
 This second example automatically asserts that this copyright message appears in every response.
+
+<br />
+
+
+<a name="smartassertions"></a>
+#### smartassertions
+It is possible to specify assertions that run conditionally on every single test step.
+
+The condition is set as part of the smart assertion.
+
+```xml
+<smartassertions> 
+   <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
+</smartassertions> 
+```
+
+In the example above, the condition is specified first, before the `|||`.
+
+The condition in this case is that the `Set\-Cookie: ` regular expression finds at least one
+match in the response output.
+
+If the condition is met, then the regular expression after the `|||` is executed.
+
+If one or match is found, then the smart assertion passes (silently). 
+
+If a match is not found, the message after the final `|||` is logged and the test step is failed.
+
+This feature is really useful for asserting that various standards are followed. In the event 
+that exceptions are agreed, the ignoresmartassertions parameter can be used.
 
 <br />
 
@@ -1188,6 +1221,21 @@ In this example, the assertion will fail if the response time is greater than 2.
 ```
 
 Enables you to turn off the auto assertions for various test cases when needed.
+
+See the config file section for information on auto assertions.
+
+<br />
+
+
+<a name="ignoresmartassertions"></a>
+#### ignoresmartassertions
+```
+    ignoresmartassertions="true"
+```
+
+Enables you to turn off the smart assertions for various test cases when needed.
+
+See the config file section for information on smart assertions.
 
 <br />
 
