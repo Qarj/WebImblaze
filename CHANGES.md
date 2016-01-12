@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.47 - Jan 12, 2016
+* added smartassertions feature along with ignoresmartassertions parameter
+
 ### Version 1.46 - Jan 11, 2016
 * refactored gethrefs and getsrcs, added getbackgroundimages
 

@@ -11,5 +11,8 @@
 <autoassertions> 
    <autoassertion1>^((?!HTTP Error 404.0 . Not Found).)*$|||Page not found error</autoassertion1> 
 </autoassertions> 
+<smartassertions> 
+   <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
+</smartassertions> 
 <testonly>Allow</testonly> 
 </root> 
