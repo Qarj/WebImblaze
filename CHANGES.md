@@ -8,6 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.48 - Jan 12, 2016
+* added {OPT_PROXY} and renamed {PROXYRULES} to {OPT_PROXYRULES}
+* removed erroneous firstlooponly lastlooponly from config for loop
+* tweak to custom_wait_for_text_visible - increased wait checks from 0.1 to 0.5 seconds
+
 ### Version 1.47 - Jan 12, 2016
 * added smartassertions feature along with ignoresmartassertions parameter
 

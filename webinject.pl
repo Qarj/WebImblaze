@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.47";
+our $version="1.48";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -773,6 +773,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         $stop = 'no';
                         return;  #break from sub
                     }
+                    
                     if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
                     {
                         ## ignore the sleep if the test case worked and it is a retry test case
@@ -1053,7 +1054,7 @@ $selresp = $combinedresp;
       {
          require MIME::Base64;
          open(FH,'>',"$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png");
-         binmode FH;
+         binmode FH; ## set binary mode
          print FH MIME::Base64::decode_base64($png_base64);
          close FH;
       }
@@ -1303,7 +1304,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
         }
         if ($foundit eq "false") 
         {
-            select(undef, undef, undef, 0.1); ## sleep for 0.1 seconds
+            select(undef, undef, undef, 0.5); ## sleep for 0.5 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -1548,6 +1549,7 @@ sub getassets { ## get page assets matching a list for a reference type
     } ## end foreach
 
 }
+
 
 #------------------------------------------------------------------
 sub savepage {## save the page in a cache to enable auto substitution
@@ -2459,7 +2461,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             }
         }
     }
-
+        
     if ($entrycriteriaOK) {
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
             if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
@@ -2470,9 +2472,9 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 @verifycountparms = split(/\|\|\|/, $case{$testAttrib});
                 $count=0;
                 $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
-
+     
                 while ($tempstring =~ m|$verifycountparms[0]|ig) { $count++;} ## count how many times string is found
-
+     
                 if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
                     unless ($reporttype) {  #we suppress most logging when running in a plugin mode
                         print RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
@@ -2822,7 +2824,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     #grab values for constants in config file:
     foreach (@configfile) {
         for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 global1 global2 global3 global4 global5 gnuplot proxy timeout
-                globaltimeout globalhttplog standaloneplot globalretry globaljumpbacks testonly autocontrolleronly firstlooponly lastlooponly/) {
+                globaltimeout globalhttplog standaloneplot globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
                 $config{$config_const} = $1;
@@ -2955,7 +2957,8 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s~{SINGLEQUOTE}~'~g; #'
     $_[0] =~ s~{TIMESTAMP}~$timestamp~g;
     $_[0] =~ s~{STARTTIME}~$starttime~g;
-    $_[0] =~ s~{PROXYRULES}~$opt_proxyrules~g;
+    $_[0] =~ s~{OPT_PROXYRULES}~$opt_proxyrules~g;
+    $_[0] =~ s~{OPT_PROXY}~$opt_proxy~g;
 
     $_[0] =~ m~{TESTSTEPTIME:(\d+)}~s;
     if ($1)
@@ -3130,6 +3133,7 @@ sub httplog {  #write requests and responses to http.log file
             print RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
             close(RESPONSEASFILE);
         }
+
 
         if ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) {  #global http log setting
             print HTTPLOGFILE $textrequest, "\n\n";
@@ -3358,8 +3362,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                                                         );       
                 }
 
-#                                                        'proxy' => {'proxyType' => 'pac', 'proxyAutoconfigUrl' => 'http://127.0.0.1:9080/proxy_blacklist.pac' },
-
 ## Firefox
                 if ($opt_driver eq "firefox") {
                     print STDOUT qq|opt_proxy $opt_proxy\n|;
@@ -3381,9 +3383,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                                                         );       
                  }
             };
-#                                                    'extra_capabilities' => {'chrome.switches' => ['--proxy-pac-url="http://127.0.0.1/proxywebdriver.pac"'],["--incognito"],["--window-size=1260,460"]}
-#                                                    'proxy' => {'proxyType' => 'pac', 'proxyAutoconfigUrl' => 'http://127.0.0.1/proxy_blacklist.pac' },
-
             
             if ( $@ and $try++ < $max )
             {

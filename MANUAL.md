@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.47
+#Manual for WebInject version 1.48
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2027,7 +2027,8 @@ Constant | Description
 **{CONCURRENCY}** | Output folder name only - not the full path
 **{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder 
 **{TESTFILENAME}** | Test file name
-**{PROXYRULES}** | What proxy option was specified via the command line to webinject.pl
+**{OPT_PROXYRULES}** | What proxyrules option was specified via the command line to webinject.pl
+**{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
 **{GLOBAL1}** | Value of `global1` specified in your config file
 **{GLOBAL2}** | Value of `global2` specified in your config file
 **{GLOBAL3}** | Value of `global3` specified in your config file
