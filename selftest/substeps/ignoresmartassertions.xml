@@ -1,0 +1,32 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Should fail due to smart assertion defined in ignoresmartassertionsconfig.xml"
+    method="cmd"
+    command="echo Set-Cookie: "
+/>
+
+<case
+    id="20"
+    description1="Should pass - smartassertions are ignored"
+    method="cmd"
+    command="echo Set-Cookie: "
+    ignoresmartassertions="true"
+/>
+
+<case
+    id="30"
+    description1="Should pass - smart assertions are satisfied"
+    method="cmd"
+    command="echo Set-Cookie: "
+    command1="echo Cache-Control: private"
+/>
+
+
+</testcases>

@@ -1,0 +1,18 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">ignoresmartassertions</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 1"
+    verifypositive1="Must have a Cache-Control of private or no-cache when a cookie is set"
+    assertcount="Failed Smart Assertion|||1"
+/>
+
+</testcases>

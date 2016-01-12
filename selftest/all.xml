@@ -212,4 +212,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="270"
+    description1="ignoresmartassertions"
+    method="cmd"
+    command="webinject.pl -o selftest\output\ignoresmartassertions selftest\ignoresmartassertions.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
