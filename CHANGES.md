@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.49 - Jan 13, 2016
+* refactored the assertion skips functionality and summary info is now included in results.xml
+
 ### Version 1.48 - Jan 12, 2016
 * added {OPT_PROXY} and renamed {PROXYRULES} to {OPT_PROXYRULES}
 * removed erroneous firstlooponly lastlooponly from config for loop

@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.48";
+our $version="1.49";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -70,6 +70,7 @@ my (@verifycountparms); ## regex match occurences must much a particular count f
 my ($output); ## folder where WebInject is outputing results
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
+my $totalassertionskips = 0;
 
 my (@pages); ## page source of previously visited pages
 my (@pagenames); ## page name of previously visited pages
@@ -402,7 +403,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
                 ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
                 ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "logrequest", "logresponse", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions", "assertionskipsmessage",
-                ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages");
+                ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly");
                 ##
                 ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
 
@@ -920,6 +921,7 @@ print RESULTSXML qq|T$hourX:$minuteX:$secondX</start-date-time>
         <test-cases-failed>$casefailedcount</test-cases-failed>
         <verifications-passed>$passedcount</verifications-passed>
         <verifications-failed>$failedcount</verifications-failed>
+        <assertion-skips>$totalassertionskips</assertion-skips>
         <average-response-time>$avgresponse</average-response-time>
         <max-response-time>$maxresponse</max-response-time>
         <min-response-time>$minresponse</min-response-time>
@@ -2243,6 +2245,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     my $count; ##
     my $tempstring; ##
     my $assertionskips = 0;
+    my $assertionskipsmessage = ""; ## support tagging an assertion as disabled with a message
+
     
     if ($entrycriteriaOK && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
@@ -2365,6 +2369,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                         print STDOUT "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
                     }
                     $assertionskips++;
+                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {  
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## verify existence of string in response
@@ -2655,13 +2660,14 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
     
     if ($assertionskips > 0) {
+        $totalassertionskips = $totalassertionskips + $assertionskips;
         unless ($reporttype) {  #we suppress most logging when running in a plugin mode
             print RESULTSXML qq|            <assertionskips>true</assertionskips>\n|;
             if ($case{assertionskipsmessage}) {
-                print RESULTSXML qq|            <assertionskips-message>$case{assertionskipsmessage}</assertionskips-message>\n|;
+                print RESULTSXML qq|            <assertionskips-message>$case{assertionskipsmessage}:$assertionskipsmessage</assertionskips-message>\n|;
             }
             else {
-                print RESULTSXML qq|            <assertionskips-message>One or more assertions were skipped on this test case</assertionskips-message>\n|;
+                print RESULTSXML qq|            <assertionskips-message>$assertionskipsmessage</assertionskips-message>\n|;
             }
         }
     }
