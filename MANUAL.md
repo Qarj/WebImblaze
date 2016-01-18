@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.49
+#Manual for WebInject version 1.50
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -129,6 +129,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 
 ####[3.3.5 - Test Response Output Control Parameters](#tcoutput)
+
+[decodequotedprintable](#decodequotedprintable)
 
 [errormessage](#tcparamerrmsg)
 
@@ -1428,6 +1430,21 @@ if the test step fails any of the verifypositives or the assertcount.
 
 <a name="tcoutput"></a>
 ###3.3.5 - Test Response Output Control Parameters
+
+<a name="decodequotedprintable"></a>
+####decodequotedprintable
+
+Decodes a quoted-printable response and replaces the response with the decoded version. The decoded
+version will be available to the parseresponse parameter.
+
+```
+    decodequotedprintable="true"
+```
+
+Note: This feature was added to deal with intermediate email files in quoted-printable format.
+
+<br />
+
 
 <a name="tcparamerrmsg"></a>
 ####errormessage

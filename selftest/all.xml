@@ -220,4 +220,12 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="280"
+    description1="decodequotedprintable"
+    method="cmd"
+    command="webinject.pl -o selftest\output\decodequotedprintable selftest\decodequotedprintable.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>

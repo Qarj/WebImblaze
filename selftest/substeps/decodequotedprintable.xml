@@ -1,0 +1,40 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!-- Note - method of cmd always generates a response code of 100 -->
+<case
+    id="10"
+    description1="Examine a quoted printable file with decode"
+    method="cmd"
+    command="type selftest\testdata\quotedprintable.txt"
+    parseresponseSCALE10='width=device-width, initial |"|'
+    decodequotedprintable="true"
+/>
+
+<case
+    id="20"
+    description1="Info - found: {SCALE10} in response step 10"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="30"
+    description1="Examine a quoted printable file without decode"
+    method="cmd"
+    command="type selftest\testdata\quotedprintable.txt"
+    parseresponseSCALE30='width=device-width, initial |"|'
+/>
+
+<case
+    id="40"
+    description1="Info - found: {SCALE30} in response step 30"
+    method="cmd"
+    command="echo NOP"
+/>
+
+</testcases>

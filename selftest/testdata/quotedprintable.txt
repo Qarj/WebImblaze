@@ -1,0 +1,13 @@
+MIME-Version: 1.0
+From: mailer@example.com
+To: testuser11122233@regression.example.com
+Date: 18 Jan 2016 15:31:00 +0000
+Subject: Important details regarding your account
+Content-Type: text/html; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+<!DOCTYPE html><html xmlns=3D"http://www.w3.org/1999/xhtml"><head=
+>=0A    <meta name=3D"viewport" content=3D"width=3Ddevice-width, =
+initial scale=3D1.0">=0A<meta http-equiv=3D"Content-Type" content=
+=3D"text/html; charset=3Diso-8859-1">=0A<title></title>=0A=0A<sty=
+le type=3D"text/css"</html>

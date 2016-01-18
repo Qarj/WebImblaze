@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.50 - Jan 18, 2016
+* added parameter decodequotedprintable which decodes a quoted-printable response and replaces it with the decoded version
+
 ### Version 1.49 - Jan 13, 2016
 * refactored the assertion skips functionality and summary info is now included in results.xml
 
