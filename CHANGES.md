@@ -8,6 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.51 - Jan 19, 2016
+* removed unused feature in sub httppost_xml that checks if xml response is well-formed
+* Error package no longer needs to be downloaded from CPAN for Strawberry Perl
+
+
 ### Version 1.50 - Jan 18, 2016
 * added parameter decodequotedprintable which decodes a quoted-printable response and replaces it with the decoded version
 

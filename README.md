@@ -1,4 +1,4 @@
-# WebInject 1.50
+# WebInject 1.51
 WebInject is a free Perl based tool for automated testing of web applications and web services.
 
 
@@ -15,18 +15,14 @@ WebInject is very easy to setup and run. An example is test included.
     * Navigate to http://strawberryperl.com/
     * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
-3. Install the Error package from CPAN
-    * Open the Command Prompt up as an Administrator
-        * Press the Windows Key
-        * Type `cmd`
-        * Right click on `cmd.exe` then select `Run as Administrator`
-    * Type `cpan Error` then press `Enter`
-
 That's it! You are now ready to run WebInject for the first time.
 
 ### Run the example WebInject test
 
 1. Open the Command Prompt up as an Administrator
+    * Press the Windows Key
+    * Type `cmd`
+    * Right click on `cmd.exe` then select `Run as Administrator`
 
 2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called WebInject, then
     * `CD C:\WebInject\webinject.pl` then press 'Enter'

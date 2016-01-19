@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.50";
+our $version="1.51";
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -33,7 +33,6 @@ use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need i
 $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}="false";
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use XML::Parser;  #for web services verification (you may comment this out if aren't doing XML verifications for web services)
-use Error qw(:try);  #for web services verification (you may comment this out if aren't doing XML verifications for web services)
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses) 
 use Data::Dumper;  #uncomment to dump hashes for debugging
 use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintable parameter and parseresponse dequote feature
@@ -2060,37 +2059,6 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
-
-
-    my $xmlparser = new XML::Parser;
-    try {  #see if the XML parses properly
-        $xmlparser->parse($response->content);
-        #print "good xml\n";
-        unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-            print RESULTS qq|<span class="pass">Passed XML Parser (content is well-formed)</span><br />\n|;
-            print RESULTSXML qq|            <verifyxml-success>true</verifyxml-success>\n|;
-        }
-        unless ($nooutput) { #skip regular STDOUT output 
-            print STDOUT "Passed XML Parser (content is well-formed) \n";
-        }
-        $passedcount++;
-        $retrypassedcount++;
-        return; #exit try block
-    }
-    catch Error with {
-        my $ex = shift;  #get the exception object
-        #print "bad xml\n";
-        unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-            print RESULTS qq|<span class="fail">Failed XML Parser: $ex</span><br />\n|;
-            print RESULTSXML qq|            <verifyxml-success>false</verifyxml-success>\n|;
-        }
-        unless ($nooutput) { #skip regular STDOUT output  
-            print STDOUT "Failed XML Parser: $ex \n";         
-        }
-        $failedcount++;
-        $retryfailedcount++;
-        $isfailure++;
-    };  # <-- remember the semicolon
 
     ## this section inserts carriage returns in the soap response to make in more readable (no indenting)
     $soapresp = $response->as_string; #get the response out
