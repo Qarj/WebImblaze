@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.51
+#Manual for WebInject version 1.52
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -29,8 +29,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [Global Retry (globalretry)](#cfgglobalretry)
 
 [Global Jumpbacks (globaljumpbacks)](#cfgglobaljumpbacks)
-
-[Global constants (global1, global2, global3, global4, global5)](#cfgglobalconstants)
 
 [Test Only (testonly)](#cfgtestonly)
 
@@ -395,17 +393,6 @@ If not present, defaulted to 20.
 <br />
 
 
-<a name="cfgglobalconstants"></a>
-####global1 to global5
-Allows you to specify up to 5 custom global constants for use across all test case files.
-
-example: `<global1>20</global1>`
-You could use it in a test case as the sleep time (for example):
-`sleep="{GLOBAL1}"`
-
-<br />
-
-
 <a name="cfgtestonly"></a>
 ####testonly
 Used in conjunction with the testonly test case parameter. If this configuration item is present
@@ -436,8 +423,6 @@ In the test step that you only want to run on automation controllers, specify th
 <a name="cfguserdefined"></a>
 ####userdefined
 You can create your own abitrary config values that can be accessed as constants in the test steps.
-
-It is recommened to do this rather than using global1 to global5 since you can give meaningful names to your config.
 
 ```xml
 <userdefined> 
@@ -2046,11 +2031,6 @@ Constant | Description
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXYRULES}** | What proxyrules option was specified via the command line to webinject.pl
 **{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
-**{GLOBAL1}** | Value of `global1` specified in your config file
-**{GLOBAL2}** | Value of `global2` specified in your config file
-**{GLOBAL3}** | Value of `global3` specified in your config file
-**{GLOBAL4}** | Value of `global4` specified in your config file
-**{GLOBAL5}** | Value of `global5` specified in your config file
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file
 **{BASEURL2}** | Value of `baseurl2` specified in your config file

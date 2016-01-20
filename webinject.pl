@@ -19,7 +19,11 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.51";
+our $version="1.52";
+
+#use Selenium::Remote::Driver; ## to use the clean version in the library
+#use Driver; ## using our own version of the package - had to stop it from dieing on error
+my $sel; ## support for Selenium test cases
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -98,10 +102,6 @@ $cwd =~ s/\n//g; ## remove newline character
 
 my ($counter); ## keeping track of the loop we are up to
 $counter = 0;
-
-#use Selenium::Remote::Driver; ## to use the clean version in the library
-#use Driver; ## using our own version of the package - had to stop it from dieing on error
-my $sel; ## support for Selenium test cases
 
 my $hostname = `hostname`; ## Windows hostname
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -2798,7 +2798,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         
     #grab values for constants in config file:
     foreach (@configfile) {
-        for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 global1 global2 global3 global4 global5 gnuplot proxy timeout
+        for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 gnuplot proxy timeout
                 globaltimeout globalhttplog standaloneplot globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
@@ -2975,11 +2975,6 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s~{BASEURL3}~$config{baseurl3}~g;
     $_[0] =~ s~{BASEURL4}~$config{baseurl4}~g;
     $_[0] =~ s~{BASEURL5}~$config{baseurl5}~g;
-    $_[0] =~ s~{GLOBAL1}~$config{global1}~g;
-    $_[0] =~ s~{GLOBAL2}~$config{global2}~g;
-    $_[0] =~ s~{GLOBAL3}~$config{global3}~g;
-    $_[0] =~ s~{GLOBAL4}~$config{global4}~g;
-    $_[0] =~ s~{GLOBAL5}~$config{global5}~g;
 
 ## perform arbirtary user defined config substituions
     our ($key, $value, $KEY);
