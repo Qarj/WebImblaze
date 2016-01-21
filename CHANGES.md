@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.53 - Jan 21, 2016
+* removed assertionskipsmessage parameter - it is redundant, use the skip feature on the assertions instead
+
 ### Version 1.52 - Jan 20, 2016
 * removed deprecated global1 to global5 - replaced by userdefined config
 

@@ -77,14 +77,6 @@ Run all self tests
 />
 
 <case
-    id="100"
-    description1="assertionskipsmessage"
-    method="cmd"
-    command="webinject.pl -o selftest\output\assertionskipsmessage selftest\assertionskipsmessage.xml"
-    verifypositive="Test Cases Failed: 0"
-/>
-
-<case
     id="110"
     description1="retry"
     method="cmd"

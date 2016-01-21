@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.52
+#Manual for WebInject version 1.53
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -107,8 +107,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [ignoresmartassertions](#ignoresmartassertions)
 
 [ignorehttpresponsecode](#tcparamignorehttpresponsecode)
-
-[assertionskipsmessage](#tcassertionskipsmessage)
 
 
 ####[3.3.4 - Retry Failed Test Step Parameters](#tcretry)
@@ -1235,24 +1233,6 @@ See the config file section for information on smart assertions.
 
 Normally we automatically fail a test step if the http response code wasn't in the 100-399 range.
 Specifying this parameter allows us to ignore this verification.
-
-<br />
-
-
-<a name="tcassertionskipsmessage"></a>
-####assertionskipsmessage
-
-Sometimes you might need to temporarily disable some of the assertions on a test for various reasons.
-Rather than removing the assertion from the test, you can disable it - see verifypositive, verifynegative and assertcount
-to find out how to do this.
-
-This parameter also allows you to specify a message to be written to the log as to why one or more assertions
-are skipped for this test step.
-
-```
-    assertionskipsmessage="Production Issue - the copyright message is out of date"
-```
-
 
 <br />
 
