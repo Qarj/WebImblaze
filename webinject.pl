@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.53";
+our $version="1.54";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -57,7 +57,7 @@ our (%case);
 our (%config);
 our ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 our ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
-our ($reporttype, $returnmessage, %exit_codes);
+our ($returnmessage, %exit_codes);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -170,20 +170,16 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
     }
         
     #open file handles
-    if ($reporttype) {  #we suppress most logging when running in a plugin mode
-        $output = "no output"; #for the {OUTPUT} constant
+    if ($opt_output) {  #use output location if it is passed from the command line
+        $output = $opt_output;
     }
     else {
-        if ($opt_output) {  #use output location if it is passed from the command line
-            $output = $opt_output;
-        }
-        else {
-             $output = $dirname."output/"; ## default to the output folder under the current folder
-        }
-            open(HTTPLOGFILE, ">$output"."http.log") or die "\nERROR: Failed to open http.log file\n\n";   
-            open(RESULTS, ">$output"."results.html") or die "\nERROR: Failed to open results.html file\n\n";    
-            open(RESULTSXML, ">$output"."results.xml") or die "\nERROR: Failed to open results.xml file\n\n";
+         $output = $dirname."output/"; ## default to the output folder under the current folder
     }
+
+    open(HTTPLOGFILE, ">$output"."http.log") or die "\nERROR: Failed to open http.log file\n\n";   
+    open(RESULTS, ">$output"."results.html") or die "\nERROR: Failed to open results.html file\n\n";    
+    open(RESULTSXML, ">$output"."results.xml") or die "\nERROR: Failed to open results.xml file\n\n";
 
     if ($output =~ m~\\([^\\]*)\\$~s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
         $concurrency = $1; 
@@ -192,10 +188,8 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
     $outsum = unpack("%32C*", $output); ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
         
-    unless ($reporttype) {  #we suppress most logging when running in a plugin mode 
-        print RESULTSXML qq|<results>\n\n|;  #write initial xml tag
-        writeinitialhtml();  #write opening tags for results file
-    }
+    print RESULTSXML qq|<results>\n\n|;  #write initial xml tag
+    writeinitialhtml();  #write opening tags for results file
                
     unless ($xnode or $nooutput) { #skip regular STDOUT output if using an XPath or $nooutput is set 
         writeinitialstdout();  #write opening tags for STDOUT. 
@@ -584,9 +578,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop 
                     if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq "true")) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
-                        unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                            print RESULTSXML qq|            <success>false</success>\n|;
-                        }
+                        print RESULTSXML qq|            <success>false</success>\n|;
                         if ($case{errormessage}) { #Add defined error message to the output 
                             print RESULTS qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
                             print RESULTSXML qq|            <result-message>$case{errormessage}</result-message>\n|;
@@ -616,9 +608,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         $casefailedcount++;
                     }
                     elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
-                        unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                            print RESULTS qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
-                        }
+                        print RESULTS qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
                         unless ($nooutput) { #skip regular STDOUT output 
                             print STDOUT qq|RETRYING... $retry to go \n|;
                         }
@@ -634,9 +624,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
                         my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
-                        unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                            print RESULTS qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
-                        }
+                        print RESULTS qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
                         unless ($nooutput) { #skip regular STDOUT output 
                             print STDOUT qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
                         }
@@ -2335,10 +2323,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
                 @verifyparms = split(/\|\|\|/, $case{$testAttrib}); #index 0 contains the actual string to verify
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                    unless ($reporttype) {  #we suppress most logging when running in a plugin mode
-                        print RESULTS qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
-                        print STDOUT "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
-                    }
+                    print RESULTS qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
+                    print STDOUT "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
                 }
                 else {

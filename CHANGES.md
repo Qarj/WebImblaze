@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.54 - Jan 23, 2016
+* removed all references to reporttype, this branch of WebInject is for functional testing, so the code is now cleaner
+
 ### Version 1.53 - Jan 21, 2016
 * removed assertionskipsmessage parameter - it is redundant, use the skip feature on the assertions instead
 
