@@ -2557,7 +2557,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     #grab values for constants in config file:
     foreach (@configfile) {
         for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
-                globaltimeout globalretry globaljumpbacks testonly autocontrolleronly/) {
+                globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
                 $config{$config_const} = $1;
