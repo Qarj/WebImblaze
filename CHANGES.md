@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.58 - Jan 23, 2016
+* removed logrequest and logresponse parameters - we will always log the requests and the responses
+
 ### Version 1.57 - Jan 23, 2016
 * removed anything to do with gui or $returnmessage - not supported
 

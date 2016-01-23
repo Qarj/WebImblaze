@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.57
+#Manual for WebInject version 1.58
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -142,11 +142,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [logastext](#tcparamlogastext)
 
-[logresponse](#tclogresponse)
-
 [logresponseasfile](#tcparamlogresponseasfile)
-
-[logrequest](#tclogrequest)
 
 [section](#tcparamsection)
 
@@ -1515,17 +1511,6 @@ than html.
 <br />
 
 
-<a name="tclogresponse"></a>
-####logresponse
-Specifies to log the response. In the case that you have automatic logging turned on, the response will be logged twice.
-
-```
-    logresponse="yes"
-```
-
-<br />
-
-
 <a name="tcparamlogresponseasfile"></a>
 ####logresponseasfile
 
@@ -1542,17 +1527,6 @@ Example:
     logastext="true"
     logresponseasfile="Captured.css"
 />
-```
-
-<br />
-
-
-<a name="tclogrequest"></a>
-####logrequest
-Specifies to log the request. In the case that you have automatic logging turned on, the request will be logged twice.
-
-```
-    logrequest="yes"
 ```
 
 <br />

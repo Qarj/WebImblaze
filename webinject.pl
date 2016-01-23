@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.57";
+our $version="1.58";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -364,7 +364,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", "command2", "command3", "command4", "command5", "command6", "command7", "command8", "command9", "command10", "", "command11", "command12", "command13", "command14", "command15", "command16", "command17", "command18", "command19", "command20", "parms", "verifytext",
                 ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
                 ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
-                ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "logrequest", "logresponse", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
+                ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
                 ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly", "decodequotedprintable");
                 ##
                 ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
@@ -2787,8 +2787,8 @@ sub httplog {  #write requests and responses to http.log file
         
 ## log separator enhancement
 ## from version 1.42 log separator is now written before each test case along with case number and test description
-    if (($case{logrequest} && ($case{logrequest} =~ /yes/i)) or
-        ($case{logresponse} && ($case{logresponse} =~ /yes/i)) or
+    if (
+        
         ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) or
         (($config{globalhttplog} && ($config{globalhttplog} =~ /onfail/i)) && ($isfailure > 0))
        ) {     
@@ -2813,11 +2813,6 @@ sub httplog {  #write requests and responses to http.log file
             }
             print HTTPLOGFILE "\n\n";
        }
-    
-    if ($case{logrequest} && ($case{logrequest} =~ /yes/i)) {  #http request - log setting per test case
-        
-        print HTTPLOGFILE $textrequest, "\n\n";
-    } 
     
     if ($case{decodequotedprintable}) {
          my $decoded = decode_qp($response->as_string); ## decode the response output
@@ -2844,10 +2839,6 @@ sub httplog {  #write requests and responses to http.log file
          #out print STDOUT "\n\n soapresp:\n$formatresponse \n\n";
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
-
-    if ($case{logresponse} && ($case{logresponse} =~ /yes/i)) {  #http response - log setting per test case
-        print HTTPLOGFILE $response->as_string, "\n\n";
-    }
         
     if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
         my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
@@ -2867,8 +2858,8 @@ sub httplog {  #write requests and responses to http.log file
         print HTTPLOGFILE $response->as_string, "\n\n";
     }
     
-    if (($case{logrequest} && ($case{logrequest} =~ /yes/i)) or
-        ($case{logresponse} && ($case{logresponse} =~ /yes/i)) or
+    if (
+        
         ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) or
         (($config{globalhttplog} && ($config{globalhttplog} =~ /onfail/i)) && ($isfailure > 0))
        ) {
