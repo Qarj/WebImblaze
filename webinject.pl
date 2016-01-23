@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.55";
+our $version="1.56";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -49,7 +49,7 @@ our ($useragent, $request, $response);
 our ($gui, $monitorenabledchkbx, $latency);
 our (%teststeptime); ## record in a hash the latency for every step for later use
 our ($cookie_jar, @httpauth);
-our ($xnode, $graphtype, $plotclear, $stop);
+our ($xnode, $stop);
 our ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
 our ($totalresponse, $avgresponse, $maxresponse, $minresponse);
 our (@casefilelist, $currentcasefile, $casecount, $isfailure, $verifynegativefailed);
@@ -139,11 +139,6 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
 
     startsession(); #starts, or restarts the webinject session
         
-    if ($gui != 1){   
-        $graphtype = 'lines'; #default to line graph if not in GUI
-        $config{standaloneplot} = 'off'; #initialize so we don't get warnings when <standaloneplot> is not set in config         
-    }
-        
     processcasefile();
         
     #add proxy support if it is set in config.xml
@@ -195,11 +190,6 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
         writeinitialstdout();  #write opening tags for STDOUT. 
     }
         
-    if ($gui == 1){ $curgraphtype = $graphtype; }  #set the initial value so we know if the user changes the graph setting from the gui
-        
-    gnuplotcfg(); #create the gnuplot config file
-        
-        
     $totalruncount = 0;
     $casepassedcount = 0;
     $casefailedcount = 0;
@@ -210,7 +200,6 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
     $maxresponse = 0;
     $minresponse = 10000000; #set to large value so first minresponse will be less
     $stop = 'no';
-    $plotclear = 'no';
 
     $globalretries=0; ## total number of retries for this run across all test cases
         
@@ -274,15 +263,6 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 $retries = 1; ## we increment retries after writing to the log
                 $retriesprint = ""; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
                     
-                if ($gui == 1){
-                    unless ($monitorenabledchkbx eq 'monitor_off') {  #don't do this if monitor is disabled in gui
-                        if ("$curgraphtype" ne "$graphtype") {  #check to see if the user changed the graph setting
-                            gnuplotcfg();  #create the gnuplot config file since graph setting changed
-                            $curgraphtype = $graphtype;
-                        }
-                    }
-                }
-
                 $timestamp = time();  #used to replace parsed {timestamp} with real timestamp value
                     
                 $case{testonly} = $xmltestcases->{case}->{$testnum}->{testonly}; ## skip test cases marked as testonly when running against production
@@ -551,14 +531,6 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     getbackgroundimages(); ## get specified web page src assets
 
                     httplog();  #write to http.log file
-                    
-                    plotlog($latency);  #send perf data to log file for plotting
-                    
-                    plotit();  #call the external plotter to create a graph
-                 
-                    if ($gui == 1) { 
-                        gui_updatemontab();  #update monitor with the newly rendered plot graph 
-                    }   
                     
                     if ($entrycriteriaOK) { ## do not want to parseresponse on junk
                        parseresponse();  #grab string from response to send later
@@ -2627,8 +2599,8 @@ sub processcasefile {  #get test case files to run (from command line or config 
         
     #grab values for constants in config file:
     foreach (@configfile) {
-        for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 gnuplot proxy timeout
-                globaltimeout globalhttplog standaloneplot globalretry globaljumpbacks testonly autocontrolleronly/) {
+        for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 proxy timeout
+                globaltimeout globalhttplog globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
                 $config{$config_const} = $1;
@@ -2954,60 +2926,6 @@ sub flush { ##immediately flush given file handle to disk
    my $h = select($_[0]); my $af=$|; $|=1; $|=$af; select($h);
 }
 #------------------------------------------------------------------
-sub plotlog {  #write performance results to plot.log in the format gnuplot can use
-        
-    our (%months, $date, $time, $mon, $mday, $hours, $min, $sec, $year, $value);
-        
-    #do this unless: monitor is disabled in gui, or running standalone mode without config setting to turn on plotting     
-    unless ((($gui == 1) and ($monitorenabledchkbx eq 'monitor_off')) or (($gui == 0) and ($config{standaloneplot} ne 'on'))) {  
-            
-        %months = ("Jan" => 1, "Feb" => 2, "Mar" => 3, "Apr" => 4, "May" => 5, "Jun" => 6, 
-                   "Jul" => 7, "Aug" => 8, "Sep" => 9, "Oct" => 10, "Nov" => 11, "Dec" => 12);
-            
-        local ($value) = @_; 
-        $date = scalar localtime; 
-        ($mon, $mday, $hours, $min, $sec, $year) = $date =~ 
-            /\w+ (\w+) +(\d+) (\d\d):(\d\d):(\d\d) (\d\d\d\d)/;
-            
-        $time = "$months{$mon} $mday $hours $min $sec $year";
-            
-        if ($plotclear eq 'yes') {  #used to clear the graph when requested
-            open(PLOTLOG, ">$dirname"."plot.log") or die "ERROR: Failed to open file plot.log\n";  #open in clobber mode so log gets truncated
-            $plotclear = 'no';  #reset the value 
-        }
-        else {
-            open(PLOTLOG, ">>$dirname"."plot.log") or die "ERROR: Failed to open file plot.log\n";  #open in append mode
-        }
-          
-        printf PLOTLOG "%s %2.4f\n", $time, $value;
-        close(PLOTLOG);
-    }    
-}
-#------------------------------------------------------------------
-sub gnuplotcfg {  #create gnuplot config file
-        
-    #do this unless: monitor is disabled in gui, or running standalone mode without config setting to turn on plotting     
-    unless ((($gui == 1) and ($monitorenabledchkbx eq 'monitor_off')) or (($gui == 0) and ($config{standaloneplot} ne 'on'))) {  
-        
-        open(GNUPLOTPLT, ">$dirname"."plot.plt") || die "Could not open file\n";
-        print GNUPLOTPLT qq|
-set term png 
-set output \"plot.png\"
-set size 1.1,0.5
-set pointsize .5
-set xdata time 
-set ylabel \"Response Time (seconds)\"
-set yrange [0:]
-set bmargin 2
-set tmargin 2
-set timefmt \"%m %d %H %M %S %Y\"
-plot \"plot.log\" using 1:7 title \"Response Times" w $graphtype
-|;      #" double quote for UltraEdit display fix
-        close(GNUPLOTPLT);
-        
-    }
-}
-#------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
         
     if ($gui == 1){ gui_stop(); }
@@ -3029,13 +2947,10 @@ sub finaltasks {  #do ending tasks
 #------------------------------------------------------------------
 sub whackoldfiles {  #delete any files leftover from previous run if they exist
         
-    if (-e "$dirname"."plot.log") { unlink "$dirname"."plot.log"; } 
-    if (-e "$dirname"."plot.plt") { unlink "$dirname"."plot.plt"; } 
-    if (-e "$dirname"."plot.png") { unlink "$dirname"."plot.png"; }
     if (glob("$dirname"."*.xml.tmp")) { unlink glob("$dirname"."*.xml.tmp"); }
         
     #verify files are deleted, if not give the filesystem time to delete them before continuing    
-    while ((-e "plot.log") or (-e "plot.plt") or (-e "plot.png") or (glob('*.xml.tmp'))) {
+    while (glob('*.xml.tmp')) {
         sleep .5; 
     }
 }
@@ -3182,24 +3097,6 @@ sub startsession {     ## creates the webinject user agent
     };    
 }
 
-#------------------------------------------------------------------
-sub plotit {  #call the external plotter to create a graph (if we are in the appropriate mode)
-        
-    #do this unless: monitor is disabled in gui, or running standalone mode without config setting to turn on plotting     
-    unless ((($gui == 1) and ($monitorenabledchkbx eq 'monitor_off')) or (($gui == 0) and ($config{standaloneplot} ne 'on'))) {
-        unless ($graphtype eq 'nograph') {  #do this unless its being called from the gui with No Graph set
-            if ($config{gnuplot}) {  #if gnuplot is specified in config.xml, use it
-                system "$config{gnuplot}", "plot.plt";  #plot it with gnuplot
-            }
-            elsif (($^O eq 'MSWin32') and (-e './wgnupl32.exe')) {  #check for Win32 exe 
-                system "wgnupl32.exe", "plot.plt";  #plot it with gnuplot using exe
-            }
-            elsif ($gui == 1) {
-                gui_no_plotter_found();  #if gnuplot not specified, notify on gui
-            }
-        }
-    }
-}
 #------------------------------------------------------------------
 sub getdirname {  #get the directory webinject engine is running from
         

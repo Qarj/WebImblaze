@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.56 - Jan 23, 2016
+* removed anything to do with plotting - not supported
+
 ### Version 1.55 - Jan 23, 2016
 * removed all references to nooutput - not properly supported or needed, made code simpler
 
