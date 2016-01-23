@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.58
+#Manual for WebInject version 1.59
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -19,8 +19,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [HTTP Authentication (httpauth)](#cfghttpauth)
 
 [Base URL (baseurl, baseurl1, baseurl2, baseurl3, baseurl4, baseurl5)](#cfgbaseurl)
-
-[HTTP Logging (globalhttplog)](#cfghttplog)
 
 [Comments (comment)](#cfgcomment)
 
@@ -315,27 +313,6 @@ in the same way as the 'baseurl' example above.
 ####baseurl5
 Creates the constant {BASEURL5} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
-    
-<br />
-
-
-<a name="cfghttplog"></a>
-####globalhttplog
-Enables logging of HTTP requests/responses for all test cases.  The HTTP requests sent and HTTP responses received 
-are written to the http.log file.  The available values you can set this to are:
-
-    
-
-**yes** - log HTTP for all test cases
-example: `<globalhttplog>yes</globalhttplog>`
-
-
-**onfail** - log HTTP for test cases that fail only
-
-example: `<globalhttplog>onfail</globalhttplog>`
-
-Note: If you also turn on logging for any individual test cases, it will produce duplicate log entries for the same 
-request/response.
     
 <br />
 

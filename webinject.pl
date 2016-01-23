@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.58";
+our $version="1.59";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -2557,7 +2557,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     #grab values for constants in config file:
     foreach (@configfile) {
         for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 proxy timeout
-                globaltimeout globalhttplog globalretry globaljumpbacks testonly autocontrolleronly/) {
+                globaltimeout globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
                 $config{$config_const} = $1;
@@ -2787,32 +2787,26 @@ sub httplog {  #write requests and responses to http.log file
         
 ## log separator enhancement
 ## from version 1.42 log separator is now written before each test case along with case number and test description
-    if (
-        
-        ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) or
-        (($config{globalhttplog} && ($config{globalhttplog} =~ /onfail/i)) && ($isfailure > 0))
-       ) {     
-            print HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
-            print HTTPLOGFILE "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
-            ## log descrption1 and description2
-            print HTTPLOGFILE "<desc1>$desc1log</desc1>\n";
-            if ($desc2log) {
-               print HTTPLOGFILE "<desc2>$desc2log</desc2>\n";
-            }
-            
-            print HTTPLOGFILE "\n";
-            for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
-                if ($case{$_}) {
-                    print HTTPLOGFILE "<searchimage>$case{$_}</searchimage>\n";
-                }
-            }
-            print HTTPLOGFILE "\n";
-            
-            if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
-                print HTTPLOGFILE "<logastext> \n";
-            }
-            print HTTPLOGFILE "\n\n";
-       }
+    print HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
+    print HTTPLOGFILE "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+    ## log descrption1 and description2
+    print HTTPLOGFILE "<desc1>$desc1log</desc1>\n";
+    if ($desc2log) {
+       print HTTPLOGFILE "<desc2>$desc2log</desc2>\n";
+    }
+    
+    print HTTPLOGFILE "\n";
+    for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
+        if ($case{$_}) {
+            print HTTPLOGFILE "<searchimage>$case{$_}</searchimage>\n";
+        }
+    }
+    print HTTPLOGFILE "\n";
+    
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
+        print HTTPLOGFILE "<logastext> \n";
+    }
+    print HTTPLOGFILE "\n\n";
     
     if ($case{decodequotedprintable}) {
          my $decoded = decode_qp($response->as_string); ## decode the response output
@@ -2847,25 +2841,11 @@ sub httplog {  #write requests and responses to http.log file
         close(RESPONSEASFILE);
     }
 
-
-    if ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) {  #global http log setting
-        print HTTPLOGFILE $textrequest, "\n\n";
-        print HTTPLOGFILE $response->as_string, "\n\n";
-    }
+    print HTTPLOGFILE $textrequest, "\n\n";
+    print HTTPLOGFILE $response->as_string, "\n\n";
         
-    if (($config{globalhttplog} && ($config{globalhttplog} =~ /onfail/i)) && ($isfailure > 0)) { #global http log setting - onfail mode
-        print HTTPLOGFILE $textrequest, "\n\n";
-        print HTTPLOGFILE $response->as_string, "\n\n";
-    }
-    
-    if (
-        
-        ($config{globalhttplog} && ($config{globalhttplog} =~ /yes/i)) or
-        (($config{globalhttplog} && ($config{globalhttplog} =~ /onfail/i)) && ($isfailure > 0))
-       ) {
-            if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
-                print HTTPLOGFILE "</logastext> \n";
-            }
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
+        print HTTPLOGFILE "</logastext> \n";
     }
 }
 
