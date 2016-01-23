@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.54
+#Manual for WebInject version 1.55
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -522,7 +522,7 @@ WebInject is called from the command line and has several command line options.
 
 Usage:
 
-`webinject.pl [-c|--config config_file] [-o|--output output_location] [-n|--no-output] [-A|--autocontroller] [testcase_file [XPath]]`
+`webinject.pl [-c|--config config_file] [-o|--output output_location] [-A|--autocontroller] [testcase_file [XPath]]`
 
 &nbsp;&nbsp;&nbsp;or
 
@@ -570,10 +570,6 @@ Note: MS Windows style directory naming also works.
 Note: You must still have write access to the directory where WebInject resides, even when writing output 
 elsewhere.
                                         
-**-n** or **--no-output**
-
-Suppresses all output to STDOUT except the results summary.
-
 **-a** or **--autocontroller**
 
 Specifies to run autocontrolleronly testcases.
