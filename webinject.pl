@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.59";
+our $version="1.60";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -2556,7 +2556,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         
     #grab values for constants in config file:
     foreach (@configfile) {
-        for my $config_const (qw/baseurl baseurl1 baseurl2 baseurl3 baseurl4 baseurl5 proxy timeout
+        for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
                 globaltimeout globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
                 $_ =~ m~<$config_const>(.*)</$config_const>~;
@@ -2709,7 +2709,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
 ## CWD Current Working Directory
     $_[0] =~ s~{CWD}~$cwd~g;
 
-## parsedresults moved before config so you can have a parsedresult of {BASEURL22} say that in turn gets turned into the actual value
+## parsedresults moved before config so you can have a parsedresult of {BASEURL2} say that in turn gets turned into the actual value
 
     ##substitute all the parsed results back
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
@@ -2721,9 +2721,6 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s~{BASEURL}~$config{baseurl}~g;
     $_[0] =~ s~{BASEURL1}~$config{baseurl1}~g;
     $_[0] =~ s~{BASEURL2}~$config{baseurl2}~g;
-    $_[0] =~ s~{BASEURL3}~$config{baseurl3}~g;
-    $_[0] =~ s~{BASEURL4}~$config{baseurl4}~g;
-    $_[0] =~ s~{BASEURL5}~$config{baseurl5}~g;
 
 ## perform arbirtary user defined config substituions
     our ($key, $value, $KEY);

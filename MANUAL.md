@@ -1,4 +1,4 @@
-#Manual for WebInject version 1.59
+#Manual for WebInject version 1.60
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -18,7 +18,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [HTTP Authentication (httpauth)](#cfghttpauth)
 
-[Base URL (baseurl, baseurl1, baseurl2, baseurl3, baseurl4, baseurl5)](#cfgbaseurl)
+[Base URL (baseurl, baseurl1, baseurl2)](#cfgbaseurl)
 
 [Comments (comment)](#cfgcomment)
 
@@ -305,13 +305,11 @@ example: `<baseurl>http://myserver</baseurl>`
 Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
  
-... and so on up to ...
-
 <br />
 
 
-####baseurl5
-Creates the constant {BASEURL5} which can be used in test cases (see 'Variables and Constants' section below).  This works
+####baseurl2
+Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
     
 <br />
@@ -1961,9 +1959,6 @@ Constant | Description
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file
 **{BASEURL2}** | Value of `baseurl2` specified in your config file
-**{BASEURL3}** | Value of `baseurl3` specified in your config file
-**{BASEURL4}** | Value of `baseurl4` specified in your config file
-**{BASEURL5}** | Value of `baseurl5` specified in your config file
 
 **{BASEURL} Example:**
 
