@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.56";
+our $version="1.57";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -46,7 +46,7 @@ $| = 1; #don't buffer output to STDOUT
 our ($timestamp, $dirname, $testfilename);
 our (%parsedresult);
 our ($useragent, $request, $response);
-our ($gui, $monitorenabledchkbx, $latency);
+our ($monitorenabledchkbx, $latency);
 our (%teststeptime); ## record in a hash the latency for every step for later use
 our ($cookie_jar, @httpauth);
 our ($xnode, $stop);
@@ -57,7 +57,7 @@ our (%case);
 our (%config);
 our ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 our ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
-our ($returnmessage, %exit_codes);
+our (%exit_codes);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -108,27 +108,17 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 my $concurrency = "null"; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
-if (($0 =~ /webinject.pl/) or ($0 =~ /webinject.exe/)) {  #set flag so we know if it is running standalone or from webinjectgui
-    $gui = 0; 
-    engine();
-}
-else {
-    $gui = 1;
-    getdirname();  #get the directory webinject engine is running from
-    whackoldfiles(); #delete files leftover from previous run (do this here so they are whacked on startup when running from gui)
-}
+engine();
 
 
 
 #------------------------------------------------------------------
-sub engine {   #wrap the whole engine in a subroutine so it can be integrated with the gui 
+sub engine {
       
     our ($startruntimer, $endruntimer, $repeat, $start);
     our ($curgraphtype);
     our ($casefilecheck); ## removed $testnum, $xmltestcases from here, made global
 
-    if ($gui == 1) { gui_initial(); }
-        
     getdirname();  #get the directory webinject engine is running from
         
     getoptions();  #get command line options
@@ -215,8 +205,6 @@ sub engine {   #wrap the whole engine in a subroutine so it can be integrated wi
         #print "\n$currentcasefile\n\n";
             
         $casefilecheck = ' ';
-            
-        if ($gui == 1){ gui_processing_msg(); }
             
         convtestcases();
             
@@ -443,8 +431,6 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     
                     $timestamp = time();  #used to replace parsed {timestamp} with real timestamp value
 
-                    if ($gui == 1){ gui_tc_descript(); }
-
                     if ($case{description1} and $case{description1} =~ /dummy test case/) {  #if we hit a dummy record, skip it
                         next;
                     }
@@ -549,18 +535,6 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                             print RESULTSXML qq|            <result-message>TEST CASE FAILED</result-message>\n|;
                             print STDOUT qq|TEST CASE FAILED\n|;
                         }    
-                        unless ($returnmessage) {  #(used for plugin compatibility) if it's the first error message, set it to variable
-                            if ($case{errormessage}) { 
-                                $returnmessage = $case{errormessage}; 
-                            }
-                            else { 
-                                $returnmessage = "Test case number $testnumlog failed"; 
-                            }
-                            #print "\nReturn Message : $returnmessage\n"
-                        }
-                        if ($gui == 1){ 
-                            gui_status_failed();
-                        }
                         $casefailedcount++;
                     }
                     elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
@@ -611,16 +585,11 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         print STDOUT qq|TEST CASE PASSED \n|;
                         print RESULTSXML qq|            <success>true</success>\n|;
                         print RESULTSXML qq|            <result-message>TEST CASE PASSED</result-message>\n|;
-                        if ($gui == 1){
-                            gui_status_passed(); 
-                        }
                         $casepassedcount++;
                         $retry = 0; # no need to retry when test case passes
                     }
                     
                     print RESULTS qq|Response Time = $latency sec <br />\n|;
-                    
-                    if ($gui == 1) { gui_timer_output(); } 
                     
                     print STDOUT qq|Response Time = $latency sec \n|;
                     
@@ -646,17 +615,12 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         $totalruncount++;
                     }
                     
-                    if ($gui == 1) { 
-                        gui_statusbar();  #update the statusbar
-                    }   
-                    
                     if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
                     if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
                     $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg 
                     if ($totalruncount > 0) { #only update average response if at least one test case has completed, to avoid division by zero
                         $avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
                     }    
-                    if ($gui == 1) { gui_updatemonstats(); }  #update timers and counts in monitor tab   
                     
                     $teststeptime{$testnumlog}=$latency; ## store latency for step
                     
@@ -672,13 +636,6 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         startsession();                        
                     }
 
-                    #break from sub if user presses stop button in gui    
-                    if ($stop eq 'yes') {
-                        finaltasks();
-                        $stop = 'no';
-                        return;  #break from sub
-                    }
-                    
                     if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
                     {
                         ## ignore the sleep if the test case worked and it is a retry test case
@@ -2927,8 +2884,6 @@ sub flush { ##immediately flush given file handle to disk
 }
 #------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
-        
-    if ($gui == 1){ gui_stop(); }
         
     writefinalhtml();  #write summary and closing tags for results file
         
