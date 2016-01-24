@@ -1,0 +1,38 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Get home page"
+    method="get"
+    url="http://{RAN}"
+/>
+
+<case
+    id="20"
+    description1="Get home page"
+    method="get"
+    url="http://{RAN}"
+    useragent="My Special Browser"
+/>
+
+<case
+    id="30"
+    description1="Get home page"
+    method="get"
+    url="http://{RAN}"
+/>
+
+<case
+    id="40"
+    description1="Get home page"
+    method="get"
+    url="http://{RAN}"
+    useragent="Firefox Browser"
+/>
+
+</testcases>

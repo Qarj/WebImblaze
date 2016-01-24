@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.64";
+our $version="1.65";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -253,6 +253,11 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 $retriesprint = ""; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
                     
                 $timestamp = time();  #used to replace parsed {timestamp} with real timestamp value
+                
+                $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
+                if ($case{useragent}) {
+                    $useragent->agent($case{useragent});
+                }
                     
                 $case{testonly} = $xmltestcases->{case}->{$testnum}->{testonly}; ## skip test cases marked as testonly when running against production
                 if ($case{testonly}) { ## is the testonly value set for this testcase?

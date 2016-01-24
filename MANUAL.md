@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.64
+# Manual for WebInject version 1.65
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -92,6 +92,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [parms](#parms)
 
+[useragent](#useragentparameter)
 
 #### [3.3.3 - Additional Assertion Parameters](#asserts)
 
@@ -1138,6 +1139,19 @@ testdata\AddJob.xml might look like:
 
 When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swapped with
 20000 and 35000 respectively.
+
+<br />
+
+
+<a name="useragentparameter"></a>
+#### useragent
+
+Change the user agent per test step. Once the user agent is changed in this way,
+it will stay changed for subsequent test steps.
+
+```
+    useragent="Firefox on Windows 2016"
+```
 
 <br />
 

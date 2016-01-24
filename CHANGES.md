@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.65 - Jan 24, 2016
+* support changing the user agent at the test case level
+
 ### Version 1.64 - Jan 24, 2016
 * bug fix - httppost_xml was changing the response format even when not requested via formatxml
 * added info about running WebInject in parallel
