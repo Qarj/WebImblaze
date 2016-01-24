@@ -50,15 +50,15 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [More Examples of Command Line Usage](#cmdlinexampls)
 
-## [3 - Test Case Setup](#tcsetup)
+## [3 - Test Case Setup](#setup)
 
-### [3.1 - Summary](#tcsummary)
+### [3.1 - Summary](#summary)
 
-### [3.2 - Minimal Example](#tcminexamp)
+### [3.2 - Minimal Example](#minexamp)
 
-### [3.3 - Available Parameters](#tcavailparams)
+### [3.3 - Available Parameters](#availparams)
 
-#### [3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#tccore)
+#### [3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#core)
 
 [id](#id)
 
@@ -80,7 +80,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [var](#var)
 
-#### [3.3.2 - Additional Test Driver Parameters](#tcdriver)
+#### [3.3.2 - Additional Test Driver Parameters](#driver)
 
 [command command1 ... command20](#command)
 
@@ -93,37 +93,37 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [parms](#parms)
 
 
-#### [3.3.3 - Additional Assertion Parameters](#tcasserts)
+#### [3.3.3 - Additional Assertion Parameters](#asserts)
 
 [assertcount](#assertcount)
 
 [verifyresponsecode](#vercode)
 
-[verifyresponsetime](#tcverifyresponsetime)
+[verifyresponsetime](#verifyresponsetime)
 
-[ignoreautoassertions](#tcignoreautoassertions)
+[ignoreautoassertions](#ignoreautoassertions)
 
 [ignoresmartassertions](#ignoresmartassertions)
 
 [ignorehttpresponsecode](#ignorehttpresponsecode)
 
 
-#### [3.3.4 - Retry Failed Test Step Parameters](#tcretry)
+#### [3.3.4 - Retry Failed Test Step Parameters](#retry)
 
 [retry](#retry)
 
-[retryfromstep](#tcretryfromstep)
+[retryfromstep](#retryfromstep)
 
 [retryresponsecode](#retryresponsecode)
 
-[restartbrowseronfail](#tcrestartbrowseronfail)
+[restartbrowseronfail](#restartbrowseronfail)
 
-[restartbrowser](#tcrestartbrowser)
+[restartbrowser](#restartbrowser)
 
 [sleep](#sleep)
 
 
-#### [3.3.5 - Test Response Output Control Parameters](#tcoutput)
+#### [3.3.5 - Test Response Output Control Parameters](#output)
 
 [decodequotedprintable](#decodequotedprintable)
 
@@ -146,7 +146,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [section](#section)
 
 
-#### [3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
+#### [3.3.6 - Parameters to skip test steps depending on target environment](#skip)
 
 [liveonly](#liveonly)
 
@@ -155,7 +155,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [autocontrolleronly](#autocontrolleronly)
 
 
-#### [3.3.7 - Parameters to skip test steps if previous test steps failed](#tcsanity)
+#### [3.3.7 - Parameters to skip test steps if previous test steps failed](#sanity)
 
 [checkpositive](#checkpositive)
 
@@ -166,7 +166,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [sanitycheck](#sanitycheck)
 
 
-#### [3.3.8 - Parameters to control Selenium WebDriver Test Execution](#tcwebdriver)
+#### [3.3.8 - Parameters to control Selenium WebDriver Test Execution](#webdriver)
 
 [screenshot](#screenshot)
 
@@ -176,15 +176,15 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 
 
-### [3.4 - Full Examples](#tcfullexamp)
+### [3.4 - Full Examples](#fullexamp)
 
-### [3.5 - Numbering Test Cases and Execution Order](#tcnumcases)
+### [3.5 - Numbering Test Cases and Execution Order](#numcases)
 
-### [3.6 - Parent XML Tags and Attributes (repeating test case files)](#tcxmltags)
+### [3.6 - Parent XML Tags and Attributes (repeating test case files)](#xmltags)
 
-### [3.7 - Valid XML and Using Reserved XML Characters](#tcvalidxml)
+### [3.7 - Valid XML and Using Reserved XML Characters](#validxml)
 
-### [3.8 - Variables and Constants](#tcvarconst)
+### [3.8 - Variables and Constants](#varconst)
 
 ## [4 - Pass/Fail Criteria](#passfailcrit)
 
@@ -630,10 +630,10 @@ your test case file and config file are located in a subdirectory named 'myfiles
 <br />
 
 
-<a name="tcsetup"></a>
+<a name="setup"></a>
 ## 3 - Test Case Setup
 
-<a name="tcsummary"></a>
+<a name="summary"></a>
 ### 3.1 - Summary
 
 Test cases are written in XML files (using XML elements and attributes) and passed to the WebInject engine 
@@ -650,7 +650,7 @@ See the "Pass/Fail Critera" section of this manual for more information.
 <br />
 
 
-<a name="tcminexamp"></a>
+<a name="minexamp"></a>
 ### 3.2 - Minimal Example
 
 A minimal test case xml file may look something like:
@@ -669,10 +669,10 @@ A minimal test case xml file may look something like:
 <br />
 
 
-<a name="tcavailparams"></a>
+<a name="availparams"></a>
 ### 3.3 - Available Parameters
 
-<a name="tccore"></a>
+<a name="core"></a>
 ### 3.3.1 - Core Parameters - Learn these first, for most tests these will be enough
 
 <a name="id"></a>
@@ -1005,7 +1005,7 @@ Set a variable that can be used in the same test step.
 <br />
 
 
-<a name="tcdriver"></a>
+<a name="driver"></a>
 ### 3.3.2 - Additional Test Driver Parameters
 
 <a name="command"></a>
@@ -1130,7 +1130,7 @@ When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swappe
 <br />
 
 
-<a name="tcasserts"></a>
+<a name="asserts"></a>
 ### 3.3.3 - Additional Assertion Parameters
 
 <a name="assertcount"></a>
@@ -1175,7 +1175,7 @@ code you receive.
 <br />
 
 
-<a name="tcverifyresponsetime"></a>
+<a name="verifyresponsetime"></a>
 #### verifyresponsetime
 Asserts that the response time is no greater than the specified time.
 
@@ -1188,7 +1188,7 @@ In this example, the assertion will fail if the response time is greater than 2.
 <br />
 
 
-<a name="tcignoreautoassertions"></a>
+<a name="ignoreautoassertions"></a>
 #### ignoreautoassertions
 ```
     ignoreautoassertions="true"
@@ -1226,7 +1226,7 @@ Specifying this parameter allows us to ignore this verification.
 <br />
 
 
-<a name="tcretry"></a>
+<a name="retry"></a>
 ### 3.3.4 - Retry Failed Test Step Parameters
 
 <a name="retry"></a>
@@ -1268,7 +1268,7 @@ things are going badly, the global limit will be enforced preventing your test r
 
 <br />
 
-<a name="tcretryfromstep"></a>
+<a name="retryfromstep"></a>
 #### retryfromstep
 Works in much the same way as the `retry` paramater, however execution will continue from the specified step
 rather than the current step.
@@ -1314,7 +1314,7 @@ However sometimes we need to override this behaviour.
 <br />
 
 
-<a name="tcrestartbrowseronfail"></a>
+<a name="restartbrowseronfail"></a>
 #### restartbrowseronfail
 When present, will restart the WebInject session if any of the verifications fail.
 
@@ -1345,7 +1345,7 @@ from a not logged in state.
 
 <br />
 
-<a name="tcrestartbrowser"></a>
+<a name="restartbrowser"></a>
 #### restartbrowser
 Will restart the WebInject session after execution of the current step.
 
@@ -1382,7 +1382,7 @@ if the test step fails any of the verifypositives or the assertcount.
 <br />
 
 
-<a name="tcoutput"></a>
+<a name="output"></a>
 ### 3.3.5 - Test Response Output Control Parameters
 
 <a name="decodequotedprintable"></a>
@@ -1542,7 +1542,7 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 <br />
 
 
-<a name="tcskip"></a>
+<a name="skip"></a>
 ### 3.3.6 - Parameters to skip test steps depending on target environment
 
 <a name="testonly"></a>
@@ -1610,7 +1610,7 @@ webinject.pl -a
 <br />
 
 
-<a name="tcsanity"></a>
+<a name="sanity"></a>
 ### 3.3.7 - Parameters to skip test steps if previous test steps failed
 
 <a name="checkpositive"></a>
@@ -1666,7 +1666,7 @@ like getting the home page, fails, then there little point running the rest of t
 <br />
 
 
-<a name="tcwebdriver"></a>
+<a name="webdriver"></a>
 ### 3.3.8 - Parameters to control Selenium WebDriver Test Execution
 
 <br />
@@ -1723,7 +1723,7 @@ Separate additional items with commas. Example:
 <br />
 
 
-<a name="tcfullexamp"></a>
+<a name="fullexamp"></a>
 ### 3.4 - Full Examples
 
 Sample test case file using multiple parameters:
@@ -1786,7 +1786,7 @@ Here is a sample test case showing usage of the "cmd" method:
 <br />
 
 
-<a name="tcnumcases"></a>
+<a name="numcases"></a>
 ### 3.5 - Numbering Test Cases and Execution Order
 
 Test Cases are numbered using the `id=` parameter.  They will be sorted and executed in sequential order based on 
@@ -1796,7 +1796,7 @@ numbering and have them in any order in the file.
 <br />
 
 
-<a name="tcxmltags"></a>
+<a name="xmltags"></a>
 ### 3.6 - Parent XML Tags and Attributes (repeating test case files)
 
 Make sure your entire set of test cases is wrapped with the proper parent tags:
@@ -1823,7 +1823,7 @@ For example, to have a test case file run 5 times, your file should open with:
 <br />
 
 
-<a name="tcvalidxml"></a>
+<a name="validxml"></a>
 ### 3.7 - Valid XML and Using Reserved XML Characters
 
 You may only use valid XML in your test cases.  Malformed XML or mixed content will not be accepted by the parser 
@@ -1911,7 +1911,7 @@ is also valid.
 <br />
 
 
-<a name="tcvarconst"></a>
+<a name="varconst"></a>
 ### 3.8 - Variables and Constants
 
 Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case 
