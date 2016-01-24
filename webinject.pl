@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.60";
+our $version="1.61";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -503,9 +503,10 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else {
                          # Response code 412 means Precondition failed
-                         print $entryresponse;
+                         print STDOUT $entryresponse;
                          $entryresponse =~ s!^!412 \n!;
                          $response = HTTP::Response->parse($entryresponse);
+                         $latency = 0.001; ## Prevent latency bleeding over from previous test step
                     }
                     
                     searchimage(); ## search for images within actual screen or page grab

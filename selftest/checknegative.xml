@@ -13,6 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 4"
     verifypositive1="last verifynegative1 failed"
     verifypositive2="last verifynegative0 failed"
+    verifypositive3="Response Time = 0.001 sec"
     assertcount="ENTRY CRITERIA NOT MET \.\.\.|||2"
     assertcount1="TEST CASE PASSED|||2"
 />

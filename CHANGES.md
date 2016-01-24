@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.61 - Jan 24, 2016
+* fixed a bug where response time was bleeding over from previous test step when checkpositive, checknegative or checkresponsecode invoked
+
 ### Version 1.60 - Jan 23, 2016
 * reverted baseurl support to only baseurl, baseurl1 and baseurl2 the same as WebInject 1.41 (baseurl is superseded by userdefined config)
 
