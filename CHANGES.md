@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.62 - Jan 24, 2016
+* put binmode on logresponseasfile
+* improved usage info when using webinject.pl --help
+
 ### Version 1.61 - Jan 24, 2016
 * fixed a bug where response time was bleeding over from previous test step when checkpositive, checknegative or checkresponsecode invoked
 

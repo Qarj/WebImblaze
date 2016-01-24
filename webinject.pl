@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.61";
+our $version="1.62";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -56,7 +56,7 @@ our (@casefilelist, $currentcasefile, $casecount, $isfailure, $verifynegativefai
 our (%case);
 our (%config);
 our ($currentdatetime, $totalruntime, $starttimer, $endtimer);
-our ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
+our ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
 our (%exit_codes);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
@@ -2835,6 +2835,7 @@ sub httplog {  #write requests and responses to http.log file
     if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
         my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
         open(RESPONSEASFILE, ">$responsefoldername/$case{logresponseasfile}");  #open in clobber mode
+        binmode RESPONSEASFILE; ## set binary mode
         print RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
         close(RESPONSEASFILE);
     }
@@ -3046,20 +3047,43 @@ sub getoptions {  #shell options
         'd|driver=s'   => \$opt_driver,
         'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
+        'h|help'   => \$opt_help,
         ) 
         or do {
             print_usage();
             exit();
         };
     if ($opt_version) {
-    print "WebInject version $version\nFor more info: http://www.webinject.org\n";
-      exit();
+        print_version();
+        exit();
+    }
+    if ($opt_help) {
+        print_version();
+        print_usage();
+        exit();
+    }
+    sub print_version {
+        print "\nWebInject version $version\nFor more info: https://github.com/Qarj/WebInject\n\n";
     }
     sub print_usage {
         print <<EOB
-    Usage:
-      webinject.pl [-c|--config config_file] [-o|--output output_location] [-A|--autocontroller] [-p|--port selenium_port] [-x|--proxy proxy_server] [-b|--basefolder baselined image folder] [testcase_file [XPath]] [-d|--driver chromedriver OR phantomjs]
-      webinject.pl --version|-v
+Usage: webinject.pl <<options>>
+
+-c|--config config_file                             -c config.xml
+-o|--output output_location                         -o output/
+-A|--autocontroller                                 -a
+-p|--port selenium_port                             -p 8325
+-x|--proxy proxy_server                             -x localhost:9222
+-b|--basefolder baselined image folder              -b examples/basefoler/
+testcase_file [XPath]                               examples/simple.xml testcases/case[20]
+-d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
+-r|--proxyrules                                     -r true
+-i|--ignoreretry                                    -i
+
+or
+
+webinject.pl --version|-v
+webinject.pl --help|-h
 EOB
     }
 }
