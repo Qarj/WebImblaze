@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.64 - Jan 24, 2016
+* bug fix - httppost_xml was changing the response format even when not requested via formatxml
+* added info about running WebInject in parallel
+
 ### Version 1.63 - Jan 24, 2016
 * new variable creation feature that can be used in the same test step e.g. varTIME="{HH}{MM}{SS}" used as desc="{TIME}"
 

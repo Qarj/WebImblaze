@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.63
+# Manual for WebInject version 1.64
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -212,6 +212,9 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ### [6.3 - Parsing Response Data & Embedded Session ID's (Cookieless)](#sessid)
 
+## [7 - Additional Info](#additionalinfo)
+
+### [7.1 - Parallel Execution](#parallel)
 
 <a name="archsoft"></a>
 ## 1 - Software Architecture
@@ -226,6 +229,15 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 WebInject is a HTTP level test automation tool initiated from the command line. WebInject sends
 HTTP GET or POST requests to the target web site (System Under Test), and runs assertions against the response.
+
+WebInject is well suited to running large suites of functional automated regression tests / checks against multiple
+test environments, or even production.
+
+When using WebInject with HTTP GET or POST commands, it is much faster than Selenium WebDriver. It is also less
+likely to suffer from the test flakiniess that is inherit with Selenium WebDriver.
+
+<br/>
+
 
 <a name="configuration"></a>
 ## 2 - Configuration
@@ -2284,3 +2296,13 @@ Will be sent to the server as:
 
 `http://myserver/search.jsp?value=123&JSESSIONID=16CD67F723A6D2218CE73AEAEA899FD9`
 
+<br />
+
+<a name="additionalinfo"></a>
+## 7 - Additional Info
+
+<a name="parallel"></a>
+### 7.1 Parallel Execution
+
+WebInject can be run in parallel / concurrently with no problem. The only thing to keep in mind is to be sure to
+specify different output locations for each instance of WebInject.

@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.63";
+our $version="1.64";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -1928,13 +1928,6 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
 
-    ## this section inserts carriage returns in the soap response to make in more readable (no indenting)
-    $soapresp = $response->as_string; #get the response out
-    ## put in a bunch of carriage returns
-    $soapresp =~ s~\>\<~\>\x0D\n\<~g; #simply insert a CR between every ><
-    #out print STDOUT "\n\n soapresp:\n$soapresp \n\n";
-    $response = HTTP::Response->parse($soapresp); #inject it back into the response
-    
 }
 #------------------------------------------------------------------
 sub httppost_form_data {  #send multipart/form-data HTTP request and read response
