@@ -1,16 +1,16 @@
-#Manual for WebInject version 1.62
+# Manual for WebInject version 1.63
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
-##Table of Contents
+## Table of Contents
 
-###[1.1 - Architecture Diagram](#archdiagram)
+### [1.1 - Architecture Diagram](#archdiagram)
 
-###[1.2 - Summary](#archsummary)
+### [1.2 - Summary](#archsummary)
 
-##[2 - Configuration](#cfg)
+## [2 - Configuration](#cfg)
 
-###[2.1 - Configuration File (config.xml)](#cfgfile)
+### [2.1 - Configuration File (config.xml)](#cfgfile)
 
 [Proxy Server (proxy)](#cfgproxy)
 
@@ -38,9 +38,9 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Smart Assertions (smartassertions)](#smartassertions)
 
-###[2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
+### [2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
 
-###[2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
+### [2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
 
 [Available Command Line Options](#cfgavailopts)
 
@@ -50,15 +50,15 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [More Examples of Command Line Usage](#cfgcmdlinexampls)
 
-##[3 - Test Case Setup](#tcsetup)
+## [3 - Test Case Setup](#tcsetup)
 
-###[3.1 - Summary](#tcsummary)
+### [3.1 - Summary](#tcsummary)
 
-###[3.2 - Minimal Example](#tcminexamp)
+### [3.2 - Minimal Example](#tcminexamp)
 
-###[3.3 - Available Parameters](#tcavailparams)
+### [3.3 - Available Parameters](#tcavailparams)
 
-####[3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#tccore)
+#### [3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#tccore)
 
 [id](#tcparamid)
 
@@ -78,8 +78,9 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [parseresponse](#tcparamparse)
 
+[var](#var)
 
-####[3.3.2 - Additional Test Driver Parameters](#tcdriver)
+#### [3.3.2 - Additional Test Driver Parameters](#tcdriver)
 
 [command command1 ... command20](#tcparamcommand)
 
@@ -92,7 +93,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [parms](#tcparamparms)
 
 
-####[3.3.3 - Additional Assertion Parameters](#tcasserts)
+#### [3.3.3 - Additional Assertion Parameters](#tcasserts)
 
 [assertcount](#tcparamassertcount)
 
@@ -107,7 +108,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [ignorehttpresponsecode](#tcparamignorehttpresponsecode)
 
 
-####[3.3.4 - Retry Failed Test Step Parameters](#tcretry)
+#### [3.3.4 - Retry Failed Test Step Parameters](#tcretry)
 
 [retry](#tcparamretry)
 
@@ -122,7 +123,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [sleep](#tcparamsleep)
 
 
-####[3.3.5 - Test Response Output Control Parameters](#tcoutput)
+#### [3.3.5 - Test Response Output Control Parameters](#tcoutput)
 
 [decodequotedprintable](#decodequotedprintable)
 
@@ -145,7 +146,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [section](#tcparamsection)
 
 
-####[3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
+#### [3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
 
 [liveonly](#tcparamliveonly)
 
@@ -154,7 +155,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [autocontrolleronly](#tcparamautocontrolleronly)
 
 
-####[3.3.7 - Parameters to skip test steps if previous test steps failed](#tcsanity)
+#### [3.3.7 - Parameters to skip test steps if previous test steps failed](#tcsanity)
 
 [checkpositive](#tcparamcheckpositive)
 
@@ -165,7 +166,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [sanitycheck](#tcparamsanitycheck)
 
 
-####[3.3.8 - Parameters to control Selenium WebDriver Test Execution](#tcwebdriver)
+#### [3.3.8 - Parameters to control Selenium WebDriver Test Execution](#tcwebdriver)
 
 [screenshot](#tcparamscreenshot)
 
@@ -175,62 +176,62 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 
 
-###[3.4 - Full Examples](#tcfullexamp)
+### [3.4 - Full Examples](#tcfullexamp)
 
-###[3.5 - Numbering Test Cases and Execution Order](#tcnumcases)
+### [3.5 - Numbering Test Cases and Execution Order](#tcnumcases)
 
-###[3.6 - Parent XML Tags and Attributes (repeating test case files)](#tcxmltags)
+### [3.6 - Parent XML Tags and Attributes (repeating test case files)](#tcxmltags)
 
-###[3.7 - Valid XML and Using Reserved XML Characters](#tcvalidxml)
+### [3.7 - Valid XML and Using Reserved XML Characters](#tcvalidxml)
 
-###[3.8 - Variables and Constants](#tcvarconst)
+### [3.8 - Variables and Constants](#tcvarconst)
 
-##[4 - Pass/Fail Criteria](#passfailcrit)
+## [4 - Pass/Fail Criteria](#passfailcrit)
 
-###[4.1 - Verifications](#passfailverf)
+### [4.1 - Verifications](#passfailverf)
 
-###[4.2 - HTTP Response Code Verification](#passfailhttpresp)
+### [4.2 - HTTP Response Code Verification](#passfailhttpresp)
 
-###[4.3 - Test Case Pass/Fail Status](#passfailcases)
+### [4.3 - Test Case Pass/Fail Status](#passfailcases)
 
-##[5 - Output/Results/Reporting](#output)
+## [5 - Output/Results/Reporting](#output)
 
-###[5.1 - Results File in HTML format (results.html)](#outputhtml)
+### [5.1 - Results File in HTML format (results.html)](#outputhtml)
 
-###[5.2 - Results File in XML format (results.xml)](#outputxml)
+### [5.2 - Results File in XML format (results.xml)](#outputxml)
 
-###[5.3 - Results in STDOUT](#outputstdout)
+### [5.3 - Results in STDOUT](#outputstdout)
 
-###[5.4 - HTTP Log File (http.log)](#outputhttp)
+### [5.4 - HTTP Log File (http.log)](#outputhttp)
 
-##[6 - Session Handling and State Management](#sessstate)
+## [6 - Session Handling and State Management](#sessstate)
 
-###[6.1 - Summary](#sesssummary)
+### [6.1 - Summary](#sesssummary)
 
-###[6.2 - Cookies](#sesscookie)
+### [6.2 - Cookies](#sesscookie)
 
-###[6.3 - Parsing Response Data & Embedded Session ID's (Cookieless)](#sessid)
+### [6.3 - Parsing Response Data & Embedded Session ID's (Cookieless)](#sessid)
 
 
 <a name="archsoft"></a>
-##1 - Software Architecture
+## 1 - Software Architecture
 
 <a name="archdiagram"></a>
-###1.1 - Architecture Diagram
+### 1.1 - Architecture Diagram
 
 ![Alt text](/images/webinject_arch.png?raw=true "Architecture Diagram")
 
 <a name="archsummary"></a>
-###1.2 - Summary
+### 1.2 - Summary
 
 WebInject is a HTTP level test automation tool initiated from the command line. WebInject sends
 HTTP GET or POST requests to the target web site (System Under Test), and runs assertions against the response.
 
 <a name="cfg"></a>
-##2 - Configuration
+## 2 - Configuration
 
 <a name="cfgfile"></a>
-###2.1 - Configuration File (config.xml)
+### 2.1 - Configuration File (config.xml)
 
 There is a configuration file named 'config.xml' that is used to store configuration settings for your project.  You can 
 use this to specify which test case files to run (see below) and to set some constants and settings to be used by WebInject.
@@ -247,7 +248,7 @@ Available config settings are:
 
 
 <a name="cfgproxy"></a>
-####proxy
+#### proxy
 Specifies a proxy server to route all HTTP requests through.
 
 example: `<proxy>http://127.0.0.1:8080</proxy>`
@@ -261,7 +262,7 @@ example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
 <br />
 
 
-####useragent
+#### useragent
 Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default 
 User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
 
@@ -271,7 +272,7 @@ example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</userage
 
 
 <a name="cfghttpauth"></a>
-####httpauth
+#### httpauth
 
 Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response 
 authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication 
@@ -292,7 +293,7 @@ Authentication credentials.
 <br />
 
 
-####baseurl
+#### baseurl
 Creates the constant {BASEURL} which can be used in test cases (see 'Variables and Constants' section below).
 
 example: `<baseurl>http://myserver</baseurl>`
@@ -300,7 +301,7 @@ example: `<baseurl>http://myserver</baseurl>`
 <br />
 
 
-####baseurl1
+#### baseurl1
 
 Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
@@ -308,7 +309,7 @@ in the same way as the 'baseurl' example above.
 <br />
 
 
-####baseurl2
+#### baseurl2
 Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
     
@@ -316,7 +317,7 @@ in the same way as the 'baseurl' example above.
 
 
 <a name="cfgcomment"></a>
-####comment
+#### comment
 
 Allows you to comment out parts of your config file.  Anything contained within comment tags will not be processed.
 (I know it is braindead that we don't allow regular XML-style comments here.. sorry)
@@ -327,7 +328,7 @@ example: `<comment>this will be ignored</comment>`
 
     
 <a name="cfgtimeout"></a>
-####timeout
+#### timeout
 Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than 
 this threshold, the HTTP request times out and the case is marked as failed.  The default timeout if you do not specify one
 is 180 seconds.
@@ -341,7 +342,7 @@ Note: This timeout setting may not always work when using SSL/HTTPS.
 
 
 <a name="cfgglobalretry"></a>
-####globalretry
+#### globalretry
 This setting is used along with the retry parameter in a test case. It limits the number of retry attempts in a test run.
 For example, consider 3 test cases each set to retry 40 times, along with a globalretry value of 50. If the test run is going
 badly, then there will be no more than 50 retry attempts rather than 120.
@@ -353,7 +354,7 @@ example: `<globalretry>50</globalretry>`
 
 
 <a name="cfgglobaljumpbacks"></a>
-####globaljumpbacks
+#### globaljumpbacks
 
 Limits the number of times the retryfromstep parameter is followed. Stops tests potentially running forever.
 
@@ -363,7 +364,7 @@ If not present, defaulted to 20.
 
 
 <a name="cfgtestonly"></a>
-####testonly
+#### testonly
 Used in conjunction with the testonly test case parameter. If this configuration item is present
 and set to any value, the test cases with the testonly parameter set will be run.
 
@@ -378,7 +379,7 @@ In the test step that you only want to run on test environments, specify the par
 <br />
 
 
-####autocontrolleronly
+#### autocontrolleronly
 Similar to testonly. Allows you to designate certain servers as an automation controller.
 This enables you to specify that certain test steps should only be run from the automation controller.
 
@@ -390,7 +391,7 @@ In the test step that you only want to run on automation controllers, specify th
 
 
 <a name="cfguserdefined"></a>
-####userdefined
+#### userdefined
 You can create your own abitrary config values that can be accessed as constants in the test steps.
 
 ```xml
@@ -406,7 +407,7 @@ In this example, you would refer to the constants in your test steps as {ADMINUS
 
 
 <a name="cfgautoassertions"></a>
-####autoassertions
+#### autoassertions
 It is possible to specify assertions that run automatically on every single test step.
 
 A possible usage is to check that you have not obtained an error page.
@@ -465,7 +466,7 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 
 
 <a name="cfgfilenamescfg"></a>
-###2.2 - Test Case Files (specifying in configuration file)
+### 2.2 - Test Case Files (specifying in configuration file)
 
 One of the configuration 
 file settings in config.xml is used to name the test case files which you have created.  You may specify any amount of test case 
@@ -487,7 +488,7 @@ Note: You can also use relative path names to point to test case files located i
 
 
 <a name="cfgcmdlineopts"></a>
-###2.3 - Command Line Options and Specifying Alternate Test Case/Config Files
+### 2.3 - Command Line Options and Specifying Alternate Test Case/Config Files
 
 WebInject is called from the command line and has several command line options.
 
@@ -503,7 +504,7 @@ Usage:
 
 
 <a name="cfgavailopts"></a>
-####Available Command Line Options
+#### Available Command Line Options
 
 **-c** or **--config**
 
@@ -979,6 +980,27 @@ Full Example - parse the redirect location from the response header
 
 You can have as many parseresponses as you want, so long as they all start with parseresponse. Examples are
 parseresponse1, parseresponse5000 and parseresponseUSERID.
+
+<br />
+
+
+<a name="var"></a>
+#### var
+Set a variable that can be used in the same test step.
+
+```
+<case
+    varTESTEMAIL="newuser_{JUMPBACKS}_{RETRY}_{COUNTER}@example.com"
+    id="10"
+    description1="Creating new user: {TESTEMAIL}"
+    method="post"
+    url="http://{MYWEBSITE}/RegisterUser"
+    postbody="txtUsername={TESTEMAIL}&txtPassword=topsecret"
+    verifypositive="Registration Success!"
+    verifypositive1="New user {TESTEMAIL} created OK"
+    retry="3"
+/>
+```
 
 <br />
 

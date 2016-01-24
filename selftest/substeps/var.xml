@@ -1,0 +1,36 @@
+<testcases repeat="2">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    varTESTEMAIL="testemail_{COUNTER}_{JUMPBACKS}_{RETRY}_{YEAR}{MONTH}{DAY}_{HH}{MM}{SS}@example.com"
+    id="10"
+    description1="Info - testemail: {TESTEMAIL}"
+    method="cmd"
+    command="echo {TESTEMAIL} > NUL"
+    verifypositive="_2_{YEAR}{MONTH}{DAY}"
+    retry="3"
+/>
+
+<case
+    id="20"
+    description1="Further Processing"
+    method="cmd"
+    command="echo NOP > NUL"
+/>
+
+<case
+    varTESTEMAIL="testemail_{COUNTER}_{JUMPBACKS}_{RETRY}_{YEAR}{MONTH}{DAY}_{HH}{MM}{SS}@example.com"
+    id="30"
+    description1="Info - testemail: {TESTEMAIL}"
+    method="cmd"
+    command="echo {TESTEMAIL} > NUL"
+    verifypositive="_2_0_{YEAR}{MONTH}{DAY}"
+    retryfromstep="20"
+/>
+
+
+</testcases>

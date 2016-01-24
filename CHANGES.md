@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.63 - Jan 24, 2016
+* new variable creation feature that can be used in the same test step e.g. varTIME="{HH}{MM}{SS}" used as desc="{TIME}"
+
 ### Version 1.62 - Jan 24, 2016
 * put binmode on logresponseasfile
 * improved usage info when using webinject.pl --help

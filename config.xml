@@ -12,5 +12,5 @@
     <smartassertions> 
        <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
     </smartassertions> 
-    <testonly>Allow</testonly> 
+    <testonly>Allow</testonly>
 </root> 

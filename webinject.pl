@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.62";
+our $version="1.63";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -45,6 +45,7 @@ $| = 1; #don't buffer output to STDOUT
 
 our ($timestamp, $dirname, $testfilename);
 our (%parsedresult);
+our (%varvar);
 our ($useragent, $request, $response);
 our ($monitorenabledchkbx, $latency);
 our (%teststeptime); ## record in a hash the latency for every step for later use
@@ -408,6 +409,11 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                             $case{$testAttrib} = $casesave{$testAttrib}; ## need to restore to the original partially substituted parameter
                             convertbackxmldynamic($case{$testAttrib}); ## now update the dynamic components
                         }
+                    }
+                    
+                    set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
+                    foreach my $testAttrib ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
+                            convertback_variables($case{$testAttrib});
                     }
             
                     $desc1log = $case{description1};
@@ -2760,6 +2766,21 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
     my $underscore = "_";
     $_[0] =~ s~{NOW}~$day\/$month\/$year$underscore$hour:$minute:$second~g;
    
+}
+#------------------------------------------------------------------
+sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
+    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+       if ( substr($testAttrib, 0, 3) eq "var" ) {
+            $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
+        }
+    }
+}
+#------------------------------------------------------------------
+sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
+    foreach my $testAttrib ( sort keys %{varvar} ) {
+       my $subVAR = substr($testAttrib, 3);
+       $_[0] =~ s~{$subVAR}~$varvar{$testAttrib}~g;
+    }
 }
 #------------------------------------------------------------------
 sub url_escape {  #escapes difficult characters with %hexvalue
