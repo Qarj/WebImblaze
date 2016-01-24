@@ -554,7 +554,7 @@ Displays the version number and other information.
 
 
 <a name="cfgpassingfile"></a>
-####Passing a Test Case Filename
+#### Passing a Test Case Filename
 
 When you launch WebInject in console mode, you can optionally supply an argument for a testcase file to run.  It will look for this 
 file in the directory that webinject.pl resides in.
@@ -575,7 +575,7 @@ config file, the files specified in the config file will not be processed (but a
 
 
 <a name="cfgxpathxnode"></a>
-####XPath/XNode
+#### XPath/XNode
 
 When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a 
 single XPath/XNode.  This will only execute the test case residing in the XPath/XNode you supply.
@@ -588,7 +588,7 @@ For example, to run only testcase 2 from your file named mytests.xml, you would 
 
 
 <a name="cfgcmdlinexampls"></a>
-####More Examples of Command Line Usage
+#### More Examples of Command Line Usage
 
 Here are some examples to illustrate using webinject.pl from the command line:
 
@@ -631,10 +631,10 @@ your test case file and config file are located in a subdirectory named 'myfiles
 
 
 <a name="tcsetup"></a>
-##3 - Test Case Setup
+## 3 - Test Case Setup
 
 <a name="tcsummary"></a>
-###3.1 - Summary
+### 3.1 - Summary
 
 Test cases are written in XML files (using XML elements and attributes) and passed to the WebInject engine 
 for execution against the application/service under test. This abstracts the internals of WebInject's 
@@ -651,7 +651,7 @@ See the "Pass/Fail Critera" section of this manual for more information.
 
 
 <a name="tcminexamp"></a>
-###3.2 - Minimal Example
+### 3.2 - Minimal Example
 
 A minimal test case xml file may look something like:
 
@@ -670,13 +670,13 @@ A minimal test case xml file may look something like:
 
 
 <a name="tcavailparams"></a>
-###3.3 - Available Parameters
+### 3.3 - Available Parameters
 
 <a name="tccore"></a>
-###3.3.1 - Core Parameters - Learn these first, for most tests these will be enough
+### 3.3.1 - Core Parameters - Learn these first, for most tests these will be enough
 
 <a name="tcparamid"></a>
-####id
+#### id
 Test case identifier used to identify the test case and set its execution order. If you number the test steps like 10, 20, 30...
 then it gives you room to insert additional steps (e.g. 15, 25) without having to renumber all the ids.
 
@@ -688,7 +688,7 @@ then it gives you room to insert additional steps (e.g. 15, 25) without having t
 
 
 <a name="tcparamdesc1"></a>
-####description1 description2
+#### description1 description2
 
 Text description for results report.
     
@@ -703,7 +703,7 @@ Both parameters are optional, but it is highly recommended to always use descrip
 
 
 <a name="tcparammethod"></a>
-####method
+#### method
 HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
 
 ```
@@ -727,7 +727,7 @@ full examples section for an example.
 
     
 <a name="tcparamurl"></a>
-####url
+#### url
 
 Full HTTP URL to request.  You can use an IP Address or Host Name.
 
@@ -739,7 +739,7 @@ Full HTTP URL to request.  You can use an IP Address or Host Name.
 
     
 <a name="tcparamposttype"></a>
-####posttype
+#### posttype
 This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
 in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
 
@@ -769,7 +769,7 @@ Defaults to "application/x-www-form-urlencoded" if this parameter is omitted.
 
 
 <a name="tcparampostbody"></a>
-####postbody
+#### postbody
 This is the data (body) of the request to be sent to the server.  This is only used in an HTTP POST (method="post").
 
 If you are sending "application/x-www-form-urlencoded" data, this parameter contains the string of text data you wish to send.
@@ -816,7 +816,7 @@ Example: `postbody="file=>soap_payload.xml"`
 
 
 <a name="tcparamverpos"></a>
-####verifypositive
+#### verifypositive
 String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched 
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
@@ -852,7 +852,7 @@ another three `|||` and writing any message after the custom error message.
    
     
 <a name="tcparamverneg"></a>
-####verifynegative
+#### verifynegative
 String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
@@ -883,7 +883,7 @@ another three `|||` and writing any message after the custom error message.
 
 
 <a name="tcparamparse"></a>
-####parseresponse
+#### parseresponse
 Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
 used for passing Session ID's, but can be applied to any case where you need to pass a 
 dynamically generated value.  It takes the arguments in the format 
@@ -1006,10 +1006,10 @@ Set a variable that can be used in the same test step.
 
 
 <a name="tcdriver"></a>
-###3.3.2 - Additional Test Driver Parameters
+### 3.3.2 - Additional Test Driver Parameters
 
 <a name="tcparamcommand"></a>
-####command command1 ... command20
+#### command command1 ... command20
 Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
 ```xml
@@ -1033,7 +1033,7 @@ In this last example, qq| is indicating that | should be used as a quote in this
 
 
 <a name="commandonerror"></a>
-####commandonerror
+#### commandonerror
 
 Will run the specified command only if the test step fails for some reason.
 
@@ -1045,7 +1045,7 @@ Will run the specified command only if the test step fails for some reason.
 
 
 <a name="tcparamaddcookie"></a>
-####addcookie
+#### addcookie
 
 This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
 The cookie will be added for the current step only.
@@ -1058,7 +1058,7 @@ The cookie will be added for the current step only.
 
 
 <a name="tcparamaddheader"></a>
-####addheader
+#### addheader
 
 This is used to add an addition header to an outgoing HTTP request.
 
@@ -1082,7 +1082,7 @@ Note that when you use addheader, any existing header cookies will be clobbered.
 
 
 <a name="tcparamparms"></a>
-####parms
+#### parms
 
 Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
 
@@ -1131,10 +1131,10 @@ When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swappe
 
 
 <a name="tcasserts"></a>
-###3.3.3 - Additional Assertion Parameters
+### 3.3.3 - Additional Assertion Parameters
 
 <a name="tcparamassertcount"></a>
-####assertcount
+#### assertcount
 Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
 if the assertion fails.
 
@@ -1164,7 +1164,7 @@ another three `|||` and writing any message after the custom error message.
 
 
 <a name="tcparamvercode"></a>
-####verifyresponsecode
+#### verifyresponsecode
 HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
 code you receive.
 
@@ -1176,7 +1176,7 @@ code you receive.
 
 
 <a name="tcverifyresponsetime"></a>
-####verifyresponsetime
+#### verifyresponsetime
 Asserts that the response time is no greater than the specified time.
 
 ```
@@ -1189,7 +1189,7 @@ In this example, the assertion will fail if the response time is greater than 2.
 
 
 <a name="tcignoreautoassertions"></a>
-####ignoreautoassertions
+#### ignoreautoassertions
 ```
     ignoreautoassertions="true"
 ```
@@ -1215,7 +1215,7 @@ See the config file section for information on smart assertions.
 
 
 <a name="tcparamignorehttpresponsecode"></a>
-####ignorehttpresponsecode
+#### ignorehttpresponsecode
 ```
     ignorehttpresponsecode="true"
 ```
@@ -1227,10 +1227,10 @@ Specifying this parameter allows us to ignore this verification.
 
 
 <a name="tcretry"></a>
-###3.3.4 - Retry Failed Test Step Parameters
+### 3.3.4 - Retry Failed Test Step Parameters
 
 <a name="tcparamretry"></a>
-####retry
+#### retry
 
 This is used to retry a test case that has failed. You specify the maximum number of times
 to retry the test case. Use this parameter if you need to wait for a database to update in
@@ -1269,7 +1269,7 @@ things are going badly, the global limit will be enforced preventing your test r
 <br />
 
 <a name="tcretryfromstep"></a>
-####retryfromstep
+#### retryfromstep
 Works in much the same way as the `retry` paramater, however execution will continue from the specified step
 rather than the current step.
 
@@ -1301,7 +1301,7 @@ globaljumpbacks setting in the config file (defaulted to 20 if not present).
 
 
 <a name="tcparamretryresponsecode"></a>
-####retryresponsecode
+#### retryresponsecode
 If a retry is present, retry if we get this reponse code, even if it is an error code.
 
 When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
@@ -1315,7 +1315,7 @@ However sometimes we need to override this behaviour.
 
 
 <a name="tcrestartbrowseronfail"></a>
-####restartbrowseronfail
+#### restartbrowseronfail
 When present, will restart the WebInject session if any of the verifications fail.
 
 If a Selenium WebDriver browser session is also present, that will be restarted too.
@@ -1346,7 +1346,7 @@ from a not logged in state.
 <br />
 
 <a name="tcrestartbrowser"></a>
-####restartbrowser
+#### restartbrowser
 Will restart the WebInject session after execution of the current step.
 
 If a Selenium WebDriver browser session is also present, that will be restarted too.
@@ -1361,7 +1361,7 @@ All cookies will be dumped.
 
 
 <a name="tcparamsleep"></a>
-####sleep
+#### sleep
 
 Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
 throttle the rate it sends requests.
@@ -1383,10 +1383,10 @@ if the test step fails any of the verifypositives or the assertcount.
 
 
 <a name="tcoutput"></a>
-###3.3.5 - Test Response Output Control Parameters
+### 3.3.5 - Test Response Output Control Parameters
 
 <a name="decodequotedprintable"></a>
-####decodequotedprintable
+#### decodequotedprintable
 
 Decodes a quoted-printable response and replaces the response with the decoded version. The decoded
 version will be available to the parseresponse parameter.
@@ -1401,7 +1401,7 @@ Note: This feature was added to deal with intermediate email files in quoted-pri
 
 
 <a name="tcparamerrmsg"></a>
-####errormessage
+#### errormessage
 If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
 (on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
 test means, like "couldn't connect to the application" or "couldn't access the login page".
@@ -1416,7 +1416,7 @@ test means, like "couldn't connect to the application" or "couldn't access the l
 
 
 <a name="tcparamformatjson"></a>
-####formatjson
+#### formatjson
 
 Improves readability of json responses.
 
@@ -1430,7 +1430,7 @@ Inserts carriage returns at various places using a simple regular expression.
 
 
 <a name="tcparamformatxml"></a>
-####formatxml
+#### formatxml
 
 Improves readability of xml responses.
 
@@ -1445,7 +1445,7 @@ Specifying this parameter puts a carriage return between every >< found in the r
 
 
 <a name="gethrefs"></a>
-####gethrefs
+#### gethrefs
 
 Gets the hrefs referred to in the html response, and writes them to the output folder.
 
@@ -1459,7 +1459,7 @@ Multiple patterns are separated with a `|`. The pattern specifies the end of the
 
 
 <a name="getsrcs"></a>
-####getsrcs
+#### getsrcs
 
 Gets the srcs referred to in the html response, and writes them to the output folder.
 
@@ -1493,7 +1493,7 @@ This will match css background images that look like this in the html source:
 
 
 <a name="tcparamlogastext"></a>
-####logastext
+#### logastext
 
 Putting this paramater on a test case will put tags around the test case in http.log file.
 
@@ -1509,7 +1509,7 @@ than html.
 
 
 <a name="tcparamlogresponseasfile"></a>
-####logresponseasfile
+#### logresponseasfile
 
 Saves the test step response in a file.
 
@@ -1530,7 +1530,7 @@ Example:
 
 
 <a name="tcparamsection"></a>
-####section
+#### section
 
 Indicates in the results.xml that a section break occurs before this test.
 
@@ -1543,10 +1543,10 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 
 
 <a name="tcskip"></a>
-###3.3.6 - Parameters to skip test steps depending on target environment
+### 3.3.6 - Parameters to skip test steps depending on target environment
 
 <a name="tcparamtestonly"></a>
-####testonly
+#### testonly
 
 If you run your test cases against both test and live environments, you can specify that selected
 test cases are skipped when run against your live config file. See the configuration file section
@@ -1565,7 +1565,7 @@ In your config.xml, you would have the following line:
 <br />
 
 <a name="tcparamliveonly"></a>
-####liveonly
+#### liveonly
 
 Works exactly the same was as testonly.
 
@@ -1583,7 +1583,7 @@ In your config.xml, you would have the following line:
 
 
 <a name="tcparamautocontrolleronly"></a>
-####autocontrolleronly
+#### autocontrolleronly
 
 You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
 a command line option to indicate you are invoking it from the automation controller. Webinject will
@@ -1611,10 +1611,10 @@ webinject.pl -a
 
 
 <a name="tcsanity"></a>
-###3.3.7 - Parameters to skip test steps if previous test steps failed
+### 3.3.7 - Parameters to skip test steps if previous test steps failed
 
 <a name="tcparamcheckpositive"></a>
-####checkpositive
+#### checkpositive
 
 ```
     checkpositive="8"
@@ -1627,7 +1627,7 @@ Allows us to skip test steps where we know they will fail since a previous depen
 
 
 <a name="tcparamchecknegative"></a>
-####checknegative
+#### checknegative
 
 ```
     checknegative="3"
@@ -1639,7 +1639,7 @@ In this example, this test step will not be run, unless the most recent verifyne
 
 
 <a name="tcparamcheckresponsecode"></a>
-####checkresponsecode
+#### checkresponsecode
 ```
     checkresponsecode="200"
 ```
@@ -1651,7 +1651,7 @@ step was 200 (if that test step was run).
 
 
 <a name="tcparamsanitycheck"></a>
-####sanitycheck
+#### sanitycheck
 
 Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
 test case fails, or any previous test has failed, then the test run is aborted.
@@ -1667,12 +1667,12 @@ like getting the home page, fails, then there little point running the rest of t
 
 
 <a name="tcwebdriver"></a>
-###3.3.8 - Parameters to control Selenium WebDriver Test Execution
+### 3.3.8 - Parameters to control Selenium WebDriver Test Execution
 
 <br />
 
 <a name="tcparamscreenshot"></a>
-####screenshot
+#### screenshot
 ```
     screenshot="false"
 ```
@@ -1688,7 +1688,7 @@ is being run by a service account, there is no window handle with which to work 
 
 
 <a name="tcparamsearchimage"></a>
-####searchimage searchimage1 ... searchimage5
+#### searchimage searchimage1 ... searchimage5
 
 Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
 the image cannot be found exactly. This is useful if the baseline image is captured in one browser version /
@@ -1710,7 +1710,7 @@ For example, refering to the example above, RunningMan_Company_Logo.png can be f
 
 
 <a name="tcparamverifytext"></a>
-####verifytext
+#### verifytext
 Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
 Or perhaps you just want those details to appear in the http.log.
 
@@ -1724,7 +1724,7 @@ Separate additional items with commas. Example:
 
 
 <a name="tcfullexamp"></a>
-###3.4 - Full Examples
+### 3.4 - Full Examples
 
 Sample test case file using multiple parameters:
 
@@ -1787,7 +1787,7 @@ Here is a sample test case showing usage of the "cmd" method:
 
 
 <a name="tcnumcases"></a>
-###3.5 - Numbering Test Cases and Execution Order
+### 3.5 - Numbering Test Cases and Execution Order
 
 Test Cases are numbered using the `id=` parameter.  They will be sorted and executed in sequential order based on 
 these numbers, not the physical position of the Test Case within your file.  You are allowed to leave gaps in the 
@@ -1797,7 +1797,7 @@ numbering and have them in any order in the file.
 
 
 <a name="tcxmltags"></a>
-###3.6 - Parent XML Tags and Attributes (repeating test case files)
+### 3.6 - Parent XML Tags and Attributes (repeating test case files)
 
 Make sure your entire set of test cases is wrapped with the proper parent tags:
 
@@ -1824,7 +1824,7 @@ For example, to have a test case file run 5 times, your file should open with:
 
 
 <a name="tcvalidxml"></a>
-###3.7 - Valid XML and Using Reserved XML Characters
+### 3.7 - Valid XML and Using Reserved XML Characters
 
 You may only use valid XML in your test cases.  Malformed XML or mixed content will not be accepted by the parser 
 that is used to read the test cases.
@@ -1839,7 +1839,7 @@ may use them within your test case XML.
 
 There are two special cases to be aware of:
 
-####less than (<) character:
+#### less than (<) character:
 
 Anywhere you use this character in your test cases (except of course, enclosing your actual XML tags), you must escape it 
 with a backslash (failure to do so will make the test case parser croak).
@@ -1874,7 +1874,7 @@ In regular expressions, a single dot, i.e. `.` will match any single character.
 <br />
 
 
-####quotes (single or double):
+#### quotes (single or double):
 
 If you need to use quotes anywhere within a test case parameter, you need to 
 make sure that the quotes are nested properly.  The quotes (single or double) 
@@ -1912,7 +1912,7 @@ is also valid.
 
 
 <a name="tcvarconst"></a>
-###3.8 - Variables and Constants
+### 3.8 - Variables and Constants
 
 Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case 
 as a keyword contained within curly braces, and are evaluated/substituted at runtime.
@@ -2004,7 +2004,7 @@ This is helpful if you want to point your tests at different environments by cha
 <br />
 
 
-####Setting Variables/Constants Within Test Case Files:
+#### Setting Variables/Constants Within Test Case Files:
 
 You may also set constants in your test case file that you can reference from your test cases.  This makes it 
 convenient to change data in a single place that is easy to reference from multiple test cases. 
@@ -2037,11 +2037,11 @@ The following example of a test case file shows how you can use them:
 <br />
 
 <a name="passfailcrit"></a>
-##4 - Pass/Fail Criteria
+## 4 - Pass/Fail Criteria
 
 
 <a name="passfailverf"></a>
-###4.1 - Verifications
+### 4.1 - Verifications
 
 
 In each test case, you can set Verifications that will pass or fail depending on the existence of a specified text string 
@@ -2059,7 +2059,7 @@ work the same way.
 
 
 <a name="passfailhttpresp"></a>
-###4.2 - HTTP Response Code Verification
+### 4.2 - HTTP Response Code Verification
 
 In each test case, you can set a Verifications that will pass or fail depending on the HTTP response code.
 
@@ -2084,7 +2084,7 @@ If you are testing an error page, you will need to use this parameter.
 
 
 <a name="passfailcases"></a>
-###4.3 - Test Case Pass/Fail Status
+### 4.3 - Test Case Pass/Fail Status
 
 If any of the Verifications defined within a test case fail, or if the HTTP Response Code Verification fails,
 the test case is marked as "FAILED".  If all of the Verifications defined within a test case pass, and the 
@@ -2095,10 +2095,10 @@ real-time during execution.
 
 
 <a name="output"></a>
-##5 - Output/Results/Reporting
+## 5 - Output/Results/Reporting
 
 <a name="outputhtml"></a>
-###5.1 - Results File in HTML format (results.html)
+### 5.1 - Results File in HTML format (results.html)
 
 An HTML file (results.html) is generated to display detailed results of the test execution.
 It is written into the WebInject output folder and is overwritten each time the tool runs.
@@ -2110,7 +2110,7 @@ well as information generated from the test engine (test case pass/fail status, 
 
 
 <a name="outputxml"></a>
-###5.2 - Results File in XML format (results.xml)
+### 5.2 - Results File in XML format (results.xml)
 
 An XML file (results.xml) is generated to display results of the test execution.
 It is written into the directory that WebInject runs from and is overwritten each time the tool runs.
@@ -2124,14 +2124,14 @@ If you put an xsl stylesheet against this file, you can get a customised display
 
 
 <a name="outputstdout"></a>
-###5.3 - Results in STDOUT
+### 5.3 - Results in STDOUT
 
 Results are also sent [in plain text format] to the STDOUT channel as the tests execute.
 
 <br />
 
 <a name="outputhttp"></a>
-###5.4 - HTTP Log File (http.log)
+### 5.4 - HTTP Log File (http.log)
 
 A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system 
 under test and HTTP responses that are received from the system under test.  Whether or not HTTP logging is 
@@ -2145,11 +2145,11 @@ Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoi
 
 
 <a name="sessstate"></a>
-##6 - Session Handling and State Management
+## 6 - Session Handling and State Management
 
 
 <a name="sesssummary"></a>
-###6.1 - Summary
+### 6.1 - Summary
 
 HTTP is a stateless protocol, meaning each request is discrete and unrelated to those that precede or follow.  Because of the 
 stateless nature of the protocol itself, web applications or services use various other methods to maintain state.  This allows 
@@ -2160,7 +2160,7 @@ state during a session, then your test tool must be able to handle this as well.
 
 
 <a name="sesscookie"></a>
-###6.2 - Cookies
+### 6.2 - Cookies
 
 One way to maintain session state is with HTTP Cookies.  WebInject automatically handles Cookies for you (like a browser would). 
 When a "Set-Cookie" is sent back in the HTTP header from the web server, the Cookie is automatically stored and sent back with 
@@ -2170,7 +2170,7 @@ subsequent requests to the domain it was set from.
 
 
 <a name="sessid"></a>
-###6.3 - Parsing Response Data &amp; Embedded Session ID's (Cookieless)
+### 6.3 - Parsing Response Data &amp; Embedded Session ID's (Cookieless)
 
 Embedded Session ID's ("Cookieless" session management) is another approach to maintaining state.  Session ID's are written 
 to the content of the HTTP response that is sent to the client.  When the client makes a subsequent HTTP request, the Session 
@@ -2199,7 +2199,7 @@ a previous response.  There are other circumstances besides maintaining session 
 <br />
 
 
-####Example of maintaining the ViewState with ASP.NET:
+#### Example of maintaining the ViewState with ASP.NET:
 
 ASP.NET may use a "__VIEWSTATE" variable to maintain state between requests.  When you request a page that uses this, you will see it 
 as a hidden form field within the HTML source:
@@ -2247,7 +2247,7 @@ Will be sent to the server as:
 <br />
 
 
-####Example of parsing the Session ID from an HTTP response header and sending it as part of the URL:
+#### Example of parsing the Session ID from an HTTP response header and sending it as part of the URL:
 
 You may receive a Session ID in a HTTP response header that needs to be parsed 
 and resent to the server as part of a URL rather than in a cookie.
