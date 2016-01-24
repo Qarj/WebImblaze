@@ -8,47 +8,47 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ### [1.2 - Summary](#archsummary)
 
-## [2 - Configuration](#cfg)
+## [2 - Configuration](#configuration)
 
-### [2.1 - Configuration File (config.xml)](#cfgfile)
+### [2.1 - Configuration File (config.xml)](#file)
 
-[Proxy Server (proxy)](#cfgproxy)
+[Proxy Server (proxy)](#proxy)
 
-[User-Agent (useragent)](#cfguseragent)
+[User-Agent (useragent)](#useragent)
 
-[HTTP Authentication (httpauth)](#cfghttpauth)
+[HTTP Authentication (httpauth)](#httpauth)
 
-[Base URL (baseurl, baseurl1, baseurl2)](#cfgbaseurl)
+[Base URL (baseurl, baseurl1, baseurl2)](#baseurl)
 
-[Comments (comment)](#cfgcomment)
+[Comments (comment)](#comment)
 
-[Response Delay Timeout (timeout)](#cfgtimeout)
+[Response Delay Timeout (timeout)](#timeout)
 
-[Global Retry (globalretry)](#cfgglobalretry)
+[Global Retry (globalretry)](#globalretry)
 
-[Global Jumpbacks (globaljumpbacks)](#cfgglobaljumpbacks)
+[Global Jumpbacks (globaljumpbacks)](#globaljumpbacks)
 
-[Test Only (testonly)](#cfgtestonly)
+[Test Only (testonly)](#testonly)
 
-[Auto Controller Only (autocontrolleronly)](#cfgautocontrolleronly)
+[Auto Controller Only (autocontrolleronly)](#autocontrolleronly)
 
-[User Defined (userdefined)](#cfguserdefined)
+[User Defined (userdefined)](#userdefined)
 
-[Auto Assertions (autoassertions)](#cfgautoassertions)
+[Auto Assertions (autoassertions)](#autoassertions)
 
 [Smart Assertions (smartassertions)](#smartassertions)
 
-### [2.2 - Test Case Files (specifying in configuration file)](#cfgfilenamescfg)
+### [2.2 - Test Case Files (specifying in configuration file)](#filenames)
 
-### [2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cfgcmdlineopts)
+### [2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cmdlineopts)
 
-[Available Command Line Options](#cfgavailopts)
+[Available Command Line Options](#availopts)
 
-[Passing a Test Case Filename](#cfgpassingfile)
+[Passing a Test Case Filename](#passingfile)
 
-[XPath/XNode](#cfgxpathxnode)
+[XPath/XNode](#xpathxnode)
 
-[More Examples of Command Line Usage](#cfgcmdlinexampls)
+[More Examples of Command Line Usage](#cmdlinexampls)
 
 ## [3 - Test Case Setup](#tcsetup)
 
@@ -60,44 +60,44 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 #### [3.3.1 - Core Parameters - Learn these first, for most tests these will be enough](#tccore)
 
-[id](#tcparamid)
+[id](#id)
 
-[description1 description2](#tcparamdesc1)
+[description1 description2](#desc1)
 
-[method](#tcparammethod)
+[method](#method)
 
-[url](#tcparamurl)
+[url](#url)
 
-[posttype](#tcparamposttype)
+[posttype](#posttype)
 
-[postbody](#tcparampostbody)
+[postbody](#postbody)
 
-[verifypositive](#tcparamverpos)
+[verifypositive](#verpos)
 
-[verifynegative](#tcparamverneg)
+[verifynegative](#verneg)
 
-[parseresponse](#tcparamparse)
+[parseresponse](#parse)
 
 [var](#var)
 
 #### [3.3.2 - Additional Test Driver Parameters](#tcdriver)
 
-[command command1 ... command20](#tcparamcommand)
+[command command1 ... command20](#command)
 
 [commandonerror](#commandonerror)
 
-[addcookie](#tcparamaddcookie)
+[addcookie](#addcookie)
 
-[addheader](#tcparamaddheader)
+[addheader](#addheader)
 
-[parms](#tcparamparms)
+[parms](#parms)
 
 
 #### [3.3.3 - Additional Assertion Parameters](#tcasserts)
 
-[assertcount](#tcparamassertcount)
+[assertcount](#assertcount)
 
-[verifyresponsecode](#tcparamvercode)
+[verifyresponsecode](#vercode)
 
 [verifyresponsetime](#tcverifyresponsetime)
 
@@ -105,33 +105,33 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [ignoresmartassertions](#ignoresmartassertions)
 
-[ignorehttpresponsecode](#tcparamignorehttpresponsecode)
+[ignorehttpresponsecode](#ignorehttpresponsecode)
 
 
 #### [3.3.4 - Retry Failed Test Step Parameters](#tcretry)
 
-[retry](#tcparamretry)
+[retry](#retry)
 
 [retryfromstep](#tcretryfromstep)
 
-[retryresponsecode](#tcparamretryresponsecode)
+[retryresponsecode](#retryresponsecode)
 
 [restartbrowseronfail](#tcrestartbrowseronfail)
 
 [restartbrowser](#tcrestartbrowser)
 
-[sleep](#tcparamsleep)
+[sleep](#sleep)
 
 
 #### [3.3.5 - Test Response Output Control Parameters](#tcoutput)
 
 [decodequotedprintable](#decodequotedprintable)
 
-[errormessage](#tcparamerrmsg)
+[errormessage](#errmsg)
 
-[formatjson](#tcparamformatjson)
+[formatjson](#formatjson)
 
-[formatxml](#tcparamformatxml)
+[formatxml](#formatxml)
 
 [gethrefs](#gethrefs)
 
@@ -139,40 +139,40 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [getbackgroundimages](#getbackgroundimages)
 
-[logastext](#tcparamlogastext)
+[logastext](#logastext)
 
-[logresponseasfile](#tcparamlogresponseasfile)
+[logresponseasfile](#logresponseasfile)
 
-[section](#tcparamsection)
+[section](#section)
 
 
 #### [3.3.6 - Parameters to skip test steps depending on target environment](#tcskip)
 
-[liveonly](#tcparamliveonly)
+[liveonly](#liveonly)
 
-[testonly](#tcparamtestonly)
+[testonly](#testonly)
 
-[autocontrolleronly](#tcparamautocontrolleronly)
+[autocontrolleronly](#autocontrolleronly)
 
 
 #### [3.3.7 - Parameters to skip test steps if previous test steps failed](#tcsanity)
 
-[checkpositive](#tcparamcheckpositive)
+[checkpositive](#checkpositive)
 
-[checknegative](#tcparamchecknegative)
+[checknegative](#checknegative)
 
-[checkresponsecode](#tcparamcheckresponsecode)
+[checkresponsecode](#checkresponsecode)
 
-[sanitycheck](#tcparamsanitycheck)
+[sanitycheck](#sanitycheck)
 
 
 #### [3.3.8 - Parameters to control Selenium WebDriver Test Execution](#tcwebdriver)
 
-[screenshot](#tcparamscreenshot)
+[screenshot](#screenshot)
 
-[searchimage searchimage1 ... searchimage5](#tcparamsearchimage)
+[searchimage searchimage1 ... searchimage5](#searchimage)
 
-[verifytext](#tcparamverifytext)
+[verifytext](#verifytext)
 
 
 
@@ -227,10 +227,10 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 WebInject is a HTTP level test automation tool initiated from the command line. WebInject sends
 HTTP GET or POST requests to the target web site (System Under Test), and runs assertions against the response.
 
-<a name="cfg"></a>
+<a name="configuration"></a>
 ## 2 - Configuration
 
-<a name="cfgfile"></a>
+<a name="file"></a>
 ### 2.1 - Configuration File (config.xml)
 
 There is a configuration file named 'config.xml' that is used to store configuration settings for your project.  You can 
@@ -247,7 +247,7 @@ Available config settings are:
 <br />
 
 
-<a name="cfgproxy"></a>
+<a name="proxy"></a>
 #### proxy
 Specifies a proxy server to route all HTTP requests through.
 
@@ -257,7 +257,7 @@ You can also do proxy authentication like this:
 
 example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
     
-<a name="cfguseragent"></a>
+<a name="useragent"></a>
 
 <br />
 
@@ -271,7 +271,7 @@ example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</userage
 <br />
 
 
-<a name="cfghttpauth"></a>
+<a name="httpauth"></a>
 #### httpauth
 
 Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response 
@@ -288,7 +288,7 @@ example: `<httpauth>server.companyintranet:80::ntdomain\username:password</httpa
 Note: You may include multiple <httpauth></httpauth> elements in your config files to support multiple sets of HTTP 
 Authentication credentials.
     
-<a name="cfgbaseurl"></a>
+<a name="baseurl"></a>
 
 <br />
 
@@ -316,7 +316,7 @@ in the same way as the 'baseurl' example above.
 <br />
 
 
-<a name="cfgcomment"></a>
+<a name="comment"></a>
 #### comment
 
 Allows you to comment out parts of your config file.  Anything contained within comment tags will not be processed.
@@ -327,7 +327,7 @@ example: `<comment>this will be ignored</comment>`
 <br />
 
     
-<a name="cfgtimeout"></a>
+<a name="timeout"></a>
 #### timeout
 Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than 
 this threshold, the HTTP request times out and the case is marked as failed.  The default timeout if you do not specify one
@@ -341,7 +341,7 @@ Note: This timeout setting may not always work when using SSL/HTTPS.
 <br />
 
 
-<a name="cfgglobalretry"></a>
+<a name="globalretry"></a>
 #### globalretry
 This setting is used along with the retry parameter in a test case. It limits the number of retry attempts in a test run.
 For example, consider 3 test cases each set to retry 40 times, along with a globalretry value of 50. If the test run is going
@@ -353,7 +353,7 @@ example: `<globalretry>50</globalretry>`
 <br />
 
 
-<a name="cfgglobaljumpbacks"></a>
+<a name="globaljumpbacks"></a>
 #### globaljumpbacks
 
 Limits the number of times the retryfromstep parameter is followed. Stops tests potentially running forever.
@@ -363,7 +363,7 @@ If not present, defaulted to 20.
 <br />
 
 
-<a name="cfgtestonly"></a>
+<a name="testonly"></a>
 #### testonly
 Used in conjunction with the testonly test case parameter. If this configuration item is present
 and set to any value, the test cases with the testonly parameter set will be run.
@@ -374,7 +374,7 @@ config files for your live servers.
 
 In the test step that you only want to run on test environments, specify the parameter `testonly="true"`
 
-<a name="cfgautocontrolleronly"></a>
+<a name="autocontrolleronly"></a>
 
 <br />
 
@@ -390,7 +390,7 @@ In the test step that you only want to run on automation controllers, specify th
 <br />
 
 
-<a name="cfguserdefined"></a>
+<a name="userdefined"></a>
 #### userdefined
 You can create your own abitrary config values that can be accessed as constants in the test steps.
 
@@ -406,7 +406,7 @@ In this example, you would refer to the constants in your test steps as {ADMINUS
 <br />
 
 
-<a name="cfgautoassertions"></a>
+<a name="autoassertions"></a>
 #### autoassertions
 It is possible to specify assertions that run automatically on every single test step.
 
@@ -465,7 +465,7 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 <br />
 
 
-<a name="cfgfilenamescfg"></a>
+<a name="filenames"></a>
 ### 2.2 - Test Case Files (specifying in configuration file)
 
 One of the configuration 
@@ -487,7 +487,7 @@ Note: You can also use relative path names to point to test case files located i
 <br />
 
 
-<a name="cfgcmdlineopts"></a>
+<a name="cmdlineopts"></a>
 ### 2.3 - Command Line Options and Specifying Alternate Test Case/Config Files
 
 WebInject is called from the command line and has several command line options.
@@ -503,7 +503,7 @@ Usage:
 <br />
 
 
-<a name="cfgavailopts"></a>
+<a name="availopts"></a>
 #### Available Command Line Options
 
 **-c** or **--config**
@@ -553,7 +553,7 @@ Displays the version number and other information.
 <br />
 
 
-<a name="cfgpassingfile"></a>
+<a name="passingfile"></a>
 #### Passing a Test Case Filename
 
 When you launch WebInject in console mode, you can optionally supply an argument for a testcase file to run.  It will look for this 
@@ -574,7 +574,7 @@ config file, the files specified in the config file will not be processed (but a
 <br />
 
 
-<a name="cfgxpathxnode"></a>
+<a name="xpathxnode"></a>
 #### XPath/XNode
 
 When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a 
@@ -587,7 +587,7 @@ For example, to run only testcase 2 from your file named mytests.xml, you would 
 <br />
 
 
-<a name="cfgcmdlinexampls"></a>
+<a name="cmdlinexampls"></a>
 #### More Examples of Command Line Usage
 
 Here are some examples to illustrate using webinject.pl from the command line:
@@ -675,7 +675,7 @@ A minimal test case xml file may look something like:
 <a name="tccore"></a>
 ### 3.3.1 - Core Parameters - Learn these first, for most tests these will be enough
 
-<a name="tcparamid"></a>
+<a name="id"></a>
 #### id
 Test case identifier used to identify the test case and set its execution order. If you number the test steps like 10, 20, 30...
 then it gives you room to insert additional steps (e.g. 15, 25) without having to renumber all the ids.
@@ -687,7 +687,7 @@ then it gives you room to insert additional steps (e.g. 15, 25) without having t
 <br />    
 
 
-<a name="tcparamdesc1"></a>
+<a name="desc1"></a>
 #### description1 description2
 
 Text description for results report.
@@ -702,7 +702,7 @@ Both parameters are optional, but it is highly recommended to always use descrip
 <br />    
 
 
-<a name="tcparammethod"></a>
+<a name="method"></a>
 #### method
 HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
 
@@ -726,7 +726,7 @@ full examples section for an example.
 <br />
 
     
-<a name="tcparamurl"></a>
+<a name="url"></a>
 #### url
 
 Full HTTP URL to request.  You can use an IP Address or Host Name.
@@ -738,7 +738,7 @@ Full HTTP URL to request.  You can use an IP Address or Host Name.
 <br />
 
     
-<a name="tcparamposttype"></a>
+<a name="posttype"></a>
 #### posttype
 This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
 in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
@@ -768,7 +768,7 @@ Defaults to "application/x-www-form-urlencoded" if this parameter is omitted.
 <br />
 
 
-<a name="tcparampostbody"></a>
+<a name="postbody"></a>
 #### postbody
 This is the data (body) of the request to be sent to the server.  This is only used in an HTTP POST (method="post").
 
@@ -815,7 +815,7 @@ Example: `postbody="file=>soap_payload.xml"`
 <br />
 
 
-<a name="tcparamverpos"></a>
+<a name="verpos"></a>
 #### verifypositive
 String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched 
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
@@ -851,7 +851,7 @@ another three `|||` and writing any message after the custom error message.
 <br />
    
     
-<a name="tcparamverneg"></a>
+<a name="verneg"></a>
 #### verifynegative
 String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
@@ -882,7 +882,7 @@ another three `|||` and writing any message after the custom error message.
 <br />
 
 
-<a name="tcparamparse"></a>
+<a name="parse"></a>
 #### parseresponse
 Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
 used for passing Session ID's, but can be applied to any case where you need to pass a 
@@ -1008,7 +1008,7 @@ Set a variable that can be used in the same test step.
 <a name="tcdriver"></a>
 ### 3.3.2 - Additional Test Driver Parameters
 
-<a name="tcparamcommand"></a>
+<a name="command"></a>
 #### command command1 ... command20
 Used with method="cmd". Allows you to run a OS level command using the backtick method in Perl.
 
@@ -1044,7 +1044,7 @@ Will run the specified command only if the test step fails for some reason.
 <br />
 
 
-<a name="tcparamaddcookie"></a>
+<a name="addcookie"></a>
 #### addcookie
 
 This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
@@ -1057,7 +1057,7 @@ The cookie will be added for the current step only.
 <br />
 
 
-<a name="tcparamaddheader"></a>
+<a name="addheader"></a>
 #### addheader
 
 This is used to add an addition header to an outgoing HTTP request.
@@ -1081,7 +1081,7 @@ Note that when you use addheader, any existing header cookies will be clobbered.
 <br />
 
 
-<a name="tcparamparms"></a>
+<a name="parms"></a>
 #### parms
 
 Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
@@ -1133,7 +1133,7 @@ When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swappe
 <a name="tcasserts"></a>
 ### 3.3.3 - Additional Assertion Parameters
 
-<a name="tcparamassertcount"></a>
+<a name="assertcount"></a>
 #### assertcount
 Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
 if the assertion fails.
@@ -1163,7 +1163,7 @@ another three `|||` and writing any message after the custom error message.
 <br />
 
 
-<a name="tcparamvercode"></a>
+<a name="vercode"></a>
 #### verifyresponsecode
 HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
 code you receive.
@@ -1214,7 +1214,7 @@ See the config file section for information on smart assertions.
 <br />
 
 
-<a name="tcparamignorehttpresponsecode"></a>
+<a name="ignorehttpresponsecode"></a>
 #### ignorehttpresponsecode
 ```
     ignorehttpresponsecode="true"
@@ -1229,7 +1229,7 @@ Specifying this parameter allows us to ignore this verification.
 <a name="tcretry"></a>
 ### 3.3.4 - Retry Failed Test Step Parameters
 
-<a name="tcparamretry"></a>
+<a name="retry"></a>
 #### retry
 
 This is used to retry a test case that has failed. You specify the maximum number of times
@@ -1300,7 +1300,7 @@ globaljumpbacks setting in the config file (defaulted to 20 if not present).
 <br />
 
 
-<a name="tcparamretryresponsecode"></a>
+<a name="retryresponsecode"></a>
 #### retryresponsecode
 If a retry is present, retry if we get this reponse code, even if it is an error code.
 
@@ -1360,7 +1360,7 @@ All cookies will be dumped.
 <br />
 
 
-<a name="tcparamsleep"></a>
+<a name="sleep"></a>
 #### sleep
 
 Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
@@ -1400,7 +1400,7 @@ Note: This feature was added to deal with intermediate email files in quoted-pri
 <br />
 
 
-<a name="tcparamerrmsg"></a>
+<a name="errmsg"></a>
 #### errormessage
 If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
 (on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
@@ -1415,7 +1415,7 @@ test means, like "couldn't connect to the application" or "couldn't access the l
 <br />
 
 
-<a name="tcparamformatjson"></a>
+<a name="formatjson"></a>
 #### formatjson
 
 Improves readability of json responses.
@@ -1429,7 +1429,7 @@ Inserts carriage returns at various places using a simple regular expression.
 <br />
 
 
-<a name="tcparamformatxml"></a>
+<a name="formatxml"></a>
 #### formatxml
 
 Improves readability of xml responses.
@@ -1492,7 +1492,7 @@ This will match css background images that look like this in the html source:
 <br />
 
 
-<a name="tcparamlogastext"></a>
+<a name="logastext"></a>
 #### logastext
 
 Putting this paramater on a test case will put tags around the test case in http.log file.
@@ -1508,7 +1508,7 @@ than html.
 <br />
 
 
-<a name="tcparamlogresponseasfile"></a>
+<a name="logresponseasfile"></a>
 #### logresponseasfile
 
 Saves the test step response in a file.
@@ -1529,7 +1529,7 @@ Example:
 <br />
 
 
-<a name="tcparamsection"></a>
+<a name="section"></a>
 #### section
 
 Indicates in the results.xml that a section break occurs before this test.
@@ -1545,7 +1545,7 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 <a name="tcskip"></a>
 ### 3.3.6 - Parameters to skip test steps depending on target environment
 
-<a name="tcparamtestonly"></a>
+<a name="testonly"></a>
 #### testonly
 
 If you run your test cases against both test and live environments, you can specify that selected
@@ -1564,7 +1564,7 @@ In your config.xml, you would have the following line:
 
 <br />
 
-<a name="tcparamliveonly"></a>
+<a name="liveonly"></a>
 #### liveonly
 
 Works exactly the same was as testonly.
@@ -1582,7 +1582,7 @@ In your config.xml, you would have the following line:
 <br />
 
 
-<a name="tcparamautocontrolleronly"></a>
+<a name="autocontrolleronly"></a>
 #### autocontrolleronly
 
 You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
@@ -1613,7 +1613,7 @@ webinject.pl -a
 <a name="tcsanity"></a>
 ### 3.3.7 - Parameters to skip test steps if previous test steps failed
 
-<a name="tcparamcheckpositive"></a>
+<a name="checkpositive"></a>
 #### checkpositive
 
 ```
@@ -1626,7 +1626,7 @@ Allows us to skip test steps where we know they will fail since a previous depen
 <br />
 
 
-<a name="tcparamchecknegative"></a>
+<a name="checknegative"></a>
 #### checknegative
 
 ```
@@ -1638,7 +1638,7 @@ In this example, this test step will not be run, unless the most recent verifyne
 <br />
 
 
-<a name="tcparamcheckresponsecode"></a>
+<a name="checkresponsecode"></a>
 #### checkresponsecode
 ```
     checkresponsecode="200"
@@ -1650,7 +1650,7 @@ step was 200 (if that test step was run).
 <br />
 
 
-<a name="tcparamsanitycheck"></a>
+<a name="sanitycheck"></a>
 #### sanitycheck
 
 Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
@@ -1671,7 +1671,7 @@ like getting the home page, fails, then there little point running the rest of t
 
 <br />
 
-<a name="tcparamscreenshot"></a>
+<a name="screenshot"></a>
 #### screenshot
 ```
     screenshot="false"
@@ -1687,7 +1687,7 @@ is being run by a service account, there is no window handle with which to work 
 <br />
 
 
-<a name="tcparamsearchimage"></a>
+<a name="searchimage"></a>
 #### searchimage searchimage1 ... searchimage5
 
 Searches the WebDriver pagegrab or screenshot for a specified subimage. A small tolerance is allowed in case
@@ -1709,7 +1709,7 @@ For example, refering to the example above, RunningMan_Company_Logo.png can be f
 <br />
 
 
-<a name="tcparamverifytext"></a>
+<a name="verifytext"></a>
 #### verifytext
 Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
 Or perhaps you just want those details to appear in the http.log.
