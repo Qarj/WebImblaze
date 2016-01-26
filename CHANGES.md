@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.66 - Jan 24, 2016
+* removed (not in error range) text from Response Code Verification to make the output cleaner
+
 ### Version 1.65 - Jan 24, 2016
 * support changing the user agent at the test case level
 

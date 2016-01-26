@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.65";
+our $version="1.66";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -2360,10 +2360,10 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
     else { #verify http response code is in the 100-399 range
         if (($response->as_string() =~ /HTTP\/1.(0|1) (1|2|3)/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
-            print RESULTS qq|<span class="pass">Passed HTTP Response Code Verification (not in error range)</span><br />\n|; 
+            print RESULTS qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|; 
             print RESULTSXML qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
-            print RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification (not in error range)</verifyresponsecode-message>\n|;
-            print STDOUT qq|Passed HTTP Response Code Verification (not in error range) \n|; 
+            print RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
+            print STDOUT qq|Passed HTTP Response Code Verification \n|; 
             #succesful response codes: 100-399
             $passedcount++;
             $retrypassedcount++;         
