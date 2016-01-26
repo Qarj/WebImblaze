@@ -256,4 +256,13 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    varFEATURE="firstlooponly"
+    id="330"
+    description1="{FEATURE}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
