@@ -1,0 +1,24 @@
+<testcases repeat="5">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Step 10 loop counter is _{COUNTER}_ "
+    method="cmd"
+    command="echo Step 10 loop counter is _{COUNTER}_ > NUL"
+    verifypositive="Step 10 loop counter is _5_"
+    lastlooponly="true"
+/>
+
+<case
+    id="20"
+    description1="Step 20 loop counter is _{COUNTER}_"
+    method="cmd"
+    command="echo Step 20 loop counter is _{COUNTER}_ > NUL"
+/>
+
+</testcases>
