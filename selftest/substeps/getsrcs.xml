@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Get an image source"
+    method="get"
+    url="http://{RAN}/Home/Pictures"
+    getsrcs="brickwork.jpg"
+/>
+
+<case
+    id="20"
+    description1="Get a JavaScript source"
+    method="get"
+    url="http://{RAN}/Home/JavaScript"
+    getsrcs="element.js"
+/>
+
+</testcases>
