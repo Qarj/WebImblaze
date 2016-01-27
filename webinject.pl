@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.66";
+our $version="1.67";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -1403,7 +1403,8 @@ sub getassets { ## get page assets matching a list for a reference type
 
             $assetresponse = $useragent->request($assetrequest);
             
-            open(RESPONSEASFILE, ">$output/$filename"); #open in clobber mode
+            my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+            open(RESPONSEASFILE, ">$responsefoldername/$filename"); #open in clobber mode
             binmode RESPONSEASFILE; ## set binary mode
             print RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
             close(RESPONSEASFILE);
