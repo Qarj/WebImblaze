@@ -301,4 +301,13 @@ Run all self tests
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    varFEATURE="gethrefs"
+    id="380"
+    description1="{FEATURE}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
 </testcases>
