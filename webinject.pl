@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.67";
+our $version="1.68";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -47,7 +47,7 @@ our ($timestamp, $dirname, $testfilename);
 our (%parsedresult);
 our (%varvar);
 our ($useragent, $request, $response);
-our ($monitorenabledchkbx, $latency);
+our ($monitorenabledchkbx, $latency, $verificationlatency, $screenshotlatency);
 our (%teststeptime); ## record in a hash the latency for every step for later use
 our ($cookie_jar, @httpauth);
 our ($xnode, $stop);
@@ -604,8 +604,21 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     print RESULTS qq|Response Time = $latency sec <br />\n|;
                     
                     print STDOUT qq|Response Time = $latency sec \n|;
-                    
+
                     print RESULTSXML qq|            <responsetime>$latency</responsetime>\n|;
+
+                    if ($case{method} eq "selenium") {
+                        print RESULTS qq|Verification Time = $verificationlatency sec <br />\n|;
+                        print RESULTS qq|Screenshot Time = $screenshotlatency sec <br />\n|;
+                        
+                        print STDOUT qq|Verification Time = $verificationlatency sec \n|;
+                        print STDOUT qq|Screenshot Time = $screenshotlatency sec \n|;
+    
+                        print RESULTSXML qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
+                        print RESULTSXML qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
+                    }
+                                        
+
                     print RESULTSXML qq|        </testcase>\n\n|;
                     print RESULTS qq|<br />\n------------------------------------------------------- <br />\n\n|;
                     
@@ -868,83 +881,91 @@ $endtimer = time(); ## we only want to measure the time it took for the commands
 $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
 
 
+$starttimer = time(); ## measure latency for the verification
 $selresp = $combinedresp;
 
-   select(undef, undef, undef, 0.02); # Sleep for 20 milliseconds
+select(undef, undef, undef, 0.02); # Sleep for 20 milliseconds
 
-   ## multiple verifytexts are separated by commas
-   if ($case{verifytext}) {
-      @parseverify = split(/,/, $case{verifytext});
-      foreach (@parseverify) {
-         print "$_\n";
-         $idx = 0;
-         $verifytext = $_;
-         if ($verifytext eq "get_body_text") {
-            print "GET_BODY_TEXT:$verifytext\n";
-            eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
-         }
-         else
-         {
-            eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
-         }
-         $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
-         foreach $vresp (@verfresp) {
-            $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
-            $idx++; ## keep track of where we are in the loop
-            $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
-            if (($vresp =~ m!(^|=)HASH\b!) || ($vresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
-               my $dumpresp = Dumper($vresp);
-               my $dumped = "dumped";
-               $selresp =~ s!$!<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n!; ## include it in the response
-               ## ^ means match start of string, $ end of string
-            }
-         }
-      }
-   }
-   
-   if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
-   {
-      ## take a very fast screenshot - visible window only, only works for interactive sessions
-      if ($chromehandle gt 0) {
-         my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
-         #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
-         #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
-      }
-   }
-   else ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
-   {
-      eval
-      {  ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
-         #$timestart = time();
-         $png_base64 = $sel->screenshot();
-         #print "TIMER: selenium screenshot took " . (int(1000 * (time() - $timestart)) / 1000) . "\n";
-      };
-      
-      if ($@) ## if there was an error in taking the screenshot, $@ will have content
-      {
-          print "Selenium full page grab failed.\n";
-          print "ERROR:$@";
-      }
-      else
-      {
-         require MIME::Base64;
-         open(FH,'>',"$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png");
-         binmode FH; ## set binary mode
-         print FH MIME::Base64::decode_base64($png_base64);
-         close FH;
-      }
-   }
-
-    if ($selresp =~ /^ERROR/) { ## Selenium returned an error
-       $selresp =~ s!^!HTTP/1.1 500 Selenium returned an error\n\n!; ## pretend this is an HTTP response - 100 means continue
-    }
-    else { 
-       $selresp =~ s!^!HTTP/1.1 100 OK\n\n!; ## pretend this is an HTTP response - 100 means continue
-    }    
-    $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
-    #print $response->as_string; print "\n\n";
-    
+## multiple verifytexts are separated by commas
+if ($case{verifytext}) {
+  @parseverify = split(/,/, $case{verifytext});
+  foreach (@parseverify) {
+     print "$_\n";
+     $idx = 0;
+     $verifytext = $_;
+     if ($verifytext eq "get_body_text") {
+        print "GET_BODY_TEXT:$verifytext\n";
+        eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
+     }
+     else
+     {
+        eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
+     }
+     $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
+     foreach $vresp (@verfresp) {
+        $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
+        $idx++; ## keep track of where we are in the loop
+        $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
+        if (($vresp =~ m!(^|=)HASH\b!) || ($vresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
+           my $dumpresp = Dumper($vresp);
+           my $dumped = "dumped";
+           $selresp =~ s!$!<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n!; ## include it in the response
+           ## ^ means match start of string, $ end of string
+        }
+     }
+  }
 }
+
+$endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+$verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+
+$starttimer = time(); ## measure latency for the screenshot
+if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
+{
+  ## take a very fast screenshot - visible window only, only works for interactive sessions
+  if ($chromehandle gt 0) {
+     my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
+     #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
+     #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
+  }
+}
+else ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
+{
+  eval
+  {  ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
+     #$timestart = time();
+     $png_base64 = $sel->screenshot();
+     #print "TIMER: selenium screenshot took " . (int(1000 * (time() - $timestart)) / 1000) . "\n";
+  };
+  
+  if ($@) ## if there was an error in taking the screenshot, $@ will have content
+  {
+      print "Selenium full page grab failed.\n";
+      print "ERROR:$@";
+  }
+  else
+  {
+     require MIME::Base64;
+     open(FH,'>',"$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png");
+     binmode FH; ## set binary mode
+     print FH MIME::Base64::decode_base64($png_base64);
+     close FH;
+  }
+}
+
+$endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+$screenshotlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+
+if ($selresp =~ /^ERROR/) { ## Selenium returned an error
+   $selresp =~ s!^!HTTP/1.1 500 Selenium returned an error\n\n!; ## pretend this is an HTTP response - 100 means continue
+}
+else { 
+   $selresp =~ s!^!HTTP/1.1 100 OK\n\n!; ## pretend this is an HTTP response - 100 means continue
+}    
+$response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
+#print $response->as_string; print "\n\n";
+    
+} ## end sub
 
 sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Locator, Label);
                             ##        custom_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');

@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.68 - Jan 30, 2016
+* verification and screenshot time for Selenium WebDriver tests now output to STDOUT, results.html and results.xml
+
 ### Version 1.67 - Jan 27, 2016
 * fixed a bug in sub getassets when an output folder includes a filename prefix
 
