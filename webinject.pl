@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.68";
+our $version="1.69";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -1465,9 +1465,9 @@ sub savepage {## save the page in a cache to enable auto substitution
    $page = $response->as_string;
    
    ## decide if we want to save this page - needs a method post action
-   if ($page =~ m~method="post" action="(.*?)"~s) { ## look for the method post action
+   if ( ($page =~ m~method="post" action="(.*?)"~s) || ($page =~ m~action="(.*?)" method="post"~s) ) { ## look for the method post action
       $pagenameaction = $1; 
-      #out print STDOUT qq|\n ACTION $pagenameaction\n|; 
+      #print STDOUT qq|\n ACTION $pagenameaction\n|; 
       $pagefound = 'true'; ## we will only save the page if we actually found one
       #out print STDOUT qq|\n|; 
    } else {
@@ -1482,7 +1482,7 @@ sub savepage {## save the page in a cache to enable auto substitution
          $pagename = $1; 
       }
       $pagename =~ s!http.?://!!s; ## remove http:// and https://
-      #out print STDOUT qq| SAVING $pagename (AFTER)\n\n|; 
+      #print STDOUT qq| SAVING $pagename (AFTER)\n\n|; 
     
       ## check to see if we already have this page
       $len = @pagenames; #number of elements in the array
@@ -1738,7 +1738,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           if ($fieldfoundflag eq 'true') {
              $fieldname =~ s~\$~\\\$~; #replace $ with \$
              $fieldname =~ s~\.~\\\.~; #replace . with \.
-             if ($pages[$pageid] =~ m~="$fieldname" value="(.*?)"~s) { 
+             if ($pages[$pageid] =~ m~="$fieldname" [^\>]*value="(.*?)"~s) { 
                 $data = $1; 
                 $datafound = 'true';
                 #print STDOUT qq| DATA is $data \n|; #debug

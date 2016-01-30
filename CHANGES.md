@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.69 - Jan 30, 2016
+* made the auto substitutions compatible with .NET MVC as well as .NET Web Forms
+
 ### Version 1.68 - Jan 30, 2016
 * verification and screenshot time for Selenium WebDriver tests now output to STDOUT, results.html and results.xml
 
