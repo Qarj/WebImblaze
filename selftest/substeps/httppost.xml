@@ -1,0 +1,29 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Get the Search form"
+    method="get"
+    url="http://{RAN}/Search/SearchForm"
+    verifypositive="Search Recipes"
+    verifypositive1="Recipe Name"
+    verifypositive2="Max Preparation Time"
+    parseresponseTOKEN="Set-Cookie: __RequestVerificationToken=([^;]*)|regex|"
+/>
+
+<case
+    id="20"
+    description1="Submit a search"
+    method="post"
+    url="http://{RAN}/Search/SearchRecipes"
+    postbody="RecipeName=Pesto&Cuisine=Italian&MaxPrepTime=20&__RequestVerificationToken={TOKEN}&BtnSubmit=Search+Recipes"
+    verifypositive="Believe it or not, you just submitted a search"
+/>
+
+
+</testcases>
