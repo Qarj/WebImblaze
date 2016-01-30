@@ -1,0 +1,17 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Get a background image"
+    method="get"
+    url="http://{RAN}/Home/Pictures"
+    getbackgroundimages=".jpg"
+/>
+
+
+</testcases>
