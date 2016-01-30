@@ -1,0 +1,37 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Get all the searches - no addheader"
+    method="get"
+    url="http://{RAN}/api/API"
+    verifypositive='"SearchId":1,"RecipeName"'
+    verifynegative="ArrayOfSearch"
+/>
+
+<case
+    id="20"
+    description1="Get all the searches - add header json"
+    method="get"
+    url="http://{RAN}/api/API"
+    addheader="Accept: application/json, text/javascript, */*; q=0.01"
+    verifypositive='"SearchId":1,"RecipeName"'
+    verifynegative="ArrayOfSearch"
+/>
+
+<case
+    id="30"
+    description1="Get all the searches - add header xml"
+    method="get"
+    url="http://{RAN}/api/API"
+    addheader="Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    verifypositive="ArrayOfSearch"
+    verifynegative='"SearchId":1,"RecipeName"'
+/>
+
+</testcases>
