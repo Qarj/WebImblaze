@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.70 - Jan 31, 2016
+* removed XML::Parser, no longer needed
+
 ### Version 1.69 - Jan 30, 2016
 * made the auto substitutions compatible with .NET MVC as well as .NET Web Forms
 

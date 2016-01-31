@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.69";
+our $version="1.70";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -36,7 +36,6 @@ use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}="false";
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
-use XML::Parser;  #for web services verification (you may comment this out if aren't doing XML verifications for web services)
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses) 
 use Data::Dumper;  #uncomment to dump hashes for debugging
 use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintable parameter and parseresponse dequote feature
