@@ -1,0 +1,19 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Post the file"
+    method="post"
+    postbody="file=>selftest\testdata\searches.xml"
+    posttype="text/xml"
+    url="http://{RAN}/BulkUpload/XML"
+    verifypositive="Confirmation"
+/>
+
+
+</testcases>
