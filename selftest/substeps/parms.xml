@@ -1,0 +1,20 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Post the file substituting parameters"
+    method="post"
+    posttype="text/xml"
+    url="http://{RAN}/BulkUpload/XML"
+    postbody="file=>selftest\testdata\search_template.xml"
+    parms="__name__=tartiflette&__cuisine__=French&__preptime__=75"
+    verifypositive="/BulkUpload/Confirmation"
+/>
+
+
+</testcases>
