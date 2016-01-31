@@ -4,7 +4,7 @@
 Self test master file. All test steps in this file should pass.
 -->
 
-<testvar varname="feature">httppost_xml</testvar>
+<testvar varname="feature">httppost_form-data</testvar>
 <case
     id="10"
     description1="${feature} - parameter"
@@ -12,7 +12,7 @@ Self test master file. All test steps in this file should pass.
     command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     command1="type selftest\output\${feature}subhttp.log"
     verifypositive="Test Cases Failed: 0"
-    verifypositive1="Irish Stew"
+    verifypositive1="Carbonara"
 />
 
 
