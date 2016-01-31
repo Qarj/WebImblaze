@@ -95,6 +95,8 @@ The manual contains extensive details on how to use WebInject.
 
 There are many working examples in the examples folder.
 
+For additional examples, study the self tests in the selftest\substeps folder.
+
 ## WebInject Self Test
 
 WebInject uses WebInject to test itself. The self tests are organised by feature name. 
