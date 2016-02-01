@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.71";
+our $version="1.72";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -2095,7 +2095,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     my $assertionskips = 0;
     my $assertionskipsmessage = ""; ## support tagging an assertion as disabled with a message
 
-    
+    ## auto assertions
     if ($entrycriteriaOK && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
         foreach my $configAttrib ( sort keys %{ $userconfig->{autoassertions} } ) {
@@ -2108,6 +2108,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print RESULTS qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
                     print STDOUT "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
+                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     #print STDOUT "$verifyparms[0]\n"; ##DEBUG
@@ -2138,7 +2139,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             }
         }    
     }
-
+    
+    ## smart assertions
     if ($entrycriteriaOK && !$case{ignoresmartassertions}) {
         foreach my $configAttrib ( sort keys %{ $userconfig->{smartassertions} } ) {
             if ( substr($configAttrib, 0, 14) eq "smartassertion" ) {
@@ -2150,6 +2152,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print RESULTS qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
                     print STDOUT "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
+                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     #print STDOUT "$verifyparms[0]\n"; ##DEBUG
@@ -2183,6 +2186,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }    
     }
 
+    ## verify positive
     if ($entrycriteriaOK) {
         ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
@@ -2228,6 +2232,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }    
     }
     
+    ## verify negative
     if ($entrycriteriaOK) {
         ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
@@ -2241,6 +2246,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print RESULTS qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print STDOUT "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
+                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  #verify existence of string in response
@@ -2274,7 +2280,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             }
         }
     }
-        
+    
+    ## assert count
     if ($entrycriteriaOK) {
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
             if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
@@ -2292,6 +2299,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
                     print STDOUT "Skipped Assertion Count - $verifycountparms[2] \n";
                     $assertionskips++;
+                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     if ($count == $verifycountparms[1]) {
