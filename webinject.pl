@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.70";
+our $version="1.71";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -1176,12 +1176,14 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     return $returnmsg;
 }
 
-sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Search Text",Timeout);
-                                   ##        custom_wait_for_text_visible("Job title",10);
+sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Search Text","target", "locator", Timeout);
+                                   ##         custom_wait_for_text_visible("Job title", "body", "tag_name", 10);
                                    ##
-                                   ## waits for text to appear visible in the body text
+                                   ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
     my $searchtext = $_[0];
-    my $timeout = $_[1];
+    my $target = $_[1];
+    my $locator = $_[2];
+    my $timeout = $_[3];
     
     print STDOUT "VISIBLE SEARCH TEXT:$searchtext\n";
     print STDOUT "TIMEOUT:$timeout\n";
@@ -1191,7 +1193,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
     my $foundit = "false";
 
     while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
-        eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
+        eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
         foreach $resp (@resp1) {
             if ($resp =~ m~$searchtext~si) {
                 $foundit = "true";

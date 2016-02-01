@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.71 - Feb 1, 2016
+* changed custom_wait_for_text_visible so that you can supply a locator
+
 ### Version 1.70 - Jan 31, 2016
 * removed XML::Parser, no longer needed
 
