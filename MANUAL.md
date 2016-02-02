@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.72
+# Manual for WebInject version 1.73
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 

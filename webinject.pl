@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.72";
+our $version="1.73";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -883,7 +883,7 @@ $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time roun
 $starttimer = time(); ## measure latency for the verification
 $selresp = $combinedresp;
 
-select(undef, undef, undef, 0.02); # Sleep for 20 milliseconds
+sleep( 0.02 ); ## Sleep for 20 milliseconds
 
 ## multiple verifytexts are separated by commas
 if ($case{verifytext}) {
@@ -1121,7 +1121,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
         }
         if ($foundit eq "false") 
         {
-            select(undef, undef, undef, 0.1); # Sleep for 0.1 seconds
+            sleep( 0.1 ); # Sleep for 0.1 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -1156,7 +1156,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
         eval { @resp1 = $sel->get_page_source(); };
         foreach $resp (@resp1) {
             if ($resp =~ m~$searchtext~si) {
-                select(undef, undef, undef, 0.1); ## sleep for 0.1 seconds
+                sleep( 0.1 ); ## sleep for 0.1 seconds
             } else {
                 $foundit = "false";
             }
@@ -1201,7 +1201,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
         }
         if ($foundit eq "false") 
         {
-            select(undef, undef, undef, 0.5); ## sleep for 0.5 seconds
+            sleep( 0.5 ); ## sleep for 0.5 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -1241,7 +1241,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
         }
         if ($foundit eq "true") 
         {
-            select(undef, undef, undef, 0.1); ## sleep for 0.1 seconds
+            sleep( 0.1 ); ## sleep for 0.1 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -1279,7 +1279,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
         }
         if ($foundit eq "false") 
         {
-            select(undef, undef, undef, 0.1); ## Sleep for 0.1 seconds
+            sleep( 0.1 ); ## Sleep for 0.1 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -1318,7 +1318,7 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
         }
         if ($foundit eq "false") 
         {
-            select(undef, undef, undef, 0.1); ## Sleep for 0.1 seconds
+            sleep( 0.1 ); ## Sleep for 0.1 seconds
         }
     }
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
@@ -2926,7 +2926,7 @@ sub whackoldfiles {  #delete any files leftover from previous run if they exist
         
     #verify files are deleted, if not give the filesystem time to delete them before continuing    
     while (glob('*.xml.tmp')) {
-        sleep .5; 
+        sleep ( 0.5 ); 
     }
 }
 #------------------------------------------------------------------
@@ -2935,7 +2935,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
     {   
         if (defined $sel) { #shut down any existing selenium browser session
             $selresp = $sel->quit();
-            select(undef, undef, undef, 2.1); ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
+            sleep( 2.1 ); ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
         }
         print STDOUT "\nStarting Selenium Remote Control server on port $opt_port \n";         
 
@@ -3007,7 +3007,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
             if ( $@ and $try++ < $max )
             {
                 print "\nError: $@ Failed try $try to connect to Selenium Server on port $opt_port, retrying...\n";
-                select(undef, undef, undef, 4); ## sleep for 4 seconds, Selenium Server may still be starting up
+                sleep( 4 ); ## sleep for 4 seconds, Selenium Server may still be starting up
                 redo ATTEMPT;
             }
         }
