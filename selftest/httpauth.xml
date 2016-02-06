@@ -1,0 +1,18 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<!-- verifyresponsetime="19" - this will fail if the sleep in step 30 is triggered - which we do not expect -->
+<testvar varname="feature">httpauth</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 0"
+/>
+
+
+</testcases>

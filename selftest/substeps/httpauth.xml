@@ -1,0 +1,16 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!-- All this test proves is that it doesn't croak when the httpauth configuration file parm is read -->
+<case
+    id="10"
+    description1="Step 10"
+    method="cmd"
+    command="echo NOP"
+/>
+
+</testcases>

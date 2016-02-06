@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.73";
+our $version="1.74";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -142,8 +142,7 @@ sub engine {
     if (@httpauth) {
         #add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we 
         #deref $elem to get the array elements.  
-        my $elem;
-        foreach $elem(@httpauth) {
+        foreach my $elem(@httpauth) {
             #print "adding credential: $elem->[0]:$elem->[1], $elem->[2], $elem->[3] => $elem->[4]\n";
             $useragent->credentials("$elem->[0]:$elem->[1]", "$elem->[2]", "$elem->[3]" => "$elem->[4]");
         }
@@ -840,7 +839,6 @@ sub selenium {  ## send Selenium command and read response
 my $command = '';
 my $verifytext = '';
 my @verfresp = ();
-my $vresp ='';
 my $idx = 0; #For keeping track of index in foreach loop
 my $grab = '';
 my $jswait = '';
@@ -901,7 +899,7 @@ if ($case{verifytext}) {
         eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
      }
      $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
-     foreach $vresp (@verfresp) {
+     foreach my $vresp (@verfresp) {
         $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
         $idx++; ## keep track of where we are in the loop
         $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
@@ -1109,12 +1107,12 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
     print STDOUT "TIMEOUT:$timeout\n";
 
     my $timestart = time();
-    my (@resp1, $resp);
+    my @resp1;
     my $foundit = "false";
 
     while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
         eval { @resp1 = $sel->get_page_source(); };
-        foreach $resp (@resp1) {
+        foreach my $resp (@resp1) {
             if ($resp =~ m~$searchtext~si) {
                 $foundit = "true";
             }
@@ -1149,12 +1147,12 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     print STDOUT "TIMEOUT:$timeout\n";
 
     my $timestart = time();
-    my (@resp1, $resp);
+    my @resp1;
     my $foundit = "true";
 
     while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
         eval { @resp1 = $sel->get_page_source(); };
-        foreach $resp (@resp1) {
+        foreach my $resp (@resp1) {
             if ($resp =~ m~$searchtext~si) {
                 sleep( 0.1 ); ## sleep for 0.1 seconds
             } else {
@@ -1189,12 +1187,12 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
     print STDOUT "TIMEOUT:$timeout\n";
 
     my $timestart = time();
-    my (@resp1, $resp);
+    my @resp1;
     my $foundit = "false";
 
     while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
         eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
-        foreach $resp (@resp1) {
+        foreach my $resp (@resp1) {
             if ($resp =~ m~$searchtext~si) {
                 $foundit = "true";
             }
@@ -1229,12 +1227,12 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     print STDOUT "TIMEOUT:$timeout\n";
 
     my $timestart = time();
-    my (@resp1, $resp);
+    my @resp1;
     my $foundit = "true"; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
 
     while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
         eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
-        foreach $resp (@resp1) {
+        foreach my $resp (@resp1) {
             if (not ($resp =~ m~$searchtext~si)) {
                 $foundit = "false";
             }
@@ -2759,8 +2757,8 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s~{BASEURL2}~$config{baseurl2}~g;
 
 ## perform arbirtary user defined config substituions
-    our ($key, $value, $KEY);
-    foreach $key (keys %{ $userconfig->{userdefined} } ) {
+    our ($value, $KEY);
+    foreach my $key (keys %{ $userconfig->{userdefined} } ) {
         $value = $userconfig->{userdefined}{$key};
         if (ref($value) eq 'HASH') { ## if we found a HASH, we treat it as blank
             $value = '';

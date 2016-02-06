@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.74 - Feb 6, 2016
+* made loop iterators lexical
+
 ### Version 1.73 - Feb 2, 2016
 * changed select statements used as sleep statements to actual sleep statements
 
