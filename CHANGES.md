@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.75 - Feb 8, 2016
+* moved the execution of decodequotedprintable to before the assertions
+* changed to 3 argument open, changed many of the opens away from bareword file handles
+
 ### Version 1.74 - Feb 6, 2016
 * made loop iterators lexical
 

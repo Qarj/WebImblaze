@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.74";
+our $version="1.75";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -161,9 +161,9 @@ sub engine {
          $output = $dirname."output/"; ## default to the output folder under the current folder
     }
 
-    open(HTTPLOGFILE, ">$output"."http.log") or die "\nERROR: Failed to open http.log file\n\n";   
-    open(RESULTS, ">$output"."results.html") or die "\nERROR: Failed to open results.html file\n\n";    
-    open(RESULTSXML, ">$output"."results.xml") or die "\nERROR: Failed to open results.xml file\n\n";
+    open( HTTPLOGFILE, '>' ,"$output".'http.log' ) or die "\nERROR: Failed to open http.log file\n\n";   
+    open( RESULTS, '>', "$output".'results.html' ) or die "\nERROR: Failed to open results.html file\n\n";    
+    open( RESULTSXML, '>', "$output".'results.xml' ) or die "\nERROR: Failed to open results.xml file\n\n";
 
     if ($output =~ m~\\([^\\]*)\\$~s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
         $concurrency = $1; 
@@ -519,6 +519,11 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     
                     searchimage(); ## search for images within actual screen or page grab
+
+					if ($case{decodequotedprintable}) {
+						 my $decoded = decode_qp($response->as_string); ## decode the response output
+						 $response = HTTP::Response->parse($decoded); ## inject it back into the response
+					}
 
                     verify(); #verify result from http response
 
@@ -943,7 +948,7 @@ else ## take a full pagegrab - works for interactive and non interactive, but is
   else
   {
      require MIME::Base64;
-     open(FH,'>',"$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png");
+     open( FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" );
      binmode FH; ## set binary mode
      print FH MIME::Base64::decode_base64($png_base64);
      close FH;
@@ -1424,10 +1429,10 @@ sub getassets { ## get page assets matching a list for a reference type
             $assetresponse = $useragent->request($assetrequest);
             
             my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-            open(RESPONSEASFILE, ">$responsefoldername/$filename"); #open in clobber mode
-            binmode RESPONSEASFILE; ## set binary mode
-            print RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
-            close(RESPONSEASFILE);
+            open( my $RESPONSEASFILE, '>', "$responsefoldername/$filename" ); #open in clobber mode
+            binmode $RESPONSEASFILE; ## set binary mode
+            print $RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
+            close( $RESPONSEASFILE );
 
             $endassetrequest = time();
             $assetlatency = (int(1000 * ($endassetrequest - $startassetrequest)) / 1000);  ## elapsed time rounded to thousandths 
@@ -1880,9 +1885,9 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     
     #read the xml file specified in the testcase
     $case{postbody} =~ m~file=>(.*)~i;
-    open(XMLBODY, "$dirname"."$1") or die "\nError: Failed to open text/xml file\n\n";  #open file handle   
-    my @xmlbody = <XMLBODY>;  #read the file into an array   
-    close(XMLBODY);
+    open( my $XMLBODY, '<', "$dirname"."$1") or die "\nError: Failed to open text/xml file\n\n";  #open file handle   
+    my @xmlbody = <$XMLBODY>;  #read the file into an array   
+    close($XMLBODY);
 
     if ($case{parms}) { #is there a postbody for this testcase - if so need to subtitute in fields
        @parms = split(/\&/, $case{parms}); #& is separator
@@ -2494,24 +2499,25 @@ sub processcasefile {  #get test case files to run (from command line or config 
     my $filename;
     my $xpath;
     my $setuseragent;
+    my $CONFIG;
         
     undef @casefilelist; #empty the array of test case filenames
     undef @configfile;
         
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
-        open(CONFIG, "$dirname"."$opt_configfile") or die "\nERROR: Failed to open $opt_configfile file\n\n";
+        open( $CONFIG, '<', "$dirname"."$opt_configfile" ) or die "\nERROR: Failed to open $opt_configfile file\n\n";
         $configexists = 1;  #flag we are going to use a config file
     }
     elsif (-e "$dirname"."config.xml") {  #if config.xml exists, read it
-        open(CONFIG, "$dirname"."config.xml") or die "\nERROR: Failed to open config.xml file\n\n";
+        open( $CONFIG, '<', "$dirname".'config.xml' ) or die "\nERROR: Failed to open config.xml file\n\n";
         $configexists = 1;  #flag we are going to use a config file
         $opt_configfile = "config.xml"; ## we have defaulted to config.xml in the current folder
     } 
         
     if ($configexists) {  #if we have a config file, use it  
             
-        my @precomment = <CONFIG>;  #read the config file into an array
+        my @precomment = <$CONFIG>;  #read the config file into an array
             
         #remove any commented blocks from config file
          foreach (@precomment) {
@@ -2626,7 +2632,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
             
     }  
         
-    close(CONFIG);
+    close( $CONFIG );
     
     if (not defined $config{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
         $config{globaljumpbacks} = 20;
@@ -2649,8 +2655,8 @@ sub convtestcases {
         
     my @xmltoconvert;        
         
-    open(XMLTOCONVERT, "$dirname"."$currentcasefile") or die "\nError: Failed to open test case file\n\n";  #open file handle   
-    @xmltoconvert = <XMLTOCONVERT>;  #read the file into an array
+    open( my $XMLTOCONVERT, '<', "$dirname"."$currentcasefile" ) or die "\nError: Failed to open test case file\n\n";  #open file handle   
+    @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
         
     $casecount = 0;
         
@@ -2667,11 +2673,11 @@ sub convtestcases {
         }    
     }  
         
-    close(XMLTOCONVERT);   
+    close( $XMLTOCONVERT );   
         
-    open(XMLTOCONVERT, ">$dirname"."$currentcasefile".".$$".".tmp") or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
-    print XMLTOCONVERT @xmltoconvert;  #overwrite file with converted array
-    close(XMLTOCONVERT);
+    open( my $CONVERTEDXML, '>', "$dirname"."$currentcasefile".".$$".'.tmp' ) or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
+    print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
+    close( $CONVERTEDXML );
 }
 #------------------------------------------------------------------
 sub fixsinglecase{ #xml parser creates a hash in a different format if there is only a single testcase.
@@ -2681,17 +2687,17 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
         
     if ($casecount == 1) {
             
-        open(XMLTOCONVERT, "$dirname"."$currentcasefile".".$$".".tmp") or die "\nError: Failed to open temp file\n\n";  #open file handle   
-        @xmltoconvert = <XMLTOCONVERT>;  #read the file into an array
+        open( my$ XMLTOCONVERT, '<', "$dirname"."$currentcasefile".".$$".'.tmp' ) or die "\nError: Failed to open temp file\n\n";  #open file handle   
+        @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
             
         for(@xmltoconvert) { 
             s/<\/testcases>/<case id="2" description1="dummy test case"\/><\/testcases>/g;  #add dummy test case to end of file   
         }       
-        close(XMLTOCONVERT);
+        close( $XMLTOCONVERT );
             
-        open(XMLTOCONVERT, ">$dirname"."$currentcasefile".".$$".".tmp") or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle   
-        print XMLTOCONVERT @xmltoconvert;  #overwrite file with converted array
-        close(XMLTOCONVERT);
+        open( my $CONVERTEDXML, '>', "$dirname"."$currentcasefile".".$$".'.tmp') or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle   
+        print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
+        close( $CONVERTEDXML );
     }
 }
 #------------------------------------------------------------------
@@ -2854,11 +2860,6 @@ sub httplog {  #write requests and responses to http.log file
     }
     print HTTPLOGFILE "\n\n";
     
-    if ($case{decodequotedprintable}) {
-         my $decoded = decode_qp($response->as_string); ## decode the response output
-         $response = HTTP::Response->parse($decoded); ## inject it back into the response
-    }
-
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
          $formatresponse = $response->as_string; ## get the response output
@@ -2882,10 +2883,10 @@ sub httplog {  #write requests and responses to http.log file
         
     if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
         my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        open(RESPONSEASFILE, ">$responsefoldername/$case{logresponseasfile}");  #open in clobber mode
-        binmode RESPONSEASFILE; ## set binary mode
-        print RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
-        close(RESPONSEASFILE);
+        open( my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}" );  #open in clobber mode
+        binmode $RESPONSEASFILE; ## set binary mode
+        print $RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
+        close( $RESPONSEASFILE );
     }
 
     print HTTPLOGFILE $textrequest, "\n\n";
