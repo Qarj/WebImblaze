@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.75";
+our $version="1.76";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -108,6 +108,8 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 my $concurrency = "null"; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
+my ( $HTTPLOGFILE, $RESULTS, $RESULTSXML ); ## output file handles
+
 engine();
 
 
@@ -161,9 +163,9 @@ sub engine {
          $output = $dirname."output/"; ## default to the output folder under the current folder
     }
 
-    open( HTTPLOGFILE, '>' ,"$output".'http.log' ) or die "\nERROR: Failed to open http.log file\n\n";   
-    open( RESULTS, '>', "$output".'results.html' ) or die "\nERROR: Failed to open results.html file\n\n";    
-    open( RESULTSXML, '>', "$output".'results.xml' ) or die "\nERROR: Failed to open results.xml file\n\n";
+    open( $HTTPLOGFILE, '>' ,"$output".'http.log' ) or die "\nERROR: Failed to open http.log file\n\n";   
+    open( $RESULTS, '>', "$output".'results.html' ) or die "\nERROR: Failed to open results.html file\n\n";    
+    open( $RESULTSXML, '>', "$output".'results.xml' ) or die "\nERROR: Failed to open results.xml file\n\n";
 
     if ($output =~ m~\\([^\\]*)\\$~s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
         $concurrency = $1; 
@@ -172,7 +174,7 @@ sub engine {
     $outsum = unpack("%32C*", $output); ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
         
-    print RESULTSXML qq|<results>\n\n|;  #write initial xml tag
+    print $RESULTSXML qq|<results>\n\n|;  #write initial xml tag
     writeinitialhtml();  #write opening tags for results file
                
     unless ($xnode) { #skip regular STDOUT output if using an XPath 
@@ -444,26 +446,26 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         next;
                     }
                     
-                    print RESULTS qq|<b>Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint </b><br />\n|;
+                    print $RESULTS qq|<b>Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint </b><br />\n|;
                     
                     print STDOUT qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
                     
                     unless ($casefilecheck eq $currentcasefile) {
                         unless ($currentcasefile eq $casefilelist[0]) {  #if this is the first test case file, skip printing the closing tag for the previous one
-                            print RESULTSXML qq|    </testcases>\n\n|;
+                            print $RESULTSXML qq|    </testcases>\n\n|;
                         }
-                        print RESULTSXML qq|    <testcases file="$currentcasefile">\n\n|;
+                        print $RESULTSXML qq|    <testcases file="$currentcasefile">\n\n|;
                     }
-                    print RESULTSXML qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
+                    print $RESULTSXML qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
                     
                     for (qw/section description1 description2/) { ## support section breaks
                         next unless defined $case{$_};
-                        print RESULTS qq|$case{$_} <br />\n|; 
+                        print $RESULTS qq|$case{$_} <br />\n|; 
                         print STDOUT qq|$case{$_} \n|;
-                        print RESULTSXML qq|            <$_>$case{$_}</$_>\n|;
+                        print $RESULTSXML qq|            <$_>$case{$_}</$_>\n|;
                     }                    
                     
-                    print RESULTS qq|<br />\n|;
+                    print $RESULTS qq|<br />\n|;
                     
                     ## display and log the verifications to do
                     ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
@@ -472,31 +474,31 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         if ( substr($testAttrib, 0, 14) eq "verifypositive" || substr($testAttrib, 0, 14) eq "verifynegative") {
                             my $verifytype = ucfirst substr($testAttrib, 6, 8); ## so we get the word Positive or Negative
                             @verifyparms = split(/\|\|\|/, $case{$testAttrib}); ## index 0 contains the actual string to verify
-                            print RESULTS qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
+                            print $RESULTS qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                             print STDOUT qq|Verify $verifytype: "$verifyparms[0]" \n|;
-                            print RESULTSXML qq|            <$testAttrib>$verifyparms[0]</$testAttrib>\n|;
+                            print $RESULTSXML qq|            <$testAttrib>$verifyparms[0]</$testAttrib>\n|;
                         }
                     }
                     
                     if ($case{verifyresponsecode}) {
-                        print RESULTS qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
+                        print $RESULTS qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
                         print STDOUT qq|Verify Response Code: "$case{verifyresponsecode}" \n|;
-                        print RESULTSXML qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
+                        print $RESULTSXML qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
                     }
 
                     if ($case{verifyresponsetime}) {
-                        print RESULTS qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
+                        print $RESULTS qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
                         print STDOUT qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
-                        print RESULTSXML qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
+                        print $RESULTSXML qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
                     }
 
                     if ($case{retryresponsecode}) {## retry if a particular response code was returned
-                        print RESULTS qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
+                        print $RESULTS qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
                         print STDOUT qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
-                        print RESULTSXML qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
+                        print $RESULTSXML qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
                     }
 
-                    flush(\*RESULTS); ## flush results html to disk so it is possible to view intermediate progress
+                    flush(\*$RESULTS); ## flush results html to disk so it is possible to view intermediate progress
                     
                     if ($entrycriteriaOK) { ## do not run it if the case has not met entry criteria
                        if ($case{method}) {
@@ -539,24 +541,24 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop 
                     if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq "true")) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
-                        print RESULTSXML qq|            <success>false</success>\n|;
+                        print $RESULTSXML qq|            <success>false</success>\n|;
                         if ($case{errormessage}) { #Add defined error message to the output 
-                            print RESULTS qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
-                            print RESULTSXML qq|            <result-message>$case{errormessage}</result-message>\n|;
+                            print $RESULTS qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
+                            print $RESULTSXML qq|            <result-message>$case{errormessage}</result-message>\n|;
                             print STDOUT qq|TEST CASE FAILED : $case{errormessage}\n|;
                         }
                         else { #print regular error output
-                            print RESULTS qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
-                            print RESULTSXML qq|            <result-message>TEST CASE FAILED</result-message>\n|;
+                            print $RESULTS qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
+                            print $RESULTSXML qq|            <result-message>TEST CASE FAILED</result-message>\n|;
                             print STDOUT qq|TEST CASE FAILED\n|;
                         }    
                         $casefailedcount++;
                     }
                     elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
-                        print RESULTS qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
+                        print $RESULTS qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
                         print STDOUT qq|RETRYING... $retry to go \n|;
-                        print RESULTSXML qq|            <success>false</success>\n|;
-                        print RESULTSXML qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
+                        print $RESULTSXML qq|            <success>false</success>\n|;
+                        print $RESULTSXML qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
                         
                         ## all this is for ensuring correct behaviour when retries occur
                         $retriesprint = ".$retries";
@@ -567,10 +569,10 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
                         my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
-                        print RESULTS qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
+                        print $RESULTS qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
                         print STDOUT qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
-                        print RESULTSXML qq|            <success>false</success>\n|;
-                        print RESULTSXML qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
+                        print $RESULTSXML qq|            <success>false</success>\n|;
+                        print $RESULTSXML qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
                         $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
                         $jumpbacksprint = "-$jumpbacks";
                         $globalretries++;
@@ -596,34 +598,34 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         }
                     }
                     else {
-                        print RESULTS qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
+                        print $RESULTS qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
                         print STDOUT qq|TEST CASE PASSED \n|;
-                        print RESULTSXML qq|            <success>true</success>\n|;
-                        print RESULTSXML qq|            <result-message>TEST CASE PASSED</result-message>\n|;
+                        print $RESULTSXML qq|            <success>true</success>\n|;
+                        print $RESULTSXML qq|            <result-message>TEST CASE PASSED</result-message>\n|;
                         $casepassedcount++;
                         $retry = 0; # no need to retry when test case passes
                     }
                     
-                    print RESULTS qq|Response Time = $latency sec <br />\n|;
+                    print $RESULTS qq|Response Time = $latency sec <br />\n|;
                     
                     print STDOUT qq|Response Time = $latency sec \n|;
 
-                    print RESULTSXML qq|            <responsetime>$latency</responsetime>\n|;
+                    print $RESULTSXML qq|            <responsetime>$latency</responsetime>\n|;
 
                     if ($case{method} eq "selenium") {
-                        print RESULTS qq|Verification Time = $verificationlatency sec <br />\n|;
-                        print RESULTS qq|Screenshot Time = $screenshotlatency sec <br />\n|;
+                        print $RESULTS qq|Verification Time = $verificationlatency sec <br />\n|;
+                        print $RESULTS qq|Screenshot Time = $screenshotlatency sec <br />\n|;
                         
                         print STDOUT qq|Verification Time = $verificationlatency sec \n|;
                         print STDOUT qq|Screenshot Time = $screenshotlatency sec \n|;
     
-                        print RESULTSXML qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
-                        print RESULTSXML qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
+                        print $RESULTSXML qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
+                        print $RESULTSXML qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
                     }
                                         
 
-                    print RESULTSXML qq|        </testcase>\n\n|;
-                    print RESULTS qq|<br />\n------------------------------------------------------- <br />\n\n|;
+                    print $RESULTSXML qq|        </testcase>\n\n|;
+                    print $RESULTS qq|<br />\n------------------------------------------------------- <br />\n\n|;
                     
                     unless ($xnode) { #skip regular STDOUT output if using an XPath   
                         print STDOUT qq|------------------------------------------------------- \n|;
@@ -717,7 +719,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
         
-    print RESULTS 
+    print $RESULTS 
 qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -761,7 +763,7 @@ Starting WebInject Engine...
 #------------------------------------------------------------------
 sub writefinalhtml {  #write summary and closing tags for results file
         
-    print RESULTS
+    print $RESULTS
 qq|    
 <br /><hr /><br />
 <b>
@@ -795,7 +797,7 @@ sub writefinalxml {  #write summary and closing tags for XML results file
     }
 
 ## startdatetime - inserted start-seconds and start-date-time below    
-    print RESULTSXML
+    print $RESULTSXML
 qq|    
     </testcases>
 
@@ -803,7 +805,7 @@ qq|
         <start-time>$currentdatetime</start-time>
         <start-seconds>$timeSecondsX</start-seconds>
         <start-date-time>$startdate|;
-print RESULTSXML qq|T$hourX:$minuteX:$secondX</start-date-time>
+print $RESULTSXML qq|T$hourX:$minuteX:$secondX</start-date-time>
         <total-run-time>$totalruntime</total-run-time>
         <test-cases-run>$totalruncount</test-cases-run>
         <test-cases-passed>$casepassedcount</test-cases-passed>
@@ -841,7 +843,6 @@ Verifications Failed: $failedcount
 #------------------------------------------------------------------
 sub selenium {  ## send Selenium command and read response
 
-my $command = '';
 my $verifytext = '';
 my @verfresp = ();
 my $idx = 0; #For keeping track of index in foreach loop
@@ -856,9 +857,9 @@ my $combinedresp='';
 $request = new HTTP::Request('GET',"WebDriver");
 for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
    if ($case{$_}) {#perform command
-      $command = $case{$_};
+      my $command = $case{$_};
       $selresp = '';
-      eval { eval "$command"; };
+      my $evalresp = eval { $command };
       print "EVALRESP:$@\n";
       if (defined $selresp) { ## phantomjs does not return a defined response sometimes
           if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
@@ -948,10 +949,10 @@ else ## take a full pagegrab - works for interactive and non interactive, but is
   else
   {
      require MIME::Base64;
-     open( FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" );
-     binmode FH; ## set binary mode
-     print FH MIME::Base64::decode_base64($png_base64);
-     close FH;
+     open( my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" );
+     binmode $FH; ## set binary mode
+     print $FH MIME::Base64::decode_base64($png_base64);
+     close $FH;
   }
 }
 
@@ -1967,7 +1968,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $substituted_postbody = autosub("$case{postbody}", "multipost", "$case{url}");
     
     my %myContent_;
-    eval "\%myContent_ = $substituted_postbody";
+    eval { %myContent_ = $substituted_postbody };
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
                Content => \%myContent_;
@@ -2058,17 +2059,17 @@ sub searchimage {  ## search for images in the actual result
                 my $location = $1;
                 
                 if ($siresp =~ m~was found~s) { ## was the image found?
-                    print RESULTS qq|<span class="found">Found image: $case{$_}</span><br />\n|;
-                    print RESULTSXML qq|            <$_-success>true</$_-success>\n|;
-                    print RESULTSXML qq|            <$_-name>$case{$_}</$_-name>\n|;
+                    print $RESULTS qq|<span class="found">Found image: $case{$_}</span><br />\n|;
+                    print $RESULTSXML qq|            <$_-success>true</$_-success>\n|;
+                    print $RESULTSXML qq|            <$_-name>$case{$_}</$_-name>\n|;
                     print STDOUT "Found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else { #the image was not found within the bigger image
-                    print RESULTS qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
-                    print RESULTSXML qq|            <$_-success>false</$_-success>\n|;
-                    print RESULTSXML qq|            <$_-name>$case{$_}</$_-name>\n|;
+                    print $RESULTS qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
+                    print $RESULTSXML qq|            <$_-success>false</$_-success>\n|;
+                    print $RESULTSXML qq|            <$_-name>$case{$_}</$_-name>\n|;
                     print STDOUT "Not found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
                     $failedcount++;
                     $retryfailedcount++;
@@ -2108,7 +2109,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
                 @verifyparms = split(/\|\|\|/, $userconfig->{autoassertions}{$configAttrib}); #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                    print RESULTS qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
+                    print $RESULTS qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
                     print STDOUT "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
@@ -2116,19 +2117,19 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 else {
                     #print STDOUT "$verifyparms[0]\n"; ##DEBUG
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## verify existence of string in response
-                        #print RESULTS qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                        print RESULTSXML qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
+                        #print $RESULTS qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
+                        print $RESULTSXML qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
                         #print STDOUT "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
                         #print STDOUT $verifynum." Passed Auto Assertion \n"; ##DEBUG
                         $passedcount++;
                         $retrypassedcount++;
                     }
                     else {
-                        print RESULTS qq|<span class="fail">Failed Auto Assertion:</span>$verifyparms[0]<br />\n|;
-                        print RESULTSXML qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
+                        print $RESULTS qq|<span class="fail">Failed Auto Assertion:</span>$verifyparms[0]<br />\n|;
+                        print $RESULTSXML qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
                         if ($verifyparms[1]) { ## is there a custom assertion failure message?
-                           print RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                           print RESULTSXML qq|            <$configAttrib-message>$verifyparms[1]</$configAttrib-message>\n|;
+                           print $RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
+                           print $RESULTSXML qq|            <$configAttrib-message>$verifyparms[1]</$configAttrib-message>\n|;
                         }
                         print STDOUT "Failed Auto Assertion \n";         
                         if ($verifyparms[1]) {
@@ -2152,7 +2153,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
                 @verifyparms = split(/\|\|\|/, $userconfig->{smartassertions}{$configAttrib}); #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
                 if ($verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                    print RESULTS qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
+                    print $RESULTS qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
                     print STDOUT "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
@@ -2161,18 +2162,18 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     #print STDOUT "$verifyparms[0]\n"; ##DEBUG
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## pre-condition for smart assertion - first regex must pass
                         if ($response->as_string() =~ m~$verifyparms[1]~si) {  ## verify existence of string in response
-                            #print RESULTS qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                            print RESULTSXML qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
+                            #print $RESULTS qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
+                            print $RESULTSXML qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
                             #print STDOUT "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
                             $passedcount++;
                             $retrypassedcount++;
                         }
                         else {
-                            print RESULTS qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
-                            print RESULTSXML qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
+                            print $RESULTS qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
+                            print $RESULTSXML qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
                             if ($verifyparms[2]) { ## is there a custom assertion failure message? 
-                               print RESULTS qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                               print RESULTSXML qq|            <$configAttrib-message>$verifyparms[2]</$configAttrib-message>\n|;
+                               print $RESULTS qq|<span class="fail">$verifyparms[2]</span><br />\n|;
+                               print $RESULTSXML qq|            <$configAttrib-message>$verifyparms[2]</$configAttrib-message>\n|;
                             }
                             print STDOUT "Failed Smart Assertion";         
                             if ($verifyparms[2]) {
@@ -2199,15 +2200,15 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
                 @verifyparms = split(/\|\|\|/, $case{$testAttrib}); #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                    print RESULTS qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
+                    print $RESULTS qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print STDOUT "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {  
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## verify existence of string in response
-                        print RESULTS qq|<span class="pass">Passed Positive Verification</span><br />\n|;
-                        print RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print $RESULTS qq|<span class="pass">Passed Positive Verification</span><br />\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
                         print STDOUT "Passed Positive Verification \n";
                         #print STDOUT $verifynum." Passed Positive Verification \n"; ##DEBUG
                         $lastpositive[$verifynum] = 'pass'; ## remember fact that this verifypositive passed
@@ -2215,11 +2216,11 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                         $retrypassedcount++;
                     }
                     else {
-                        print RESULTS qq|<span class="fail">Failed Positive Verification:</span>$verifyparms[0]<br />\n|;
-                        print RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print $RESULTS qq|<span class="fail">Failed Positive Verification:</span>$verifyparms[0]<br />\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
                         if ($verifyparms[1]) { ## is there a custom assertion failure message?
-                           print RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                           print RESULTSXML qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
+                           print $RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
+                           print $RESULTSXML qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
                         }
                         print STDOUT "Failed Positive Verification \n";         
                         if ($verifyparms[1]) {
@@ -2246,18 +2247,18 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
                 @verifyparms = split(/\|\|\|/, $case{$testAttrib}); #index 0 contains the actual string to verify
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                    print RESULTS qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
+                    print $RESULTS qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print STDOUT "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     if ($response->as_string() =~ m~$verifyparms[0]~si) {  #verify existence of string in response
-                        print RESULTS qq|<span class="fail">Failed Negative Verification</span><br />\n|;
-                        print RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print $RESULTS qq|<span class="fail">Failed Negative Verification</span><br />\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
                         if ($verifyparms[1]) {
-                           print RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                             print RESULTSXML qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
+                           print $RESULTS qq|<span class="fail">$verifyparms[1]</span><br />\n|;
+                             print $RESULTSXML qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
                         }
                         print STDOUT "Failed Negative Verification \n";            
                         if ($verifyparms[1]) {
@@ -2272,8 +2273,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                         $verifynegativefailed = "true";
                     }
                     else {
-                        print RESULTS qq|<span class="pass">Passed Negative Verification</span><br />\n|;
-                        print RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print $RESULTS qq|<span class="pass">Passed Negative Verification</span><br />\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
                         print STDOUT "Passed Negative Verification \n";
                         $lastnegative[$verifynum] = 'pass'; ## remember fact that this verifynegative passed
                         $passedcount++;
@@ -2299,29 +2300,29 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 while ($tempstring =~ m|$verifycountparms[0]|ig) { $count++;} ## count how many times string is found
      
                 if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                    print RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
+                    print $RESULTS qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
                     print STDOUT "Skipped Assertion Count - $verifycountparms[2] \n";
                     $assertionskips++;
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
                     if ($count == $verifycountparms[1]) {
-                        print RESULTS qq|<span class="pass">Passed Count Assertion of $verifycountparms[1]</span><br />\n|;
-                        print RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print $RESULTS qq|<span class="pass">Passed Count Assertion of $verifycountparms[1]</span><br />\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
                         print STDOUT "Passed Count Assertion of $verifycountparms[1] \n";
                         $passedcount++;
                         $retrypassedcount++;
                     }
                     else {
-                        print RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print $RESULTSXML qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
                         if ($verifycountparms[2]) {## if there is a custom message, write it out
-                            print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                            print RESULTS qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
-                            print RESULTSXML qq|            <$testAttrib-message>$verifycountparms[2] [got $count]</$testAttrib-message>\n|;
+                            print $RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
+                            print $RESULTS qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
+                            print $RESULTSXML qq|            <$testAttrib-message>$verifycountparms[2] [got $count]</$testAttrib-message>\n|;
                         }
                         else {# we make up a standard message
-                            print RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                            print RESULTSXML qq|            <$testAttrib-message>Failed Count Assertion of $verifycountparms[1], got $count</$testAttrib-message>\n|;
+                            print $RESULTS qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
+                            print $RESULTSXML qq|            <$testAttrib-message>Failed Count Assertion of $verifycountparms[1], got $count</$testAttrib-message>\n|;
                         }    
                         print STDOUT "Failed Count Assertion of $verifycountparms[1], got $count \n";         
                         if ($verifycountparms[2]) {
@@ -2339,16 +2340,16 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaOK) {
          if ($case{verifyresponsetime}) { ## verify that the response time is less than or equal to given amount in seconds
              if ($latency <= $case{verifyresponsetime}) {
-                    print RESULTS qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
-                    print RESULTSXML qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
+                    print $RESULTS qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
+                    print $RESULTSXML qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
                     print STDOUT "Passed Response Time Verification \n";
                     $passedcount++;
                     $retrypassedcount++;
              }
              else {
-                    print RESULTS qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
-                    print RESULTSXML qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
-                    print RESULTSXML qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
+                    print $RESULTS qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
+                    print $RESULTSXML qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
+                    print $RESULTSXML qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
                     print STDOUT "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n";         
                     $failedcount++;
                     $retryfailedcount++;
@@ -2361,9 +2362,9 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         $forcedretry="false";
         if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
             if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
-                print RESULTS qq|<span class="pass">Will retry on response code </span><br />\n|; 
-                print RESULTSXML qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
-                print RESULTSXML qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
+                print $RESULTS qq|<span class="pass">Will retry on response code </span><br />\n|; 
+                print $RESULTSXML qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
+                print $RESULTSXML qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
                 print STDOUT qq|Found Retry HTTP Response Code \n|; 
                 $forcedretry="true"; ## force a retry even though we received a potential error code        
             }
@@ -2374,18 +2375,18 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     #print "\n\n\ DEBUG    $lastresponsecode \n\n";
     if ($case{verifyresponsecode}) {
         if ($case{verifyresponsecode} == $response->code()) { #verify returned HTTP response code matches verifyresponsecode set in test case
-            print RESULTS qq|<span class="pass">Passed HTTP Response Code Verification </span><br />\n|; 
-            print RESULTSXML qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
-            print RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
+            print $RESULTS qq|<span class="pass">Passed HTTP Response Code Verification </span><br />\n|; 
+            print $RESULTSXML qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
+            print $RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
             print STDOUT qq|Passed HTTP Response Code Verification \n|; 
             $passedcount++;
             $retrypassedcount++;
             $retry=0; ## we won't retry if the response code is invalid since it will probably never work         
             }
         else {
-            print RESULTS qq|<span class="fail">Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
-            print RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-            print RESULTSXML qq|            <verifyresponsecode-message>Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
+            print $RESULTS qq|<span class="fail">Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
+            print $RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+            print $RESULTSXML qq|            <verifyresponsecode-message>Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
             print STDOUT qq|Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|;
             $failedcount++;
             $retryfailedcount++;
@@ -2394,9 +2395,9 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
     else { #verify http response code is in the 100-399 range
         if (($response->as_string() =~ /HTTP\/1.(0|1) (1|2|3)/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
-            print RESULTS qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|; 
-            print RESULTSXML qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
-            print RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
+            print $RESULTS qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|; 
+            print $RESULTSXML qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
+            print $RESULTSXML qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
             print STDOUT qq|Passed HTTP Response Code Verification \n|; 
             #succesful response codes: 100-399
             $passedcount++;
@@ -2405,21 +2406,21 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         else {
             $response->as_string() =~ /(HTTP\/1.)(.*)/i;
             if (!$entrycriteriaOK){ ## test wasn't run due to entry criteria not being met
-                print RESULTS qq|<span class="fail">Failed - Entry criteria not met</span><br />\n|; #($1$2) is HTTP response code
-                print RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                print RESULTSXML qq|            <verifyresponsecode-message>Failed - Entry criteria not met</verifyresponsecode-message>\n|;
+                print $RESULTS qq|<span class="fail">Failed - Entry criteria not met</span><br />\n|; #($1$2) is HTTP response code
+                print $RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+                print $RESULTSXML qq|            <verifyresponsecode-message>Failed - Entry criteria not met</verifyresponsecode-message>\n|;
                 print STDOUT "Failed - Entry criteria not met \n"; #($1$2) is HTTP response code   
             }
             elsif ($1) {  #this is true if an HTTP response returned 
-                print RESULTS qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
-                print RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                print RESULTSXML qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
+                print $RESULTS qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
+                print $RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+                print $RESULTSXML qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
                 print STDOUT "Failed HTTP Response Code Verification ($1$2) \n"; #($1$2) is HTTP response code   
             }
             else {  #no HTTP response returned.. could be error in connection, bad hostname/address, or can not connect to web server
-                print RESULTS qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
-                print RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                print RESULTSXML qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
+                print $RESULTS qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
+                print $RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+                print $RESULTSXML qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
                 print STDOUT "Failed - No Response \n"; #($1$2) is HTTP response code   
             }
             if ($forcedretry eq "false") {
@@ -2434,8 +2435,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     
     if ($assertionskips > 0) {
         $totalassertionskips = $totalassertionskips + $assertionskips;
-        print RESULTSXML qq|            <assertionskips>true</assertionskips>\n|;
-        print RESULTSXML qq|            <assertionskips-message>$assertionskipsmessage</assertionskips-message>\n|;
+        print $RESULTSXML qq|            <assertionskips>true</assertionskips>\n|;
+        print $RESULTSXML qq|            <assertionskips-message>$assertionskipsmessage</assertionskips-message>\n|;
     }
     
     if (($case{commandonerror}) && ($isfailure > 0)) { ## if the test case failed, check if we want to run a command to help sort out any problems
@@ -2839,26 +2840,26 @@ sub httplog {  #write requests and responses to http.log file
         
 ## log separator enhancement
 ## from version 1.42 log separator is now written before each test case along with case number and test description
-    print HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
-    print HTTPLOGFILE "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+    print $HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
+    print $HTTPLOGFILE "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
     ## log descrption1 and description2
-    print HTTPLOGFILE "<desc1>$desc1log</desc1>\n";
+    print $HTTPLOGFILE "<desc1>$desc1log</desc1>\n";
     if ($desc2log) {
-       print HTTPLOGFILE "<desc2>$desc2log</desc2>\n";
+       print $HTTPLOGFILE "<desc2>$desc2log</desc2>\n";
     }
     
-    print HTTPLOGFILE "\n";
+    print $HTTPLOGFILE "\n";
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
-            print HTTPLOGFILE "<searchimage>$case{$_}</searchimage>\n";
+            print $HTTPLOGFILE "<searchimage>$case{$_}</searchimage>\n";
         }
     }
-    print HTTPLOGFILE "\n";
+    print $HTTPLOGFILE "\n";
     
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
-        print HTTPLOGFILE "<logastext> \n";
+        print $HTTPLOGFILE "<logastext> \n";
     }
-    print HTTPLOGFILE "\n\n";
+    print $HTTPLOGFILE "\n\n";
     
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
@@ -2889,11 +2890,11 @@ sub httplog {  #write requests and responses to http.log file
         close( $RESPONSEASFILE );
     }
 
-    print HTTPLOGFILE $textrequest, "\n\n";
-    print HTTPLOGFILE $response->as_string, "\n\n";
+    print $HTTPLOGFILE $textrequest, "\n\n";
+    print $HTTPLOGFILE $response->as_string, "\n\n";
         
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
-        print HTTPLOGFILE "</logastext> \n";
+        print $HTTPLOGFILE "</logastext> \n";
     }
 }
 
@@ -2912,10 +2913,10 @@ sub finaltasks {  #do ending tasks
         
     writefinalxml();  #write summary and closing tags for XML results file
 
-    print HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
-    close(HTTPLOGFILE);
-    close(RESULTS);
-    close(RESULTSXML);
+    print $HTTPLOGFILE "\n************************* LOG SEPARATOR *************************\n\n\n";
+    close( $HTTPLOGFILE );
+    close( $RESULTS );
+    close( $RESULTSXML );
     
 }
 #------------------------------------------------------------------
@@ -3111,10 +3112,13 @@ sub getoptions {  #shell options
         print_usage();
         exit();
     }
-    sub print_version {
-        print "\nWebInject version $version\nFor more info: https://github.com/Qarj/WebInject\n\n";
-    }
-    sub print_usage {
+}
+
+sub print_version {
+    print "\nWebInject version $version\nFor more info: https://github.com/Qarj/WebInject\n\n";
+}
+
+sub print_usage {
         print <<EOB
 Usage: webinject.pl <<options>>
 
@@ -3135,5 +3139,5 @@ webinject.pl --version|-v
 webinject.pl --help|-h
 EOB
     }
-}
+
 #------------------------------------------------------------------

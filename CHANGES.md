@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.76 - Feb 9, 2016
+* removed all use of barewords as file handles, changed eval methods
+
 ### Version 1.75 - Feb 8, 2016
 * moved the execution of decodequotedprintable to before the assertions
 * changed to 3 argument open, changed many of the opens away from bareword file handles
