@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.77 - Feb 10, 2016
+* reverted eval methods, made whackoldfiles work properly
+
 ### Version 1.76 - Feb 9, 2016
 * removed all use of barewords as file handles, changed eval methods
 

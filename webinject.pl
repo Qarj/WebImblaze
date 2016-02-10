@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.76";
+our $version="1.77";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -843,6 +843,7 @@ Verifications Failed: $failedcount
 #------------------------------------------------------------------
 sub selenium {  ## send Selenium command and read response
 
+my $command = '';
 my $verifytext = '';
 my @verfresp = ();
 my $idx = 0; #For keeping track of index in foreach loop
@@ -857,9 +858,9 @@ my $combinedresp='';
 $request = new HTTP::Request('GET',"WebDriver");
 for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
    if ($case{$_}) {#perform command
-      my $command = $case{$_};
+      $command = $case{$_};
       $selresp = '';
-      my $evalresp = eval { $command };
+      my $evalresp = eval { eval "$command"; };
       print "EVALRESP:$@\n";
       if (defined $selresp) { ## phantomjs does not return a defined response sometimes
           if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
@@ -1968,7 +1969,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $substituted_postbody = autosub("$case{postbody}", "multipost", "$case{url}");
     
     my %myContent_;
-    eval { %myContent_ = $substituted_postbody };
+    eval "\%myContent_ = $substituted_postbody";
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
                Content => \%myContent_;
@@ -2921,13 +2922,15 @@ sub finaltasks {  #do ending tasks
 }
 #------------------------------------------------------------------
 sub whackoldfiles {  #delete any files leftover from previous run if they exist
-        
-    if (glob("$dirname"."*.xml.tmp")) { unlink glob("$dirname"."*.xml.tmp"); }
-        
-    #verify files are deleted, if not give the filesystem time to delete them before continuing    
-    while (glob('*.xml.tmp')) {
-        sleep ( 0.5 ); 
-    }
+
+    my $casefilepath = dirname( $ARGV[0] ); ## get the path portion of the asset location
+
+    ## delete tmp files in the WebInject.pl folder
+    if (glob("$dirname"."*.xml.*.tmp")) { unlink glob("$dirname"."*.xml.*.tmp"); }
+
+    ## delete tmp files in the test case folder
+    if (glob("$casefilepath\\"."*.xml.*.tmp")) { unlink glob("$casefilepath\\"."*.xml.*.tmp"); }
+
 }
 #------------------------------------------------------------------
 sub startseleniumbrowser {     ## start Selenium Remote Control browser if applicable
