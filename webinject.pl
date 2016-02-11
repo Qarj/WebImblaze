@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.77";
+our $version="1.78";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -52,7 +52,7 @@ our ($cookie_jar, @httpauth);
 our ($xnode, $stop);
 our ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
 our ($totalresponse, $avgresponse, $maxresponse, $minresponse);
-our (@casefilelist, $currentcasefile, $casecount, $isfailure, $verifynegativefailed);
+our (@casefilelist, $currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
 our (%case);
 our (%config);
 our ($currentdatetime, $totalruntime, $starttimer, $endtimer);
@@ -71,7 +71,7 @@ my ($cmdresp); ## response from running a terminal command
 my ($selresp); ## response from a Selenium command
 my (@verifyparms); ## friendly error message to show when an assertion fails
 my (@verifycountparms); ## regex match occurences must much a particular count for the assertion to pass
-my ($output); ## folder where WebInject is outputing results
+my ($output, $outputfolder); ## output path including possible filename prefix, output path without filename prefix
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
 my $totalassertionskips = 0;
@@ -154,15 +154,8 @@ sub engine {
     if ($config{timeout}) {
         $useragent->timeout("$config{timeout}");  #default LWP timeout is 180 secs.
     }
-        
-    #open file handles
-    if ($opt_output) {  #use output location if it is passed from the command line
-        $output = $opt_output;
-    }
-    else {
-         $output = $dirname."output/"; ## default to the output folder under the current folder
-    }
 
+    #open file handles
     open( $HTTPLOGFILE, '>' ,"$output".'http.log' ) or die "\nERROR: Failed to open http.log file\n\n";   
     open( $RESULTS, '>', "$output".'results.html' ) or die "\nERROR: Failed to open results.html file\n\n";    
     open( $RESULTSXML, '>', "$output".'results.xml' ) or die "\nERROR: Failed to open results.xml file\n\n";
@@ -201,7 +194,8 @@ sub engine {
     foreach (@casefilelist) { #process test case files named in config
         
         $currentcasefile = $_;
-        $currentcasefile =~ m~\\([^\.^\\]*?)\.xml~; #Get the filename only without folder names or .xml suffix
+        #$currentcasefile =~ m~\\([^\.^\\]*?)\.xml~; #Get the filename only without folder names or .xml suffix
+        $currentcasefilename = basename($currentcasefile);
         $testfilename = $1;
         #print "\n$currentcasefile\n\n";
             
@@ -211,12 +205,12 @@ sub engine {
             
         fixsinglecase();
           
-        $xmltestcases = XMLin("$dirname"."$currentcasefile".".$$".".tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
+        $xmltestcases = XMLin("$outputfolder"."$currentcasefilename".".$$".".tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
         #print Dumper($xmltestcases);  #for debug, dump hash of xml   
         #print keys %{$configfile};  #for debug, print keys from dereferenced hash
             
         #delete the temp file as soon as we are done reading it    
-        if (-e "$dirname"."$currentcasefile".".$$".".tmp") { unlink "$dirname"."$currentcasefile".".$$".".tmp"; }        
+        if (-e "$outputfolder"."$currentcasefilename".".$$".".tmp") { unlink "$outputfolder"."$currentcasefilename".".$$".".tmp"; }        
             
             
         $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
@@ -1430,8 +1424,7 @@ sub getassets { ## get page assets matching a list for a reference type
 
             $assetresponse = $useragent->request($assetrequest);
             
-            my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-            open( my $RESPONSEASFILE, '>', "$responsefoldername/$filename" ); #open in clobber mode
+            open( my $RESPONSEASFILE, '>', "$outputfolder/$filename" ); #open in clobber mode
             binmode $RESPONSEASFILE; ## set binary mode
             print $RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
             close( $RESPONSEASFILE );
@@ -2676,8 +2669,8 @@ sub convtestcases {
     }  
         
     close( $XMLTOCONVERT );   
-        
-    open( my $CONVERTEDXML, '>', "$dirname"."$currentcasefile".".$$".'.tmp' ) or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
+
+    open( my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' ) or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
     print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
     close( $CONVERTEDXML );
 }
@@ -2689,7 +2682,7 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
         
     if ($casecount == 1) {
             
-        open( my$ XMLTOCONVERT, '<', "$dirname"."$currentcasefile".".$$".'.tmp' ) or die "\nError: Failed to open temp file\n\n";  #open file handle   
+        open( my$ XMLTOCONVERT, '<', "$outputfolder"."$currentcasefilename".".$$".'.tmp' ) or die "\nError: Failed to open temp file\n\n";  #open file handle   
         @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
             
         for(@xmltoconvert) { 
@@ -2697,7 +2690,7 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
         }       
         close( $XMLTOCONVERT );
             
-        open( my $CONVERTEDXML, '>', "$dirname"."$currentcasefile".".$$".'.tmp') or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle   
+        open( my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp') or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle   
         print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
         close( $CONVERTEDXML );
     }
@@ -2923,13 +2916,8 @@ sub finaltasks {  #do ending tasks
 #------------------------------------------------------------------
 sub whackoldfiles {  #delete any files leftover from previous run if they exist
 
-    my $casefilepath = dirname( $ARGV[0] ); ## get the path portion of the asset location
-
-    ## delete tmp files in the WebInject.pl folder
-    if (glob("$dirname"."*.xml.*.tmp")) { unlink glob("$dirname"."*.xml.*.tmp"); }
-
-    ## delete tmp files in the test case folder
-    if (glob("$casefilepath\\"."*.xml.*.tmp")) { unlink glob("$casefilepath\\"."*.xml.*.tmp"); }
+    ## delete tmp files in the output folder
+    if (glob("$outputfolder"."*.xml.*.tmp")) { unlink glob("$output"."*.xml.*.tmp"); }
 
 }
 #------------------------------------------------------------------
@@ -3106,15 +3094,27 @@ sub getoptions {  #shell options
             print_usage();
             exit();
         };
+        
     if ($opt_version) {
         print_version();
         exit();
     }
+    
     if ($opt_help) {
         print_version();
         print_usage();
         exit();
     }
+
+    if ($opt_output) {  #use output location if it is passed from the command line
+        $output = $opt_output;
+    }
+    else {
+        $output = $dirname."output/"; ## default to the output folder under the current folder
+    }
+    $outputfolder = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+
+
 }
 
 sub print_version {

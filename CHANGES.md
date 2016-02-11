@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.78 - Feb 11, 2016
+* made whackoldfiles safer for running WebInject in parallel
+
 ### Version 1.77 - Feb 10, 2016
 * reverted eval methods, made whackoldfiles work properly
 
