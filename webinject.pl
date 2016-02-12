@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.78";
+our $version="1.79";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -34,13 +34,13 @@ use XML::Simple;
 use Time::HiRes 'time','sleep';
 use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
-$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME}="false";
+local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = "false";
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses) 
 use Data::Dumper;  #uncomment to dump hashes for debugging
 use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintable parameter and parseresponse dequote feature
 
-$| = 1; #don't buffer output to STDOUT
+local $| = 1; #don't buffer output to STDOUT
 
 our ($timestamp, $dirname, $testfilename);
 our (%parsedresult);
@@ -698,11 +698,14 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
     }
 
     finaltasks();  #do return/cleanup tasks
+    
 
     ## shut down the Selenium server last - it is less important than closing the files
     if ($opt_port) {  ## if -p is used, we need to close the browser and stop the selenium server
         $selresp = $sel->quit(); ## shut down selenium browser session
     }
+    
+    return;
         
 } #end engine subroutine
 
@@ -742,8 +745,11 @@ qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 <body>
 <hr />
 -------------------------------------------------------<br />
-|; 
+|;
+
+    return;
 }
+
 #------------------------------------------------------------------
 sub writeinitialstdout {  #write initial text for STDOUT
         
@@ -752,8 +758,11 @@ qq|
 Starting WebInject Engine...
 
 -------------------------------------------------------
-|; 
+|;
+
+    return;
 }
+
 #------------------------------------------------------------------
 sub writefinalhtml {  #write summary and closing tags for results file
         
@@ -778,8 +787,11 @@ Min Response Time: $minresponse seconds <br />
 
 </body>
 </html>
-|; 
+|;
+
+    return;
 }
+
 #------------------------------------------------------------------
 sub writefinalxml {  #write summary and closing tags for XML results file
 
@@ -814,8 +826,11 @@ print $RESULTSXML qq|T$hourX:$minuteX:$secondX</start-date-time>
     </test-summary>
 
 </results>
-|; 
+|;
+
+    return;
 }
+
 #------------------------------------------------------------------
 sub writefinalstdout {  #write summary and closing text for STDOUT
         
@@ -830,147 +845,151 @@ Test Cases Failed: $casefailedcount
 Verifications Passed: $passedcount
 Verifications Failed: $failedcount
 
-|; 
+|;
+
+    return;
 }
 
 ## Selenium server support
 #------------------------------------------------------------------
 sub selenium {  ## send Selenium command and read response
 
-my $command = '';
-my $verifytext = '';
-my @verfresp = ();
-my $idx = 0; #For keeping track of index in foreach loop
-my $grab = '';
-my $jswait = '';
-our @parseverify ='';
-my $timestart;
+    my $command = '';
+    my $verifytext = '';
+    my @verfresp = ();
+    my $idx = 0; #For keeping track of index in foreach loop
+    my $grab = '';
+    my $jswait = '';
+    our @parseverify ='';
+    my $timestart;
 
+    $starttimer = time();
 
-$starttimer = time();
-my $combinedresp='';
-$request = new HTTP::Request('GET',"WebDriver");
-for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
-   if ($case{$_}) {#perform command
-      $command = $case{$_};
-      $selresp = '';
-      my $evalresp = eval { eval "$command"; };
-      print "EVALRESP:$@\n";
-      if (defined $selresp) { ## phantomjs does not return a defined response sometimes
-          if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
-              my $dumpresp = Dumper($selresp);
-              print "SELRESP:$dumpresp";
-              $selresp = "selresp:$dumpresp";
+    my $combinedresp='';
+    $request = new HTTP::Request('GET',"WebDriver");
+    for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
+       if ($case{$_}) {#perform command
+          $command = $case{$_};
+          $selresp = '';
+          my $evalresp = eval { eval "$command"; };
+          print "EVALRESP:$@\n";
+          if (defined $selresp) { ## phantomjs does not return a defined response sometimes
+              if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
+                  my $dumpresp = Dumper($selresp);
+                  print "SELRESP:$dumpresp";
+                  $selresp = "selresp:$dumpresp";
+              }
+              else {
+                  print "SELRESP:$selresp\n";
+                  $selresp = "selresp:$selresp";
+              }
           }
           else {
-              print "SELRESP:$selresp\n";
-              $selresp = "selresp:$selresp";
+              print "SELRESP:<undefined>\n";
+              $selresp = "selresp:<undefined>";
           }
-      }
-      else {
-          print "SELRESP:<undefined>\n";
-          $selresp = "selresp:<undefined>";
-      }
-      #$request = new HTTP::Request('GET',"$case{command}");
-      $combinedresp =~ s!$!<$_>$command</$_>\n$selresp\n\n\n!; ## include it in the response
-   }
-}
-$endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-$latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
-
-
-$starttimer = time(); ## measure latency for the verification
-$selresp = $combinedresp;
-
-sleep( 0.02 ); ## Sleep for 20 milliseconds
-
-## multiple verifytexts are separated by commas
-if ($case{verifytext}) {
-  @parseverify = split(/,/, $case{verifytext});
-  foreach (@parseverify) {
-     print "$_\n";
-     $idx = 0;
-     $verifytext = $_;
-     if ($verifytext eq "get_body_text") {
-        print "GET_BODY_TEXT:$verifytext\n";
-        eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
-     }
-     else
-     {
-        eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
-     }
-     $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
-     foreach my $vresp (@verfresp) {
-        $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
-        $idx++; ## keep track of where we are in the loop
-        $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
-        if (($vresp =~ m!(^|=)HASH\b!) || ($vresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
-           my $dumpresp = Dumper($vresp);
-           my $dumped = "dumped";
-           $selresp =~ s!$!<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n!; ## include it in the response
-           ## ^ means match start of string, $ end of string
-        }
-     }
-  }
-}
-
-$endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-$verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
-
-$starttimer = time(); ## measure latency for the screenshot
-if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
-{
-  ## take a very fast screenshot - visible window only, only works for interactive sessions
-  if ($chromehandle gt 0) {
-     my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
-     #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
-     #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
-  }
-}
-else ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
-{
-  eval
-  {  ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
-     #$timestart = time();
-     $png_base64 = $sel->screenshot();
-     #print "TIMER: selenium screenshot took " . (int(1000 * (time() - $timestart)) / 1000) . "\n";
-  };
-  
-  if ($@) ## if there was an error in taking the screenshot, $@ will have content
-  {
-      print "Selenium full page grab failed.\n";
-      print "ERROR:$@";
-  }
-  else
-  {
-     require MIME::Base64;
-     open( my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" );
-     binmode $FH; ## set binary mode
-     print $FH MIME::Base64::decode_base64($png_base64);
-     close $FH;
-  }
-}
-
-$endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-$screenshotlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
-
-if ($selresp =~ /^ERROR/) { ## Selenium returned an error
-   $selresp =~ s!^!HTTP/1.1 500 Selenium returned an error\n\n!; ## pretend this is an HTTP response - 100 means continue
-}
-else { 
-   $selresp =~ s!^!HTTP/1.1 100 OK\n\n!; ## pretend this is an HTTP response - 100 means continue
-}    
-$response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
-#print $response->as_string; print "\n\n";
+          #$request = new HTTP::Request('GET',"$case{command}");
+          $combinedresp =~ s!$!<$_>$command</$_>\n$selresp\n\n\n!; ## include it in the response
+       }
+    }
     
+    $endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+
+
+    $starttimer = time(); ## measure latency for the verification
+    
+    $selresp = $combinedresp;
+
+    sleep( 0.02 ); ## Sleep for 20 milliseconds
+
+    ## multiple verifytexts are separated by commas
+    if ($case{verifytext}) {
+      @parseverify = split(/,/, $case{verifytext});
+      foreach (@parseverify) {
+         print "$_\n";
+         $idx = 0;
+         $verifytext = $_;
+         if ($verifytext eq "get_body_text") {
+            print "GET_BODY_TEXT:$verifytext\n";
+            eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
+         }
+         else
+         {
+            eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
+         }
+         $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
+         foreach my $vresp (@verfresp) {
+            $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
+            $idx++; ## keep track of where we are in the loop
+            $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
+            if (($vresp =~ m!(^|=)HASH\b!) || ($vresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
+               my $dumpresp = Dumper($vresp);
+               my $dumped = "dumped";
+               $selresp =~ s!$!<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n!; ## include it in the response
+               ## ^ means match start of string, $ end of string
+            }
+         }
+      }
+    }
+
+    $endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+
+    $starttimer = time(); ## measure latency for the screenshot
+    
+    if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
+    {
+      ## take a very fast screenshot - visible window only, only works for interactive sessions
+      if ($chromehandle gt 0) {
+         my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
+         #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
+         #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
+      }
+    }
+    else ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
+    {
+      eval
+      {  ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
+         #$timestart = time();
+         $png_base64 = $sel->screenshot();
+         #print "TIMER: selenium screenshot took " . (int(1000 * (time() - $timestart)) / 1000) . "\n";
+      };
+      
+      if ($@) ## if there was an error in taking the screenshot, $@ will have content
+      {
+          print "Selenium full page grab failed.\n";
+          print "ERROR:$@";
+      }
+      else
+      {
+         require MIME::Base64;
+         open( my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" );
+         binmode $FH; ## set binary mode
+         print $FH MIME::Base64::decode_base64($png_base64);
+         close $FH;
+      }
+    }
+
+    $endtimer = time(); ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $screenshotlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+
+    if ($selresp =~ /^ERROR/) { ## Selenium returned an error
+       $selresp =~ s!^!HTTP/1.1 500 Selenium returned an error\n\n!; ## pretend this is an HTTP response - 100 means continue
+    }
+    else { 
+       $selresp =~ s!^!HTTP/1.1 100 OK\n\n!; ## pretend this is an HTTP response - 100 means continue
+    }    
+    $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
+    #print $response->as_string; print "\n\n";
+
+    return;
 } ## end sub
 
 sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Locator, Label);
                             ##        custom_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
     
-    my $searchtarget = $_[0];
-    my $locator = $_[1];
-    my $labeltext = $_[2];
+    my ($searchtarget, $locator, $labeltext) = @_;
 
     my $elem1 = $sel->find_element("$searchtarget", "$locator");
     #my $child = $sel->find_child_element($elem1, "./option[\@value='4']")->click();
@@ -981,10 +1000,8 @@ sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Loca
 
 sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Target, Locator, Keys);
                                  ##        custom_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
-    
-    my $searchtarget = $_[0];
-    my $locator = $_[1];
-    my $sendkeys = $_[2];
+
+    my ($searchtarget, $locator, $sendkeys) = @_;
 
     my $elem1 = $sel->find_element("$searchtarget", "$locator")->clear();
     my $resp1 = $sel->find_element("$searchtarget", "$locator")->send_keys("$sendkeys");
@@ -995,10 +1012,7 @@ sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Tar
 sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
                                     ##        custom_mouse_move_to_location('closeBtn','id','3','4');
     
-    my $searchtarget = $_[0];
-    my $locator = $_[1];
-    my $xoffset = $_[2];
-    my $yoffset = $_[3];
+    my ($searchtarget, $locator, $xoffset, $yoffset) = @_;
 
     my $elem1 = $sel->find_element("$searchtarget", "$locator");
     my $child = $sel->mouse_move_to_location($elem1, $xoffset, $yoffset);
@@ -1009,7 +1023,8 @@ sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Sear
 sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
                               ##        custom_switch_to_window(0);
                               ##        custom_switch_to_window(1);
-    my $windownumber = $_[0]; 
+
+    my ($windownumber) = @_; 
 
     my $handles = $sel->get_window_handles;
     print Dumper $handles;
@@ -1020,7 +1035,8 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
 
 sub custom_js_click { ## usage: custom_js_click(id);
                       ##        custom_js_click("btnSubmit");
-    my $idToClick = $_[0]; 
+
+    my ($idToClick) = @_; 
 
     my $script = q{
         var arg1 = arguments[0];
@@ -1036,8 +1052,8 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
                            ##        custom_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');
                            ## 
                            ##        Single quotes will not treat \ as escape codes
-    my $idToSetValue = $_[0];
-    my $valueToSet = $_[1];
+
+    my ($idToSetValue, $valueToSet) = @_;
 
     my $script = q{
         var arg1 = arguments[0];
@@ -1052,7 +1068,8 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
 
 sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_field_visible(id);
                                                     ##        custom_js_make_field_visible('cvProvider_filCVUploadFile');
-    my $idToSetCSS = $_[0];
+
+    my ($idToSetCSS) = @_;
 
     my $script = q{
         var arg1 = arguments[0];
@@ -1067,11 +1084,8 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
 
 sub custom_check_element_within_pixels {     ## usage: custom_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
                                              ##        custom_check_element_within_pixels('txtEmail','id',193,325,30);
-    my $searchTarget = $_[0];
-    my $locator = $_[1];
-    my $xBase = $_[2];
-    my $yBase = $_[3];
-    my $pixelThreshold = $_[4];
+
+    my ($searchTarget, $locator, $xBase, $yBase, $pixelThreshold) = @_;
 
     ## get_element_location will return a reference to a hash associative array
     ## http://www.troubleshooters.com/codecorn/littperl/perlscal.htm
@@ -1101,9 +1115,9 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
                                    ##        custom_wait_for_text_present("Job title",10);
                                    ## 
                                    ## waits for text to appear in page source
-    my $searchtext = $_[0];
-    my $timeout = $_[1];
-    
+
+    my ($searchtext, $timeout) = @_;
+
     print STDOUT "SEARCHTEXT:$searchtext\n";
     print STDOUT "TIMEOUT:$timeout\n";
 
@@ -1141,9 +1155,9 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
                                        ##        custom_wait_for_text_not_present("Job title",10);
                                        ## 
                                        ## waits for text to disappear from page source
-    my $searchtext = $_[0];
-    my $timeout = $_[1];
-    
+
+    my ($searchtext, $timeout) = @_;
+
     print STDOUT "DO NOT WANT TEXT:$searchtext\n";
     print STDOUT "TIMEOUT:$timeout\n";
 
@@ -1161,14 +1175,13 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
             }
         }
     }
+    
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
     
     my $returnmsg;
     if ($foundit eq "true") {
         $returnmsg = "TIMEOUT: Text was *still* in page source after $trytime seconds";        
-    }
-    else
-    {
+    } else {
         $returnmsg = "SUCCESS: Did not find sought text in page source after $trytime seconds"; 
     }
   
@@ -1179,11 +1192,9 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
                                    ##         custom_wait_for_text_visible("Job title", "body", "tag_name", 10);
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
-    my $searchtext = $_[0];
-    my $target = $_[1];
-    my $locator = $_[2];
-    my $timeout = $_[3];
-    
+
+    my ($searchtext, $target, $locator, $timeout) = @_;
+
     print STDOUT "VISIBLE SEARCH TEXT:$searchtext\n";
     print STDOUT "TIMEOUT:$timeout\n";
 
@@ -1203,6 +1214,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
             sleep( 0.5 ); ## sleep for 0.5 seconds
         }
     }
+
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
     
     my $returnmsg;
@@ -1221,9 +1233,9 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
                                        ##        custom_wait_for_text_not_visible("This job has been emailed to",10);
                                        ## 
                                        ## waits for text to be not visible in the body text - e.g. closing a JavaScript popup
-    my $searchtext = $_[0];
-    my $timeout = $_[1];
-    
+
+    my ($searchtext, $timeout) = @_;
+
     print STDOUT "NOT VISIBLE SEARCH TEXT:$searchtext\n";
     print STDOUT "TIMEOUT:$timeout\n";
 
@@ -1243,6 +1255,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
             sleep( 0.1 ); ## sleep for 0.1 seconds
         }
     }
+    
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
     
     my $returnmsg;
@@ -1259,10 +1272,9 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
 
 sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present('element-name','element-type','Timeout');
                                       ##        custom_wait_for_element_present('menu-search-icon','id','5');
-    my $elementName = $_[0];
-    my $elementType = $_[1];
-    my $timeout = $_[2];
-    
+
+    my ($elementName, $elementType, $timeout) = @_;
+
     print STDOUT "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
 
     my $timestart = time();
@@ -1281,6 +1293,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
             sleep( 0.1 ); ## Sleep for 0.1 seconds
         }
     }
+
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
     
     my $returnmsg;
@@ -1298,10 +1311,9 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
 
 sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible('element-name','element-type','Timeout');
                                       ##        custom_wait_for_element_visible('menu-search-icon','id','5');
-    my $elementName = $_[0];
-    my $elementType = $_[1];
-    my $timeout = $_[2];
-    
+
+    my ($elementName, $elementType, $timeout) = @_;
+
     print STDOUT "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
 
     my $timestart = time();
@@ -1351,6 +1363,8 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
         }
         undef $cookies;
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -1362,6 +1376,8 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
         getassets ($match,$delim,$delim,$case{gethrefs});
         #getassets ("href",$case{gethrefs});
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -1373,6 +1389,8 @@ sub getsrcs { ## get page src assets matching a list of ending patterns, separat
         getassets ($match, $delim, $delim, $case{getsrcs});
         #getassets ("src",$case{getsrcs});
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -1384,6 +1402,8 @@ sub getbackgroundimages { ## style="background-image: url( )"
         my $rightdelim = '\)';
         getassets ($match,$leftdelim,$rightdelim,$case{getbackgroundimages});
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -1443,7 +1463,8 @@ sub getassets { ## get page assets matching a list for a reference type
         } ## end while
         
     } ## end foreach
-
+    
+    return;
 }
 
 
@@ -1538,6 +1559,7 @@ sub savepage {## save the page in a cache to enable auto substitution
       
    }
    
+   return;
 }
 
 #------------------------------------------------------------------
@@ -1813,7 +1835,9 @@ sub httpget {  #send http request and read response
     
     savepage (); ## save page in the cache for the auto substitutions
     
+    return;
 }
+
 #------------------------------------------------------------------
 sub httppost {  #post request based on specified encoding
         
@@ -1829,8 +1853,10 @@ sub httppost {  #post request based on specified encoding
     }
 
     savepage (); ## for auto substitutions
-
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or application/json HTTP request and read response
 
@@ -1865,8 +1891,10 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
-
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub httppost_xml{  #send text/xml HTTP request and read response 
     
@@ -1953,8 +1981,10 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
-
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub httppost_form_data {  #send multipart/form-data HTTP request and read response
     
@@ -1988,7 +2018,9 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
     
+    return;
 }
+
 #------------------------------------------------------------------
 sub cmd {  ## send terminal command and read response
 
@@ -2009,7 +2041,9 @@ sub cmd {  ## send terminal command and read response
     $combinedresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse($combinedresp); ## pretend the response is a http response - inject it into the object
     $endtimer = time();
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths 
+    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -2028,6 +2062,8 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
         }
     }
     $response = HTTP::Response->parse($combinedresp); ## put the test response along with the command on error response back in the response
+    
+    return;
 }
 
 
@@ -2080,7 +2116,8 @@ sub searchimage {  ## search for images in the actual result
        $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-unmarked.png`);
        $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png`);
     }
-
+    
+    return;
 } ## end sub
             
 
@@ -2435,8 +2472,11 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     
     if (($case{commandonerror}) && ($isfailure > 0)) { ## if the test case failed, check if we want to run a command to help sort out any problems
         commandonerror();
-    }        
+    }
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub parseresponse {  #parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
         
@@ -2481,8 +2521,10 @@ sub parseresponse {  #parse values from responses for use in future request (for
             #print "\n\nParsed String: $parsedresult{$_}\n\n";
         }
     }
-        
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets 
@@ -2642,7 +2684,10 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if ($configexists) {  
         $userconfig = XMLin("$dirname"."$opt_configfile");
     }
+
+    return;
 }
+
 #------------------------------------------------------------------
 sub convtestcases {  
     #here we do some pre-processing of the test case file and write it out to a temp file.
@@ -2673,7 +2718,10 @@ sub convtestcases {
     open( my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' ) or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
     print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
     close( $CONVERTEDXML );
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub fixsinglecase{ #xml parser creates a hash in a different format if there is only a single testcase.
                    #add a dummy testcase to fix this situation
@@ -2694,7 +2742,10 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
         print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
         close( $CONVERTEDXML );
     }
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub convertbackxml() {  #converts replaced xml with substitutions
 
@@ -2767,8 +2818,10 @@ sub convertbackxml() {  #converts replaced xml with substitutions
         $KEY = uc $key; ## convert to uppercase
         $_[0] =~ s~{$KEY}~$value~g;
     }
-
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub convertbackxmldynamic() {## some values need to be updated after each retry
 
@@ -2793,8 +2846,10 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 
     my $underscore = "_";
     $_[0] =~ s~{NOW}~$day\/$month\/$year$underscore$hour:$minute:$second~g;
-   
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
@@ -2802,14 +2857,20 @@ sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
             $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
         }
     }
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
     foreach my $testAttrib ( sort keys %{varvar} ) {
        my $subVAR = substr($testAttrib, 3);
        $_[0] =~ s~{$subVAR}~$varvar{$testAttrib}~g;
     }
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub url_escape {  #escapes difficult characters with %hexvalue
     #LWP handles url encoding already, but use this to escape valid chars that LWP won't convert (like +)
@@ -2890,12 +2951,17 @@ sub httplog {  #write requests and responses to http.log file
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
         print $HTTPLOGFILE "</logastext> \n";
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
 sub flush { ##immediately flush given file handle to disk
    my $h = select($_[0]); my $af=$|; $|=1; $|=$af; select($h);
+   
+   return;
 }
+
 #------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
         
@@ -2912,14 +2978,18 @@ sub finaltasks {  #do ending tasks
     close( $RESULTS );
     close( $RESULTSXML );
     
+    return;
 }
+
 #------------------------------------------------------------------
 sub whackoldfiles {  #delete any files leftover from previous run if they exist
 
     ## delete tmp files in the output folder
     if (glob("$outputfolder"."*.xml.*.tmp")) { unlink glob("$output"."*.xml.*.tmp"); }
-
+    
+    return;
 }
+
 #------------------------------------------------------------------
 sub startseleniumbrowser {     ## start Selenium Remote Control browser if applicable
     if ($opt_port) ## if -p is used, we need to start up a selenium server
@@ -3044,6 +3114,8 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         #$sel->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
         $sel->set_window_size(968, 1260); ## y,x
     }
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -3060,7 +3132,9 @@ sub startsession {     ## creates the webinject user agent
     {
        $useragent->ssl_opts(verify_hostname=>0); ## stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
        $useragent->ssl_opts(SSL_verify_mode=>SSL_VERIFY_NONE); ## from Perl 5.16.3 need this to prevent ugly warnings
-    };    
+    };
+    
+    return;
 }
 
 #------------------------------------------------------------------
@@ -3072,6 +3146,8 @@ sub getdirname {  #get the directory webinject engine is running from
     if ($dirname eq $0) { 
         $dirname = './'; 
     }
+    
+    return;
 }    
 #------------------------------------------------------------------
 sub getoptions {  #shell options
@@ -3114,15 +3190,17 @@ sub getoptions {  #shell options
     }
     $outputfolder = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
 
-
+    return;
 }
 
 sub print_version {
     print "\nWebInject version $version\nFor more info: https://github.com/Qarj/WebInject\n\n";
+    
+    return;
 }
 
 sub print_usage {
-        print <<EOB
+        print <<'EOB'
 Usage: webinject.pl <<options>>
 
 -c|--config config_file                             -c config.xml
@@ -3141,6 +3219,8 @@ or
 webinject.pl --version|-v
 webinject.pl --help|-h
 EOB
-    }
-
+    ;
+ 
+    return;
+}
 #------------------------------------------------------------------
