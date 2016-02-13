@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.80 - Feb 13, 2016
+* more code tidy up - addressed almost all sev 4 issues
+
 ### Version 1.79 - Feb 12, 2016
 * code tidy up - resolved more than 40 sev 4 perl critic issues
 

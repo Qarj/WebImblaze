@@ -36,6 +36,7 @@ use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = "false";
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+use IO::Handle;
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses) 
 use Data::Dumper;  #uncomment to dump hashes for debugging
 use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintable parameter and parseresponse dequote feature
@@ -492,7 +493,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         print $RESULTSXML qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
                     }
 
-                    flush(\*$RESULTS); ## flush results html to disk so it is possible to view intermediate progress
+                    $RESULTS->autoflush();
                     
                     if ($entrycriteriaOK) { ## do not run it if the case has not met entry criteria
                        if ($case{method}) {
@@ -871,7 +872,7 @@ sub selenium {  ## send Selenium command and read response
        if ($case{$_}) {#perform command
           $command = $case{$_};
           $selresp = '';
-          my $evalresp = eval { eval "$command"; };
+          my $evalresp = eval { eval "$command"; }; ## no critic
           print "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
@@ -1990,7 +1991,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $substituted_postbody = autosub("$case{postbody}", "multipost", "$case{url}");
     
     my %myContent_;
-    eval "\%myContent_ = $substituted_postbody";
+    eval "\%myContent_ = $substituted_postbody";  ## no critic
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
                Content => \%myContent_;
@@ -2580,7 +2581,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         foreach (@configfile) {
                 
             if (/<testcasefile>/) {   
-                $firstparse = $';  #print "$' \n\n"; ## " doublequote for UltraEdit display fix
+                $firstparse = $';  #print "$' \n\n"; ## " doublequote for text editor display fix
                 $firstparse =~ m~</testcasefile>~;
                 $filename = $`;  #string between tags will be in $filename
                 #print "\n$filename \n\n";
@@ -2740,7 +2741,9 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
 }
 
 #------------------------------------------------------------------
+## no critic (RequireArgUnpacking)
 sub convertbackxml() {  #converts replaced xml with substitutions
+
 
 ## length feature for returning the size of the response
     my $mylength;
@@ -2844,21 +2847,22 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 }
 
 #------------------------------------------------------------------
-sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
-    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-       if ( substr($testAttrib, 0, 3) eq "var" ) {
-            $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
-        }
+sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
+    foreach my $testAttrib ( sort keys %{varvar} ) {
+       my $subVAR = substr($testAttrib, 3);
+       $_[0] =~ s~{$subVAR}~$varvar{$testAttrib}~g;
     }
     
     return;
 }
 
+## use critic
 #------------------------------------------------------------------
-sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
-    foreach my $testAttrib ( sort keys %{varvar} ) {
-       my $subVAR = substr($testAttrib, 3);
-       $_[0] =~ s~{$subVAR}~$varvar{$testAttrib}~g;
+sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
+    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+       if ( substr($testAttrib, 0, 3) eq "var" ) {
+            $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
+        }
     }
     
     return;
@@ -2871,7 +2875,7 @@ sub url_escape {  #escapes difficult characters with %hexvalue
     my @a = @_;  #make a copy of the arguments
 
 ## escape change - changed the mapping around so / would be escaped        
-    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  #(1.42 version of escape) - needed to change it to prevent problems with __VIEWSTATE #'
+    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## no critic ## changed escape to prevent problems with __VIEWSTATE #'
 #   map { s¦[-,^+!~()\\/' ]¦sprintf "%%%02x", ord $&¦eg } @a; #(1.41 version of escape)
     return wantarray ? @a : $a[0];
 }
@@ -2949,13 +2953,6 @@ sub httplog {  #write requests and responses to http.log file
 }
 
 #------------------------------------------------------------------
-sub flush { ##immediately flush given file handle to disk
-   my $h = select($_[0]); my $af=$|; $|=1; $|=$af; select($h);
-   
-   return;
-}
-
-#------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
         
     writefinalhtml();  #write summary and closing tags for results file
@@ -2993,17 +2990,10 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         }
         print STDOUT "\nStarting Selenium Remote Control server on port $opt_port \n";         
 
-        #        $sel = WWW::Selenium->new( host => "localhost", 
-        #                                   port => $opt_port, 
-        #                                   browser => "*firefox", 
-        #                                   browser_url => "http://www.mywebsite.com",
-        #                                  );
-
         ## connecting to the Selenium server is done in a retry loop in case of slow startup
         ## see http://www.perlmonks.org/?node_id=355817
         my $max = 30;
         my $try = 0;
-
 
         ## --load-extension Loads an extension from the specified directory
         ## --whitelisted-extension-id
@@ -3013,50 +3003,49 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         {
             eval
             {
-#                                                   'proxy' => {'proxyType' => 'direct',},
-#    my $driver = Selenium::Remote::Driver->new     ('proxy' => {'proxyType' => 'manual', 'httpProxy' => 'myproxy.com:1234'});
-#                                                   'proxy' => {'proxyType' => 'manual', 'httpProxy' => 'localhost:$opt_proxy'},
-#                                                   'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
-#                                                   'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
-#                                                   'extra_capabilities' => {'chromeOptions' => {'args' => ['incognito','window-size=1260,960']}}
 
-#                                                    'extra_capabilities'
-#                                                       => {'chromeOptions' => {'args'  =>         ['window-size=1260,960','incognito'],
-#                                                                               'prefs' => {'session' => {'restore_on_startup' =>4, 'urls_to_restore_on_startup' => ['http://www.google.com/ig','http://www.totaljobs.com']},
-#                                                                                           'first_run_tabs' => ['http://www.mywebsite.com','http://www.google.de']
-#                                                                                          }
-#                                                                              }
-#                                                          }
-
-## Phantomjs
+                ## Phantomjs
                 if ($opt_driver eq "phantomjs") {
-                    $sel = new Selenium::Remote::Driver ('remote_server_addr' => 'localhost',
+                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port, 
                                                         'browser_name' => 'phantomjs',
                                                         );       
                 }
 
-## Firefox
+                ## Firefox
                 if ($opt_driver eq "firefox") {
                     print STDOUT qq|opt_proxy $opt_proxy\n|;
-                    $sel = new Selenium::Remote::Driver ('remote_server_addr' => 'localhost',
+                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port, 
                                                         'browser_name' => 'firefox',
                                                         'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                         );       
                  }
 
-## Chrome
+                ## Chrome
                 if ($opt_driver eq "chrome") {
                     print STDOUT qq|opt_proxy $opt_proxy\n|;
-                    $sel = new Selenium::Remote::Driver ('remote_server_addr' => 'localhost',
+                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port, 
                                                         'browser_name' => 'chrome',
                                                         'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                         'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
                                                         );       
                  }
-            };
+
+                                                       #'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
+                                                       #'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
+                                                       #'extra_capabilities' => {'chromeOptions' => {'args' => ['incognito','window-size=1260,960']}}
+
+                                                       #'extra_capabilities'
+                                                       #   => {'chromeOptions' => {'args'  =>         ['window-size=1260,960','incognito'],
+                                                       #                           'prefs' => {'session' => {'restore_on_startup' =>4, 'urls_to_restore_on_startup' => ['http://www.google.com','http://www.example.com']},
+                                                       #                                       'first_run_tabs' => ['http://www.mywebsite.com','http://www.google.de']
+                                                       #                                      }
+                                                       #                          }
+                                                       #      }
+
+            }; ## end eval
             
             if ( $@ and $try++ < $max )
             {
@@ -3064,25 +3053,13 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                 sleep( 4 ); ## sleep for 4 seconds, Selenium Server may still be starting up
                 redo ATTEMPT;
             }
-        }
+        } ## end ATTEMPT
+        
         if ($@) 
             {
                 print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
                 die "WebInject Aborted - could not connect to Selenium Server\n";
             }
-        
-        #    my $driver = new Selenium::Remote::Driver('remote_server_addr' => '10.10.1.1',
-        #                                              'port' => '2222',
-        #                                              auto_close => 0
-        #                                              );
-        #    or
-        #    my $driver = new Selenium::Remote::Driver('browser_name'       => 'chrome',
-        #                                              'platform'           => 'VISTA',
-        #                                              'extra_capabilities' => {'chrome.switches' => ["--user-data-dir=$ENV{LOCALAPPDATA}\\Google\\Chrome\\User Data"],},
-        #                                              );
-
-        #$sel->start; ## start up selenium browser session
-        #$sel->get("http://localhost"); ## the shut down Selenium Server command will cause a crash if a web page isn't open
         
         ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
         my $thetime = time();
@@ -3217,3 +3194,7 @@ EOB
     return;
 }
 #------------------------------------------------------------------
+
+## References
+##
+## http://www.kichwa.com/quik_ref/spec_variables.html
