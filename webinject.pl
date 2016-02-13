@@ -19,7 +19,7 @@ use warnings;
 #    GNU General Public License for more details.
 
 
-our $version="1.79";
+our $version="1.80";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -866,7 +866,7 @@ sub selenium {  ## send Selenium command and read response
     $starttimer = time();
 
     my $combinedresp='';
-    $request = new HTTP::Request('GET',"WebDriver");
+    $request = HTTP::Request->new('GET',"WebDriver");
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
        if ($case{$_}) {#perform command
           $command = $case{$_};
@@ -1409,11 +1409,9 @@ sub getbackgroundimages { ## style="background-image: url( )"
 #------------------------------------------------------------------
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ("href",".less|.css")
-    my $match = $_[0];
-    my $leftdelim = $_[1];            
-    my $rightdelim = $_[2];            
-    my $assetlist = $_[3];
-    
+
+    my ($match, $leftdelim, $rightdelim, $assetlist) = @_;
+
     my ($startassetrequest, $endassetrequest, $assetlatency);
     my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse, $cachecontrol);
     
@@ -1432,14 +1430,14 @@ sub getassets { ## get page assets matching a list for a reference type
             $assetref = $1;
             #print "$extension: $assetref\n";
             
-            $ururl = new URI::URL $assetref, $case{url}; ## join the current page url together with the href of the asset
+            $ururl = URI::URL->new($assetref, $case{url}); ## join the current page url together with the href of the asset
             $asseturl = $ururl->abs; ## determine the absolute address of the asset
             #print "$asseturl\n\n";
             $path = $asseturl->path; ## get the path portion of the asset location
             $filename = basename($path); ## get the filename from the path
             print STDOUT "  GET Asset [$filename] ...";
             
-            $assetrequest = new HTTP::Request('GET',"$asseturl");
+            $assetrequest = HTTP::Request->new('GET',"$asseturl");
             $cookie_jar->add_cookie_header($assetrequest); ## session cookies will be needed
 
             $assetresponse = $useragent->request($assetrequest);
@@ -1572,9 +1570,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 ## Example: postbody="txtUsername{NAME}=testuser&txtPassword=123&__VIEWSTATE=456"
 ##          In this example, the actual user name field may have been txtUsername_xpos5_ypos8_33926509
 ##
-    my $postbody = $_[0];  ## postbody is first arg
-    my $posttype = $_[1];  ## posttype is second
-    my $posturl =  $_[2];  ## posturl is the third
+
+    my ($postbody, $posttype, $posturl) = @_;
+
     my @postfields;
     my $fieldname;
     my $len=0;
@@ -1807,7 +1805,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 #------------------------------------------------------------------
 sub httpget {  #send http request and read response
         
-    $request = new HTTP::Request('GET',"$case{url}");
+    $request = HTTP::Request->new('GET',"$case{url}");
 
     #1.42 Moved cookie management up above addheader as per httppost_form_data
     $cookie_jar->add_cookie_header($request);
@@ -1863,7 +1861,7 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     my $substituted_postbody; ## auto substitution
     $substituted_postbody = autosub("$case{postbody}", "normalpost", "$case{url}");
         
-    $request = new HTTP::Request('POST',"$case{url}");
+    $request = HTTP::Request->new('POST',"$case{url}");
     $request->content_type("$case{posttype}");
     #$request->content("$case{postbody}");
     $request->content("$substituted_postbody");
@@ -1956,7 +1954,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     }
         
-    $request = new HTTP::Request('POST', "$case{url}"); 
+    $request = HTTP::Request->new('POST', "$case{url}"); 
     $request->content_type("$case{posttype}");
     $request->content(join(" ", @xmlbody));  #load the contents of the file into the request body 
 
@@ -2025,7 +2023,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
 sub cmd {  ## send terminal command and read response
 
     my $combinedresp='';
-    $request = new HTTP::Request('GET',"CMD");
+    $request = HTTP::Request->new('GET',"CMD");
     $starttimer = time();
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
@@ -2530,32 +2528,35 @@ sub processcasefile {  #get test case files to run (from command line or config 
                        #parse config file and grab values it sets 
         
     my @configfile;
-    my $configexists = 0;
     my $comment_mode;
     my $firstparse;
     my $filename;
     my $xpath;
     my $setuseragent;
     my $CONFIG;
+    my $configfilepath;
         
     undef @casefilelist; #empty the array of test case filenames
     undef @configfile;
         
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
-        open( $CONFIG, '<', "$dirname"."$opt_configfile" ) or die "\nERROR: Failed to open $opt_configfile file\n\n";
-        $configexists = 1;  #flag we are going to use a config file
+        $configfilepath = "$dirname"."$opt_configfile";
     }
     elsif (-e "$dirname"."config.xml") {  #if config.xml exists, read it
-        open( $CONFIG, '<', "$dirname".'config.xml' ) or die "\nERROR: Failed to open config.xml file\n\n";
-        $configexists = 1;  #flag we are going to use a config file
+        $configfilepath = "$dirname".'config.xml';
         $opt_configfile = "config.xml"; ## we have defaulted to config.xml in the current folder
     } 
         
-    if ($configexists) {  #if we have a config file, use it  
-            
+    if (-e "$configfilepath") {  #if we have a config file, use it  
+        
+        ## read the XML config into an array for parsing using regex (WebInject 1.41 method)
+        open( $CONFIG, '<', "$configfilepath" ) or die "\nERROR: Failed to open $configfilepath \n\n";
         my @precomment = <$CONFIG>;  #read the config file into an array
-            
+        close( $CONFIG );
+
+        $userconfig = XMLin("$configfilepath"); ## Parse as XML for the user defined config
+    
         #remove any commented blocks from config file
          foreach (@precomment) {
             unless (m~<comment>.*</comment>~) {  #single line comment 
@@ -2669,8 +2670,6 @@ sub processcasefile {  #get test case files to run (from command line or config 
             
     }  
         
-    close( $CONFIG );
-    
     if (not defined $config{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
         $config{globaljumpbacks} = 20;
     }
@@ -2678,11 +2677,6 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if ($opt_ignoreretry) { ##
         $config{globalretry} = -1;
         $config{globaljumpbacks} = 0;
-    }
-    
-    ## read the user defined arbirtary config
-    if ($configexists) {  
-        $userconfig = XMLin("$dirname"."$opt_configfile");
     }
 
     return;
@@ -2697,6 +2691,7 @@ sub convtestcases {
         
     open( my $XMLTOCONVERT, '<', "$dirname"."$currentcasefile" ) or die "\nError: Failed to open test case file\n\n";  #open file handle   
     @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
+    close( $XMLTOCONVERT );
         
     $casecount = 0;
         
@@ -2712,8 +2707,6 @@ sub convtestcases {
             $casecount++; 
         }    
     }  
-        
-    close( $XMLTOCONVERT );   
 
     open( my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' ) or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file  
     print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
