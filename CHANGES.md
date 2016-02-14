@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.81 - Feb 14, 2016
+* substantial code tidy up
+* recently introduced bug resolved with {TESTFILENAME}
+
 ### Version 1.80 - Feb 13, 2016
 * more code tidy up - addressed almost all sev 4 issues
 

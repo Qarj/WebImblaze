@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.80';
+$VERSION = '1.81';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -226,7 +226,7 @@ sub engine {
 
             $counter = $counter + 1;
             $runcount = 0;
-            $jumpbacksprint = ""; ## we do not indicate a jump back until we actually jump back
+            $jumpbacksprint = ''; ## we do not indicate a jump back until we actually jump back
             $jumpbacks = 0;
 
             my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
@@ -245,7 +245,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                 $isfailure = 0;
                 $retries = 1; ## we increment retries after writing to the log
-                $retriesprint = ""; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+                $retriesprint = ''; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
                 $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
@@ -319,8 +319,8 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                 }
 
-                $entrycriteriaok = "true"; ## assume entry criteria met
-                $entryresponse = "";
+                $entrycriteriaok = 'true'; ## assume entry criteria met
+                $entryresponse = '';
 
                 $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
                 if (defined $case{checkpositive}) { ## is the checkpositive value set for this testcase?
@@ -466,7 +466,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
                     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
                     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                        if ( substr($testAttrib, 0, 14) eq "verifypositive" || substr($testAttrib, 0, 14) eq "verifynegative") {
+                        if ( substr($testAttrib, 0, 14) eq 'verifypositive' || substr($testAttrib, 0, 14) eq 'verifynegative') {
                             my $verifytype = ucfirst substr($testAttrib, 6, 8); ## so we get the word Positive or Negative
                             @verifyparms = split /\|\|\|/, $case{$testAttrib} ; ## index 0 contains the actual string to verify
                             print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
@@ -497,10 +497,10 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
                        if ($case{method}) {
-                           if ($case{method} eq "get") { httpget(); }
-                           elsif ($case{method} eq "post") { httppost(); }
-                           elsif ($case{method} eq "cmd") { cmd(); }
-                           elsif ($case{method} eq "selenium") { selenium(); }
+                           if ($case{method} eq 'get') { httpget(); }
+                           elsif ($case{method} eq 'post') { httppost(); }
+                           elsif ($case{method} eq 'cmd') { cmd(); }
+                           elsif ($case{method} eq 'selenium') { selenium(); }
                            else { print STDERR qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
                        }
                        else {
@@ -535,7 +535,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
 
                     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-                    if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq "true")) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
+                    if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
                         print {$RESULTSXML} qq|            <success>false</success>\n|;
                         if ($case{errormessage}) { #Add defined error message to the output
                             print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
@@ -576,15 +576,15 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                         ## find the index for the test step we are retrying from
                         $stepindex = 0;
-                        my $foundindex = "false";
+                        my $foundindex = 'false';
                         foreach (@teststeps) {
                             if ($teststeps[$stepindex] eq $case{retryfromstep}) {
-                                $foundindex = "true";
+                                $foundindex = 'true';
                                 last;
                             }
                             $stepindex++
                         }
-                        if ($foundindex eq "false") {
+                        if ($foundindex eq 'false') {
                             print {*STDOUT} qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
                         }
                         else
@@ -632,7 +632,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
 
                     #if (($isfailure > 0) && ($retry > 0)) {  ## do not increase the run count if we will retry
-                    if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq "false") ) ) {
+                    if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq 'false') ) ) {
                         ## do not count this in run count if we are retrying, again maximum usage of retryfromstep has been hard coded
                     }
                     else {
@@ -797,10 +797,10 @@ Min Response Time: $minresponse seconds <br />
 sub writefinalxml {  #write summary and closing tags for XML results file
 
     if ($case{sanitycheck} && ($casefailedcount > 0)) { ## sanitycheck
-        $sanityresult = "false";
+        $sanityresult = 'false';
     }
     else {
-        $sanityresult = "true";
+        $sanityresult = 'true';
     }
 
 ## startdatetime - inserted start-seconds and start-date-time below
@@ -867,7 +867,7 @@ sub selenium {  ## send Selenium command and read response
     $starttimer = time;
 
     my $combinedresp='';
-    $request = HTTP::Request->new('GET',"WebDriver");
+    $request = HTTP::Request->new('GET','WebDriver');
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
        if ($case{$_}) {#perform command
           $command = $case{$_};
@@ -911,7 +911,7 @@ sub selenium {  ## send Selenium command and read response
          print "$_\n";
          $idx = 0;
          $verifytext = $_;
-         if ($verifytext eq "get_body_text") {
+         if ($verifytext eq 'get_body_text') {
             print "GET_BODY_TEXT:$verifytext\n";
             eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
          }
@@ -939,7 +939,7 @@ sub selenium {  ## send Selenium command and read response
 
     $starttimer = time; ## measure latency for the screenshot
 
-    if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
+    if ($case{screenshot} && (lc($case{screenshot}) eq 'false' || lc($case{screenshot}) eq 'no')) #lc = lowercase
     {
       ## take a very fast screenshot - visible window only, only works for interactive sessions
       if ($chromehandle > 0) {
@@ -1035,7 +1035,7 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
 }
 
 sub custom_js_click { ## usage: custom_js_click(id);
-                      ##        custom_js_click("btnSubmit");
+                      ##        custom_js_click('btnSubmit');
 
     my ($idToClick) = @_;
 
@@ -1074,8 +1074,8 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
 
     my $script = q{
         var arg1 = arguments[0];
-        window.document.getElementById(arg1).style.width = "5px";
-        var elem = window.document.getElementById(arg1).style.height = "5px";
+        window.document.getElementById(arg1).style.width = '5px';
+        var elem = window.document.getElementById(arg1).style.height = '5px';
         return elem;
     };
     my $resp1 = $sel->execute_script($script,$idToSetCSS);
@@ -1112,8 +1112,8 @@ sub custom_check_element_within_pixels {     ## usage: custom_check_element_with
     return $Message;
 }
 
-sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Search Text",Timeout);
-                                   ##        custom_wait_for_text_present("Job title",10);
+sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Search Text',Timeout);
+                                   ##        custom_wait_for_text_present('Job title',10);
                                    ##
                                    ## waits for text to appear in page source
 
@@ -1124,16 +1124,16 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
 
     my $timestart = time;
     my @resp1;
-    my $foundit = "false";
+    my $foundit = 'false';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
-                $foundit = "true";
+                $foundit = 'true';
             }
         }
-        if ($foundit eq "false")
+        if ($foundit eq 'false')
         {
             sleep 0.1; # Sleep for 0.1 seconds
         }
@@ -1141,7 +1141,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "true") {
+    if ($foundit eq 'true') {
         $returnmsg = "Found sought text in page source after $trytime seconds";
     }
     else
@@ -1152,8 +1152,8 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
     return $returnmsg;
 }
 
-sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_present("Search Text",Timeout);
-                                       ##        custom_wait_for_text_not_present("Job title",10);
+sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_present('Search Text',Timeout);
+                                       ##        custom_wait_for_text_not_present('Job title',10);
                                        ##
                                        ## waits for text to disappear from page source
 
@@ -1164,15 +1164,15 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
 
     my $timestart = time;
     my @resp1;
-    my $foundit = "true";
+    my $foundit = 'true';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'true' ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
                 sleep 0.1; ## sleep for 0.1 seconds
             } else {
-                $foundit = "false";
+                $foundit = 'false';
             }
         }
     }
@@ -1180,7 +1180,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "true") {
+    if ($foundit eq 'true') {
         $returnmsg = "TIMEOUT: Text was *still* in page source after $trytime seconds";
     } else {
         $returnmsg = "SUCCESS: Did not find sought text in page source after $trytime seconds";
@@ -1189,8 +1189,8 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     return $returnmsg;
 }
 
-sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Search Text","target", "locator", Timeout);
-                                   ##         custom_wait_for_text_visible("Job title", "body", "tag_name", 10);
+sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible('Search Text','target', 'locator', Timeout);
+                                   ##         custom_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
@@ -1201,16 +1201,16 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
 
     my $timestart = time;
     my @resp1;
-    my $foundit = "false";
+    my $foundit = 'false';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' ) {
         eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
-                $foundit = "true";
+                $foundit = 'true';
             }
         }
-        if ($foundit eq "false")
+        if ($foundit eq 'false')
         {
             sleep 0.5; ## sleep for 0.5 seconds
         }
@@ -1219,7 +1219,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "true") {
+    if ($foundit eq 'true') {
         $returnmsg = "Found sought text visible after $trytime seconds";
     }
     else
@@ -1230,8 +1230,8 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
     return $returnmsg;
 }
 
-sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visible("Search Text",Timeout);
-                                       ##        custom_wait_for_text_not_visible("This job has been emailed to",10);
+sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visible('Search Text',Timeout);
+                                       ##        custom_wait_for_text_not_visible('This job has been emailed to',10);
                                        ##
                                        ## waits for text to be not visible in the body text - e.g. closing a JavaScript popup
 
@@ -1242,16 +1242,16 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
 
     my $timestart = time;
     my @resp1;
-    my $foundit = "true"; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
+    my $foundit = 'true'; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'true' ) {
         eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
         foreach my $resp (@resp1) {
             if (not ($resp =~ m{$searchtext}si)) {
-                $foundit = "false";
+                $foundit = 'false';
             }
         }
-        if ($foundit eq "true")
+        if ($foundit eq 'true')
         {
             sleep 0.1; ## sleep for 0.1 seconds
         }
@@ -1260,7 +1260,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "false") {
+    if ($foundit eq 'false') {
         $returnmsg = "Sought text is now not visible after $trytime seconds";
     }
     else
@@ -1279,17 +1279,17 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
     print {*STDOUT} "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
 
     my $timestart = time;
-    my $foundit = "false";
+    my $foundit = 'false';
     my $findElement;
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "false" )
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
     {
         eval { $findElement = $sel->find_element("$elementName","$elementType"); };
         if ($findElement)
         {
-            $foundit = "true";
+            $foundit = 'true';
         }
-        if ($foundit eq "false")
+        if ($foundit eq 'false')
         {
             sleep 0.1; ## Sleep for 0.1 seconds
         }
@@ -1298,7 +1298,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "true") {
+    if ($foundit eq 'true') {
         $returnmsg = "Found sought element after $trytime seconds";
     }
     else
@@ -1318,17 +1318,17 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
     print {*STDOUT} "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
 
     my $timestart = time;
-    my $foundit = "false";
+    my $foundit = 'false';
     my $findElement;
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq "false" )
+    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
     {
         eval { $findElement = $sel->find_element("$elementName","$elementType")->is_displayed(); };
         if ($findElement)
         {
-            $foundit = "true";
+            $foundit = 'true';
         }
-        if ($foundit eq "false")
+        if ($foundit eq 'false')
         {
             sleep 0.1; ## Sleep for 0.1 seconds
         }
@@ -1336,7 +1336,7 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
     my $trytime = ( int( (time() - $timestart) *10 ) / 10);
 
     my $returnmsg;
-    if ($foundit eq "true") {
+    if ($foundit eq 'true') {
         $returnmsg = "Found sought element visible after $trytime seconds";
     }
     else
@@ -1445,7 +1445,7 @@ sub getassets { ## get page assets matching a list for a reference type
 
             open my $RESPONSEASFILE, '>', "$outputfolder/$filename"; #open in clobber mode
             binmode $RESPONSEASFILE; ## set binary mode
-            print $RESPONSEASFILE $assetresponse->content, ""; ## content just outputs the content, whereas as_string includes the response header
+            print $RESPONSEASFILE $assetresponse->content, ''; ## content just outputs the content, whereas as_string includes the response header
             close $RESPONSEASFILE;
 
             $endassetrequest = time;
@@ -1602,7 +1602,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
 
     ## separate the fields
-    if ($posttype eq "normalpost") {
+    if ($posttype eq 'normalpost') {
        @postfields = split /\&/, $postbody ; ## & is separator
     } else {
        ## assumes that double quotes on the outside, internally single qoutes
@@ -1717,7 +1717,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           ## did we take out the .x or .y? we need to put it back
           if ($dotx eq 'true') {
-             if ($posttype eq "normalpost") {
+             if ($posttype eq 'normalpost') {
                 $postfields[$idx] =~ s{\=}{\.x\=};
              } else {
                 $postfields[$idx] =~ s{\'[ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space
@@ -1727,7 +1727,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           ## did we take out the .x or .y? we need to put it back
           if ($doty eq 'true') {
-             if ($posttype eq "normalpost") {
+             if ($posttype eq 'normalpost') {
                 $postfields[$idx] =~ s{\=}{\.y\=};
              } else {
                 $postfields[$idx] =~ s{\'[ ]?\=}{\.y\' \=};
@@ -1738,7 +1738,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           $fieldid=0;
           $fieldfoundflag = 'false';
 
-          if ($posttype eq "normalpost") {
+          if ($posttype eq 'normalpost') {
              if ($postfields[$idx] =~ m/(.{0,70}?)\=\{DATA\}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
@@ -1746,7 +1746,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
              }
           }
 
-          if ($posttype eq "multipost") {
+          if ($posttype eq 'multipost') {
              if ($postfields[$idx] =~ m/\'(.{0,70}?)\'.{0,70}?{DATA\}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
@@ -1782,7 +1782,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
 
     ## done all the substitutions, now put it all together again
-    if ($posttype eq "normalpost") {
+    if ($posttype eq 'normalpost') {
        $postbody = join "&", @postfields;
     } else {
        ## assumes that double quotes on the outside, internally single qoutes
@@ -1860,7 +1860,7 @@ sub httppost {  #post request based on specified encoding
 sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or application/json HTTP request and read response
 
     my $substituted_postbody; ## auto substitution
-    $substituted_postbody = autosub("$case{postbody}", "normalpost", "$case{url}");
+    $substituted_postbody = autosub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new('POST',"$case{url}");
     $request->content_type("$case{posttype}");
@@ -1956,7 +1956,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     $request = HTTP::Request->new('POST', "$case{url}");
     $request->content_type("$case{posttype}");
-    $request->content(join " ", @xmlbody);  #load the contents of the file into the request body
+    $request->content(join ' ', @xmlbody);  #load the contents of the file into the request body
 
 ## moved cookie management up above addheader as per httppost_form_data
     $cookie_jar->add_cookie_header($request);
@@ -1987,7 +1987,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 sub httppost_form_data {  #send multipart/form-data HTTP request and read response
 
     my $substituted_postbody; ## auto substitution
-    $substituted_postbody = autosub("$case{postbody}", "multipost", "$case{url}");
+    $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
     my %myContent_;
     eval "\%myContent_ = $substituted_postbody";  ## no critic
@@ -2023,7 +2023,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
 sub cmd {  ## send terminal command and read response
 
     my $combinedresp='';
-    $request = HTTP::Request->new('GET',"CMD");
+    $request = HTTP::Request->new('GET','CMD');
     $starttimer = time;
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
@@ -2068,15 +2068,15 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 #------------------------------------------------------------------
 sub searchimage {  ## search for images in the actual result
 
-    my $unmarked = "true";
+    my $unmarked = 'true';
     my $imagecopy;
 
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
             if (-e "$cwd$opt_basefolder$case{$_}") { ## imageinimage bigimage smallimage markimage
-                if ($unmarked eq "true") {
+                if ($unmarked eq 'true') {
                    $imagecopy = (`copy $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
-                   $unmarked = "false";
+                   $unmarked = 'false';
                 }
                 my $siresp = (`imageinimage.py $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png "$cwd$opt_basefolder$case{$_}" $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
                 $siresp =~ m/primary confidence (\d+)/s;
@@ -2109,7 +2109,7 @@ sub searchimage {  ## search for images in the actual result
         } ## end first if
     } ## end for
 
-    if ($unmarked eq "false") {
+    if ($unmarked eq 'false') {
        #keep an unmarked image, make the marked the actual result
        $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-unmarked.png`);
        $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png`);
@@ -2126,13 +2126,13 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     my $count; ##
     my $tempstring; ##
     my $assertionskips = 0;
-    my $assertionskipsmessage = ""; ## support tagging an assertion as disabled with a message
+    my $assertionskipsmessage = ''; ## support tagging an assertion as disabled with a message
 
     ## auto assertions
     if ($entrycriteriaok && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
         foreach my $configAttrib ( sort keys %{ $userconfig->{autoassertions} } ) {
-            if ( substr ($configAttrib, 0, 13) eq "autoassertion" ) {
+            if ( substr ($configAttrib, 0, 13) eq 'autoassertion' ) {
                 $verifynum = $configAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
@@ -2141,7 +2141,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print {$RESULTS} qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
-                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
+                    $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
                 }
                 else {
                     #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
@@ -2176,7 +2176,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## smart assertions
     if ($entrycriteriaok && !$case{ignoresmartassertions}) {
         foreach my $configAttrib ( sort keys %{ $userconfig->{smartassertions} } ) {
-            if ( substr($configAttrib, 0, 14) eq "smartassertion" ) {
+            if ( substr($configAttrib, 0, 14) eq 'smartassertion' ) {
                 $verifynum = $configAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
@@ -2185,7 +2185,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print {$RESULTS} qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
                     print {*STDOUT} "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
-                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
+                    $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
                 }
                 else {
                     #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
@@ -2204,7 +2204,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                                print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
                                print {$RESULTSXML} qq|            <$configAttrib-message>$verifyparms[2]</$configAttrib-message>\n|;
                             }
-                            print {*STDOUT} "Failed Smart Assertion";
+                            print {*STDOUT} 'Failed Smart Assertion';
                             if ($verifyparms[2]) {
                                print {*STDOUT} ": $verifyparms[2]";
                             }
@@ -2223,7 +2223,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaok) {
         ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 14) eq "verifypositive" ) {
+            if ( substr($testAttrib, 0, 14) eq 'verifypositive' ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
@@ -2232,7 +2232,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print {$RESULTS} qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
-                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
+                    $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
                 }
                 else {
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
@@ -2269,7 +2269,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaok) {
         ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 14) eq "verifynegative" ) {
+            if ( substr($testAttrib, 0, 14) eq 'verifynegative' ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 #print {*STDOUT} "$testAttrib\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
@@ -2279,7 +2279,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print {$RESULTS} qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
                     $assertionskips++;
-                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
+                    $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
                 }
                 else {
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
@@ -2299,7 +2299,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                         $isfailure++;
                         if ($retry > 0) { print {*STDOUT} "==> Won't retry - a verifynegative failed \n"; }
                         $retry=0; ## we won't retry if any of the verifynegatives fail
-                        $verifynegativefailed = "true";
+                        $verifynegativefailed = 'true';
                     }
                     else {
                         print {$RESULTS} qq|<span class="pass">Passed Negative Verification</span><br />\n|;
@@ -2317,7 +2317,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## assert count
     if ($entrycriteriaok) {
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
+            if ( substr($testAttrib, 0, 11) eq 'assertcount' ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 #print {*STDOUT} "$testAttrib\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
@@ -2332,7 +2332,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     print {$RESULTS} qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
                     print {*STDOUT} "Skipped Assertion Count - $verifycountparms[2] \n";
                     $assertionskips++;
-                    $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
+                    $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
                 }
                 else {
                     if ($count == $verifycountparms[1]) {
@@ -2388,14 +2388,14 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
 
     if ($entrycriteriaok) {
-        $forcedretry="false";
+        $forcedretry='false';
         if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
             if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
                 print {$RESULTS} qq|<span class="pass">Will retry on response code </span><br />\n|;
                 print {$RESULTSXML} qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
                 print {$RESULTSXML} qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
                 print {*STDOUT} qq|Found Retry HTTP Response Code \n|;
-                $forcedretry="true"; ## force a retry even though we received a potential error code
+                $forcedretry='true'; ## force a retry even though we received a potential error code
             }
         }
     }
@@ -2452,7 +2452,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 print {$RESULTSXML} qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
                 print {*STDOUT} "Failed - No Response \n"; #($1$2) is HTTP response code
             }
-            if ($forcedretry eq "false") {
+            if ($forcedretry eq 'false') {
                 $failedcount++;
                 $retryfailedcount++;
                 $isfailure++;
@@ -2483,7 +2483,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
 
-        if ( substr($testAttrib, 0, 13) eq "parseresponse" ) {
+        if ( substr($testAttrib, 0, 13) eq 'parseresponse' ) {
 
             @parseargs = split /\|/, $case{$testAttrib} ;
 
@@ -2545,7 +2545,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
     elsif (-e "$dirname"."config.xml") {  #if config.xml exists, read it
         $configfilepath = "$dirname".'config.xml';
-        $opt_configfile = "config.xml"; ## we have defaulted to config.xml in the current folder
+        $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
 
     if (-e "$configfilepath") {  #if we have a config file, use it
@@ -2591,7 +2591,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         unless ($casefilelist[0]) {
             if (-e "$dirname".'testcases.xml') {
                 #not appending a $dirname here since we append one when we open the file
-                push @casefilelist, "testcases.xml";  #if no files are specified in config.xml, default to testcases.xml
+                push @casefilelist, 'testcases.xml';  #if no files are specified in config.xml, default to testcases.xml
             }
             else {
                 die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename " .
@@ -2781,7 +2781,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s/{SS}/$SECOND/g;
     $_[0] =~ s/{WEEKOFMONTH}/$WEEKOFMONTH/g;
     $_[0] =~ s/{DATETIME}/$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND/g;
-    my $underscore = "_";
+    my $underscore = '_';
     $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$underscore$HOUR:$MINUTE:$SECOND}g;
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
@@ -2839,7 +2839,7 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
     $minute = sprintf "%02d", $minute;
     $second = sprintf "%02d", $second;
 
-    my $underscore = "_";
+    my $underscore = '_';
     $_[0] =~ s{{NOW}}{$day\/$month\/$year$underscore$hour:$minute:$second}g;
 
     return;
@@ -2859,7 +2859,7 @@ sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
 #------------------------------------------------------------------
 sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-       if ( substr($testAttrib, 0, 3) eq "var" ) {
+       if ( substr($testAttrib, 0, 3) eq 'var' ) {
             $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
         }
     }
@@ -2932,10 +2932,10 @@ sub httplog {  #write requests and responses to http.log file
     }
 
     if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
-        my $responsefoldername = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+        my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
         open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}";  #open in clobber mode
         binmode $RESPONSEASFILE; ## set binary mode
-        print $RESPONSEASFILE $response->content, ""; #content just outputs the content, whereas as_string includes the response header
+        print $RESPONSEASFILE $response->content, ''; #content just outputs the content, whereas as_string includes the response header
         close $RESPONSEASFILE;
     }
 
@@ -3002,7 +3002,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
             {
 
                 ## Phantomjs
-                if ($opt_driver eq "phantomjs") {
+                if ($opt_driver eq 'phantomjs') {
                     $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port,
                                                         'browser_name' => 'phantomjs',
@@ -3010,7 +3010,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                 }
 
                 ## Firefox
-                if ($opt_driver eq "firefox") {
+                if ($opt_driver eq 'firefox') {
                     print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
                     $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port,
@@ -3020,7 +3020,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                  }
 
                 ## Chrome
-                if ($opt_driver eq "chrome") {
+                if ($opt_driver eq 'chrome') {
                     print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
                     $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
                                                         'port' => $opt_port,
