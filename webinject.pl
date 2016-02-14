@@ -111,7 +111,7 @@ $counter = 0;
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## Windows hostname
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
-my $concurrency = "null"; ## current working directory - not full path
+my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
 my ( $HTTPLOGFILE, $RESULTS, $RESULTSXML ); ## output file handles
@@ -119,12 +119,10 @@ my ( $HTTPLOGFILE, $RESULTS, $RESULTSXML ); ## output file handles
 engine();
 
 
-
 #------------------------------------------------------------------
 sub engine {
 
     my ($startruntimer, $endruntimer, $repeat, $start);
-    my ($curgraphtype);
     my ($casefilecheck); ## removed $testnum, $xmltestcases from here, made global
 
     getdirname();  #get the directory webinject engine is running from
@@ -3076,7 +3074,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         {
             $chromehandle = 0;
         }
-        print STDOUT qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
+        print {*STDOUT} qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
 
         #$sel->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
         $sel->set_window_size(968, 1260); ## y,x
@@ -3108,10 +3106,10 @@ sub startsession {     ## creates the webinject user agent
 sub getdirname {  #get the directory webinject engine is running from
 
     $dirname = $0;
-    $dirname =~ s~(.*/).*~$1~;  #for nix systems
-    $dirname =~ s~(.*\\).*~$1~; #for windoz systems
+    $dirname =~ s{(.*/).*}{$1};  #for nix systems
+    $dirname =~ s{(.*\\).*}{$1}; #for windoz systems
     if ($dirname eq $0) {
-        $dirname = './';
+        $dirname = q{./};
     }
 
     return;
@@ -3135,27 +3133,27 @@ sub getoptions {  #shell options
         )
         or do {
             print_usage();
-            exit();
+            exit;
         };
 
     if ($opt_version) {
         print_version();
-        exit();
+        exit;
     }
 
     if ($opt_help) {
         print_version();
         print_usage();
-        exit();
+        exit;
     }
 
     if ($opt_output) {  #use output location if it is passed from the command line
         $output = $opt_output;
     }
     else {
-        $output = $dirname."output/"; ## default to the output folder under the current folder
+        $output = $dirname.'output/'; ## default to the output folder under the current folder
     }
-    $outputfolder = dirname($output."dummy"); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+    $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
 
     return;
 }
