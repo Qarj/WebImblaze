@@ -1,6 +1,15 @@
 #!/usr/bin/perl
+
+# $Id$
+# $Revision$
+# $Date$
+
 use strict;
 use warnings;
+use vars qw/ $VERSION /;
+
+$VERSION = '1.80';
+
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -18,8 +27,6 @@ use warnings;
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
-
-our $version="1.80";
 
 #use Selenium::Remote::Driver; ## to use the clean version in the library
 #use Driver; ## using our own version of the package - had to stop it from dieing on error
@@ -43,22 +50,22 @@ use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintab
 
 local $| = 1; #don't buffer output to STDOUT
 
-our ($timestamp, $dirname, $testfilename);
-our (%parsedresult);
-our (%varvar);
-our ($useragent, $request, $response);
-our ($monitorenabledchkbx, $latency, $verificationlatency, $screenshotlatency);
-our (%teststeptime); ## record in a hash the latency for every step for later use
-our ($cookie_jar, @httpauth);
-our ($xnode, $stop);
-our ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
-our ($totalresponse, $avgresponse, $maxresponse, $minresponse);
-our (@casefilelist, $currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
-our (%case);
-our (%config);
-our ($currentdatetime, $totalruntime, $starttimer, $endtimer);
-our ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
-our (%exit_codes);
+my ($timestamp, $dirname, $testfilename);
+my (%parsedresult);
+my (%varvar);
+my ($useragent, $request, $response);
+my ($monitorenabledchkbx, $latency, $verificationlatency, $screenshotlatency);
+my (%teststeptime); ## record in a hash the latency for every step for later use
+my ($cookie_jar, @httpauth);
+my ($xnode, $stop);
+my ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
+my ($totalresponse, $avgresponse, $maxresponse, $minresponse);
+my (@casefilelist, $currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
+my (%case);
+my (%config);
+my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
+my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
+my (%exit_codes);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -371,7 +378,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
 
                 my %casesave; ## we need a clean array for each test case
-                undef *case; ## do not allow values from previous test cases to bleed over
+                undef %case; ## do not allow values from previous test cases to bleed over
                 foreach my $testAttrib ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
                     #print "DEBUG: $testAttrib", ": ", $xmltestcases->{case}->{$testnum}->{$testAttrib};
                     #print "\n";
@@ -3164,7 +3171,7 @@ sub getoptions {  #shell options
 }
 
 sub print_version {
-    print "\nWebInject version $version\nFor more info: https://github.com/Qarj/WebInject\n\n";
+    print "\nWebInject version $VERSION\nFor more info: https://github.com/Qarj/WebInject\n\n";
     
     return;
 }
