@@ -54,7 +54,7 @@ my ($timestamp, $dirname, $testfilename);
 my (%parsedresult);
 my (%varvar);
 my ($useragent, $request, $response);
-my ($monitorenabledchkbx, $latency, $verificationlatency, $screenshotlatency);
+my ($latency, $verificationlatency, $screenshotlatency);
 my (%teststeptime); ## record in a hash the latency for every step for later use
 my ($cookie_jar, @httpauth);
 my ($xnode, $stop);
@@ -65,7 +65,6 @@ my (%case);
 my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
-my (%exit_codes);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -89,7 +88,6 @@ my (@pagenames); ## page name of previously visited pages
 my (@pageupdatetimes); ## last time the page was updated in the cache
 
 my $chromehandle = 0; ## windows handle of chrome browser window - for screenshots
-my $hexchromehandle; 
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @monthsX = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -111,7 +109,7 @@ $cwd =~ s/\n//g; ## remove newline character
 my ($counter); ## keeping track of the loop we are up to
 $counter = 0;
 
-my $hostname = `hostname`; ## Windows hostname
+my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## Windows hostname
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 my $concurrency = "null"; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
@@ -125,9 +123,9 @@ engine();
 #------------------------------------------------------------------
 sub engine {
       
-    our ($startruntimer, $endruntimer, $repeat, $start);
-    our ($curgraphtype);
-    our ($casefilecheck); ## removed $testnum, $xmltestcases from here, made global
+    my ($startruntimer, $endruntimer, $repeat, $start);
+    my ($curgraphtype);
+    my ($casefilecheck); ## removed $testnum, $xmltestcases from here, made global
 
     getdirname();  #get the directory webinject engine is running from
         
@@ -213,13 +211,12 @@ sub engine {
             
         fixsinglecase();
           
-        $xmltestcases = XMLin("$outputfolder"."$currentcasefilename".".$$".".tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
+        $xmltestcases = XMLin("$outputfolder$currentcasefilename.$$.tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
         #print Dumper($xmltestcases);  #for debug, dump hash of xml   
         #print keys %{$configfile};  #for debug, print keys from dereferenced hash
             
         #delete the temp file as soon as we are done reading it    
-        if (-e "$outputfolder"."$currentcasefilename".".$$".".tmp") { unlink "$outputfolder"."$currentcasefilename".".$$".".tmp"; }        
-            
+        if (-e "$outputfolder$currentcasefilename.$$.tmp") { unlink "$outputfolder$currentcasefilename.$$.tmp"; }        
             
         $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
         unless ($repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file               
@@ -868,7 +865,7 @@ sub selenium {  ## send Selenium command and read response
     my $idx = 0; #For keeping track of index in foreach loop
     my $grab = '';
     my $jswait = '';
-    our @parseverify ='';
+    my @parseverify ='';
     my $timestart;
 
     $starttimer = time();
@@ -949,7 +946,7 @@ sub selenium {  ## send Selenium command and read response
     if ($case{screenshot} && (lc($case{screenshot}) eq "false" || lc($case{screenshot}) eq "no")) #lc = lowercase
     {
       ## take a very fast screenshot - visible window only, only works for interactive sessions
-      if ($chromehandle gt 0) {
+      if ($chromehandle > 0) {
          my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
          #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
          #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
@@ -1910,7 +1907,6 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     my $fieldname;
     my $fieldvalue;
     my $subname;
-    my $soapresp;
     
     #read the xml file specified in the testcase
     $case{postbody} =~ m~file=>(.*)~i;
@@ -2486,8 +2482,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 #------------------------------------------------------------------
 sub parseresponse {  #parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
         
-    our ($resptoparse, @parseargs);
-    our ($leftboundary, $rightboundary, $escape);
+    my ($resptoparse, @parseargs);
+    my ($leftboundary, $rightboundary, $escape);
 
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
 
@@ -2597,13 +2593,13 @@ sub processcasefile {  #get test case files to run (from command line or config 
         }    
             
         unless ($casefilelist[0]) {
-            if (-e "$dirname"."testcases.xml") {
+            if (-e "$dirname".'testcases.xml') {
                 #not appending a $dirname here since we append one when we open the file
                 push @casefilelist, "testcases.xml";  #if no files are specified in config.xml, default to testcases.xml
             }
             else {
                 die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename " . 
-                    "on the command line if you are not using the default testcase file (testcases.xml).";
+                    "on the command line if you are not using the default testcase file (testcases.xml).\n";
             }
         }
     }
@@ -2812,7 +2808,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s~{BASEURL2}~$config{baseurl2}~g;
 
 ## perform arbirtary user defined config substituions
-    our ($value, $KEY);
+    my ($value, $KEY);
     foreach my $key (keys %{ $userconfig->{userdefined} } ) {
         $value = $userconfig->{userdefined}{$key};
         if (ref($value) eq 'HASH') { ## if we found a HASH, we treat it as blank
@@ -2925,7 +2921,6 @@ sub httplog {  #write requests and responses to http.log file
          $formatresponse = $response->as_string; ## get the response output
          ## put in carriage returns
          $formatresponse =~ s~\>\<~\>\x0D\n\<~g; ## insert a CR between every ><
-         #out print STDOUT "\n\n soapresp:\n$formatxml \n\n";
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
         
@@ -2937,7 +2932,6 @@ sub httplog {  #write requests and responses to http.log file
          $formatresponse =~ s~\},~\},\x0D\n~g;  ## insert a CR after  every },
          $formatresponse =~ s~\["~\x0D\n\["~g;  ## insert a CR before every ["
          $formatresponse =~ s~\\n\\tat~\x0D\n\\tat~g;  ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
-         #out print STDOUT "\n\n soapresp:\n$formatresponse \n\n";
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
         
@@ -3085,8 +3079,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
             $chromehandle = 0;
         }
         print STDOUT qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
-        #$hexchromehandle = sprintf("%x", $chromehandle);
-        #print STDOUT qq|CHROME HANDLE hex\n$hexchromehandle\n|; 
 
         #$sel->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
         $sel->set_window_size(968, 1260); ## y,x
