@@ -41,7 +41,7 @@ use XML::Simple;
 use Time::HiRes 'time','sleep';
 use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
-local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = "false";
+local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use IO::Handle;
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses)
@@ -90,18 +90,18 @@ my (@pageupdatetimes); ## last time the page was updated in the cache
 my $chromehandle = 0; ## windows handle of chrome browser window - for screenshots
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
-my @monthsX = qw(01 02 03 04 05 06 07 08 09 10 11 12);
-my @weekDaysX = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
-my ($secondX, $minuteX, $hourX, $dayOfMonthX, $monthX, $yearOffsetX, $dayOfWeekX, $dayOfYearX, $daylightSavingsX) = localtime();
-my $yearX = 1900 + $yearOffsetX;
-my $yyX = substr($yearX, 2); #year as 2 digits
-$dayOfMonthX = sprintf("%02d", $dayOfMonthX);
-my $weekOfMonth = int(($dayOfMonthX-1)/7)+1;
-my $startdate = "$yearX-$monthsX[$monthX]-$dayOfMonthX";
-$minuteX = sprintf("%02d", $minuteX); #put in up to 2 leading zeros
-$secondX = sprintf("%02d", $secondX);
-$hourX = sprintf("%02d", $hourX);
-my $timeSecondsX = ($hourX * 60 * 60) + ($minuteX * 60) + $secondX;
+my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
+my @WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYOFYEAR, $DAYLIGHTSAVINGS) = localtime;
+my $YEAR = 1900 + $YEAROFFSET;
+my $YY = substr($YEAR, 2); #year as 2 digits
+$DAYOFMONTH = sprintf("%02d", $DAYOFMONTH);
+my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
+my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
+$MINUTE = sprintf("%02d", $MINUTE); #put in up to 2 leading zeros
+$SECOND = sprintf("%02d", $SECOND);
+$HOUR = sprintf("%02d", $HOUR);
+my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
 
 my $cwd = (`cd`); ## find current Windows working directory using backtick method
 $cwd =~ s/\n//g; ## remove newline character
@@ -814,9 +814,9 @@ qq|
 
     <test-summary>
         <start-time>$currentdatetime</start-time>
-        <start-seconds>$timeSecondsX</start-seconds>
-        <start-date-time>$startdate|;
-print $RESULTSXML qq|T$hourX:$minuteX:$secondX</start-date-time>
+        <start-seconds>$TIMESECONDS</start-seconds>
+        <start-date-time>$STARTDATE|;
+print $RESULTSXML qq|T$HOUR:$MINUTE:$SECOND</start-date-time>
         <total-run-time>$totalruntime</total-run-time>
         <test-cases-run>$totalruncount</test-cases-run>
         <test-cases-passed>$casepassedcount</test-cases-passed>
@@ -2776,17 +2776,17 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     }
 
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
-    $_[0] =~ s~{DAY}~$dayOfMonthX~g;
-    $_[0] =~ s~{MONTH}~$monthsX[$monthX]~g;
-    $_[0] =~ s~{YEAR}~$yearX~g; #4 digit year
-    $_[0] =~ s~{YY}~$yyX~g; #2 digit year
-    $_[0] =~ s~{HH}~$hourX~g;
-    $_[0] =~ s~{MM}~$minuteX~g;
-    $_[0] =~ s~{SS}~$secondX~g;
-    $_[0] =~ s~{WEEKOFMONTH}~$weekOfMonth~g;
-    $_[0] =~ s~{DATETIME}~$yearX$monthsX[$monthX]$dayOfMonthX$hourX$minuteX$secondX~g;
+    $_[0] =~ s~{DAY}~$DAYOFMONTH~g;
+    $_[0] =~ s~{MONTH}~$MONTHS[$MONTH]~g;
+    $_[0] =~ s~{YEAR}~$YEAR~g; #4 digit year
+    $_[0] =~ s~{YY}~$YY~g; #2 digit year
+    $_[0] =~ s~{HH}~$HOUR~g;
+    $_[0] =~ s~{MM}~$MINUTE~g;
+    $_[0] =~ s~{SS}~$SECOND~g;
+    $_[0] =~ s~{WEEKOFMONTH}~$WEEKOFMONTH~g;
+    $_[0] =~ s~{DATETIME}~$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND~g;
     my $underscore = "_";
-    $_[0] =~ s~{FORMATDATETIME}~$dayOfMonthX\/$monthsX[$monthX]\/$yearX$underscore$hourX:$minuteX:$secondX~g;
+    $_[0] =~ s~{FORMATDATETIME}~$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$underscore$HOUR:$MINUTE:$SECOND~g;
     $_[0] =~ s~{COUNTER}~$counter~g;
     $_[0] =~ s~{CONCURRENCY}~$concurrency~g; #name of the temporary folder being used - not full path
     $_[0] =~ s~{OUTPUT}~$output~g;
