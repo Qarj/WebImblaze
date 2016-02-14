@@ -12,7 +12,7 @@ Expected failures will be asserted by the master test file.
     method="cmd"
     command="echo NOP"
     verifypositive="This text will not be found"
-    errormessage="Test case failed for some reason"
+    errormessage="Test failed for some reason"
 />
 
 <case

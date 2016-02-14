@@ -66,7 +66,7 @@ my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
 
-my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaOK, $entryresponse); ## skip tests if prevous ones failed
+my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
 my ($testnumlog, $desc1log, $desc2log); ## log separator enhancement
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
@@ -94,13 +94,13 @@ my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
 my @WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
 my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYOFYEAR, $DAYLIGHTSAVINGS) = localtime;
 my $YEAR = 1900 + $YEAROFFSET;
-my $YY = substr($YEAR, 2); #year as 2 digits
-$DAYOFMONTH = sprintf("%02d", $DAYOFMONTH);
+my $YY = substr $YEAR, 2; #year as 2 digits
+$DAYOFMONTH = sprintf '%02d', $DAYOFMONTH;
 my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
 my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
-$MINUTE = sprintf("%02d", $MINUTE); #put in up to 2 leading zeros
-$SECOND = sprintf("%02d", $SECOND);
-$HOUR = sprintf("%02d", $HOUR);
+$MINUTE = sprintf '%02d', $MINUTE; #put in up to 2 leading zeros
+$SECOND = sprintf '%02d', $SECOND;
+$HOUR = sprintf '%02d', $HOUR;
 my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
 
 my $cwd = (`cd`); ## find current Windows working directory using backtick method
@@ -200,10 +200,8 @@ sub engine {
     foreach (@casefilelist) { #process test case files named in config
 
         $currentcasefile = $_;
-        #$currentcasefile =~ m~\\([^\.^\\]*?)\.xml~; #Get the filename only without folder names or .xml suffix
-        $currentcasefilename = basename($currentcasefile);
-        $testfilename = $1;
-        #print "\n$currentcasefile\n\n";
+        $currentcasefilename = basename($currentcasefile); ## with extension
+        $testfilename = fileparse($currentcasefile, '.xml'); ## without extension
 
         $casefilecheck = ' ';
 
@@ -323,7 +321,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                 }
 
-                $entrycriteriaOK = "true"; ## assume entry criteria met
+                $entrycriteriaok = "true"; ## assume entry criteria met
                 $entryresponse = "";
 
                 $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
@@ -332,7 +330,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaOK = '';
+                        $entrycriteriaok = '';
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
                         ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
@@ -345,7 +343,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaOK = '';
+                        $entrycriteriaok = '';
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
                     }
@@ -357,7 +355,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaOK = '';
+                        $entrycriteriaok = '';
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
                     }
@@ -499,7 +497,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     $RESULTS->autoflush();
 
-                    if ($entrycriteriaOK) { ## do not run it if the case has not met entry criteria
+                    if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
                        if ($case{method}) {
                            if ($case{method} eq "get") { httpget(); }
                            elsif ($case{method} eq "post") { httppost(); }
@@ -534,7 +532,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     httplog();  #write to http.log file
 
-                    if ($entrycriteriaOK) { ## do not want to parseresponse on junk
+                    if ($entrycriteriaok) { ## do not want to parseresponse on junk
                        parseresponse();  #grab string from response to send later
                     }
 
@@ -2133,7 +2131,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     my $assertionskipsmessage = ""; ## support tagging an assertion as disabled with a message
 
     ## auto assertions
-    if ($entrycriteriaOK && !$case{ignoreautoassertions}) {
+    if ($entrycriteriaok && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
         foreach my $configAttrib ( sort keys %{ $userconfig->{autoassertions} } ) {
             if ( substr($configAttrib, 0, 13) eq "autoassertion" ) {
@@ -2178,7 +2176,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
 
     ## smart assertions
-    if ($entrycriteriaOK && !$case{ignoresmartassertions}) {
+    if ($entrycriteriaok && !$case{ignoresmartassertions}) {
         foreach my $configAttrib ( sort keys %{ $userconfig->{smartassertions} } ) {
             if ( substr($configAttrib, 0, 14) eq "smartassertion" ) {
                 $verifynum = $configAttrib; ## determine index verifypositive index
@@ -2224,7 +2222,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
 
     ## verify positive
-    if ($entrycriteriaOK) {
+    if ($entrycriteriaok) {
         ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
             if ( substr($testAttrib, 0, 14) eq "verifypositive" ) {
@@ -2270,7 +2268,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
 
     ## verify negative
-    if ($entrycriteriaOK) {
+    if ($entrycriteriaok) {
         ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
             if ( substr($testAttrib, 0, 14) eq "verifynegative" ) {
@@ -2319,7 +2317,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     }
 
     ## assert count
-    if ($entrycriteriaOK) {
+    if ($entrycriteriaok) {
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
             if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
@@ -2370,7 +2368,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         } ## end foreach
     } ## end if entrycriteriaOK
 
-    if ($entrycriteriaOK) {
+    if ($entrycriteriaok) {
          if ($case{verifyresponsetime}) { ## verify that the response time is less than or equal to given amount in seconds
              if ($latency <= $case{verifyresponsetime}) {
                     print $RESULTS qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
@@ -2391,7 +2389,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
          }
     }
 
-    if ($entrycriteriaOK) {
+    if ($entrycriteriaok) {
         $forcedretry="false";
         if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
             if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
@@ -2438,7 +2436,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }
         else {
             $response->as_string() =~ /(HTTP\/1.)(.*)/i;
-            if (!$entrycriteriaOK){ ## test wasn't run due to entry criteria not being met
+            if (!$entrycriteriaok){ ## test wasn't run due to entry criteria not being met
                 print $RESULTS qq|<span class="fail">Failed - Entry criteria not met</span><br />\n|; #($1$2) is HTTP response code
                 print $RESULTSXML qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                 print $RESULTSXML qq|            <verifyresponsecode-message>Failed - Entry criteria not met</verifyresponsecode-message>\n|;
@@ -2911,7 +2909,7 @@ sub httplog {  #write requests and responses to http.log file
     }
     print $HTTPLOGFILE "\n";
 
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
         print $HTTPLOGFILE "<logastext> \n";
     }
     print $HTTPLOGFILE "\n\n";
@@ -2946,7 +2944,7 @@ sub httplog {  #write requests and responses to http.log file
     print $HTTPLOGFILE $textrequest, "\n\n";
     print $HTTPLOGFILE $response->as_string, "\n\n";
 
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaOK) { #Always log as text when a selenium command is present, or entry criteria not met
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
         print $HTTPLOGFILE "</logastext> \n";
     }
 
