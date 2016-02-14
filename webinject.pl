@@ -164,7 +164,7 @@ sub engine {
     open( $RESULTS, '>', "$output".'results.html' ) or die "\nERROR: Failed to open results.html file\n\n";
     open( $RESULTSXML, '>', "$output".'results.xml' ) or die "\nERROR: Failed to open results.xml file\n\n";
 
-    if ($output =~ m~\\([^\\]*)\\$~s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
+    if ($output =~ m{\\([^\\]*)\\$}s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
         $concurrency = $1;
     }
 
@@ -422,7 +422,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else
                     {
-                       $desc2log = ""; ## must blank it out if not being used
+                       $desc2log = ''; ## must blank it out if not being used
                     }
 
                     if ($config{globalretry}) {
@@ -431,7 +431,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         }
                     }
                     $isfailure = 0;
-                    $verifynegativefailed = "false";
+                    $verifynegativefailed = 'false';
                     $retrypassedcount = 0;
                     $retryfailedcount = 0;
 
@@ -510,7 +510,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     else {
                          # Response code 412 means Precondition failed
                          print {*STDOUT} $entryresponse;
-                         $entryresponse =~ s!^!412 \n!;
+                         $entryresponse =~ s{^}{412 \n};
                          $response = HTTP::Response->parse($entryresponse);
                          $latency = 0.001; ## Prevent latency bleeding over from previous test step
                     }
@@ -607,7 +607,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     print {$RESULTSXML} qq|            <responsetime>$latency</responsetime>\n|;
 
-                    if ($case{method} eq "selenium") {
+                    if ($case{method} eq 'selenium') {
                         print {$RESULTS} qq|Verification Time = $verificationlatency sec <br />\n|;
                         print {$RESULTS} qq|Screenshot Time = $screenshotlatency sec <br />\n|;
 
@@ -1129,7 +1129,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present("Searc
     while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
-            if ($resp =~ m~$searchtext~si) {
+            if ($resp =~ m{$searchtext}si) {
                 $foundit = "true";
             }
         }
@@ -1169,7 +1169,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
-            if ($resp =~ m~$searchtext~si) {
+            if ($resp =~ m{$searchtext}si) {
                 sleep( 0.1 ); ## sleep for 0.1 seconds
             } else {
                 $foundit = "false";
@@ -1206,7 +1206,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible("Searc
     while ( (($timestart + $timeout) > time()) && $foundit eq "false" ) {
         eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
         foreach my $resp (@resp1) {
-            if ($resp =~ m~$searchtext~si) {
+            if ($resp =~ m{$searchtext}si) {
                 $foundit = "true";
             }
         }
@@ -1247,7 +1247,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     while ( (($timestart + $timeout) > time()) && $foundit eq "true" ) {
         eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
         foreach my $resp (@resp1) {
-            if (not ($resp =~ m~$searchtext~si)) {
+            if (not ($resp =~ m{$searchtext}si)) {
                 $foundit = "false";
             }
         }
@@ -1422,9 +1422,9 @@ sub getassets { ## get page assets matching a list for a reference type
 
     foreach my $extension (@extensions) {
 
-        #while ($page =~ m~$assettype="([^"]*$extension)["\?]~g) ##" Iterate over all the matches to this extension
+        #while ($page =~ m{$assettype="([^"]*$extension)["\?]}g) ##" Iterate over all the matches to this extension
         print "\n $match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?] \n";
-        while ($page =~ m~$match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?]~g) ##" Iterate over all the matches to this extension
+        while ($page =~ m{$match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?]}g) ##" Iterate over all the matches to this extension
         {
             $startassetrequest = time();
 
@@ -1484,7 +1484,7 @@ sub savepage {## save the page in a cache to enable auto substitution
    $page = $response->as_string;
 
    ## decide if we want to save this page - needs a method post action
-   if ( ($page =~ m~method="post" action="(.*?)"~s) || ($page =~ m~action="(.*?)" method="post"~s) ) { ## look for the method post action
+   if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
       $pagenameaction = $1;
       #print {*STDOUT} qq|\n ACTION $pagenameaction\n|;
       $pagefound = 'true'; ## we will only save the page if we actually found one
@@ -1497,7 +1497,7 @@ sub savepage {## save the page in a cache to enable auto substitution
 
       $pagename = $case{url};
       #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
-      if ($pagename =~ m~(.*?)\?~s) { ## we only want everything to the left of the ? mark
+      if ($pagename =~ m{(.*?)\?}s) { ## we only want everything to the left of the ? mark
          $pagename = $1;
       }
       $pagename =~ s!http.?://!!s; ## remove http:// and https://
@@ -1621,7 +1621,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
 
     ## work out pagename to use for matching purposes
-    if ($posturl =~ m~(.*?)\?~s) { ## we only want everything to the left of the ? mark
+    if ($posturl =~ m{(.*?)\?}s) { ## we only want everything to the left of the ? mark
        $posturl = $1;
     }
     $posturl =~ s!http.?://!!s; ## remove http:// and https://
@@ -1670,38 +1670,38 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           my $dotx='false';
           my $doty='false';
 
-          if ($postfields[$idx] =~ m~\.x[\=\']~) { ## does it end in .x?
+          if ( $postfields[$idx] =~ m{\.x[\=\']} ) { ## does it end in .x?
              #out print {*STDOUT} qq| DOTX found in $postfields[$idx] \n|;
              $dotx = 'true';
-             $postfields[$idx] =~ s~\.x~~; ## get rid of the .x, we'll have to put it back later
+             $postfields[$idx] =~ s{\.x}{}; ## get rid of the .x, we'll have to put it back later
           }
 
-          if ($postfields[$idx] =~ m~\.y[\=\']~) { ## does it end in .y?
+          if ( $postfields[$idx] =~ m/\.y[\=\']/ ) { ## does it end in .y?
              #out print {*STDOUT} qq| DOTY found in $postfields[$idx] \n|;
              $doty = 'true';
-             $postfields[$idx] =~ s~\.y~~; ## get rid of the .y, we'll have to put it back later
+             $postfields[$idx] =~ s{\.y}{}; ## get rid of the .y, we'll have to put it back later
           }
 
-          if ($postfields[$idx] =~ m~([^']{0,70}?)\{NAME\}~s) { ## ' was *?, {0,70}? much quicker
+          if ( $postfields[$idx] =~ m/([^']{0,70}?)\{NAME\}/s ) { ## ' was *?, {0,70}? much quicker
              $lhsname = $1;
-             $lhsname =~ s~\$~\\\$~g;
-             $lhsname =~ s~\.~\\\.~g;
+             $lhsname =~ s{\$}{\\\$}g;
+             $lhsname =~ s{\.}{\\\.}g;
              #out print {*STDOUT} qq| LHS $lhsname has {NAME} \n|;
              $namefoundflag = 'true';
           }
 
-          if ($postfields[$idx] =~ m~\{NAME\}([^=']{0,70})~s) { ## '
+          if ( $postfields[$idx] =~ m/\{NAME\}([^=']{0,70})/s ) { ## '
              $rhsname = $1;
-             $rhsname =~ s~%24~\$~g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
-             $rhsname =~ s~\$~\\\$~g; ## protect the $ with a \ in further regexs
-             $rhsname =~ s~\.~\\\.~g; ## same for the .
+             $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
+             $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
+             $rhsname =~ s{\.}{\\\.}g; ## same for the .
              #out print {*STDOUT} qq| RHS $rhsname has {NAME} \n|;
              $namefoundflag = 'true';
           }
 
           ## time to find out what to substitute it with
           if ($namefoundflag eq 'true') {
-             if ($pages[$pageid] =~ m~name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]~s) { ## "
+             if ($pages[$pageid] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
                 $name = $1;
                 $realnamefound = 'true';
                 #out print {*STDOUT} qq| NAME is $name \n|;
@@ -1710,7 +1710,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           ## now to substitute in the data
           if ($realnamefound eq 'true') {
-             if ($postfields[$idx] =~ s~{NAME}~$name~) {
+             if ($postfields[$idx] =~ s/{NAME}/$name/) {
                 #out print {*STDOUT} qq| SUBBED_NAME is $postfields[$idx] \n|;
              }
           }
@@ -1718,9 +1718,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           ## did we take out the .x or .y? we need to put it back
           if ($dotx eq 'true') {
              if ($posttype eq "normalpost") {
-                $postfields[$idx] =~ s~\=~\.x\=~;
+                $postfields[$idx] =~ s{\=}{\.x\=};
              } else {
-                $postfields[$idx] =~ s~\'[ ]?\=~\.x\' \=~; #[ ]? means match 0 or 1 space
+                $postfields[$idx] =~ s{\'[ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space
              }
              #out print {*STDOUT} qq| DOTX restored to $postfields[$idx] \n|;
           }
@@ -1728,9 +1728,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           ## did we take out the .x or .y? we need to put it back
           if ($doty eq 'true') {
              if ($posttype eq "normalpost") {
-                $postfields[$idx] =~ s~\=~\.y\=~;
+                $postfields[$idx] =~ s{\=}{\.y\=};
              } else {
-                $postfields[$idx] =~ s~\'[ ]?\=~\.y\' \=~;
+                $postfields[$idx] =~ s{\'[ ]?\=}{\.y\' \=};
              }
              #out print {*STDOUT} qq| DOTY restored to $postfields[$idx] \n|;
           }
@@ -1739,7 +1739,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           $fieldfoundflag = 'false';
 
           if ($posttype eq "normalpost") {
-             if ($postfields[$idx] =~ m~(.{0,70}?)\=\{DATA\}~s) {
+             if ($postfields[$idx] =~ m/(.{0,70}?)\=\{DATA\}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
@@ -1747,7 +1747,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           }
 
           if ($posttype eq "multipost") {
-             if ($postfields[$idx] =~ m~\'(.{0,70}?)\'.{0,70}?{DATA\}~s) {
+             if ($postfields[$idx] =~ m/\'(.{0,70}?)\'.{0,70}?{DATA\}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
@@ -1756,9 +1756,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           ## time to find out what to substitute it with
           if ($fieldfoundflag eq 'true') {
-             $fieldname =~ s~\$~\\\$~; #replace $ with \$
-             $fieldname =~ s~\.~\\\.~; #replace . with \.
-             if ($pages[$pageid] =~ m~="$fieldname" [^\>]*value="(.*?)"~s) {
+             $fieldname =~ s{\$}{\\\$}; #replace $ with \$
+             $fieldname =~ s{\.}{\\\.}; #replace . with \.
+             if ($pages[$pageid] =~ m/="$fieldname" [^\>]*value="(.*?)"/s) {
                 $data = $1;
                 $datafound = 'true';
                 #print {*STDOUT} qq| DATA is $data \n|; #debug
@@ -1771,7 +1771,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
                 $data = url_escape($data);
                 #print {*STDOUT} qq| URLESCAPE!! \n|; #debug
              }
-             if ($postfields[$idx] =~ s~{DATA}~$data~) {
+             if ($postfields[$idx] =~ s/{DATA}/$data/) {
                 #print {*STDOUT} qq| SUBBED_FIELD is $postfields[$idx] \n|; #debug
              }
           }
@@ -1817,7 +1817,7 @@ sub httpget {  #send http request and read response
     if ($case{addheader}) {  #add an additional HTTP Header if specified
         my @addheaders = split(/\|/, $case{addheader});  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
-            $_ =~ m~(.*): (.*)~;
+            $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
     }
@@ -1841,9 +1841,9 @@ sub httpget {  #send http request and read response
 sub httppost {  #post request based on specified encoding
 
     if ($case{posttype}) {
-         if (($case{posttype} =~ m~application/x-www-form-urlencoded~) or ($case{posttype} =~ m~application/json~)) { httppost_form_urlencoded(); } ## application/json support
-         elsif ($case{posttype} =~ m~multipart/form-data~) { httppost_form_data(); }
-         elsif (($case{posttype} =~ m~text/xml~) or ($case{posttype} =~ m~application/soap+xml~)) { httppost_xml(); }
+         if (($case{posttype} =~ m{application/x-www-form-urlencoded}) or ($case{posttype} =~ m{application/json})) { httppost_form_urlencoded(); } ## application/json support
+         elsif ($case{posttype} =~ m{multipart/form-data}) { httppost_form_data(); }
+         elsif (($case{posttype} =~ m{text/xml}) or ($case{posttype} =~ m{application/soap+xml})) { httppost_xml(); }
          else { print STDERR qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
        }
     else {
@@ -1875,7 +1875,7 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     if ($case{addheader}) {  # add an additional HTTP Header if specified
         my @addheaders = split(/\|/, $case{addheader});  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
-            $_ =~ m~(.*): (.*)~;
+            $_ =~ m{(.*): (.*)};
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
         #$case{addheader} = ''; ## why is this line here? Fails with retry, so commented out
@@ -1905,7 +1905,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     my $subname;
 
     #read the xml file specified in the testcase
-    $case{postbody} =~ m~file=>(.*)~i;
+    $case{postbody} =~ m/file=>(.*)/i;
     open( my $XMLBODY, '<', "$dirname"."$1") or die "\nError: Failed to open text/xml file\n\n";  #open file handle
     my @xmlbody = <$XMLBODY>;  #read the file into an array
     close($XMLBODY);
@@ -1919,12 +1919,12 @@ sub httppost_xml{  #send text/xml HTTP request and read response
        for ($idx = 1; $idx <= $len; $idx++) {
             $fieldname = '';
             #out print {*STDOUT} qq| \n parms $idx: $parms[$idx-1] \n |;
-            if ($parms[$idx-1] =~ m~(.*?)\=~s) { #we only want everything to the left of the = sign
+            if ($parms[$idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
                 $fieldname = $1;
                 #out print {*STDOUT} qq| fieldname: $fieldname \n|;
             }
             $fieldvalue = '';
-            if ($parms[$idx-1] =~ m~\=(.*)~s) { #we only want everything to the right of the = sign
+            if ($parms[$idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
                 $fieldvalue = $1;
                 #out print {*STDOUT} qq| fieldvalue: $fieldvalue \n\n|;
             }
@@ -1932,20 +1932,20 @@ sub httppost_xml{  #send text/xml HTTP request and read response
             #make the substitution
             foreach (@xmlbody) {
                 #non escaped fields
-                $_ =~ s~\<$fieldname\>.*?\<\/$fieldname\>~\<$fieldname\>$fieldvalue\<\/$fieldname\>~;
+                $_ =~ s{\<$fieldname\>.*?\<\/$fieldname\>}{\<$fieldname\>$fieldvalue\<\/$fieldname\>};
 
                 #escaped fields
-                $_ =~ s~\&lt;$fieldname\&gt;.*?\&lt;\/$fieldname\&gt;~\&lt;$fieldname\&gt;$fieldvalue\&lt;\/$fieldname\&gt;~;
+                $_ =~ s{\&lt;$fieldname\&gt;.*?\&lt;\/$fieldname\&gt;}{\&lt;$fieldname\&gt;$fieldvalue\&lt;\/$fieldname\&gt;};
 
                 #attributes
                 # ([^a-zA-Z]) says there must be a non alpha so that bigid and id and treated separately
                 # $1 will put it back - otherwise it'll be eaten
-                $_ =~ s~([^a-zA-Z])$fieldname\=\".*?\"~$1$fieldname\=\"$fieldvalue\"~;
+                $_ =~ s{([^a-zA-Z])$fieldname\=\".*?\"}{$1$fieldname\=\"$fieldvalue\"};
 
                 #variable substitution
                 $subname = $fieldname;
-                if ($subname =~ s~__~~) {#if there are double underscores, like __salarymax__ then replace it
-                    $_ =~ s~__$subname~$fieldvalue~g;
+                if ( $subname =~ s{__}{} ) {#if there are double underscores, like __salarymax__ then replace it
+                    $_ =~ s{__$subname}{$fieldvalue}g;
                 }
 
             }
@@ -1964,7 +1964,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     if ($case{addheader}) {  #add an additional HTTP Header if specified
         my @addheaders = split(/\|/, $case{addheader});  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
-            $_ =~ m~(.*): (.*)~;
+            $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
         #$case{addheader} = ''; ## why is this line here? Fails with retry, so commented out
@@ -2002,7 +2002,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     if ($case{addheader}) {  #add an additional HTTP Header if specified
         my @addheaders = split(/\|/, $case{addheader});  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
-            $_ =~ m~(.*): (.*)~;
+            $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
     }
@@ -2079,14 +2079,14 @@ sub searchimage {  ## search for images in the actual result
                    $unmarked = "false";
                 }
                 my $siresp = (`imageinimage.py $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png "$cwd$opt_basefolder$case{$_}" $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
-                $siresp =~ m~primary confidence (\d+)~s;
+                $siresp =~ m/primary confidence (\d+)/s;
                 my $primaryconfidence = $1;
-                $siresp =~ m~alternate confidence (\d+)~s;
+                $siresp =~ m/alternate confidence (\d+)/s;
                 my $alternateconfidence = $1;
-                $siresp =~ m~min_loc (.*?)X~s;
+                $siresp =~ m/min_loc (.*?)X/s;
                 my $location = $1;
 
-                if ($siresp =~ m~was found~s) { ## was the image found?
+                if ($siresp =~ m/was found/s) { ## was the image found?
                     print {$RESULTS} qq|<span class="found">Found image: $case{$_}</span><br />\n|;
                     print {$RESULTSXML} qq|            <$_-success>true</$_-success>\n|;
                     print {$RESULTSXML} qq|            <$_-name>$case{$_}</$_-name>\n|;
@@ -2145,7 +2145,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 }
                 else {
                     #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
-                    if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## verify existence of string in response
+                    if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                         #print {$RESULTS} qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                         print {$RESULTSXML} qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
                         #print {*STDOUT} "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
@@ -2189,8 +2189,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 }
                 else {
                     #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
-                    if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## pre-condition for smart assertion - first regex must pass
-                        if ($response->as_string() =~ m~$verifyparms[1]~si) {  ## verify existence of string in response
+                    if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
+                        if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
                             #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                             print {$RESULTSXML} qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
                             #print {*STDOUT} "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
@@ -2235,7 +2235,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
-                    if ($response->as_string() =~ m~$verifyparms[0]~si) {  ## verify existence of string in response
+                    if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                         print {$RESULTS} qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                         print {$RESULTSXML} qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
                         print {*STDOUT} "Passed Positive Verification \n";
@@ -2282,7 +2282,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     $assertionskipsmessage = $assertionskipsmessage . "[" . $verifyparms[2] . "]";
                 }
                 else {
-                    if ($response->as_string() =~ m~$verifyparms[0]~si) {  #verify existence of string in response
+                    if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
                         print {$RESULTS} qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                         print {$RESULTSXML} qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
                         if ($verifyparms[1]) {
@@ -2494,11 +2494,11 @@ sub parseresponse {  #parse values from responses for use in future request (for
             $parsedresult{$testAttrib} = undef; ## clear out any old value first
 
             if ($rightboundary eq 'regex') {## custom regex feature
-                if ($resptoparse =~ m~$leftboundary~s) {
+                if ($resptoparse =~ m/$leftboundary/s) {
                     $parsedresult{$testAttrib} = $1;
                 }
             } else {
-                if ($resptoparse =~ m~$leftboundary(.*?)$rightboundary~s) {
+                if ($resptoparse =~ m/$leftboundary(.*?)$rightboundary/s) {
                     $parsedresult{$testAttrib} = $1;
                 }
             }
@@ -2559,12 +2559,12 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
         #remove any commented blocks from config file
          foreach (@precomment) {
-            unless (m~<comment>.*</comment>~) {  #single line comment
+            unless (m{<comment>.*</comment>}) {  #single line comment
                 #multi-line comments
                 if (/<comment>/) {
                     $comment_mode = 1;
                 }
-                elsif (m~</comment>~) {
+                elsif (m{</comment>}) {
                     $comment_mode = 0;
                 }
                 elsif (!$comment_mode) {
@@ -2581,7 +2581,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
             if (/<testcasefile>/) {
                 $firstparse = $';  #print "$' \n\n"; ## " doublequote for text editor display fix
-                $firstparse =~ m~</testcasefile>~;
+                $firstparse =~ m{</testcasefile>};
                 $filename = $`;  #string between tags will be in $filename
                 #print "\n$filename \n\n";
                 push @casefilelist, $filename;  #add next filename we grab to end of array
@@ -2637,14 +2637,14 @@ sub processcasefile {  #get test case files to run (from command line or config 
         for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
                 globalretry globaljumpbacks testonly autocontrolleronly/) {
             if (/<$config_const>/) {
-                $_ =~ m~<$config_const>(.*)</$config_const>~;
+                $_ =~ m{<$config_const>(.*)</$config_const>};
                 $config{$config_const} = $1;
                 #print "\n$_ : $config{$_} \n\n";
             }
         }
 
         if (/<useragent>/) {
-            $_ =~ m~<useragent>(.*)</useragent>~;
+            $_ =~ m{<useragent>(.*)</useragent>};
             $setuseragent = $1;
             if ($setuseragent) { #http useragent that will show up in webserver logs
                 $useragent->agent($setuseragent);
@@ -2657,7 +2657,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
                 #array of values, then we use [] to get a reference to that array
                 #and push that reference onto @httpauth.
         my @authentry;
-            $_ =~ m~<httpauth>(.*)</httpauth>~;
+            $_ =~ m{<httpauth>(.*)</httpauth>};
             @authentry = split(/:/, $1);
             if ($#authentry != 4) {
                 print STDERR "\nError: httpauth should have 5 fields delimited by colons\n\n";
@@ -2750,43 +2750,43 @@ sub convertbackxml() {  #converts replaced xml with substitutions
         $mylength = length($response->as_string);
     }
 
-    $_[0] =~ s~{JUMPBACKS}~$jumpbacks~g; #Number of times we have jumped back due to failure
+    $_[0] =~ s/{JUMPBACKS}/$jumpbacks/g; #Number of times we have jumped back due to failure
 
 ## hostname, testnum, concurrency, teststeptime
-    $_[0] =~ s~{HOSTNAME}~$hostname~g; #of the computer currently running webinject
-    $_[0] =~ s~{TESTNUM}~$testnumlog~g;
-    $_[0] =~ s~{TESTFILENAME}~$testfilename~g;
-    $_[0] =~ s~{LENGTH}~$mylength~g; #length of the previous test step response
-    $_[0] =~ s~{AMPERSAND}~&~g;
-    $_[0] =~ s~{LESSTHAN}~<~g;
-    $_[0] =~ s~{SINGLEQUOTE}~'~g; #'
-    $_[0] =~ s~{TIMESTAMP}~$timestamp~g;
-    $_[0] =~ s~{STARTTIME}~$starttime~g;
-    $_[0] =~ s~{OPT_PROXYRULES}~$opt_proxyrules~g;
-    $_[0] =~ s~{OPT_PROXY}~$opt_proxy~g;
+    $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running webinject
+    $_[0] =~ s/{TESTNUM}/$testnumlog/g;
+    $_[0] =~ s/{TESTFILENAME}/$testfilename/g;
+    $_[0] =~ s/{LENGTH}/$mylength/g; #length of the previous test step response
+    $_[0] =~ s/{AMPERSAND}/&/g;
+    $_[0] =~ s/{LESSTHAN}/</g;
+    $_[0] =~ s/{SINGLEQUOTE}/'/g; #'
+    $_[0] =~ s/{TIMESTAMP}/$timestamp/g;
+    $_[0] =~ s/{STARTTIME}/$starttime/g;
+    $_[0] =~ s/{OPT_PROXYRULES}/$opt_proxyrules/g;
+    $_[0] =~ s/{OPT_PROXY}/$opt_proxy/g;
 
-    $_[0] =~ m~{TESTSTEPTIME:(\d+)}~s;
+    $_[0] =~ m/{TESTSTEPTIME:(\d+)}/s;
     if ($1)
     {
-     $_[0] =~ s~{TESTSTEPTIME:(\d+)}~$teststeptime{$1}~g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
+     $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
-    $_[0] =~ s~{DAY}~$DAYOFMONTH~g;
-    $_[0] =~ s~{MONTH}~$MONTHS[$MONTH]~g;
-    $_[0] =~ s~{YEAR}~$YEAR~g; #4 digit year
-    $_[0] =~ s~{YY}~$YY~g; #2 digit year
-    $_[0] =~ s~{HH}~$HOUR~g;
-    $_[0] =~ s~{MM}~$MINUTE~g;
-    $_[0] =~ s~{SS}~$SECOND~g;
-    $_[0] =~ s~{WEEKOFMONTH}~$WEEKOFMONTH~g;
-    $_[0] =~ s~{DATETIME}~$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND~g;
+    $_[0] =~ s/{DAY}/$DAYOFMONTH/g;
+    $_[0] =~ s/{MONTH}/$MONTHS[$MONTH]/g;
+    $_[0] =~ s/{YEAR}/$YEAR/g; #4 digit year
+    $_[0] =~ s/{YY}/$YY/g; #2 digit year
+    $_[0] =~ s/{HH}/$HOUR/g;
+    $_[0] =~ s/{MM}/$MINUTE/g;
+    $_[0] =~ s/{SS}/$SECOND/g;
+    $_[0] =~ s/{WEEKOFMONTH}/$WEEKOFMONTH/g;
+    $_[0] =~ s/{DATETIME}/$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND/g;
     my $underscore = "_";
-    $_[0] =~ s~{FORMATDATETIME}~$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$underscore$HOUR:$MINUTE:$SECOND~g;
-    $_[0] =~ s~{COUNTER}~$counter~g;
-    $_[0] =~ s~{CONCURRENCY}~$concurrency~g; #name of the temporary folder being used - not full path
-    $_[0] =~ s~{OUTPUT}~$output~g;
-    $_[0] =~ s~{OUTSUM}~$outsum~g;
+    $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$underscore$HOUR:$MINUTE:$SECOND}g;
+    $_[0] =~ s/{COUNTER}/$counter/g;
+    $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
+    $_[0] =~ s/{OUTPUT}/$output/g;
+    $_[0] =~ s/{OUTSUM}/$outsum/g;
 ## CWD Current Working Directory
     $_[0] =~ s~{CWD}~$cwd~g;
 
@@ -2796,12 +2796,12 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $testAttrib ( sort keys %{parsedresult} ) {
        my $parseVAR = substr($testAttrib, 13);
-       $_[0] =~ s~{$parseVAR}~$parsedresult{$testAttrib}~g;
+       $_[0] =~ s/{$parseVAR}/$parsedresult{$testAttrib}/g;
     }
 
-    $_[0] =~ s~{BASEURL}~$config{baseurl}~g;
-    $_[0] =~ s~{BASEURL1}~$config{baseurl1}~g;
-    $_[0] =~ s~{BASEURL2}~$config{baseurl2}~g;
+    $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
+    $_[0] =~ s/{BASEURL1}/$config{baseurl1}/g;
+    $_[0] =~ s/{BASEURL2}/$config{baseurl2}/g;
 
 ## perform arbirtary user defined config substituions
     my ($value, $KEY);
@@ -2811,7 +2811,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
             $value = '';
         }
         $KEY = uc $key; ## convert to uppercase
-        $_[0] =~ s~{$KEY}~$value~g;
+        $_[0] =~ s/{$KEY}/$value/g;
     }
 
     return;
@@ -2825,9 +2825,9 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
     my $elapsedseconds = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
     my $elapsedminutes = int($elapsedseconds / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
 
-    $_[0] =~ s~{RETRY}~$retriessub~g;
-    $_[0] =~ s~{ELAPSED_SECONDS}~$elapsedseconds~g; ## always rounded up
-    $_[0] =~ s~{ELAPSED_MINUTES}~$elapsedminutes~g; ## always rounded up
+    $_[0] =~ s/{RETRY}/$retriessub/g;
+    $_[0] =~ s/{ELAPSED_SECONDS}/$elapsedseconds/g; ## always rounded up
+    $_[0] =~ s/{ELAPSED_MINUTES}/$elapsedminutes/g; ## always rounded up
 
     ## put the current date and time into variables
     my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime();
@@ -2840,7 +2840,7 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
     $second = sprintf("%02d", $second);
 
     my $underscore = "_";
-    $_[0] =~ s~{NOW}~$day\/$month\/$year$underscore$hour:$minute:$second~g;
+    $_[0] =~ s{{NOW}}{$day\/$month\/$year$underscore$hour:$minute:$second}g;
 
     return;
 }
@@ -2849,7 +2849,7 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
     foreach my $testAttrib ( sort keys %{varvar} ) {
        my $subVAR = substr($testAttrib, 3);
-       $_[0] =~ s~{$subVAR}~$varvar{$testAttrib}~g;
+       $_[0] =~ s/{$subVAR}/$varvar{$testAttrib}/g;
     }
 
     return;
@@ -2916,7 +2916,7 @@ sub httplog {  #write requests and responses to http.log file
          ## makes an xml response easier to read by putting in a few carriage returns
          $formatresponse = $response->as_string; ## get the response output
          ## put in carriage returns
-         $formatresponse =~ s~\>\<~\>\x0D\n\<~g; ## insert a CR between every ><
+         $formatresponse =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
 
@@ -2924,10 +2924,10 @@ sub httplog {  #write requests and responses to http.log file
          ## makes a JSON response easier to read by putting in a few carriage returns
          $formatresponse = $response->as_string; #get the response out
          ## put in carriage returns
-         $formatresponse =~ s~",~",\x0D\n~g;    ## insert a CR after  every ",
-         $formatresponse =~ s~\},~\},\x0D\n~g;  ## insert a CR after  every },
-         $formatresponse =~ s~\["~\x0D\n\["~g;  ## insert a CR before every ["
-         $formatresponse =~ s~\\n\\tat~\x0D\n\\tat~g;  ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
+         $formatresponse =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
+         $formatresponse =~ s/\},/\},\x0D\n/g;  ## insert a CR after  every },
+         $formatresponse =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
+         $formatresponse =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
 
@@ -3065,7 +3065,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         $sel->set_timeout(5000);
         my $allchromehandle = (`GetWindows.exe`); ## this is a separate simple .NET C# program that lists all open windows and what their title is
         #print {*STDOUT} qq|$allchromehandle\n|;
-        $allchromehandle =~ m~(\d+), http:..127.0.0.1:87..windowidentify_$thetime~s;
+        $allchromehandle =~ m{(\d+), http:..127.0.0.1:87..windowidentify_$thetime}s;
         if ($1)
         {
             $chromehandle = $1;
