@@ -94,7 +94,7 @@ my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
 my @WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
 my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYOFYEAR, $DAYLIGHTSAVINGS) = localtime;
 my $YEAR = 1900 + $YEAROFFSET;
-my $YY = substr $YEAR, 2; #year as 2 digits
+my $YY = substr($YEAR, 2); #year as 2 digits
 $DAYOFMONTH = sprintf '%02d', $DAYOFMONTH;
 my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
 my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
@@ -467,7 +467,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
                     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
                         if ( substr($testAttrib, 0, 14) eq "verifypositive" || substr($testAttrib, 0, 14) eq "verifynegative") {
-                            my $verifytype = ucfirst substr $testAttrib, 6, 8; ## so we get the word Positive or Negative
+                            my $verifytype = ucfirst substr($testAttrib, 6, 8); ## so we get the word Positive or Negative
                             @verifyparms = split /\|\|\|/, $case{$testAttrib} ; ## index 0 contains the actual string to verify
                             print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                             print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
@@ -2132,7 +2132,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaok && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
         foreach my $configAttrib ( sort keys %{ $userconfig->{autoassertions} } ) {
-            if ( substr $configAttrib, 0, 13 eq "autoassertion" ) {
+            if ( substr ($configAttrib, 0, 13) eq "autoassertion" ) {
                 $verifynum = $configAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
@@ -2176,7 +2176,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## smart assertions
     if ($entrycriteriaok && !$case{ignoresmartassertions}) {
         foreach my $configAttrib ( sort keys %{ $userconfig->{smartassertions} } ) {
-            if ( substr $configAttrib, 0, 14 eq "smartassertion" ) {
+            if ( substr($configAttrib, 0, 14) eq "smartassertion" ) {
                 $verifynum = $configAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
@@ -2223,7 +2223,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaok) {
         ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr $testAttrib, 0, 14 eq "verifypositive" ) {
+            if ( substr($testAttrib, 0, 14) eq "verifypositive" ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
@@ -2269,7 +2269,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     if ($entrycriteriaok) {
         ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr $testAttrib, 0, 14 eq "verifynegative" ) {
+            if ( substr($testAttrib, 0, 14) eq "verifynegative" ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 #print {*STDOUT} "$testAttrib\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
@@ -2317,7 +2317,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## assert count
     if ($entrycriteriaok) {
         foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr $testAttrib, 0, 11 eq "assertcount" ) {
+            if ( substr($testAttrib, 0, 11) eq "assertcount" ) {
                 $verifynum = $testAttrib; ## determine index verifypositive index
                 #print {*STDOUT} "$testAttrib\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
@@ -2483,7 +2483,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
 
-        if ( substr $testAttrib, 0, 13 eq "parseresponse" ) {
+        if ( substr($testAttrib, 0, 13) eq "parseresponse" ) {
 
             @parseargs = split /\|/, $case{$testAttrib} ;
 
@@ -2795,7 +2795,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     ##substitute all the parsed results back
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $testAttrib ( sort keys %{parsedresult} ) {
-       my $parseVAR = substr $testAttrib, 13;
+       my $parseVAR = substr($testAttrib, 13);
        $_[0] =~ s/{$parseVAR}/$parsedresult{$testAttrib}/g;
     }
 
@@ -2859,7 +2859,7 @@ sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
 #------------------------------------------------------------------
 sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-       if ( substr $testAttrib, 0, 3 eq "var" ) {
+       if ( substr($testAttrib, 0, 3) eq "var" ) {
             $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
         }
     }
