@@ -226,7 +226,7 @@ sub engine {
 
             $counter = $counter + 1;
             $runcount = 0;
-            $jumpbacksprint = ''; ## we do not indicate a jump back until we actually jump back
+            $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
             $jumpbacks = 0;
 
             my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
@@ -245,7 +245,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                 $isfailure = 0;
                 $retries = 1; ## we increment retries after writing to the log
-                $retriesprint = ''; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+                $retriesprint = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
                 $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
@@ -320,7 +320,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 }
 
                 $entrycriteriaok = 'true'; ## assume entry criteria met
-                $entryresponse = '';
+                $entryresponse = q{};
 
                 $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
                 if (defined $case{checkpositive}) { ## is the checkpositive value set for this testcase?
@@ -328,7 +328,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaok = '';
+                        $entrycriteriaok = q{};
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
                         ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
@@ -341,7 +341,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaok = '';
+                        $entrycriteriaok = q{};
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
                     }
@@ -353,7 +353,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                         ## ok to run this test case
                     }
                     else {
-                        $entrycriteriaok = '';
+                        $entrycriteriaok = q{};
                         $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n!;
                         ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
                     }
@@ -422,7 +422,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else
                     {
-                       $desc2log = ''; ## must blank it out if not being used
+                       $desc2log = q{}; ## must blank it out if not being used
                     }
 
                     if ($config{globalretry}) {
@@ -855,23 +855,23 @@ Verifications Failed: $failedcount
 #------------------------------------------------------------------
 sub selenium {  ## send Selenium command and read response
 
-    my $command = '';
-    my $verifytext = '';
+    my $command = q{};
+    my $verifytext = q{};
     my @verfresp = ();
     my $idx = 0; #For keeping track of index in foreach loop
-    my $grab = '';
-    my $jswait = '';
-    my @parseverify ='';
+    my $grab = q{};
+    my $jswait = q{};
+    my @parseverify =q{};
     my $timestart;
 
     $starttimer = time;
 
-    my $combinedresp='';
+    my $combinedresp = q{};
     $request = HTTP::Request->new('GET','WebDriver');
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
        if ($case{$_}) {#perform command
           $command = $case{$_};
-          $selresp = '';
+          $selresp = q{};
           my $evalresp = eval { eval "$command"; }; ## no critic
           print "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
@@ -1445,7 +1445,7 @@ sub getassets { ## get page assets matching a list for a reference type
 
             open my $RESPONSEASFILE, '>', "$outputfolder/$filename"; #open in clobber mode
             binmode $RESPONSEASFILE; ## set binary mode
-            print $RESPONSEASFILE $assetresponse->content, ''; ## content just outputs the content, whereas as_string includes the response header
+            print $RESPONSEASFILE $assetresponse->content, q{}; ## content just outputs the content, whereas as_string includes the response header
             close $RESPONSEASFILE;
 
             $endassetrequest = time;
@@ -1469,14 +1469,14 @@ sub getassets { ## get page assets matching a list for a reference type
 
 #------------------------------------------------------------------
 sub savepage {## save the page in a cache to enable auto substitution
-   my $page = '';
-   my $pagenameaction = '';
-   my $pagename = '';
+   my $page = q{};
+   my $pagenameaction = q{};
+   my $pagename = q{};
    my $pagefound = 'false';
    my $idx = 0; #For keeping track of index in foreach loop
    my $idfound = 0;
    my $idfoundflag = 'false';
-   my $tempname = '';
+   my $tempname = q{};
    my $saveidx = 0;
    my $len = 0;
    my $count = 0;
@@ -1593,9 +1593,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     my $nameid=0;
     my $namefoundflag = 'false';
-    my $lhsname='';
-    my $rhsname='';
-    my $name='';
+    my $lhsname=q{};
+    my $rhsname=q{};
+    my $name=q{};
     my $realnamefound='false';
 
     $startsubtimer = time;
@@ -1662,9 +1662,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           $nameid=0;
           $namefoundflag = 'false';
-          $lhsname='';
-          $rhsname='';
-          $name='';
+          $lhsname=q{};
+          $rhsname=q{};
+          $name=q{};
           $realnamefound='false';
           $datafound='false';
           my $dotx='false';
@@ -1878,7 +1878,7 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
             $_ =~ m{(.*): (.*)};
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
-        #$case{addheader} = ''; ## why is this line here? Fails with retry, so commented out
+        #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
     #print $request->as_string; print "\n\n";
@@ -1917,13 +1917,13 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
        #loop through each of the fields and substitute
        for ($idx = 1; $idx <= $len; $idx++) {
-            $fieldname = '';
+            $fieldname = q{};
             #out print {*STDOUT} qq| \n parms $idx: $parms[$idx-1] \n |;
             if ($parms[$idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
                 $fieldname = $1;
                 #out print {*STDOUT} qq| fieldname: $fieldname \n|;
             }
-            $fieldvalue = '';
+            $fieldvalue = q{};
             if ($parms[$idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
                 $fieldvalue = $1;
                 #out print {*STDOUT} qq| fieldvalue: $fieldvalue \n\n|;
@@ -1967,7 +1967,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
             $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
         }
-        #$case{addheader} = ''; ## why is this line here? Fails with retry, so commented out
+        #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
     #print $request->as_string; print "\n\n";
@@ -2022,7 +2022,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
 #------------------------------------------------------------------
 sub cmd {  ## send terminal command and read response
 
-    my $combinedresp='';
+    my $combinedresp=q{};
     $request = HTTP::Request->new('GET','CMD');
     $starttimer = time;
 
@@ -2126,7 +2126,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     my $count; ##
     my $tempstring; ##
     my $assertionskips = 0;
-    my $assertionskipsmessage = ''; ## support tagging an assertion as disabled with a message
+    my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 
     ## auto assertions
     if ($entrycriteriaok && !$case{ignoreautoassertions}) {
@@ -2808,7 +2808,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     foreach my $key (keys %{ $userconfig->{userdefined} } ) {
         $value = $userconfig->{userdefined}{$key};
         if (ref($value) eq 'HASH') { ## if we found a HASH, we treat it as blank
-            $value = '';
+            $value = q{};
         }
         $KEY = uc $key; ## convert to uppercase
         $_[0] =~ s/{$KEY}/$value/g;
@@ -2883,8 +2883,8 @@ sub url_escape {  #escapes difficult characters with %hexvalue
 sub httplog {  #write requests and responses to http.log file
 
     ## show a single space instead of %20 in the http.log
-    my $textrequest = '';
-    my $formatresponse = '';
+    my $textrequest = q{};
+    my $formatresponse = q{};
     $textrequest = $request->as_string;
     $textrequest =~ s|%20| |g; #Replace %20 with a single space for clarity in the log file
     #print "http request ---- ", $textrequest, "\n\n";
@@ -2935,7 +2935,7 @@ sub httplog {  #write requests and responses to http.log file
         my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
         open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}";  #open in clobber mode
         binmode $RESPONSEASFILE; ## set binary mode
-        print $RESPONSEASFILE $response->content, ''; #content just outputs the content, whereas as_string includes the response header
+        print $RESPONSEASFILE $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
         close $RESPONSEASFILE;
     }
 
