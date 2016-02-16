@@ -168,7 +168,7 @@ sub engine {
         $concurrency = $1;
     }
 
-    $outsum = unpack "%32C*", $output; ## checksum of output directory name - for concurrency
+    $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
 
     print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
@@ -201,7 +201,7 @@ sub engine {
         $currentcasefilename = basename($currentcasefile); ## with extension
         $testfilename = fileparse($currentcasefile, '.xml'); ## without extension
 
-        $casefilecheck = ' ';
+        $casefilecheck = q{ };
 
         convtestcases();
 
