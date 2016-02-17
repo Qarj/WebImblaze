@@ -372,12 +372,12 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                 my %casesave; ## we need a clean array for each test case
                 undef %case; ## do not allow values from previous test cases to bleed over
-                foreach my $testAttrib ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                    #print "DEBUG: $testAttrib", ": ", $xmltestcases->{case}->{$testnum}->{$testAttrib};
+                foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+                    #print "DEBUG: $case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$case_attribute};
                     #print "\n";
-                    $case{$testAttrib} = $xmltestcases->{case}->{$testnum}->{$testAttrib};
-                    convertbackxml($case{$testAttrib});
-                    $casesave{$testAttrib} = $case{$testAttrib}; ## in case we have to retry, some parms need to be resubbed
+                    $case{$case_attribute} = $xmltestcases->{case}->{$testnum}->{$case_attribute};
+                    convertbackxml($case{$case_attribute});
+                    $casesave{$case_attribute} = $case{$case_attribute}; ## in case we have to retry, some parms need to be resubbed
                 }
 
                 $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
@@ -403,17 +403,17 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                 do ## retry loop
                 {
                     ## for each retry, there are a few substitutions that we need to redo - like the retry number
-                    foreach my $testAttrib ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                        if (defined $casesave{$testAttrib}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
+                    foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+                        if (defined $casesave{$case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
                         {
-                            $case{$testAttrib} = $casesave{$testAttrib}; ## need to restore to the original partially substituted parameter
-                            convertbackxmldynamic($case{$testAttrib}); ## now update the dynamic components
+                            $case{$case_attribute} = $casesave{$case_attribute}; ## need to restore to the original partially substituted parameter
+                            convertbackxmldynamic($case{$case_attribute}); ## now update the dynamic components
                         }
                     }
 
                     set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
-                    foreach my $testAttrib ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
-                            convertback_variables($case{$testAttrib});
+                    foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
+                            convertback_variables($case{$case_attribute});
                     }
 
                     $desc1log = $case{description1};
@@ -465,13 +465,13 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     ## display and log the verifications to do
                     ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
                     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
-                    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                        if ( substr($testAttrib, 0, 14) eq 'verifypositive' || substr($testAttrib, 0, 14) eq 'verifynegative') {
-                            my $verifytype = ucfirst substr($testAttrib, 6, 8); ## so we get the word Positive or Negative
-                            @verifyparms = split /\|\|\|/, $case{$testAttrib} ; ## index 0 contains the actual string to verify
+                    foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+                        if ( substr($case_attribute, 0, 14) eq 'verifypositive' || substr($case_attribute, 0, 14) eq 'verifynegative') {
+                            my $verifytype = ucfirst substr($case_attribute, 6, 8); ## so we get the word Positive or Negative
+                            @verifyparms = split /\|\|\|/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
                             print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                             print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
-                            print {$RESULTSXML} qq|            <$testAttrib>$verifyparms[0]</$testAttrib>\n|;
+                            print {$RESULTSXML} qq|            <$case_attribute>$verifyparms[0]</$case_attribute>\n|;
                         }
                     }
 
@@ -2222,12 +2222,12 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## verify positive
     if ($entrycriteriaok) {
         ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
-        foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 14) eq 'verifypositive' ) {
-                $verifynum = $testAttrib; ## determine index verifypositive index
+        foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+            if ( substr($case_attribute, 0, 14) eq 'verifypositive' ) {
+                $verifynum = $case_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
-                @verifyparms = split /\|\|\|/, $case{$testAttrib} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+                @verifyparms = split /\|\|\|/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
@@ -2237,7 +2237,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 else {
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                         print {$RESULTS} qq|<span class="pass">Passed Positive Verification</span><br />\n|;
-                        print {$RESULTSXML} qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
                         print {*STDOUT} "Passed Positive Verification \n";
                         #print {*STDOUT} $verifynum." Passed Positive Verification \n"; ##DEBUG
                         $lastpositive[$verifynum] = 'pass'; ## remember fact that this verifypositive passed
@@ -2246,10 +2246,10 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     }
                     else {
                         print {$RESULTS} qq|<span class="fail">Failed Positive Verification:</span>$verifyparms[0]<br />\n|;
-                        print {$RESULTSXML} qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
                         if ($verifyparms[1]) { ## is there a custom assertion failure message?
                            print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                           print {$RESULTSXML} qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
+                           print {$RESULTSXML} qq|            <$case_attribute-message>$verifyparms[1]</$case_attribute-message>\n|;
                         }
                         print {*STDOUT} "Failed Positive Verification \n";
                         if ($verifyparms[1]) {
@@ -2268,13 +2268,13 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## verify negative
     if ($entrycriteriaok) {
         ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
-        foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 14) eq 'verifynegative' ) {
-                $verifynum = $testAttrib; ## determine index verifypositive index
-                #print {*STDOUT} "$testAttrib\n"; ##DEBUG
+        foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+            if ( substr($case_attribute, 0, 14) eq 'verifynegative' ) {
+                $verifynum = $case_attribute; ## determine index verifypositive index
+                #print {*STDOUT} "$case_attribute\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-                @verifyparms = split /\|\|\|/, $case{$testAttrib} ; #index 0 contains the actual string to verify
+                @verifyparms = split /\|\|\|/, $case{$case_attribute} ; #index 0 contains the actual string to verify
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
@@ -2284,10 +2284,10 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 else {
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
                         print {$RESULTS} qq|<span class="fail">Failed Negative Verification</span><br />\n|;
-                        print {$RESULTSXML} qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
                         if ($verifyparms[1]) {
                            print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                             print {$RESULTSXML} qq|            <$testAttrib-message>$verifyparms[1]</$testAttrib-message>\n|;
+                             print {$RESULTSXML} qq|            <$case_attribute-message>$verifyparms[1]</$case_attribute-message>\n|;
                         }
                         print {*STDOUT} "Failed Negative Verification \n";
                         if ($verifyparms[1]) {
@@ -2303,7 +2303,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     }
                     else {
                         print {$RESULTS} qq|<span class="pass">Passed Negative Verification</span><br />\n|;
-                        print {$RESULTSXML} qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
                         print {*STDOUT} "Passed Negative Verification \n";
                         $lastnegative[$verifynum] = 'pass'; ## remember fact that this verifynegative passed
                         $passedcount++;
@@ -2316,13 +2316,13 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 
     ## assert count
     if ($entrycriteriaok) {
-        foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            if ( substr($testAttrib, 0, 11) eq 'assertcount' ) {
-                $verifynum = $testAttrib; ## determine index verifypositive index
-                #print {*STDOUT} "$testAttrib\n"; ##DEBUG
+        foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+            if ( substr($case_attribute, 0, 11) eq 'assertcount' ) {
+                $verifynum = $case_attribute; ## determine index verifypositive index
+                #print {*STDOUT} "$case_attribute\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-                @verifycountparms = split /\|\|\|/, $case{$testAttrib} ;
+                @verifycountparms = split /\|\|\|/, $case{$case_attribute} ;
                 $count=0;
                 $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
 
@@ -2337,21 +2337,21 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 else {
                     if ($count == $verifycountparms[1]) {
                         print {$RESULTS} qq|<span class="pass">Passed Count Assertion of $verifycountparms[1]</span><br />\n|;
-                        print {$RESULTSXML} qq|            <$testAttrib-success>true</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
                         print {*STDOUT} "Passed Count Assertion of $verifycountparms[1] \n";
                         $passedcount++;
                         $retrypassedcount++;
                     }
                     else {
-                        print {$RESULTSXML} qq|            <$testAttrib-success>false</$testAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
                         if ($verifycountparms[2]) {## if there is a custom message, write it out
                             print {$RESULTS} qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
                             print {$RESULTS} qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
-                            print {$RESULTSXML} qq|            <$testAttrib-message>$verifycountparms[2] [got $count]</$testAttrib-message>\n|;
+                            print {$RESULTSXML} qq|            <$case_attribute-message>$verifycountparms[2] [got $count]</$case_attribute-message>\n|;
                         }
                         else {# we make up a standard message
                             print {$RESULTS} qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                            print {$RESULTSXML} qq|            <$testAttrib-message>Failed Count Assertion of $verifycountparms[1], got $count</$testAttrib-message>\n|;
+                            print {$RESULTSXML} qq|            <$case_attribute-message>Failed Count Assertion of $verifycountparms[1], got $count</$case_attribute-message>\n|;
                         }
                         print {*STDOUT} "Failed Count Assertion of $verifycountparms[1], got $count \n";
                         if ($verifycountparms[2]) {
@@ -2481,38 +2481,38 @@ sub parseresponse {  #parse values from responses for use in future request (for
     my ($resptoparse, @parseargs);
     my ($leftboundary, $rightboundary, $escape);
 
-    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
 
-        if ( substr($testAttrib, 0, 13) eq 'parseresponse' ) {
+        if ( substr($case_attribute, 0, 13) eq 'parseresponse' ) {
 
-            @parseargs = split /\|/, $case{$testAttrib} ;
+            @parseargs = split /\|/, $case{$case_attribute} ;
 
             $leftboundary = $parseargs[0]; $rightboundary = $parseargs[1]; $escape = $parseargs[2];
 
             $resptoparse = $response->as_string;
 
-            $parsedresult{$testAttrib} = undef; ## clear out any old value first
+            $parsedresult{$case_attribute} = undef; ## clear out any old value first
 
             if ($rightboundary eq 'regex') {## custom regex feature
                 if ($resptoparse =~ m/$leftboundary/s) {
-                    $parsedresult{$testAttrib} = $1;
+                    $parsedresult{$case_attribute} = $1;
                 }
             } else {
                 if ($resptoparse =~ m/$leftboundary(.*?)$rightboundary/s) {
-                    $parsedresult{$testAttrib} = $1;
+                    $parsedresult{$case_attribute} = $1;
                 }
             }
 
             if ($escape) {
                 if ($escape eq 'escape') {
-                    $parsedresult{$testAttrib} = url_escape($parsedresult{$testAttrib});
+                    $parsedresult{$case_attribute} = url_escape($parsedresult{$case_attribute});
                 }
             }
 
             ## decode html entities - e.g. convert &amp; to & and &lt; to <
             if ($escape) {
                 if ($escape eq 'decode') {
-                    $parsedresult{$testAttrib} = decode_entities($parsedresult{$testAttrib});
+                    $parsedresult{$case_attribute} = decode_entities($parsedresult{$case_attribute});
                 }
             }
 
@@ -2794,9 +2794,9 @@ sub convertbackxml() {  #converts replaced xml with substitutions
 
     ##substitute all the parsed results back
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
-    foreach my $testAttrib ( sort keys %{parsedresult} ) {
-       my $parseVAR = substr($testAttrib, 13);
-       $_[0] =~ s/{$parseVAR}/$parsedresult{$testAttrib}/g;
+    foreach my $case_attribute ( sort keys %{parsedresult} ) {
+       my $parseVAR = substr($case_attribute, 13);
+       $_[0] =~ s/{$parseVAR}/$parsedresult{$case_attribute}/g;
     }
 
     $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
@@ -2847,9 +2847,9 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 
 #------------------------------------------------------------------
 sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
-    foreach my $testAttrib ( sort keys %{varvar} ) {
-       my $subVAR = substr($testAttrib, 3);
-       $_[0] =~ s/{$subVAR}/$varvar{$testAttrib}/g;
+    foreach my $case_attribute ( sort keys %{varvar} ) {
+       my $subVAR = substr($case_attribute, 3);
+       $_[0] =~ s/{$subVAR}/$varvar{$case_attribute}/g;
     }
 
     return;
@@ -2858,9 +2858,9 @@ sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
 ## use critic
 #------------------------------------------------------------------
 sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
-    foreach my $testAttrib ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-       if ( substr($testAttrib, 0, 3) eq 'var' ) {
-            $varvar{$testAttrib} = $case{$testAttrib}; ## assign the variable
+    foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+       if ( substr($case_attribute, 0, 3) eq 'var' ) {
+            $varvar{$case_attribute} = $case{$case_attribute}; ## assign the variable
         }
     }
 
