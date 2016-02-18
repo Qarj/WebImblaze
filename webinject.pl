@@ -875,7 +875,7 @@ sub selenium {  ## send Selenium command and read response
           my $evalresp = eval { eval "$command"; }; ## no critic
           print "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
-              if (($selresp =~ m!(^|=)HASH\b!) || ($selresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
+              if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                   my $dumpresp = Dumper($selresp);
                   print "SELRESP:$dumpresp";
                   $selresp = "selresp:$dumpresp";
