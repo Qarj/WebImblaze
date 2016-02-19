@@ -174,7 +174,7 @@ sub engine {
     print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
     writeinitialhtml();  #write opening tags for results file
 
-    unless ($xnode) { #skip regular STDOUT output if using an XPath
+    if (!$xnode) { #skip regular STDOUT output if using an XPath
         writeinitialstdout();  #write opening tags for STDOUT.
     }
 
@@ -215,10 +215,10 @@ sub engine {
         if (-e "$outputfolder$currentcasefilename.$$.tmp") { unlink "$outputfolder$currentcasefilename.$$.tmp"; }
 
         $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
-        unless ($repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
+        if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
 
         $start = $xmltestcases->{start};  #grab the start for repeating (for restart)
-        unless ($start) { $start = 1; }  #set to 1 in case it is not defined in test case file
+        if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
         $counter = $start - 1; #so starting position and counter are aligned
 
@@ -445,8 +445,8 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 
                     print {*STDOUT} qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
 
-                    unless ($casefilecheck eq $currentcasefile) {
-                        unless ($currentcasefile eq $casefilelist[0]) {  #if this is the first test case file, skip printing the closing tag for the previous one
+                    if ($casefilecheck ne $currentcasefile) {
+                        if ($currentcasefile ne $casefilelist[0]) {  #if this is the first test case file, skip printing the closing tag for the previous one
                             print {$RESULTSXML} qq|    </testcases>\n\n|;
                         }
                         print {$RESULTSXML} qq|    <testcases file="$currentcasefile">\n\n|;
@@ -501,7 +501,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                            elsif ($case{method} eq 'post') { httppost(); }
                            elsif ($case{method} eq 'cmd') { cmd(); }
                            elsif ($case{method} eq 'selenium') { selenium(); }
-                           else { print STDERR qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
+                           else { print {*STDERR} qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
                        }
                        else {
                           httpget();  #use "get" if no method is specified
@@ -717,7 +717,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
 
-    print $RESULTS
+    print {$RESULTS}
 qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -754,12 +754,9 @@ qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 #------------------------------------------------------------------
 sub writeinitialstdout {  #write initial text for STDOUT
 
-    print STDOUT
-qq|
-Starting WebInject Engine...
-
--------------------------------------------------------
-|;
+    print {*STDOUT} "\n";
+    print {*STDOUT} "Starting WebInject Engine...\n\n";
+    print {*STDOUT} "-------------------------------------------------------\n";
 
     return;
 }
@@ -767,7 +764,7 @@ Starting WebInject Engine...
 #------------------------------------------------------------------
 sub writefinalhtml {  #write summary and closing tags for results file
 
-    print $RESULTS
+    print {$RESULTS}
 qq|
 <br /><hr /><br />
 <b>
@@ -804,7 +801,7 @@ sub writefinalxml {  #write summary and closing tags for XML results file
     }
 
 ## startdatetime - inserted start-seconds and start-date-time below
-    print $RESULTSXML
+    print {$RESULTSXML}
 qq|
     </testcases>
 
@@ -835,7 +832,7 @@ print {$RESULTSXML} qq|T$HOUR:$MINUTE:$SECOND</start-date-time>
 #------------------------------------------------------------------
 sub writefinalstdout {  #write summary and closing text for STDOUT
 
-    print STDOUT
+    print {*STDOUT}
 qq|
 Start Time: $currentdatetime
 Total Run Time: $totalruntime seconds
@@ -873,20 +870,20 @@ sub selenium {  ## send Selenium command and read response
           $command = $case{$_};
           $selresp = q{};
           my $evalresp = eval { eval "$command"; }; ## no critic
-          print "EVALRESP:$@\n";
+          print {*STDOUT} "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                   my $dumpresp = Dumper($selresp);
-                  print "SELRESP:$dumpresp";
+                  print {*STDOUT} "SELRESP:$dumpresp";
                   $selresp = "selresp:$dumpresp";
               }
               else {
-                  print "SELRESP:$selresp\n";
+                  print {*STDOUT} "SELRESP:$selresp\n";
                   $selresp = "selresp:$selresp";
               }
           }
           else {
-              print "SELRESP:<undefined>\n";
+              print {*STDOUT} "SELRESP:<undefined>\n";
               $selresp = "selresp:<undefined>";
           }
           #$request = new HTTP::Request('GET',"$case{command}");
@@ -919,15 +916,15 @@ sub selenium {  ## send Selenium command and read response
          {
             eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
          }
-         $selresp =~ s!$!\n\n\n\n!; ## put in a few carriage returns after any Selenium server message first
+         $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
          foreach my $vresp (@verfresp) {
             $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
             $idx++; ## keep track of where we are in the loop
-            $selresp =~ s!$!<$verifytext$idx>$vresp</$verifytext$idx>\n!; ## include it in the response
-            if (($vresp =~ m!(^|=)HASH\b!) || ($vresp =~ m!(^|=)ARRAY\b!)) { ## check to see if we have a HASH or ARRAY object returned
+            $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
+            if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                my $dumpresp = Dumper($vresp);
-               my $dumped = "dumped";
-               $selresp =~ s!$!<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n!; ## include it in the response
+               my $dumped = 'dumped';
+               $selresp =~ s{$}{<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n}; ## include it in the response
                ## ^ means match start of string, $ end of string
             }
          }
@@ -990,9 +987,9 @@ sub selenium {  ## send Selenium command and read response
 sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Locator, Label);
                             ##        custom_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
 
-    my ($searchtarget, $locator, $labeltext) = @_;
+    my ($search_target, $locator, $labeltext) = @_;
 
-    my $elem1 = $sel->find_element("$searchtarget", "$locator");
+    my $elem1 = $sel->find_element("$search_target", "$locator");
     #my $child = $sel->find_child_element($elem1, "./option[\@value='4']")->click();
     my $child = $sel->find_child_element($elem1, "./option[. = '$labeltext']")->click();
 
@@ -1002,10 +999,10 @@ sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Loca
 sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Target, Locator, Keys);
                                  ##        custom_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
 
-    my ($searchtarget, $locator, $sendkeys) = @_;
+    my ($search_target, $locator, $sendkeys) = @_;
 
-    my $elem1 = $sel->find_element("$searchtarget", "$locator")->clear();
-    my $resp1 = $sel->find_element("$searchtarget", "$locator")->send_keys("$sendkeys");
+    my $elem1 = $sel->find_element("$search_target", "$locator")->clear();
+    my $resp1 = $sel->find_element("$search_target", "$locator")->send_keys("$sendkeys");
 
     return $resp1;
 }
@@ -1013,9 +1010,9 @@ sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Tar
 sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
                                     ##        custom_mouse_move_to_location('closeBtn','id','3','4');
 
-    my ($searchtarget, $locator, $xoffset, $yoffset) = @_;
+    my ($search_target, $locator, $xoffset, $yoffset) = @_;
 
-    my $elem1 = $sel->find_element("$searchtarget", "$locator");
+    my $elem1 = $sel->find_element("$search_target", "$locator");
     my $child = $sel->mouse_move_to_location($elem1, $xoffset, $yoffset);
 
     return $child;
@@ -1037,14 +1034,14 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
 sub custom_js_click { ## usage: custom_js_click(id);
                       ##        custom_js_click('btnSubmit');
 
-    my ($idToClick) = @_;
+    my ($id_to_click) = @_;
 
     my $script = q{
         var arg1 = arguments[0];
         var elem = window.document.getElementById(arg1).click();
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$idToClick);
+    my $resp1 = $sel->execute_script($script,$id_to_click);
 
     return $resp1;
 }
@@ -1054,7 +1051,7 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
                            ##
                            ##        Single quotes will not treat \ as escape codes
 
-    my ($idToSetValue, $valueToSet) = @_;
+    my ($id_to_set_value, $value_to_set) = @_;
 
     my $script = q{
         var arg1 = arguments[0];
@@ -1062,7 +1059,7 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
         var elem = window.document.getElementById(arg1).value=arg2;
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$idToSetValue,$valueToSet);
+    my $resp1 = $sel->execute_script($script,$id_to_set_value,$value_to_set);
 
     return $resp1;
 }
@@ -1070,7 +1067,7 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
 sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_field_visible(id);
                                                     ##        custom_js_make_field_visible('cvProvider_filCVUploadFile');
 
-    my ($idToSetCSS) = @_;
+    my ($id_to_set_css) = @_;
 
     my $script = q{
         var arg1 = arguments[0];
@@ -1078,7 +1075,7 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
         var elem = window.document.getElementById(arg1).style.height = '5px';
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$idToSetCSS);
+    my $resp1 = $sel->execute_script($script,$id_to_set_css);
 
     return $resp1;
 }
@@ -1086,13 +1083,13 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
 sub custom_check_element_within_pixels {     ## usage: custom_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
                                              ##        custom_check_element_within_pixels('txtEmail','id',193,325,30);
 
-    my ($searchTarget, $locator, $xBase, $yBase, $pixelThreshold) = @_;
+    my ($search_target, $locator, $x_base, $y_base, $pixel_threshold) = @_;
 
     ## get_element_location will return a reference to a hash associative array
     ## http://www.troubleshooters.com/codecorn/littperl/perlscal.htm
     ## the array will look something like this
     # { 'y' => 325, 'hCode' => 25296896, 'x' => 193, 'class' => 'org.openqa.selenium.Point' };
-    my ($location) = $sel->find_element("$searchTarget", "$locator")->get_element_location();
+    my ($location) = $sel->find_element("$search_target", "$locator")->get_element_location();
 
     ## if the element doesn't exist, we get an empty output, so presumably this subroutine just dies and the program carries on
 
@@ -1100,16 +1097,16 @@ sub custom_check_element_within_pixels {     ## usage: custom_check_element_with
     my $x = $location->{x};
     my $y = $location->{y};
 
-    my $xDiff = abs $xBase - $x;
-    my $yDiff = abs $yBase - $y;
+    my $x_diff = abs $x_base - $x;
+    my $y_diff = abs $y_base - $y;
 
-    my $Message = "Pixel threshold check passed - $searchTarget is $xDiff,$yDiff (x,y) pixels removed from baseline of $xBase,$yBase; actual was $x,$y";
+    my $message = "Pixel threshold check passed - $search_target is $x_diff,$y_diff (x,y) pixels removed from baseline of $x_base,$y_base; actual was $x,$y";
 
-    if ($xDiff > $pixelThreshold || $yDiff > $pixelThreshold) {
-        $Message = "Pixel threshold check failed - $searchTarget is $xDiff,$yDiff (x,y) pixels removed from baseline of $xBase,$yBase; actual was $x,$y";
+    if ($x_diff > $pixel_threshold || $y_diff > $pixel_threshold) {
+        $message = "Pixel threshold check failed - $search_target is $x_diff,$y_diff (x,y) pixels removed from baseline of $x_base,$y_base; actual was $x,$y";
     }
 
-    return $Message;
+    return $message;
 }
 
 sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Search Text',Timeout);
@@ -1274,18 +1271,18 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
 sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present('element-name','element-type','Timeout');
                                       ##        custom_wait_for_element_present('menu-search-icon','id','5');
 
-    my ($elementName, $elementType, $timeout) = @_;
+    my ($element_name, $element_type, $timeout) = @_;
 
-    print {*STDOUT} "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
+    print {*STDOUT} "SEARCH ELEMENT[$element_name], ELEMENT TYPE[$element_type], TIMEOUT[$timeout]\n";
 
     my $timestart = time;
     my $foundit = 'false';
-    my $findElement;
+    my $find_element;
 
     while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
     {
-        eval { $findElement = $sel->find_element("$elementName","$elementType"); };
-        if ($findElement)
+        eval { $find_element = $sel->find_element("$element_name","$element_type"); };
+        if ($find_element)
         {
             $foundit = 'true';
         }
@@ -1313,18 +1310,18 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
 sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible('element-name','element-type','Timeout');
                                       ##        custom_wait_for_element_visible('menu-search-icon','id','5');
 
-    my ($elementName, $elementType, $timeout) = @_;
+    my ($element_name, $element_type, $timeout) = @_;
 
-    print {*STDOUT} "SEARCH ELEMENT[$elementName], ELEMENT TYPE[$elementType], TIMEOUT[$timeout]\n";
+    print {*STDOUT} "SEARCH ELEMENT[$element_name], ELEMENT TYPE[$element_type], TIMEOUT[$timeout]\n";
 
     my $timestart = time;
     my $foundit = 'false';
-    my $findElement;
+    my $find_element;
 
     while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
     {
-        eval { $findElement = $sel->find_element("$elementName","$elementType")->is_displayed(); };
-        if ($findElement)
+        eval { $find_element = $sel->find_element("$element_name","$element_type")->is_displayed(); };
+        if ($find_element)
         {
             $foundit = 'true';
         }
@@ -1352,15 +1349,15 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
 #------------------------------------------------------------------
 sub addcookie { ## add a cookie like JBM_COOKIE=4830075
     if ($case{addcookie}) { ## inject in an additional cookie for this test step only if specified
-        my $cookies = $request->header("Cookie");
+        my $cookies = $request->header('Cookie');
         if (defined $cookies) {
             #print "[COOKIE] $cookies\n";
-            $request->header("Cookie" => "$cookies; " . $case{addcookie});
-            #print "[COOKIE UPDATED] " . $request->header("Cookie") . "\n";
+            $request->header('Cookie' => "$cookies; " . $case{addcookie});
+            #print '[COOKIE UPDATED] ' . $request->header('Cookie') . "\n";
         } else {
             #print "[COOKIE] <UNDEFINED>\n";
-            $request->header("Cookie" => $case{addcookie});
-            #print "[COOKIE UPDATED] " . $request->header("Cookie") . "\n";
+            $request->header('Cookie' => $case{addcookie});
+            #print "[COOKIE UPDATED] " . $request->header('Cookie') . "\n";
         }
         undef $cookies;
     }
@@ -1372,7 +1369,7 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
 sub gethrefs { ## get page href assets matching a list of ending patterns, separate multiple with |
                ## gethrefs=".less|.css"
     if ($case{gethrefs}) {
-        my $match = "href=";
+        my $match = 'href=';
         my $delim = "\x22"; #"
         getassets ($match,$delim,$delim,$case{gethrefs});
         #getassets ("href",$case{gethrefs});
@@ -1385,7 +1382,7 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
 sub getsrcs { ## get page src assets matching a list of ending patterns, separate multiple with |
               ## getsrcs=".js|.png|.jpg|.gif"
     if ($case{getsrcs}) {
-        my $match = "src=";
+        my $match = 'src=';
         my $delim = '"';
         getassets ($match, $delim, $delim, $case{getsrcs});
         #getassets ("src",$case{getsrcs});
@@ -1844,7 +1841,7 @@ sub httppost {  #post request based on specified encoding
          if (($case{posttype} =~ m{application/x-www-form-urlencoded}) or ($case{posttype} =~ m{application/json})) { httppost_form_urlencoded(); } ## application/json support
          elsif ($case{posttype} =~ m{multipart/form-data}) { httppost_form_data(); }
          elsif (($case{posttype} =~ m{text/xml}) or ($case{posttype} =~ m{application/soap+xml})) { httppost_xml(); }
-         else { print STDERR qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
+         else { print {*STDERR} qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
        }
     else {
         $case{posttype} = 'application/x-www-form-urlencoded';
@@ -2618,7 +2615,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
             #print "\nXPath Node is: $xnode \n";
         }
         else {
-            print STDERR "\nSorry, $xpath is not in the XPath format I was expecting, I'm ignoring it...\n";
+            print {*STDERR} "\nSorry, $xpath is not in the XPath format I was expecting, I'm ignoring it...\n";
         }
 
         #use testcase filename passed on command line (config.xml is only used for other options)
@@ -2660,7 +2657,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
             $_ =~ m{<httpauth>(.*)</httpauth>};
             @authentry = split /:/, $1;
             if ($#authentry != 4) {
-                print STDERR "\nError: httpauth should have 5 fields delimited by colons\n\n";
+                print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
             }
             else {
         push @httpauth, [@authentry];
