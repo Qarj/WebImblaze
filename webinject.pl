@@ -186,7 +186,7 @@ sub engine {
     $totalresponse = 0;
     $avgresponse = 0;
     $maxresponse = 0;
-    $minresponse = 10000000; #set to large value so first minresponse will be less
+    $minresponse = 10_000_000; #set to large value so first minresponse will be less
     $stop = 'no';
 
     $globalretries=0; ## total number of retries for this run across all test cases
@@ -232,12 +232,12 @@ sub engine {
             my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
             my $numsteps = scalar @teststeps;
 
-TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
+TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
 
                 $testnum = $teststeps[$stepindex];
 
                 ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
-                $testnumlog = $testnum + ($counter*10000) - 10000;
+                $testnumlog = $testnum + ($counter*10_000) - 10_000;
 
                 if ($xnode) {  #if an XPath Node is defined, only process the single Node
                     $testnum = $xnode;
@@ -329,7 +329,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else {
                         $entrycriteriaok = q{};
-                        $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n!;
+                        $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n/;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
                         ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
                     }
@@ -342,7 +342,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else {
                         $entrycriteriaok = q{};
-                        $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n!;
+                        $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n/;
                         ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
                     }
                 }
@@ -354,7 +354,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     else {
                         $entrycriteriaok = q{};
-                        $entryresponse =~ s!^!ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n!;
+                        $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n/;
                         ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
                     }
                 }
@@ -468,7 +468,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
                         if ( substr($case_attribute, 0, 14) eq 'verifypositive' || substr($case_attribute, 0, 14) eq 'verifynegative') {
                             my $verifytype = ucfirst substr($case_attribute, 6, 8); ## so we get the word Positive or Negative
-                            @verifyparms = split /\|\|\|/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
+                            @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
                             print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                             print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
                             print {$RESULTSXML} qq|            <$case_attribute>$verifyparms[0]</$case_attribute>\n|;
@@ -622,7 +622,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     print {$RESULTSXML} qq|        </testcase>\n\n|;
                     print {$RESULTS} qq|<br />\n------------------------------------------------------- <br />\n\n|;
 
-                    unless ($xnode) { #skip regular STDOUT output if using an XPath
+                    if (!$xnode) { #skip regular STDOUT output if using an XPath
                         print {*STDOUT} qq|------------------------------------------------------- \n|;
                     }
 
@@ -686,7 +686,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {
                     }
                     $retry = $retry - 1;
                 } ## end of retry loop
-                until ($retry < 0);
+                until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
 
                 if ($case{sanitycheck} && ($casefailedcount > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
                     print {*STDOUT} qq|SANITY CHECK FAILED ... Aborting \n|;
@@ -869,7 +869,7 @@ sub selenium {  ## send Selenium command and read response
        if ($case{$_}) {#perform command
           $command = $case{$_};
           $selresp = q{};
-          my $evalresp = eval { eval "$command"; }; ## no critic
+          my $evalresp = eval { eval "$command"; };
           print {*STDOUT} "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
@@ -884,10 +884,10 @@ sub selenium {  ## send Selenium command and read response
           }
           else {
               print {*STDOUT} "SELRESP:<undefined>\n";
-              $selresp = "selresp:<undefined>";
+              $selresp = 'selresp:<undefined>';
           }
           #$request = new HTTP::Request('GET',"$case{command}");
-          $combinedresp =~ s!$!<$_>$command</$_>\n$selresp\n\n\n!; ## include it in the response
+          $combinedresp =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
        }
     }
 
@@ -962,10 +962,10 @@ sub selenium {  ## send Selenium command and read response
       else
       {
          require MIME::Base64;
-         open my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png";
+         open my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" or die "\nCould not open $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png for writing\n";
          binmode $FH; ## set binary mode
-         print $FH MIME::Base64::decode_base64($png_base64);
-         close $FH;
+         print {$FH} MIME::Base64::decode_base64($png_base64);
+         close $FH or die "\nCould not close page capture file handle\n";
       }
     }
 
@@ -973,10 +973,10 @@ sub selenium {  ## send Selenium command and read response
     $screenshotlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
     if ($selresp =~ /^ERROR/) { ## Selenium returned an error
-       $selresp =~ s!^!HTTP/1.1 500 Selenium returned an error\n\n!; ## pretend this is an HTTP response - 100 means continue
+       $selresp =~ s{^}{HTTP/1.1 500 Selenium returned an error\n\n}; ## pretend this is an HTTP response - 100 means continue
     }
     else {
-       $selresp =~ s!^!HTTP/1.1 100 OK\n\n!; ## pretend this is an HTTP response - 100 means continue
+       $selresp =~ s{^}{HTTP/1.1 100 OK\n\n}; ## pretend this is an HTTP response - 100 means continue
     }
     $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
     #print $response->as_string; print "\n\n";
@@ -1025,7 +1025,7 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
     my ($windownumber) = @_;
 
     my $handles = $sel->get_window_handles;
-    print Dumper $handles;
+    print {*Dumper} $handles;
     my $resp1 =  $sel->switch_to_window($handles->[$windownumber]);
 
     return $resp1;
@@ -1123,7 +1123,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Searc
     my @resp1;
     my $foundit = 'false';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' ) {
+    while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
@@ -1135,7 +1135,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Searc
             sleep 0.1; # Sleep for 0.1 seconds
         }
     }
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $trytime = ( int( (time - $timestart) *10 ) / 10);
 
     my $returnmsg;
     if ($foundit eq 'true') {
@@ -1241,7 +1241,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     my @resp1;
     my $foundit = 'true'; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'true' ) {
+    while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
         eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
         foreach my $resp (@resp1) {
             if (not ($resp =~ m{$searchtext}si)) {
@@ -1254,7 +1254,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
         }
     }
 
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $trytime = ( int( (time - $timestart) *10 ) / 10);
 
     my $returnmsg;
     if ($foundit eq 'false') {
@@ -1279,7 +1279,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
     my $foundit = 'false';
     my $find_element;
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
+    while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
     {
         eval { $find_element = $sel->find_element("$element_name","$element_type"); };
         if ($find_element)
@@ -1292,7 +1292,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
         }
     }
 
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $trytime = ( int( (time - $timestart) *10 ) / 10);
 
     my $returnmsg;
     if ($foundit eq 'true') {
@@ -1318,7 +1318,7 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
     my $foundit = 'false';
     my $find_element;
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' )
+    while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
     {
         eval { $find_element = $sel->find_element("$element_name","$element_type")->is_displayed(); };
         if ($find_element)
@@ -1330,7 +1330,7 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
             sleep 0.1; ## Sleep for 0.1 seconds
         }
     }
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $trytime = ( int( (time - $timestart) *10 ) / 10);
 
     my $returnmsg;
     if ($foundit eq 'true') {
@@ -1370,9 +1370,8 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
                ## gethrefs=".less|.css"
     if ($case{gethrefs}) {
         my $match = 'href=';
-        my $delim = "\x22"; #"
+        my $delim = q{"}; #"
         getassets ($match,$delim,$delim,$case{gethrefs});
-        #getassets ("href",$case{gethrefs});
     }
 
     return;
@@ -1383,9 +1382,8 @@ sub getsrcs { ## get page src assets matching a list of ending patterns, separat
               ## getsrcs=".js|.png|.jpg|.gif"
     if ($case{getsrcs}) {
         my $match = 'src=';
-        my $delim = '"';
+        my $delim = q{"}; #"
         getassets ($match, $delim, $delim, $case{getsrcs});
-        #getassets ("src",$case{getsrcs});
     }
 
     return;
@@ -1406,22 +1404,22 @@ sub getbackgroundimages { ## style="background-image: url( )"
 
 #------------------------------------------------------------------
 sub getassets { ## get page assets matching a list for a reference type
-                ## getassets ("href",".less|.css")
+                ## getassets ('href',q{"},q{"},'.less|.css')
 
     my ($match, $leftdelim, $rightdelim, $assetlist) = @_;
 
     my ($startassetrequest, $endassetrequest, $assetlatency);
-    my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse, $cachecontrol);
+    my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse);
 
     my $page = $response->as_string;
 
-    my @extensions = split /\|/, $assetlist ;
+    my @extensions = split /[|]/, $assetlist ;
 
     foreach my $extension (@extensions) {
 
         #while ($page =~ m{$assettype="([^"]*$extension)["\?]}g) ##" Iterate over all the matches to this extension
         print "\n $match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?] \n";
-        while ($page =~ m{$match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?]}g) ##" Iterate over all the matches to this extension
+        while ($page =~ m{$match$leftdelim([^$rightdelim]*$extension)[$rightdelim?]}g) ##" Iterate over all the matches to this extension
         {
             $startassetrequest = time;
 
@@ -1440,21 +1438,14 @@ sub getassets { ## get page assets matching a list for a reference type
 
             $assetresponse = $useragent->request($assetrequest);
 
-            open my $RESPONSEASFILE, '>', "$outputfolder/$filename"; #open in clobber mode
+            open my $RESPONSEASFILE, '>', "$outputfolder/$filename" or die "\nCould not open asset file $outputfolder/$filename for writing\n"; #open in clobber mode
             binmode $RESPONSEASFILE; ## set binary mode
-            print $RESPONSEASFILE $assetresponse->content, q{}; ## content just outputs the content, whereas as_string includes the response header
-            close $RESPONSEASFILE;
+            print {$RESPONSEASFILE} $assetresponse->content, q{}; ## content just outputs the content, whereas as_string includes the response header
+            close $RESPONSEASFILE or die "\nCould not close asset file\n";
 
             $endassetrequest = time;
             $assetlatency = (int(1000 * ($endassetrequest - $startassetrequest)) / 1000);  ## elapsed time rounded to thousandths
             print {*STDOUT} " $assetlatency s\n";
-
-            #print {*STDOUT} $assetresponse->headers()->as_string(), "\n\n\n";
-
-            #$assetresponse->headers()->as_string() =~ m!^Cache-Control: ([\w]*)$!;
-            #$cachecontrol = $1;
-            #print {*STDOUT} " Cache-Control: $cachecontrol\n";
-
 
         } ## end while
 
@@ -1494,10 +1485,10 @@ sub savepage {## save the page in a cache to enable auto substitution
 
       $pagename = $case{url};
       #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
-      if ($pagename =~ m{(.*?)\?}s) { ## we only want everything to the left of the ? mark
+      if ($pagename =~ m{(.*?)[?]}s) { ## we only want everything to the left of the ? mark
          $pagename = $1;
       }
-      $pagename =~ s!http.?://!!s; ## remove http:// and https://
+      $pagename =~ s{http.?://}{}s; ## remove http:// and https://
       #print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
 
       ## check to see if we already have this page
