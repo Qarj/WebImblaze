@@ -1658,31 +1658,31 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           my $dotx='false';
           my $doty='false';
 
-          if ( $postfields[$idx] =~ m{\.x[\=\']} ) { ## does it end in .x?
+          if ( $postfields[$idx] =~ m{[.]x[=']} ) { ## does it end in .x? #'
              #out print {*STDOUT} qq| DOTX found in $postfields[$idx] \n|;
              $dotx = 'true';
-             $postfields[$idx] =~ s{\.x}{}; ## get rid of the .x, we'll have to put it back later
+             $postfields[$idx] =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
           }
 
-          if ( $postfields[$idx] =~ m/\.y[\=\']/ ) { ## does it end in .y?
+          if ( $postfields[$idx] =~ m/[.]y[=']/ ) { ## does it end in .y? #'
              #out print {*STDOUT} qq| DOTY found in $postfields[$idx] \n|;
              $doty = 'true';
-             $postfields[$idx] =~ s{\.y}{}; ## get rid of the .y, we'll have to put it back later
+             $postfields[$idx] =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
           }
 
-          if ( $postfields[$idx] =~ m/([^']{0,70}?)\{NAME\}/s ) { ## ' was *?, {0,70}? much quicker
+          if ( $postfields[$idx] =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
              $lhsname = $1;
              $lhsname =~ s{\$}{\\\$}g;
-             $lhsname =~ s{\.}{\\\.}g;
+             $lhsname =~ s{[.]}{\\\.}g;
              #out print {*STDOUT} qq| LHS $lhsname has {NAME} \n|;
              $namefoundflag = 'true';
           }
 
-          if ( $postfields[$idx] =~ m/\{NAME\}([^=']{0,70})/s ) { ## '
+          if ( $postfields[$idx] =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
              $rhsname = $1;
              $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
              $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
-             $rhsname =~ s{\.}{\\\.}g; ## same for the .
+             $rhsname =~ s{[.]}{\\\.}g; ## same for the .
              #out print {*STDOUT} qq| RHS $rhsname has {NAME} \n|;
              $namefoundflag = 'true';
           }
@@ -1706,9 +1706,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           ## did we take out the .x or .y? we need to put it back
           if ($dotx eq 'true') {
              if ($posttype eq 'normalpost') {
-                $postfields[$idx] =~ s{\=}{\.x\=};
+                $postfields[$idx] =~ s{[=]}{\.x\=};
              } else {
-                $postfields[$idx] =~ s{\'[ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space
+                $postfields[$idx] =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
              }
              #out print {*STDOUT} qq| DOTX restored to $postfields[$idx] \n|;
           }
@@ -1716,9 +1716,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           ## did we take out the .x or .y? we need to put it back
           if ($doty eq 'true') {
              if ($posttype eq 'normalpost') {
-                $postfields[$idx] =~ s{\=}{\.y\=};
+                $postfields[$idx] =~ s{[=]}{\.y\=};
              } else {
-                $postfields[$idx] =~ s{\'[ ]?\=}{\.y\' \=};
+                $postfields[$idx] =~ s{['][ ]?\=}{\.y\' \=}; #'
              }
              #out print {*STDOUT} qq| DOTY restored to $postfields[$idx] \n|;
           }
@@ -1745,7 +1745,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           ## time to find out what to substitute it with
           if ($fieldfoundflag eq 'true') {
              $fieldname =~ s{\$}{\\\$}; #replace $ with \$
-             $fieldname =~ s{\.}{\\\.}; #replace . with \.
+             $fieldname =~ s{[.]}{\\\.}; #replace . with \.
              if ($pages[$pageid] =~ m/="$fieldname" [^\>]*value="(.*?)"/s) {
                 $data = $1;
                 $datafound = 'true';
@@ -1861,7 +1861,7 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     addcookie (); ## append to additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  # add an additional HTTP Header if specified
-        my @addheaders = split /\|/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m{(.*): (.*)};
             $request->header($1 => $2);  #using HTTP::Headers Class
@@ -1896,7 +1896,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
     $case{postbody} =~ m/file=>(.*)/i;
     open my $XMLBODY, '<', "$dirname"."$1" or die "\nError: Failed to open text/xml file\n\n";  #open file handle
     my @xmlbody = <$XMLBODY>;  #read the file into an array
-    close $XMLBODY ;
+    close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
 
     if ($case{parms}) { #is there a postbody for this testcase - if so need to subtitute in fields
        @parms = split /\&/, $case{parms} ; #& is separator
