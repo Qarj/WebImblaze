@@ -1928,7 +1928,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
                 #attributes
                 # ([^a-zA-Z]) says there must be a non alpha so that bigid and id and treated separately
                 # $1 will put it back - otherwise it'll be eaten
-                $_ =~ s{([^a-zA-Z])$fieldname\=\".*?\"}{$1$fieldname\=\"$fieldvalue\"};
+                $_ =~ s{([^a-zA-Z])$fieldname\=\".*?\"}{$1$fieldname\=\"$fieldvalue\"}; ## no critic(ProhibitEnumeratedClasses)
 
                 #variable substitution
                 $subname = $fieldname;
@@ -1944,13 +1944,13 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     $request = HTTP::Request->new('POST', "$case{url}");
     $request->content_type("$case{posttype}");
-    $request->content(join ' ', @xmlbody);  #load the contents of the file into the request body
+    $request->content(join q{ }, @xmlbody);  #load the contents of the file into the request body
 
 ## moved cookie management up above addheader as per httppost_form_data
     $cookie_jar->add_cookie_header($request);
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /\|/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
@@ -1978,7 +1978,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
     my %myContent_;
-    eval "\%myContent_ = $substituted_postbody";  ## no critic
+    eval "\%myContent_ = $substituted_postbody";
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
                Content => \%myContent_;
@@ -1988,7 +1988,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     addcookie (); ## append additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /\|/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
@@ -2021,10 +2021,10 @@ sub cmd {  ## send terminal command and read response
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combinedresp =~ s!$!<$_>$cmd</$_>\n$cmdresp\n\n\n!; ## include it in the response
+            $combinedresp =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
     }
-    $combinedresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
+    $combinedresp =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse($combinedresp); ## pretend the response is a http response - inject it into the object
     $endtimer = time;
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
@@ -2044,7 +2044,7 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combinedresp =~ s!$!<$_>$cmd</$_>\n$cmdresp\n\n\n!; ## include it in the response
+            $combinedresp =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
     }
     $response = HTTP::Response->parse($combinedresp); ## put the test response along with the command on error response back in the response
@@ -2119,12 +2119,12 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     ## auto assertions
     if ($entrycriteriaok && !$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
-        foreach my $configAttrib ( sort keys %{ $userconfig->{autoassertions} } ) {
-            if ( substr ($configAttrib, 0, 13) eq 'autoassertion' ) {
-                $verifynum = $configAttrib; ## determine index verifypositive index
+        foreach my $config_attribute ( sort keys %{ $userconfig->{autoassertions} } ) {
+            if ( substr ($config_attribute, 0, 13) eq 'autoassertion' ) {
+                $verifynum = $config_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
-                @verifyparms = split /\|\|\|/, $userconfig->{autoassertions}{$configAttrib} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+                @verifyparms = split /\|\|\|/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
@@ -2135,7 +2135,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                         #print {$RESULTS} qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                        print {$RESULTSXML} qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
                         #print {*STDOUT} "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
                         #print {*STDOUT} $verifynum." Passed Auto Assertion \n"; ##DEBUG
                         $passedcount++;
@@ -2143,10 +2143,10 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     }
                     else {
                         print {$RESULTS} qq|<span class="fail">Failed Auto Assertion:</span>$verifyparms[0]<br />\n|;
-                        print {$RESULTSXML} qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
+                        print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
                         if ($verifyparms[1]) { ## is there a custom assertion failure message?
                            print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                           print {$RESULTSXML} qq|            <$configAttrib-message>$verifyparms[1]</$configAttrib-message>\n|;
+                           print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[1]</$config_attribute-message>\n|;
                         }
                         print {*STDOUT} "Failed Auto Assertion \n";
                         if ($verifyparms[1]) {
@@ -2163,12 +2163,12 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 
     ## smart assertions
     if ($entrycriteriaok && !$case{ignoresmartassertions}) {
-        foreach my $configAttrib ( sort keys %{ $userconfig->{smartassertions} } ) {
-            if ( substr($configAttrib, 0, 14) eq 'smartassertion' ) {
-                $verifynum = $configAttrib; ## determine index verifypositive index
+        foreach my $config_attribute ( sort keys %{ $userconfig->{smartassertions} } ) {
+            if ( substr($config_attribute, 0, 14) eq 'smartassertion' ) {
+                $verifynum = $config_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
-                @verifyparms = split /\|\|\|/, $userconfig->{smartassertions}{$configAttrib} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+                @verifyparms = split /\|\|\|/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
                 if ($verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
                     print {*STDOUT} "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
@@ -2180,17 +2180,17 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
                         if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
                             #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                            print {$RESULTSXML} qq|            <$configAttrib-success>true</$configAttrib-success>\n|;
+                            print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
                             #print {*STDOUT} "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
                             $passedcount++;
                             $retrypassedcount++;
                         }
                         else {
                             print {$RESULTS} qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
-                            print {$RESULTSXML} qq|            <$configAttrib-success>false</$configAttrib-success>\n|;
+                            print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
                             if ($verifyparms[2]) { ## is there a custom assertion failure message?
                                print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                               print {$RESULTSXML} qq|            <$configAttrib-message>$verifyparms[2]</$configAttrib-message>\n|;
+                               print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[2]</$config_attribute-message>\n|;
                             }
                             print {*STDOUT} 'Failed Smart Assertion';
                             if ($verifyparms[2]) {
