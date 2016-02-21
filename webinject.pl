@@ -73,7 +73,6 @@ my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $ret
 my ($forcedretry); ## force retry when specific http error code received
 my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($starttime); ## to store a copy of $startruntimer in a global variable
-my ($elapsedseconds, $elapsedminutes); ## number of seconds and minutes since starting till now - always rounded up
 my ($cmdresp); ## response from running a terminal command
 my ($selresp); ## response from a Selenium command
 my (@verifyparms); ## friendly error message to show when an assertion fails
@@ -1771,12 +1770,12 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## done all the substitutions, now put it all together again
     if ($posttype eq 'normalpost') {
-       $postbody = join "&", @postfields;
+       $postbody = join q{&}, @postfields;
     } else {
        ## assumes that double quotes on the outside, internally single qoutes
        ## enhancements needed
        ##   1. subsitute out blank space first between the field separators
-       $postbody = join "',", @postfields;
+       $postbody = join q{',}, @postfields; #'
     }
     #out print {*STDOUT} qq|\n\n POSTBODY is $postbody \n|;
 
@@ -1803,7 +1802,7 @@ sub httpget {  #send http request and read response
     addcookie (); ## append additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /\|/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
             $request->header($1 => $2);  #using HTTP::Headers Class
@@ -1977,11 +1976,11 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     my $substituted_postbody; ## auto substitution
     $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
-    my %myContent_;
-    eval "\%myContent_ = $substituted_postbody";
+    my %my_content_;
+    eval "\%my_content_ = $substituted_postbody";
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
-               Content => \%myContent_;
+               Content => \%my_content_;
     $cookie_jar->add_cookie_header($request);
     #print $request->as_string; print "\n\n";
 
@@ -2124,7 +2123,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $verifynum = $config_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
-                @verifyparms = split /\|\|\|/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+                @verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
@@ -2168,7 +2167,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $verifynum = $config_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
-                @verifyparms = split /\|\|\|/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+                @verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
                 if ($verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
                     print {*STDOUT} "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
@@ -2215,7 +2214,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $verifynum = $case_attribute; ## determine index verifypositive index
                 $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
-                @verifyparms = split /\|\|\|/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+                @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
@@ -2262,7 +2261,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 #print {*STDOUT} "$case_attribute\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-                @verifyparms = split /\|\|\|/, $case{$case_attribute} ; #index 0 contains the actual string to verify
+                @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify
                 if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
                     print {*STDOUT} "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
@@ -2310,11 +2309,11 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 #print {*STDOUT} "$case_attribute\n"; ##DEBUG
                 $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
                 if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-                @verifycountparms = split /\|\|\|/, $case{$case_attribute} ;
+                @verifycountparms = split /[|][|][|]/, $case{$case_attribute} ;
                 $count=0;
                 $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
 
-                while ($tempstring =~ m|$verifycountparms[0]|ig) { $count++;} ## count how many times string is found
+                while ($tempstring =~ m/$verifycountparms[0]/ig) { $count++;} ## count how many times string is found
 
                 if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
                     print {$RESULTS} qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
@@ -2401,10 +2400,10 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $retry=0; ## we won't retry if the response code is invalid since it will probably never work
             }
         else {
-            print {$RESULTS} qq|<span class="fail">Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
+            print {$RESULTS} '<span class="fail">Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
             print {$RESULTSXML} qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-            print {$RESULTSXML} qq|            <verifyresponsecode-message>Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
-            print {*STDOUT} qq|Failed HTTP Response Code Verification (received | . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|;
+            print {$RESULTSXML}   '            <verifyresponsecode-message>Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
+            print {*STDOUT} 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|;
             $failedcount++;
             $retryfailedcount++;
             $isfailure++;
@@ -2473,7 +2472,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
         if ( substr($case_attribute, 0, 13) eq 'parseresponse' ) {
 
-            @parseargs = split /\|/, $case{$case_attribute} ;
+            @parseargs = split /[|]/, $case{$case_attribute} ;
 
             $leftboundary = $parseargs[0]; $rightboundary = $parseargs[1]; $escape = $parseargs[2];
 
@@ -2531,7 +2530,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
         $configfilepath = "$dirname"."$opt_configfile";
     }
-    elsif (-e "$dirname"."config.xml") {  #if config.xml exists, read it
+    elsif (-e "$dirname".'config.xml') {  #if config.xml exists, read it
         $configfilepath = "$dirname".'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
@@ -2541,13 +2540,13 @@ sub processcasefile {  #get test case files to run (from command line or config 
         ## read the XML config into an array for parsing using regex (WebInject 1.41 method)
         open $CONFIG, '<', "$configfilepath" or die "\nERROR: Failed to open $configfilepath \n\n";
         my @precomment = <$CONFIG>;  #read the config file into an array
-        close $CONFIG;
+        close $CONFIG or die "\nCould not close config file\n\n";
 
         $userconfig = XMLin("$configfilepath"); ## Parse as XML for the user defined config
 
         #remove any commented blocks from config file
          foreach (@precomment) {
-            unless (m{<comment>.*</comment>}) {  #single line comment
+            if (!m{<comment>.*</comment>}) {  #if not single line comment
                 #multi-line comments
                 if (/<comment>/) {
                     $comment_mode = 1;
@@ -2576,7 +2575,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
             }
         }
 
-        unless ($casefilelist[0]) {
+        if (!$casefilelist[0]) {
             if (-e "$dirname".'testcases.xml') {
                 #not appending a $dirname here since we append one when we open the file
                 push @casefilelist, 'testcases.xml';  #if no files are specified in config.xml, default to testcases.xml
@@ -2679,7 +2678,7 @@ sub convtestcases {
 
     open my $XMLTOCONVERT, '<', "$dirname"."$currentcasefile" or die "\nError: Failed to open test case file\n\n";  #open file handle
     @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
-    close $XMLTOCONVERT;
+    close $XMLTOCONVERT or die "\nCould not close test case file\n\n";
 
     $casecount = 0;
 
@@ -2697,8 +2696,8 @@ sub convtestcases {
     }
 
     open my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file
-    print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
-    close $CONVERTEDXML;
+    print {$CONVERTEDXML} @xmltoconvert;  #overwrite file with converted array
+    close $CONVERTEDXML or die "\nCould not closed converted XML file\n\n";
 
     return;
 }
@@ -2711,17 +2710,17 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
 
     if ($casecount == 1) {
 
-        open my$ XMLTOCONVERT, '<', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nError: Failed to open temp file\n\n";  #open file handle
+        open my $XMLTOCONVERT, '<', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nError: Failed to open temp file\n\n";  #open file handle
         @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
 
         for(@xmltoconvert) {
             s/<\/testcases>/<case id="2" description1="dummy test case"\/><\/testcases>/g;  #add dummy test case to end of file
         }
-        close $XMLTOCONVERT;
+        close $XMLTOCONVERT or die "\nCould not close XML to convert for single test case\n\n";
 
         open my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle
-        print $CONVERTEDXML @xmltoconvert;  #overwrite file with converted array
-        close $CONVERTEDXML;
+        print {$CONVERTEDXML} @xmltoconvert;  #overwrite file with converted array
+        close $CONVERTEDXML or die "\nCould not close converted XML for single test case\n\n";;
     }
 
     return;
@@ -2776,15 +2775,15 @@ sub convertbackxml() {  #converts replaced xml with substitutions
     $_[0] =~ s/{OUTPUT}/$output/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;
 ## CWD Current Working Directory
-    $_[0] =~ s~{CWD}~$cwd~g;
+    $_[0] =~ s/{CWD}/$cwd/g;
 
 ## parsedresults moved before config so you can have a parsedresult of {BASEURL2} say that in turn gets turned into the actual value
 
     ##substitute all the parsed results back
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $case_attribute ( sort keys %{parsedresult} ) {
-       my $parseVAR = substr($case_attribute, 13);
-       $_[0] =~ s/{$parseVAR}/$parsedresult{$case_attribute}/g;
+       my $parse_var = substr($case_attribute, 13);
+       $_[0] =~ s/{$parse_var}/$parsedresult{$case_attribute}/g;
     }
 
     $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
@@ -2810,25 +2809,24 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 
     my $retriessub = $retries-1;
 
-    my $elapsedseconds = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
-    my $elapsedminutes = int($elapsedseconds / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
+    my $elapsed_seconds_so_far = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
+    my $elapsed_minutes_so_far = int($elapsed_seconds_so_far / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
 
     $_[0] =~ s/{RETRY}/$retriessub/g;
-    $_[0] =~ s/{ELAPSED_SECONDS}/$elapsedseconds/g; ## always rounded up
-    $_[0] =~ s/{ELAPSED_MINUTES}/$elapsedminutes/g; ## always rounded up
+    $_[0] =~ s/{ELAPSED_SECONDS}/$elapsed_seconds_so_far/g; ## always rounded up
+    $_[0] =~ s/{ELAPSED_MINUTES}/$elapsed_minutes_so_far/g; ## always rounded up
 
     ## put the current date and time into variables
-    my ($second, $minute, $hour, $dayOfMonth, $month, $yearOffset, $dayOfWeek, $dayOfYear, $daylightSavings) = localtime;
-    my $year = 1900 + $yearOffset;
-    my @months = qw(01 02 03 04 05 06 07 08 09 10 11 12);
-    $month = $months[$month];
-    my $day = sprintf "%02d", $dayOfMonth;
-    $hour = sprintf "%02d", $hour; #put in up to 2 leading zeros
-    $minute = sprintf "%02d", $minute;
-    $second = sprintf "%02d", $second;
+    my ($dynamic_second, $dynamic_minute, $dynamic_hour, $dynamic_day_of_month, $dynamic_month, $dynamic_year_offset, $dynamic_day_of_week, $dynamic_day_of_year, $dynamic_daylight_savings) = localtime;
+    my $dynamic_year = 1900 + $dynamic_year_offset;
+    $dynamic_month = $MONTHS[$dynamic_month];
+    my $dynamic_day = sprintf '%02d', $dynamic_day_of_month;
+    $dynamic_hour = sprintf '%02d', $dynamic_hour; #put in up to 2 leading zeros
+    $dynamic_minute = sprintf '%02d', $dynamic_minute;
+    $dynamic_second = sprintf '%02d', $dynamic_second;
 
     my $underscore = '_';
-    $_[0] =~ s{{NOW}}{$day\/$month\/$year$underscore$hour:$minute:$second}g;
+    $_[0] =~ s{{NOW}}{$dynamic_day\/$dynamic_month\/$dynamic_year$underscore$dynamic_hour:$dynamic_minute:$dynamic_second}g;
 
     return;
 }
@@ -2836,8 +2834,8 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 #------------------------------------------------------------------
 sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
     foreach my $case_attribute ( sort keys %{varvar} ) {
-       my $subVAR = substr($case_attribute, 3);
-       $_[0] =~ s/{$subVAR}/$varvar{$case_attribute}/g;
+       my $sub_var = substr($case_attribute, 3);
+       $_[0] =~ s/{$sub_var}/$varvar{$case_attribute}/g;
     }
 
     return;
@@ -2862,7 +2860,7 @@ sub url_escape {  #escapes difficult characters with %hexvalue
     my @a = @_;  #make a copy of the arguments
 
 ## escape change - changed the mapping around so / would be escaped
-    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## no critic ## changed escape to prevent problems with __VIEWSTATE #'
+    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## changed escape to prevent problems with __VIEWSTATE #'
 #   map { s¦[-,^+!~()\\/' ]¦sprintf "%%%02x", ord $&¦eg } @a; #(1.41 version of escape)
     return wantarray ? @a : $a[0];
 }
@@ -2874,7 +2872,7 @@ sub httplog {  #write requests and responses to http.log file
     my $textrequest = q{};
     my $formatresponse = q{};
     $textrequest = $request->as_string;
-    $textrequest =~ s|%20| |g; #Replace %20 with a single space for clarity in the log file
+    $textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
     #print "http request ---- ", $textrequest, "\n\n";
 
 ## log separator enhancement
@@ -2921,10 +2919,10 @@ sub httplog {  #write requests and responses to http.log file
 
     if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
         my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}";  #open in clobber mode
+        open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
         binmode $RESPONSEASFILE; ## set binary mode
-        print $RESPONSEASFILE $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
-        close $RESPONSEASFILE;
+        print {$RESPONSEASFILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
+        close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
     print {$HTTPLOGFILE} $textrequest, "\n\n";
@@ -2942,7 +2940,7 @@ sub finaltasks {  #do ending tasks
 
     writefinalhtml();  #write summary and closing tags for results file
 
-    unless ($xnode) { #skip regular STDOUT output if using an XPath
+    if (!$xnode) { #skip regular STDOUT output if using an XPath
         writefinalstdout();  #write summary and closing tags for STDOUT
     }
 
@@ -2960,7 +2958,7 @@ sub finaltasks {  #do ending tasks
 sub whackoldfiles {  #delete any files leftover from previous run if they exist
 
     ## delete tmp files in the output folder
-    if (glob("$outputfolder"."*.xml.*.tmp")) { unlink glob("$output"."*.xml.*.tmp"); }
+    if (glob("$outputfolder".'*.xml.*.tmp')) { unlink glob("$output".'*.xml.*.tmp'); }
 
     return;
 }
