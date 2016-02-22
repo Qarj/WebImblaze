@@ -1611,7 +1611,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     if ($posturl =~ m{(.*?)\?}s) { ## we only want everything to the left of the ? mark
        $posturl = $1;
     }
-    $posturl =~ s!http.?://!!s; ## remove http:// and https://
+    $posturl =~ s{http.?://}{}s; ## remove http:// and https://
     #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     ## see if we have stored this page
@@ -2911,7 +2911,7 @@ sub httplog {  #write requests and responses to http.log file
          $formatresponse = $response->as_string; #get the response out
          ## put in carriage returns
          $formatresponse =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
-         $formatresponse =~ s/\},/\},\x0D\n/g;  ## insert a CR after  every },
+         $formatresponse =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
          $formatresponse =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
          $formatresponse =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
@@ -2947,9 +2947,9 @@ sub finaltasks {  #do ending tasks
     writefinalxml();  #write summary and closing tags for XML results file
 
     print {$HTTPLOGFILE} "\n************************* LOG SEPARATOR *************************\n\n\n";
-    close $HTTPLOGFILE;
-    close $RESULTS;
-    close $RESULTSXML;
+    close $HTTPLOGFILE or die "\nCould not close http log file\n\n";
+    close $RESULTS or die "\nCould not close html results file\n\n";
+    close $RESULTSXML or die "\nCould not close xml results file\n\n";
 
     return;
 }
