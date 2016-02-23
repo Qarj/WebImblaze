@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.81
+# Manual for WebInject version 1.82
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -482,17 +482,13 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 ### 2.2 - Test Case Files (specifying in configuration file)
 
 One of the configuration 
-file settings in config.xml is used to name the test case files which you have created.  You may specify any amount of test case 
-files to process by placing each file name inside the proper (<testcasefile>) xml tags.  If there is no configuration setting 
-used to name your test case file(s), it will default to using a file named 'testcases.xml' in the current [webinject] directory.  The 
-files are processed in the order they appear in your config file.
+file settings in config.xml is used to name a test case files that you have created.  You may specify one test case 
+file to process by placing the file name inside the (<testcasefile>) xml tags.
 
-A configuration file listing 3 test case files to process (tests_1.xml, tests_2.xml, tests_3.xml) may look something like:
+A configuration file containing a test case files to process (tests_1.xml) may look something like:
 
 ```xml
-<testcasefile>tests_1.xml</testcasefile>
-<testcasefile>tests_2.xml</testcasefile>
-<testcasefile>tests_3.xml</testcasefile>
+<testcasefile>my_tests.xml</testcasefile>
 ```
 
 Note: You can also use relative path names to point to test case files located in other directories or subdirectories.

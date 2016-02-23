@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.82 - Feb 23, 2016
+* removed a feature - specifiying multiple test case files to process in the config (classic example of overengineering)
+* more code tidy up
+
 ### Version 1.81 - Feb 14, 2016
 * substantial code tidy up
 * recently introduced bug resolved with {TESTFILENAME}
