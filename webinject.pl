@@ -2514,25 +2514,20 @@ sub processcasefile {  #get test case files to run (from command line or config 
                 }
             }
         }
+    } else {
+        die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
+    
 
     if (($#ARGV + 1) < 1) {  #no command line args were passed
         #if testcase filename is not passed on the command line, use files in config.xml
-        #parse test case file names from config.xml and build array
-        foreach (@configfile) {
-
-            if (/<testcasefile>/) {
-                $firstparse = $';  #print "$' \n\n"; ## " doublequote for text editor display fix
-                $firstparse =~ m{</testcasefile>};
-                $currentcasefile = $`;  #string between tags will be in $filename - only support one test case file to process
-                #print "\n$filename \n\n";
-            }
+        
+        if ($userconfig->{testcasefile}) {
+            $currentcasefile = $userconfig->{testcasefile}
+        } else {
+            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
         }
 
-        if (!$currentcasefile) {
-            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename " .
-                "on the command line if you are not using the default testcase file (testcases.xml).\n";
-        }
     }
 
     elsif (($#ARGV + 1) == 1) {  #one command line arg was passed
