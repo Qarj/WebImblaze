@@ -2523,7 +2523,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         #if testcase filename is not passed on the command line, use files in config.xml
         
         if ($userconfig->{testcasefile}) {
-            $currentcasefile = $userconfig->{testcasefile}
+            $currentcasefile = $userconfig->{testcasefile};
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
         }
@@ -2560,41 +2560,35 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     #grab values for constants in config file:
-    foreach (@configfile) {
-        for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
-                globalretry globaljumpbacks testonly autocontrolleronly/) {
-            if (/<$config_const>/) {
-                $_ =~ m{<$config_const>(.*)</$config_const>};
-                $config{$config_const} = $1;
-                #print "\n$_ : $config{$_} \n\n";
-            }
+    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
+            globalretry globaljumpbacks testonly autocontrolleronly/) {
+        if ($userconfig->{$config_const}) {
+            $config{$config_const} = $userconfig->{$config_const};
+            #print "\n$_ : $config{$_} \n\n";
         }
+    }
 
-        if (/<useragent>/) {
-            $_ =~ m{<useragent>(.*)</useragent>};
-            $setuseragent = $1;
-            if ($setuseragent) { #http useragent that will show up in webserver logs
-                $useragent->agent($setuseragent);
-            }
-            #print "\nuseragent : $setuseragent \n\n";
+    if ($userconfig->{useragent}) {
+        $setuseragent = $userconfig->{useragent};
+        if ($setuseragent) { #http useragent that will show up in webserver logs
+            $useragent->agent($setuseragent);
         }
+        #print "\nuseragent : $setuseragent \n\n";
+    }
 
-        if (/<httpauth>/) {
-                #each time we see an <httpauth>, we set @authentry to be the
-                #array of values, then we use [] to get a reference to that array
-                #and push that reference onto @httpauth.
-        my @authentry;
-            $_ =~ m{<httpauth>(.*)</httpauth>};
-            @authentry = split /:/, $1;
-            if ($#authentry != 4) {
-                print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
-            }
-            else {
-        push @httpauth, [@authentry];
+    if ($userconfig->{httpauth}) {
+            #each time we see an <httpauth>, we set @authentry to be the
+            #array of values, then we use [] to get a reference to that array
+            #and push that reference onto @httpauth.
+    my @authentry;
+        @authentry = split /:/, $userconfig->{httpauth};
+        if ($#authentry != 4) {
+            print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
         }
-            #print "\nhttpauth : @httpauth \n\n";
-        }
-
+        else {
+    push @httpauth, [@authentry];
+    }
+        #print "\nhttpauth : @httpauth \n\n";
     }
 
     if (not defined $config{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
