@@ -412,7 +412,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## 
 
                 if (!$is_testcases_tag_already_written) { # Only write the testcases opening tag once in the results.xml
                     print {$RESULTSXML} qq|    <testcases file="$currentcasefile">\n\n|;
-                    $is_testcases_tag_already_written = "true"; 
+                    $is_testcases_tag_already_written = 'true';
                 }
 
                 print {$RESULTSXML} qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
@@ -657,7 +657,7 @@ TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## 
         } ## end of test case loop
 
         $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
-    }
+    } ## end of repeat loop
 
     finaltasks();  #do return/cleanup tasks
 
