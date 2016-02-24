@@ -2470,16 +2470,9 @@ sub parseresponse {  #parse values from responses for use in future request (for
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
-    my @configfile;
-    my $comment_mode;
-    my $firstparse;
-    my $filename;
     my $xpath;
     my $setuseragent;
-    my $CONFIG;
     my $configfilepath;
-
-    undef @configfile;
 
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
@@ -2491,33 +2484,10 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     if (-e "$configfilepath") {  #if we have a config file, use it
-
-        ## read the XML config into an array for parsing using regex (WebInject 1.41 method)
-        open $CONFIG, '<', "$configfilepath" or die "\nERROR: Failed to open $configfilepath \n\n";
-        my @precomment = <$CONFIG>;  #read the config file into an array
-        close $CONFIG or die "\nCould not close config file\n\n";
-
         $userconfig = XMLin("$configfilepath"); ## Parse as XML for the user defined config
-
-        #remove any commented blocks from config file
-         foreach (@precomment) {
-            if (!m{<comment>.*</comment>}) {  #if not single line comment
-                #multi-line comments
-                if (/<comment>/) {
-                    $comment_mode = 1;
-                }
-                elsif (m{</comment>}) {
-                    $comment_mode = 0;
-                }
-                elsif (!$comment_mode) {
-                    push @configfile, $_;
-                }
-            }
-        }
     } else {
         die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
-    
 
     if (($#ARGV + 1) < 1) {  #no command line args were passed
         #if testcase filename is not passed on the command line, use files in config.xml
