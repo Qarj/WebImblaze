@@ -298,9 +298,8 @@ You can use also use NTLM authentication in the following format. You'll need to
 
 example: `<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>`
 
-Note: You may include multiple <httpauth></httpauth> elements in your config files to support multiple sets of HTTP 
-Authentication credentials.
-    
+Note: Only one httpauth entry is currently supported, if you really need more, raise an issue.
+
 <a name="baseurl"></a>
 
 <br />

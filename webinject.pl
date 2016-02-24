@@ -2478,7 +2478,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
         $configfilepath = "$dirname"."$opt_configfile";
     }
-    elsif (-e "$dirname".'config.xml') {  #if config.xml exists, read it
+    elsif (-e "$dirname".'config.xml') {  #if config.xml exists, use it
         $configfilepath = "$dirname".'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
@@ -2530,8 +2530,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     #grab values for constants in config file:
-    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout
-            globalretry globaljumpbacks testonly autocontrolleronly/) {
+    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks testonly autocontrolleronly/) {
         if ($userconfig->{$config_const}) {
             $config{$config_const} = $userconfig->{$config_const};
             #print "\n$_ : $config{$_} \n\n";
@@ -2547,17 +2546,14 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     if ($userconfig->{httpauth}) {
-            #each time we see an <httpauth>, we set @authentry to be the
-            #array of values, then we use [] to get a reference to that array
-            #and push that reference onto @httpauth.
-    my @authentry;
+        my @authentry;
         @authentry = split /:/, $userconfig->{httpauth};
         if ($#authentry != 4) {
             print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
         }
         else {
-    push @httpauth, [@authentry];
-    }
+            push @httpauth, [@authentry];
+        }
         #print "\nhttpauth : @httpauth \n\n";
     }
 
