@@ -50,6 +50,8 @@ use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintab
 
 local $| = 1; #don't buffer output to STDOUT
 
+
+## Variable declarations
 my ($timestamp, $dirname, $testfilename);
 my (%parsedresult);
 my (%varvar);
@@ -81,11 +83,9 @@ my ($output, $outputfolder); ## output path including possible filename prefix, 
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
 my $totalassertionskips = 0;
-
 my (@pages); ## page source of previously visited pages
 my (@pagenames); ## page name of previously visited pages
 my (@pageupdatetimes); ## last time the page was updated in the cache
-
 my $chromehandle = 0; ## windows handle of chrome browser window - for screenshots
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
@@ -105,572 +105,566 @@ my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
 my $cwd = (`cd`); ## find current Windows working directory using backtick method
 $cwd =~ s/\n//g; ## remove newline character
 
-my ($counter); ## keeping track of the loop we are up to
-$counter = 0;
+my $counter = 0; ## keeping track of the loop we are up to
 
-my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## Windows hostname
-$hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
 my ( $HTTPLOGFILE, $RESULTS, $RESULTSXML ); ## output file handles
+my ($startruntimer, $endruntimer, $repeat, $start);
+my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from here, made global
 
-engine();
+my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## Windows hostname
+$hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 
 
-#------------------------------------------------------------------
-sub engine {
+## Startup
+getdirname();  #get the directory webinject engine is running from
 
-    my ($startruntimer, $endruntimer, $repeat, $start);
-    my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from here, made global
+getoptions();  #get command line options
 
-    getdirname();  #get the directory webinject engine is running from
+whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
 
-    getoptions();  #get command line options
+startseleniumbrowser();  #start selenium browser if applicable. If it is already started, close browser then start it again.
 
-    whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
+startsession(); #starts, or restarts the webinject session
 
-    startseleniumbrowser();  #start selenium browser if applicable. If it is already started, close browser then start it again.
+processcasefile();
 
-    startsession(); #starts, or restarts the webinject session
+#open file handles
+open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
+open $RESULTS, '>', "$output".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
+open $RESULTSXML, '>', "$output".'results.xml' or die "\nERROR: Failed to open results.xml file\n\n";
 
-    processcasefile();
+print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
+writeinitialhtml();  #write opening tags for results file
 
-    #open file handles
-    open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
-    open $RESULTS, '>', "$output".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
-    open $RESULTSXML, '>', "$output".'results.xml' or die "\nERROR: Failed to open results.xml file\n\n";
+if (!$xnode) { #skip regular STDOUT output if using an XPath
+    writeinitialstdout();  #write opening tags for STDOUT.
+}
 
-    print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
-    writeinitialhtml();  #write opening tags for results file
+$totalruncount = 0;
+$casepassedcount = 0;
+$casefailedcount = 0;
+$passedcount = 0;
+$failedcount = 0;
+$totalresponse = 0;
+$avgresponse = 0;
+$maxresponse = 0;
+$minresponse = 10_000_000; #set to large value so first minresponse will be less
+$stop = 'no';
 
-    if (!$xnode) { #skip regular STDOUT output if using an XPath
-        writeinitialstdout();  #write opening tags for STDOUT.
-    }
+$globalretries=0; ## total number of retries for this run across all test cases
 
-    $totalruncount = 0;
-    $casepassedcount = 0;
-    $casefailedcount = 0;
-    $passedcount = 0;
-    $failedcount = 0;
-    $totalresponse = 0;
-    $avgresponse = 0;
-    $maxresponse = 0;
-    $minresponse = 10_000_000; #set to large value so first minresponse will be less
-    $stop = 'no';
+$currentdatetime = localtime time;  #get current date and time for results report
+$startruntimer = time;  #timer for entire test run
+$starttime = $startruntimer; ## need a global variable to make a copy of the start run timer
 
-    $globalretries=0; ## total number of retries for this run across all test cases
+$currentcasefilename = basename($currentcasefile); ## with extension
+$testfilename = fileparse($currentcasefile, '.xml'); ## without extension
 
-    $currentdatetime = localtime time;  #get current date and time for results report
-    $startruntimer = time;  #timer for entire test run
-    $starttime = $startruntimer; ## need a global variable to make a copy of the start run timer
+convtestcases();
 
-    $currentcasefilename = basename($currentcasefile); ## with extension
-    $testfilename = fileparse($currentcasefile, '.xml'); ## without extension
+fixsinglecase();
 
-    convtestcases();
+$xmltestcases = XMLin("$outputfolder$currentcasefilename.$$.tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
+#print Dumper($xmltestcases);  #for debug, dump hash of xml
+#print keys %{$configfile};  #for debug, print keys from dereferenced hash
 
-    fixsinglecase();
+#delete the temp file as soon as we are done reading it
+if (-e "$outputfolder$currentcasefilename.$$.tmp") { unlink "$outputfolder$currentcasefilename.$$.tmp"; }
 
-    $xmltestcases = XMLin("$outputfolder$currentcasefilename.$$.tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
-    #print Dumper($xmltestcases);  #for debug, dump hash of xml
-    #print keys %{$configfile};  #for debug, print keys from dereferenced hash
+$repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
+if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
 
-    #delete the temp file as soon as we are done reading it
-    if (-e "$outputfolder$currentcasefilename.$$.tmp") { unlink "$outputfolder$currentcasefilename.$$.tmp"; }
+$start = $xmltestcases->{start};  #grab the start for repeating (for restart)
+if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
-    $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
-    if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
+$counter = $start - 1; #so starting position and counter are aligned
 
-    $start = $xmltestcases->{start};  #grab the start for repeating (for restart)
-    if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
+## Repeat Loop
+foreach ($start .. $repeat) {
 
-    $counter = $start - 1; #so starting position and counter are aligned
+    $counter = $counter + 1;
+    $runcount = 0;
+    $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
+    $jumpbacks = 0;
 
-    foreach ($start .. $repeat) {
+    my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
+    my $numsteps = scalar @teststeps;
 
-        $counter = $counter + 1;
-        $runcount = 0;
-        $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
-        $jumpbacks = 0;
+    ## Loop over each of the test cases (test steps)
+    TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
 
-        my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
-        my $numsteps = scalar @teststeps;
+        $testnum = $teststeps[$stepindex];
 
-TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
+        ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
+        $testnumlog = $testnum + ($counter*10_000) - 10_000;
 
-            $testnum = $teststeps[$stepindex];
+        if ($xnode) {  #if an XPath Node is defined, only process the single Node
+            $testnum = $xnode;
+        }
 
-            ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
-            $testnumlog = $testnum + ($counter*10_000) - 10_000;
+        $isfailure = 0;
+        $retries = 1; ## we increment retries after writing to the log
+        $retriesprint = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
-            if ($xnode) {  #if an XPath Node is defined, only process the single Node
-                $testnum = $xnode;
+        $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
+
+        $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
+        if ($case{useragent}) {
+            $useragent->agent($case{useragent});
+        }
+
+        $case{testonly} = $xmltestcases->{case}->{$testnum}->{testonly}; ## skip test cases marked as testonly when running against production
+        if ($case{testonly}) { ## is the testonly value set for this testcase?
+            if ($config{testonly}) { ## if so, does the config file allow us to run it?
+                ## run this test case as normal since it is allowed
+            }
+            else {
+                  print {*STDOUT} "Skipping Test Case $testnum... (TESTONLY)\n";
+                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                  next TESTCASE; ## skip this test case if a testonly parameter is not set in the global config
+            }
+        }
+
+        $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
+        if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
+            if ($opt_autocontroller) { ## if so, was the auto controller option specified?
+                ## run this test case as normal since it is allowed
+            }
+            else {
+                  print {*STDOUT} "Skipping Test Case $testnum...\n (This is not the automation controller)\n";
+                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                  next TESTCASE; ## skip this test case if this isn't the test controller
+            }
+        }
+
+        $case{liveonly} = $xmltestcases->{case}->{$testnum}->{liveonly}; ## only run the test case against production
+        if ($case{liveonly}) { ## is the liveonly value set for this testcase?
+            if (!$config{testonly}) { ## assume that if the config doesn't contain the testonly item, then it is a live config
+                ## run this test case as normal since it is allowed
+            }
+            else {
+                  print {*STDOUT} "Skipping Test Case $testnum... (LIVEONLY)\n";
+                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                  next TESTCASE; ## skip this test case if a liveonly parameter is not set in the global config
+            }
+        }
+
+        $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
+        if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
+            if ($counter == 1) { ## counter keeps track of what loop number we are on
+                ## run this test case as normal since it is the first pass
+            }
+            else {
+                  print {*STDOUT} "Skipping Test Case $testnum... (firstlooponly)\n";
+                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                  next TESTCASE; ## skip this test case since it is firstlooponly and we have already run it
+            }
+        }
+
+        $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
+        if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
+            if ($counter == $repeat) { ## counter keeps track of what loop number we are on
+                ## run this test case as normal since it is the first pass
+            }
+            else {
+                  print {*STDOUT} "Skipping Test Case $testnum... (LASTLOOPONLY)\n";
+                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                  next TESTCASE; ## skip this test case since it is not yet the lastloop
+            }
+        }
+
+        $entrycriteriaok = 'true'; ## assume entry criteria met
+        $entryresponse = q{};
+
+        $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
+        if (defined $case{checkpositive}) { ## is the checkpositive value set for this testcase?
+            if ($lastpositive[$case{checkpositive}] eq 'pass') { ## last verifypositive for this indexed passed
+                ## ok to run this test case
+            }
+            else {
+                $entrycriteriaok = q{};
+                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n/;
+                ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
+                ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
+            }
+        }
+
+        $case{checknegative} = $xmltestcases->{case}->{$testnum}->{checknegative};
+        if (defined $case{checknegative}) { ## is the checkpositive value set for this testcase?
+            if ($lastnegative[$case{checknegative}] eq 'pass') { ## last verifynegative for this indexed passed
+                ## ok to run this test case
+            }
+            else {
+                $entrycriteriaok = q{};
+                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n/;
+                ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
+            }
+        }
+
+        $case{checkresponsecode} = $xmltestcases->{case}->{$testnum}->{checkresponsecode};
+        if (defined $case{checkresponsecode}) { ## is the checkpositive value set for this testcase?
+            if ($lastresponsecode == $case{checkresponsecode}) { ## expected response code last test case equals actual
+                ## ok to run this test case
+            }
+            else {
+                $entrycriteriaok = q{};
+                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n/;
+                ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
+            }
+        }
+
+        # populate variables with values from testcase file, do substitutions, and revert converted values back
+        ## old parmlist, kept for reference of what attributes are supported
+        ##
+        ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", "command2", "command3", "command4", "command5", "command6", "command7", "command8", "command9", "command10", "", "command11", "command12", "command13", "command14", "command15", "command16", "command17", "command18", "command19", "command20", "parms", "verifytext",
+        ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
+        ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
+        ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
+        ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly", "decodequotedprintable");
+        ##
+        ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
+
+        my %casesave; ## we need a clean array for each test case
+        undef %case; ## do not allow values from previous test cases to bleed over
+        foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+            #print "DEBUG: $case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$case_attribute};
+            #print "\n";
+            $case{$case_attribute} = $xmltestcases->{case}->{$testnum}->{$case_attribute};
+            convertbackxml($case{$case_attribute});
+            $casesave{$case_attribute} = $case{$case_attribute}; ## in case we have to retry, some parms need to be resubbed
+        }
+
+        $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
+        if ($case{retry}) { ## retry parameter found
+              $retry = $case{retry}; ## assume we can retry as many times as specified
+              if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
+                  if ($retry > ($config{globalretry} - $globalretries)) { ## we can't retry that many times
+                     $retry =  $config{globalretry} - $globalretries; ## this is the most we can retry
+                     if ($retry < 0) {$retry = 0;} ## if less than 0 then make 0
+                  }
+              }
+              print {*STDOUT} qq|Retry $retry times\n|;
+        }
+        else {
+              $retry = 0; #no retry parameter found, don't retry this case
+        }
+
+        $case{retryfromstep} = $xmltestcases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
+        if ($case{retryfromstep}) { ## retryfromstep parameter found
+              $retry = 0; ## we will not do a regular retry
+        }
+
+        do ## retry loop
+        {
+            ## for each retry, there are a few substitutions that we need to redo - like the retry number
+            foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+                if (defined $casesave{$case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
+                {
+                    $case{$case_attribute} = $casesave{$case_attribute}; ## need to restore to the original partially substituted parameter
+                    convertbackxmldynamic($case{$case_attribute}); ## now update the dynamic components
+                }
             }
 
+            set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
+            foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
+                    convertback_variables($case{$case_attribute});
+            }
+
+            $desc1log = $case{description1};
+            if ($case{description2}) {
+               $desc2log = $case{description2};
+            }
+            else
+            {
+               $desc2log = q{}; ## must blank it out if not being used
+            }
+
+            if ($config{globalretry}) {
+                if ($globalretries >= $config{globalretry}) {
+                    $retry = 0; ## globalretries value exceeded - not retrying any more this run
+                }
+            }
             $isfailure = 0;
-            $retries = 1; ## we increment retries after writing to the log
-            $retriesprint = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+            $verifynegativefailed = 'false';
+            $retrypassedcount = 0;
+            $retryfailedcount = 0;
 
             $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
-            $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
-            if ($case{useragent}) {
-                $useragent->agent($case{useragent});
+            if ($case{description1} and $case{description1} =~ /dummy test case/) {  #if we hit a dummy record, skip it
+                next;
             }
 
-            $case{testonly} = $xmltestcases->{case}->{$testnum}->{testonly}; ## skip test cases marked as testonly when running against production
-            if ($case{testonly}) { ## is the testonly value set for this testcase?
-                if ($config{testonly}) { ## if so, does the config file allow us to run it?
-                    ## run this test case as normal since it is allowed
-                }
-                else {
-                      print {*STDOUT} "Skipping Test Case $testnum... (TESTONLY)\n";
-                      print {*STDOUT} qq|------------------------------------------------------- \n|;
+            print {$RESULTS} qq|<b>Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint </b><br />\n|;
 
-                      next TESTCASE; ## skip this test case if a testonly parameter is not set in the global config
-                }
+            print {*STDOUT} qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
+
+            if (!$is_testcases_tag_already_written) { # Only write the testcases opening tag once in the results.xml
+                print {$RESULTSXML} qq|    <testcases file="$currentcasefile">\n\n|;
+                $is_testcases_tag_already_written = 'true';
             }
 
-            $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
-            if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
-                if ($opt_autocontroller) { ## if so, was the auto controller option specified?
-                    ## run this test case as normal since it is allowed
-                }
-                else {
-                      print {*STDOUT} "Skipping Test Case $testnum...\n (This is not the automation controller)\n";
-                      print {*STDOUT} qq|------------------------------------------------------- \n|;
+            print {$RESULTSXML} qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
 
-                      next TESTCASE; ## skip this test case if this isn't the test controller
-                }
+            for (qw/section description1 description2/) { ## support section breaks
+                next unless defined $case{$_};
+                print {$RESULTS} qq|$case{$_} <br />\n|;
+                print {*STDOUT} qq|$case{$_} \n|;
+                print {$RESULTSXML} qq|            <$_>$case{$_}</$_>\n|;
             }
 
-            $case{liveonly} = $xmltestcases->{case}->{$testnum}->{liveonly}; ## only run the test case against production
-            if ($case{liveonly}) { ## is the liveonly value set for this testcase?
-                if (!$config{testonly}) { ## assume that if the config doesn't contain the testonly item, then it is a live config
-                    ## run this test case as normal since it is allowed
-                }
-                else {
-                      print {*STDOUT} "Skipping Test Case $testnum... (LIVEONLY)\n";
-                      print {*STDOUT} qq|------------------------------------------------------- \n|;
+            print {$RESULTS} qq|<br />\n|;
 
-                      next TESTCASE; ## skip this test case if a liveonly parameter is not set in the global config
+            ## display and log the verifications to do
+            ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
+            ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
+            foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+                if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
+                    my $verifytype = ucfirst substr($case_attribute, 6, 8); ## so we get the word Positive or Negative
+                    @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
+                    print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
+                    print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
+                    print {$RESULTSXML} qq|            <$case_attribute>$verifyparms[0]</$case_attribute>\n|;
                 }
             }
 
-            $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
-            if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
-                if ($counter == 1) { ## counter keeps track of what loop number we are on
-                    ## run this test case as normal since it is the first pass
-                }
-                else {
-                      print {*STDOUT} "Skipping Test Case $testnum... (firstlooponly)\n";
-                      print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                      next TESTCASE; ## skip this test case since it is firstlooponly and we have already run it
-                }
+            if ($case{verifyresponsecode}) {
+                print {$RESULTS} qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
+                print {*STDOUT} qq|Verify Response Code: "$case{verifyresponsecode}" \n|;
+                print {$RESULTSXML} qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
             }
 
-            $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
-            if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
-                if ($counter == $repeat) { ## counter keeps track of what loop number we are on
-                    ## run this test case as normal since it is the first pass
-                }
-                else {
-                      print {*STDOUT} "Skipping Test Case $testnum... (LASTLOOPONLY)\n";
-                      print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                      next TESTCASE; ## skip this test case since it is not yet the lastloop
-                }
+            if ($case{verifyresponsetime}) {
+                print {$RESULTS} qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
+                print {*STDOUT} qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
+                print {$RESULTSXML} qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
             }
 
-            $entrycriteriaok = 'true'; ## assume entry criteria met
-            $entryresponse = q{};
-
-            $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
-            if (defined $case{checkpositive}) { ## is the checkpositive value set for this testcase?
-                if ($lastpositive[$case{checkpositive}] eq 'pass') { ## last verifypositive for this indexed passed
-                    ## ok to run this test case
-                }
-                else {
-                    $entrycriteriaok = q{};
-                    $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n/;
-                    ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
-                    ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
-                }
+            if ($case{retryresponsecode}) {## retry if a particular response code was returned
+                print {$RESULTS} qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
+                print {*STDOUT} qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
+                print {$RESULTSXML} qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
             }
 
-            $case{checknegative} = $xmltestcases->{case}->{$testnum}->{checknegative};
-            if (defined $case{checknegative}) { ## is the checkpositive value set for this testcase?
-                if ($lastnegative[$case{checknegative}] eq 'pass') { ## last verifynegative for this indexed passed
-                    ## ok to run this test case
-                }
-                else {
-                    $entrycriteriaok = q{};
-                    $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n/;
-                    ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
-                }
-            }
+            $RESULTS->autoflush();
 
-            $case{checkresponsecode} = $xmltestcases->{case}->{$testnum}->{checkresponsecode};
-            if (defined $case{checkresponsecode}) { ## is the checkpositive value set for this testcase?
-                if ($lastresponsecode == $case{checkresponsecode}) { ## expected response code last test case equals actual
-                    ## ok to run this test case
-                }
-                else {
-                    $entrycriteriaok = q{};
-                    $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n/;
-                    ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
-                }
-            }
-
-            # populate variables with values from testcase file, do substitutions, and revert converted values back
-            ## old parmlist, kept for reference of what attributes are supported
-            ##
-            ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", "command2", "command3", "command4", "command5", "command6", "command7", "command8", "command9", "command10", "", "command11", "command12", "command13", "command14", "command15", "command16", "command17", "command18", "command19", "command20", "parms", "verifytext",
-            ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
-            ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
-            ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
-            ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly", "decodequotedprintable");
-            ##
-            ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
-
-            my %casesave; ## we need a clean array for each test case
-            undef %case; ## do not allow values from previous test cases to bleed over
-            foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                #print "DEBUG: $case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$case_attribute};
-                #print "\n";
-                $case{$case_attribute} = $xmltestcases->{case}->{$testnum}->{$case_attribute};
-                convertbackxml($case{$case_attribute});
-                $casesave{$case_attribute} = $case{$case_attribute}; ## in case we have to retry, some parms need to be resubbed
-            }
-
-            $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
-            if ($case{retry}) { ## retry parameter found
-                  $retry = $case{retry}; ## assume we can retry as many times as specified
-                  if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
-                      if ($retry > ($config{globalretry} - $globalretries)) { ## we can't retry that many times
-                         $retry =  $config{globalretry} - $globalretries; ## this is the most we can retry
-                         if ($retry < 0) {$retry = 0;} ## if less than 0 then make 0
-                      }
-                  }
-                  print {*STDOUT} qq|Retry $retry times\n|;
+            if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
+               if ($case{method}) {
+                   if ($case{method} eq 'get') { httpget(); }
+                   elsif ($case{method} eq 'post') { httppost(); }
+                   elsif ($case{method} eq 'cmd') { cmd(); }
+                   elsif ($case{method} eq 'selenium') { selenium(); }
+                   else { print {*STDERR} qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
+               }
+               else {
+                  httpget();  #use "get" if no method is specified
+               }
             }
             else {
-                  $retry = 0; #no retry parameter found, don't retry this case
+                 # Response code 412 means Precondition failed
+                 print {*STDOUT} $entryresponse;
+                 $entryresponse =~ s{^}{412 \n};
+                 $response = HTTP::Response->parse($entryresponse);
+                 $latency = 0.001; ## Prevent latency bleeding over from previous test step
             }
 
-            $case{retryfromstep} = $xmltestcases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
-            if ($case{retryfromstep}) { ## retryfromstep parameter found
-                  $retry = 0; ## we will not do a regular retry
+            searchimage(); ## search for images within actual screen or page grab
+
+			if ($case{decodequotedprintable}) {
+				 my $decoded = decode_qp($response->as_string); ## decode the response output
+				 $response = HTTP::Response->parse($decoded); ## inject it back into the response
+			}
+
+            verify(); #verify result from http response
+
+            gethrefs(); ## get specified web page href assets
+            getsrcs(); ## get specified web page src assets
+            getbackgroundimages(); ## get specified web page src assets
+
+            httplog();  #write to http.log file
+
+            if ($entrycriteriaok) { ## do not want to parseresponse on junk
+               parseresponse();  #grab string from response to send later
             }
 
-            do ## retry loop
-            {
-                ## for each retry, there are a few substitutions that we need to redo - like the retry number
-                foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                    if (defined $casesave{$case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
-                    {
-                        $case{$case_attribute} = $casesave{$case_attribute}; ## need to restore to the original partially substituted parameter
-                        convertbackxmldynamic($case{$case_attribute}); ## now update the dynamic components
+            ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
+            if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
+                print {$RESULTSXML} qq|            <success>false</success>\n|;
+                if ($case{errormessage}) { #Add defined error message to the output
+                    print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
+                    print {$RESULTSXML} qq|            <result-message>$case{errormessage}</result-message>\n|;
+                    print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
+                }
+                else { #print regular error output
+                    print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
+                    print {$RESULTSXML} qq|            <result-message>TEST CASE FAILED</result-message>\n|;
+                    print {*STDOUT} qq|TEST CASE FAILED\n|;
+                }
+                $casefailedcount++;
+            }
+            elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
+                print {$RESULTS} qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
+                print {*STDOUT} qq|RETRYING... $retry to go \n|;
+                print {$RESULTSXML} qq|            <success>false</success>\n|;
+                print {$RESULTSXML} qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
+
+                ## all this is for ensuring correct behaviour when retries occur
+                $retriesprint = ".$retries";
+                $retries++;
+                $globalretries++;
+                $passedcount = $passedcount - $retrypassedcount;
+                $failedcount = $failedcount - $retryfailedcount;
+            }
+            elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
+                my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
+                print {$RESULTS} qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
+                print {*STDOUT} qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
+                print {$RESULTSXML} qq|            <success>false</success>\n|;
+                print {$RESULTSXML} qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
+                $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
+                $jumpbacksprint = "-$jumpbacks";
+                $globalretries++;
+                $passedcount = $passedcount - $retrypassedcount;
+                $failedcount = $failedcount - $retryfailedcount;
+
+                ## find the index for the test step we are retrying from
+                $stepindex = 0;
+                my $foundindex = 'false';
+                foreach (@teststeps) {
+                    if ($teststeps[$stepindex] eq $case{retryfromstep}) {
+                        $foundindex = 'true';
+                        last;
                     }
+                    $stepindex++
                 }
-
-                set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
-                foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
-                        convertback_variables($case{$case_attribute});
-                }
-
-                $desc1log = $case{description1};
-                if ($case{description2}) {
-                   $desc2log = $case{description2};
+                if ($foundindex eq 'false') {
+                    print {*STDOUT} qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
                 }
                 else
                 {
-                   $desc2log = q{}; ## must blank it out if not being used
+                    $stepindex--; ## since we increment it at the start of the next loop / end of this loop
                 }
+            }
+            else {
+                print {$RESULTS} qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
+                print {*STDOUT} qq|TEST CASE PASSED \n|;
+                print {$RESULTSXML} qq|            <success>true</success>\n|;
+                print {$RESULTSXML} qq|            <result-message>TEST CASE PASSED</result-message>\n|;
+                $casepassedcount++;
+                $retry = 0; # no need to retry when test case passes
+            }
 
-                if ($config{globalretry}) {
-                    if ($globalretries >= $config{globalretry}) {
-                        $retry = 0; ## globalretries value exceeded - not retrying any more this run
-                    }
-                }
-                $isfailure = 0;
-                $verifynegativefailed = 'false';
-                $retrypassedcount = 0;
-                $retryfailedcount = 0;
+            print {$RESULTS} qq|Response Time = $latency sec <br />\n|;
 
-                $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
+            print {*STDOUT} qq|Response Time = $latency sec \n|;
 
-                if ($case{description1} and $case{description1} =~ /dummy test case/) {  #if we hit a dummy record, skip it
-                    next;
-                }
+            print {$RESULTSXML} qq|            <responsetime>$latency</responsetime>\n|;
 
-                print {$RESULTS} qq|<b>Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint </b><br />\n|;
+            if ($case{method} eq 'selenium') {
+                print {$RESULTS} qq|Verification Time = $verificationlatency sec <br />\n|;
+                print {$RESULTS} qq|Screenshot Time = $screenshotlatency sec <br />\n|;
 
-                print {*STDOUT} qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
+                print {*STDOUT} qq|Verification Time = $verificationlatency sec \n|;
+                print {*STDOUT} qq|Screenshot Time = $screenshotlatency sec \n|;
 
-                if (!$is_testcases_tag_already_written) { # Only write the testcases opening tag once in the results.xml
-                    print {$RESULTSXML} qq|    <testcases file="$currentcasefile">\n\n|;
-                    $is_testcases_tag_already_written = 'true';
-                }
+                print {$RESULTSXML} qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
+                print {$RESULTSXML} qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
+            }
 
-                print {$RESULTSXML} qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
 
-                for (qw/section description1 description2/) { ## support section breaks
-                    next unless defined $case{$_};
-                    print {$RESULTS} qq|$case{$_} <br />\n|;
-                    print {*STDOUT} qq|$case{$_} \n|;
-                    print {$RESULTSXML} qq|            <$_>$case{$_}</$_>\n|;
-                }
+            print {$RESULTSXML} qq|        </testcase>\n\n|;
+            print {$RESULTS} qq|<br />\n------------------------------------------------------- <br />\n\n|;
 
-                print {$RESULTS} qq|<br />\n|;
+            if (!$xnode) { #skip regular STDOUT output if using an XPath
+                print {*STDOUT} qq|------------------------------------------------------- \n|;
+            }
 
-                ## display and log the verifications to do
-                ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
-                ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
-                foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                    if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
-                        my $verifytype = ucfirst substr($case_attribute, 6, 8); ## so we get the word Positive or Negative
-                        @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
-                        print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
-                        print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
-                        print {$RESULTSXML} qq|            <$case_attribute>$verifyparms[0]</$case_attribute>\n|;
-                    }
-                }
+            $endruntimer = time;
+            $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
 
-                if ($case{verifyresponsecode}) {
-                    print {$RESULTS} qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
-                    print {*STDOUT} qq|Verify Response Code: "$case{verifyresponsecode}" \n|;
-                    print {$RESULTSXML} qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
-                }
+            #if (($isfailure > 0) && ($retry > 0)) {  ## do not increase the run count if we will retry
+            if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq 'false') ) ) {
+                ## do not count this in run count if we are retrying, again maximum usage of retryfromstep has been hard coded
+            }
+            else {
+                $runcount++;
+                $totalruncount++;
+            }
 
-                if ($case{verifyresponsetime}) {
-                    print {$RESULTS} qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
-                    print {*STDOUT} qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
-                    print {$RESULTSXML} qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
-                }
+            if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
+            if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
+            $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
+            if ($totalruncount > 0) { #only update average response if at least one test case has completed, to avoid division by zero
+                $avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
+            }
 
-                if ($case{retryresponsecode}) {## retry if a particular response code was returned
-                    print {$RESULTS} qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
-                    print {*STDOUT} qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
-                    print {$RESULTSXML} qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
-                }
+            $teststeptime{$testnumlog}=$latency; ## store latency for step
 
-                $RESULTS->autoflush();
+            if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
+                print {*STDOUT} qq|RESTARTING BROWSER DUE TO FAIL ... \n|;
+                startseleniumbrowser();
+                startsession();
+            }
 
-                if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
-                   if ($case{method}) {
-                       if ($case{method} eq 'get') { httpget(); }
-                       elsif ($case{method} eq 'post') { httppost(); }
-                       elsif ($case{method} eq 'cmd') { cmd(); }
-                       elsif ($case{method} eq 'selenium') { selenium(); }
-                       else { print {*STDERR} qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
-                   }
-                   else {
-                      httpget();  #use "get" if no method is specified
-                   }
-                }
-                else {
-                     # Response code 412 means Precondition failed
-                     print {*STDOUT} $entryresponse;
-                     $entryresponse =~ s{^}{412 \n};
-                     $response = HTTP::Response->parse($entryresponse);
-                     $latency = 0.001; ## Prevent latency bleeding over from previous test step
-                }
+            if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
+                print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
+                startseleniumbrowser();
+                startsession();
+            }
 
-                searchimage(); ## search for images within actual screen or page grab
-
-				if ($case{decodequotedprintable}) {
-					 my $decoded = decode_qp($response->as_string); ## decode the response output
-					 $response = HTTP::Response->parse($decoded); ## inject it back into the response
-				}
-
-                verify(); #verify result from http response
-
-                gethrefs(); ## get specified web page href assets
-                getsrcs(); ## get specified web page src assets
-                getbackgroundimages(); ## get specified web page src assets
-
-                httplog();  #write to http.log file
-
-                if ($entrycriteriaok) { ## do not want to parseresponse on junk
-                   parseresponse();  #grab string from response to send later
-                }
-
-                ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-                if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
-                    print {$RESULTSXML} qq|            <success>false</success>\n|;
-                    if ($case{errormessage}) { #Add defined error message to the output
-                        print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
-                        print {$RESULTSXML} qq|            <result-message>$case{errormessage}</result-message>\n|;
-                        print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
-                    }
-                    else { #print regular error output
-                        print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
-                        print {$RESULTSXML} qq|            <result-message>TEST CASE FAILED</result-message>\n|;
-                        print {*STDOUT} qq|TEST CASE FAILED\n|;
-                    }
-                    $casefailedcount++;
-                }
-                elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
-                    print {$RESULTS} qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
-                    print {*STDOUT} qq|RETRYING... $retry to go \n|;
-                    print {$RESULTSXML} qq|            <success>false</success>\n|;
-                    print {$RESULTSXML} qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
-
-                    ## all this is for ensuring correct behaviour when retries occur
-                    $retriesprint = ".$retries";
-                    $retries++;
-                    $globalretries++;
-                    $passedcount = $passedcount - $retrypassedcount;
-                    $failedcount = $failedcount - $retryfailedcount;
-                }
-                elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
-                    my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
-                    print {$RESULTS} qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
-                    print {*STDOUT} qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
-                    print {$RESULTSXML} qq|            <success>false</success>\n|;
-                    print {$RESULTSXML} qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
-                    $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
-                    $jumpbacksprint = "-$jumpbacks";
-                    $globalretries++;
-                    $passedcount = $passedcount - $retrypassedcount;
-                    $failedcount = $failedcount - $retryfailedcount;
-
-                    ## find the index for the test step we are retrying from
-                    $stepindex = 0;
-                    my $foundindex = 'false';
-                    foreach (@teststeps) {
-                        if ($teststeps[$stepindex] eq $case{retryfromstep}) {
-                            $foundindex = 'true';
-                            last;
-                        }
-                        $stepindex++
-                    }
-                    if ($foundindex eq 'false') {
-                        print {*STDOUT} qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
+            if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
+            {
+                ## ignore the sleep if the test case worked and it is a retry test case
+            }
+            else
+            {
+                if ($case{sleep})
+                {
+                    if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
+                    {
+                        ## do not sleep if the test case failed and we have run out of retries or jumpbacks
                     }
                     else
                     {
-                        $stepindex--; ## since we increment it at the start of the next loop / end of this loop
+                        ## if a sleep value is set in the test case, sleep that amount
+                        sleep $case{sleep};
                     }
                 }
-                else {
-                    print {$RESULTS} qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
-                    print {*STDOUT} qq|TEST CASE PASSED \n|;
-                    print {$RESULTSXML} qq|            <success>true</success>\n|;
-                    print {$RESULTSXML} qq|            <result-message>TEST CASE PASSED</result-message>\n|;
-                    $casepassedcount++;
-                    $retry = 0; # no need to retry when test case passes
-                }
+            }
 
-                print {$RESULTS} qq|Response Time = $latency sec <br />\n|;
-
-                print {*STDOUT} qq|Response Time = $latency sec \n|;
-
-                print {$RESULTSXML} qq|            <responsetime>$latency</responsetime>\n|;
-
-                if ($case{method} eq 'selenium') {
-                    print {$RESULTS} qq|Verification Time = $verificationlatency sec <br />\n|;
-                    print {$RESULTS} qq|Screenshot Time = $screenshotlatency sec <br />\n|;
-
-                    print {*STDOUT} qq|Verification Time = $verificationlatency sec \n|;
-                    print {*STDOUT} qq|Screenshot Time = $screenshotlatency sec \n|;
-
-                    print {$RESULTSXML} qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
-                    print {$RESULTSXML} qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
-                }
-
-
-                print {$RESULTSXML} qq|        </testcase>\n\n|;
-                print {$RESULTS} qq|<br />\n------------------------------------------------------- <br />\n\n|;
-
-                if (!$xnode) { #skip regular STDOUT output if using an XPath
-                    print {*STDOUT} qq|------------------------------------------------------- \n|;
-                }
-
-                $endruntimer = time;
-                $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
-
-                #if (($isfailure > 0) && ($retry > 0)) {  ## do not increase the run count if we will retry
-                if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq 'false') ) ) {
-                    ## do not count this in run count if we are retrying, again maximum usage of retryfromstep has been hard coded
-                }
-                else {
-                    $runcount++;
-                    $totalruncount++;
-                }
-
-                if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
-                if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
-                $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
-                if ($totalruncount > 0) { #only update average response if at least one test case has completed, to avoid division by zero
-                    $avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
-                }
-
-                $teststeptime{$testnumlog}=$latency; ## store latency for step
-
-                if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
-                    print {*STDOUT} qq|RESTARTING BROWSER DUE TO FAIL ... \n|;
-                    startseleniumbrowser();
-                    startsession();
-                }
-
-                if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
-                    print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
-                    startseleniumbrowser();
-                    startsession();
-                }
-
-                if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
-                {
-                    ## ignore the sleep if the test case worked and it is a retry test case
-                }
-                else
-                {
-                    if ($case{sleep})
-                    {
-                        if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
-                        {
-                            ## do not sleep if the test case failed and we have run out of retries or jumpbacks
-                        }
-                        else
-                        {
-                            ## if a sleep value is set in the test case, sleep that amount
-                            sleep $case{sleep};
-                        }
-                    }
-                }
-
-                if ($xnode) {  #if an XPath Node is defined, only process the single Node
-                    last;
-                }
-                $retry = $retry - 1;
-            } ## end of retry loop
-            until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
-
-            if ($case{sanitycheck} && ($casefailedcount > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
-                print {*STDOUT} qq|SANITY CHECK FAILED ... Aborting \n|;
+            if ($xnode) {  #if an XPath Node is defined, only process the single Node
                 last;
             }
-        } ## end of test case loop
+            $retry = $retry - 1;
+        } ## end of retry loop
+        until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
 
-        $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
-    } ## end of repeat loop
+        if ($case{sanitycheck} && ($casefailedcount > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
+            print {*STDOUT} qq|SANITY CHECK FAILED ... Aborting \n|;
+            last;
+        }
+    } ## end of test case loop
 
-    finaltasks();  #do return/cleanup tasks
+    $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
+} ## end of repeat loop
+
+finaltasks();  #do return/cleanup tasks
 
 
-    ## shut down the Selenium server last - it is less important than closing the files
-    if ($opt_port) {  ## if -p is used, we need to close the browser and stop the selenium server
-        $selresp = $sel->quit(); ## shut down selenium browser session
-    }
+## shut down the Selenium server last - it is less important than closing the files
+if ($opt_port) {  ## if -p is used, we need to close the browser and stop the selenium server
+    $selresp = $sel->quit(); ## shut down selenium browser session
+}
 
-    return;
-
-} #end engine subroutine
-
+## End main code
 
 
 #------------------------------------------------------------------
@@ -2687,7 +2681,7 @@ sub fixsinglecase{ #xml parser creates a hash in a different format if there is 
 
 #------------------------------------------------------------------
 ## no critic (RequireArgUnpacking)
-sub convertbackxml() {  #converts replaced xml with substitutions
+sub convertbackxml {  #converts replaced xml with substitutions
 
 
 ## length feature for returning the size of the response
@@ -2764,7 +2758,7 @@ sub convertbackxml() {  #converts replaced xml with substitutions
 }
 
 #------------------------------------------------------------------
-sub convertbackxmldynamic() {## some values need to be updated after each retry
+sub convertbackxmldynamic {## some values need to be updated after each retry
 
     my $retriessub = $retries-1;
 
@@ -2791,7 +2785,7 @@ sub convertbackxmldynamic() {## some values need to be updated after each retry
 }
 
 #------------------------------------------------------------------
-sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
+sub convertback_variables { ## e.g. postbody="time={RUNSTART}"
     foreach my $case_attribute ( sort keys %{varvar} ) {
        my $sub_var = substr $case_attribute, 3;
        $_[0] =~ s/{$sub_var}/$varvar{$case_attribute}/g;
@@ -2802,7 +2796,7 @@ sub convertback_variables() { ## e.g. postbody="time={RUNSTART}"
 
 ## use critic
 #------------------------------------------------------------------
-sub set_variables() { ## e.g. varRUNSTART="{HH}{MM}{SS}"
+sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
        if ( (substr $case_attribute, 0, 3) eq 'var' ) {
             $varvar{$case_attribute} = $case{$case_attribute}; ## assign the variable
