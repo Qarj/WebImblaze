@@ -127,9 +127,9 @@ whackoldfiles();  #delete files leftover from previous run (do this here so they
 
 startseleniumbrowser();  #start selenium browser if applicable. If it is already started, close browser then start it again.
 
-startsession(); #starts, or restarts the webinject session
-
 processcasefile();
+
+startsession(); #starts, or restarts the webinject session
 
 #open file handles
 open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
@@ -2546,15 +2546,16 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     if ($userconfig->{httpauth}) {
-        my @authentry;
-        @authentry = split /:/, $userconfig->{httpauth};
-        if ($#authentry != 4) {
-            print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
+        for my $auths ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
+            #print "\nhttpauth:$auths\n";
+            my @authentry = split /:/, $auths;
+            if ($#authentry != 4) {
+                print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
+            }
+            else {
+                push @httpauth, [@authentry];
+            }
         }
-        else {
-            push @httpauth, [@authentry];
-        }
-        #print "\nhttpauth : @httpauth \n\n";
     }
 
     if (not defined $config{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
@@ -3005,7 +3006,7 @@ sub startsession {     ## creates the webinject user agent
         #add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         #deref $elem to get the array elements.
         foreach my $elem(@httpauth) {
-            #print "adding credential: $elem->[0]:$elem->[1], $elem->[2], $elem->[3] => $elem->[4]\n";
+            #print {*STDOUT} "adding credential: $elem->[0]:$elem->[1], $elem->[2], $elem->[3] => $elem->[4]\n";
             $useragent->credentials("$elem->[0]:$elem->[1]", "$elem->[2]", "$elem->[3]" => "$elem->[4]");
         }
     }
