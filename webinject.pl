@@ -1763,7 +1763,7 @@ sub httpget {  #send http request and read response
         my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
-            $request->header($1 => $2);  #using HTTP::Headers Class
+            if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
     }
 
@@ -1821,7 +1821,7 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
         my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m{(.*): (.*)};
-            $request->header($1 => $2);  #using HTTP::Headers Class
+            if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
         #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
@@ -1910,7 +1910,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
         my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
-            $request->header($1 => $2);  #using HTTP::Headers Class
+            if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
         #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
@@ -1948,7 +1948,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
         my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
         foreach (@addheaders) {
             $_ =~ m/(.*): (.*)/;
-            $request->header($1 => $2);  #using HTTP::Headers Class
+            if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
     }
 
@@ -2025,11 +2025,14 @@ sub searchimage {  ## search for images in the actual result
                 }
                 my $siresp = (`imageinimage.py $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png "$cwd$opt_basefolder$case{$_}" $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
                 $siresp =~ m/primary confidence (\d+)/s;
-                my $primaryconfidence = $1;
+                my $primaryconfidence;
+                if ($1) {$primaryconfidence = $1;}
                 $siresp =~ m/alternate confidence (\d+)/s;
-                my $alternateconfidence = $1;
+                my $alternateconfidence;
+                if ($1) {$alternateconfidence = $1;}
                 $siresp =~ m/min_loc (.*?)X/s;
-                my $location = $1;
+                my $location;
+                if ($1) {$location = $1;}
 
                 if ($siresp =~ m/was found/s) { ## was the image found?
                     print {$RESULTS} qq|<span class="found">Found image: $case{$_}</span><br />\n|;
@@ -2549,7 +2552,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
         if ($xpath =~ /\/(.*)\[/) {  #if the argument contains a "/" and "[", it is really an XPath
             $xpath =~ /(.*)\/(.*)\[(.*?)\]/;  #if it contains XPath info, just grab the file name
-            $xnode = $3;  #grab the XPath Node value.. (from inside the "[]")
+            if ($3) {$xnode = $3;}  #grab the XPath Node value.. (from inside the "[]")
             #print "\nXPath Node is: $xnode \n";
         }
         else {
@@ -2623,7 +2626,7 @@ sub _push_httpauth {
     else {
         push @httpauth, [@authentry];
     }
-    
+
     return;
 }
 
