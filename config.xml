@@ -13,6 +13,4 @@
        <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
     </smartassertions> 
     <testonly>Allow</testonly>
-    <httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>
-    <httpauth>www.example.com:8080:my_area:foo2:welcome2</httpauth>
 </root> 

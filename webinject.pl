@@ -2546,15 +2546,14 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     if ($userconfig->{httpauth}) {
-        for my $auths ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
-            #print "\nhttpauth:$auths\n";
-            my @authentry = split /:/, $auths;
-            if ($#authentry != 4) {
-                print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
+        if ( ref($userconfig->{httpauth}) eq 'ARRAY') {
+            #print "We have an array of httpauths\n";
+            for my $auth ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
+                _push_httpauth ($auth);
             }
-            else {
-                push @httpauth, [@authentry];
-            }
+        } else {
+            #print "Not an array - we just have one httpauth\n";
+            _push_httpauth ($userconfig->{httpauth});
         }
     }
 
@@ -2576,6 +2575,19 @@ sub processcasefile {  #get test case files to run (from command line or config 
     #print "outsum $outsum \n";
 
     return;
+}
+
+sub _push_httpauth {
+    my ($auth) = @_;
+
+    #print "\nhttpauth:$auth\n";
+    my @authentry = split /:/, $auth;
+    if ($#authentry != 4) {
+        print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
+    }
+    else {
+        push @httpauth, [@authentry];
+    }
 }
 
 #------------------------------------------------------------------
