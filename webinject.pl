@@ -430,7 +430,8 @@ foreach ($start .. $repeat) {
             ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
             foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
                 if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
-                    my $verifytype = ucfirst substr($case_attribute, 6, 8); ## so we get the word Positive or Negative
+                    my $verifytype = substr $case_attribute, 6, 8; ## so we get the word positive or negative
+                    $verifytype = ucfirst $verifytype; ## change to Positive or Negative
                     @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
                     print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                     print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
@@ -461,10 +462,9 @@ foreach ($start .. $repeat) {
             if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
                if ($case{method}) {
                    if ($case{method} eq 'get') { httpget(); }
-                   elsif ($case{method} eq 'post') { httppost(); }
-                   elsif ($case{method} eq 'cmd') { cmd(); }
-                   elsif ($case{method} eq 'selenium') { selenium(); }
-                   else { print {*STDERR} qq|ERROR: bad Method Type, you must use "get", "post", "cmd" or "selenium"\n|; }
+                   if ($case{method} eq 'post') { httppost(); }
+                   if ($case{method} eq 'cmd') { cmd(); }
+                   if ($case{method} eq 'selenium') { selenium(); }
                }
                else {
                   httpget();  #use "get" if no method is specified
@@ -674,36 +674,34 @@ if ($opt_port) {  ## if -p is used, we need to close the browser and stop the se
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
 
-    print {$RESULTS}
-qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    print {$RESULTS} qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"\n|;
+    print {$RESULTS} qq|    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n\n|;
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <title>WebInject Test Results</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <style type="text/css">
-        body {
-            background-color: #F5F5F5;
-            color: #000000;
-            font-family: Verdana, Arial, Helvetica, sans-serif;
-            font-size: 10px;
-        }
-        .pass {
-            color: green;
-        }
-        .fail {
-            color: red;
-        }
-        .skip {
-            color: orange;
-        }
-    </style>
-</head>
-<body>
-<hr />
--------------------------------------------------------<br />
-|;
+    print {$RESULTS} qq|<html xmlns="http://www.w3.org/1999/xhtml">\n|;
+    print {$RESULTS} qq|<head>\n|;
+    print {$RESULTS} qq|    <title>WebInject Test Results</title>\n|;
+    print {$RESULTS} qq|    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />\n|;
+    print {$RESULTS} qq|    <style type="text/css">\n|;
+    print {$RESULTS} qq|        body {\n|;
+    print {$RESULTS} qq|            background-color: #F5F5F5;\n|;
+    print {$RESULTS} qq|            color: #000000;\n|;
+    print {$RESULTS} qq|            font-family: Verdana, Arial, Helvetica, sans-serif;\n|;
+    print {$RESULTS} qq|            font-size: 10px;\n|;
+    print {$RESULTS} qq|        }\n|;
+    print {$RESULTS} qq|        .pass {\n|;
+    print {$RESULTS} qq|            color: green;\n|;
+    print {$RESULTS} qq|        }\n|;
+    print {$RESULTS} qq|        .fail {\n|;
+    print {$RESULTS} qq|            color: red;\n|;
+    print {$RESULTS} qq|        }\n|;
+    print {$RESULTS} qq|        .skip {\n|;
+    print {$RESULTS} qq|            color: orange;\n|;
+    print {$RESULTS} qq|        }\n|;
+    print {$RESULTS} qq|    </style>\n|;
+    print {$RESULTS} qq|</head>\n|;
+    print {$RESULTS} qq|<body>\n|;
+    print {$RESULTS} qq|<hr />\n|;
+    print {$RESULTS} qq|-------------------------------------------------------<br />\n\n|;
 
     return;
 }
@@ -721,28 +719,25 @@ sub writeinitialstdout {  #write initial text for STDOUT
 #------------------------------------------------------------------
 sub writefinalhtml {  #write summary and closing tags for results file
 
-    print {$RESULTS}
-qq|
-<br /><hr /><br />
-<b>
-Start Time: $currentdatetime <br />
-Total Run Time: $totalruntime seconds <br />
-<br />
-Test Cases Run: $totalruncount <br />
-Test Cases Passed: $casepassedcount <br />
-Test Cases Failed: $casefailedcount <br />
-Verifications Passed: $passedcount <br />
-Verifications Failed: $failedcount <br />
-<br />
-Average Response Time: $avgresponse seconds <br />
-Max Response Time: $maxresponse seconds <br />
-Min Response Time: $minresponse seconds <br />
-</b>
-<br />
+    print {$RESULTS} qq|<br /><hr /><br />\n|;
+    print {$RESULTS} qq|<b>\n|;
+    print {$RESULTS} qq|Start Time: $currentdatetime <br />\n|;
+    print {$RESULTS} qq|Total Run Time: $totalruntime seconds <br />\n|;
+    print {$RESULTS} qq|<br />\n|;
+    print {$RESULTS} qq|Test Cases Run: $totalruncount <br />\n|;
+    print {$RESULTS} qq|Test Cases Passed: $casepassedcount <br />\n|;
+    print {$RESULTS} qq|Test Cases Failed: $casefailedcount <br />\n|;
+    print {$RESULTS} qq|Verifications Passed: $passedcount <br />\n|;
+    print {$RESULTS} qq|Verifications Failed: $failedcount <br />\n|;
+    print {$RESULTS} qq|<br />\n|;
+    print {$RESULTS} qq|Average Response Time: $avgresponse seconds <br />\n|;
+    print {$RESULTS} qq|Max Response Time: $maxresponse seconds <br />\n|;
+    print {$RESULTS} qq|Min Response Time: $minresponse seconds <br />\n|;
+    print {$RESULTS} qq|</b>\n|;
+    print {$RESULTS} qq|<br />\n\n|;
 
-</body>
-</html>
-|;
+    print {$RESULTS} qq|</body>\n|;
+    print {$RESULTS} qq|</html>\n|;
 
     return;
 }
@@ -757,31 +752,28 @@ sub writefinalxml {  #write summary and closing tags for XML results file
         $sanityresult = 'true';
     }
 
-## startdatetime - inserted start-seconds and start-date-time below
-    print {$RESULTSXML}
-qq|
-    </testcases>
+    print {$RESULTSXML} qq|    </testcases>\n\n|;
 
-    <test-summary>
-        <start-time>$currentdatetime</start-time>
-        <start-seconds>$TIMESECONDS</start-seconds>
-        <start-date-time>$STARTDATE|;
-print {$RESULTSXML} qq|T$HOUR:$MINUTE:$SECOND</start-date-time>
-        <total-run-time>$totalruntime</total-run-time>
-        <test-cases-run>$totalruncount</test-cases-run>
-        <test-cases-passed>$casepassedcount</test-cases-passed>
-        <test-cases-failed>$casefailedcount</test-cases-failed>
-        <verifications-passed>$passedcount</verifications-passed>
-        <verifications-failed>$failedcount</verifications-failed>
-        <assertion-skips>$totalassertionskips</assertion-skips>
-        <average-response-time>$avgresponse</average-response-time>
-        <max-response-time>$maxresponse</max-response-time>
-        <min-response-time>$minresponse</min-response-time>
-        <sanity-check-passed>$sanityresult</sanity-check-passed>
-    </test-summary>
+    print {$RESULTSXML} qq|    <test-summary>\n|;
+    print {$RESULTSXML} qq|        <start-time>$currentdatetime</start-time>\n|;
+    print {$RESULTSXML} qq|        <start-seconds>$TIMESECONDS</start-seconds>\n|;
+    print {$RESULTSXML} qq|        <start-date-time>$STARTDATE|;
+    print {$RESULTSXML} qq|T$HOUR:$MINUTE:$SECOND</start-date-time>\n|;
+    print {$RESULTSXML} qq|        <total-run-time>$totalruntime</total-run-time>\n|;
+    print {$RESULTSXML} qq|        <test-cases-run>$totalruncount</test-cases-run>\n|;
+    print {$RESULTSXML} qq|        <test-cases-passed>$casepassedcount</test-cases-passed>\n|;
+    print {$RESULTSXML} qq|        <test-cases-failed>$casefailedcount</test-cases-failed>\n|;
+    print {$RESULTSXML} qq|        <verifications-passed>$passedcount</verifications-passed>\n|;
+    print {$RESULTSXML} qq|        <verifications-failed>$failedcount</verifications-failed>\n|;
+    print {$RESULTSXML} qq|        <assertion-skips>$totalassertionskips</assertion-skips>\n|;
+    print {$RESULTSXML} qq|        <average-response-time>$avgresponse</average-response-time>\n|;
+    print {$RESULTSXML} qq|        <max-response-time>$maxresponse</max-response-time>\n|;
+    print {$RESULTSXML} qq|        <min-response-time>$minresponse</min-response-time>\n|;
+    print {$RESULTSXML} qq|        <sanity-check-passed>$sanityresult</sanity-check-passed>\n|;
+    print {$RESULTSXML} qq|    </test-summary>\n\n|;
 
-</results>
-|;
+    print {$RESULTSXML} qq|</results>\n|;
+
 
     return;
 }
@@ -826,7 +818,7 @@ sub selenium {  ## send Selenium command and read response
        if ($case{$_}) {#perform command
           $command = $case{$_};
           $selresp = q{};
-          my $evalresp = eval { eval "$command"; };
+          my $evalresp = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
           print {*STDOUT} "EVALRESP:$@\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
@@ -1935,7 +1927,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
     $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
     my %my_content_;
-    eval "\%my_content_ = $substituted_postbody";
+    eval "\%my_content_ = $substituted_postbody"; ## no critic(ProhibitStringyEval)
     $request = POST "$case{url}",
                Content_Type => "$case{posttype}",
                Content => \%my_content_;
