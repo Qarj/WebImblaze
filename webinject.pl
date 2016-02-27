@@ -2503,8 +2503,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
         $configfilepath = "$dirname"."$opt_configfile";
-    }
-    elsif (-e "$dirname".'config.xml') {  #if config.xml exists, use it
+    } else {
         $configfilepath = "$dirname".'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
@@ -2809,7 +2808,7 @@ sub url_escape {  #escapes difficult characters with %hexvalue
     my @a = @_;  #make a copy of the arguments
 
 ## escape change - changed the mapping around so / would be escaped
-    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## changed escape to prevent problems with __VIEWSTATE #'
+    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## no critic(ProhibitMutatingListFunctions) ## changed escape to prevent problems with __VIEWSTATE #'
 #   map { s¦[-,^+!~()\\/' ]¦sprintf "%%%02x", ord $&¦eg } @a; #(1.41 version of escape)
     return wantarray ? @a : $a[0];
 }
