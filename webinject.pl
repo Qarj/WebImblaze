@@ -1832,7 +1832,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     my @parms;
     my $len;
-    my $idx;
+    #my $idx;
     my $fieldname;
     my $fieldvalue;
     my $subname;
@@ -1849,7 +1849,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
        #out print {*STDOUT} qq| \n There are $len fields in the parms \n|;
 
        #loop through each of the fields and substitute
-       for ($idx = 1; $idx <= $len; $idx++) {
+       foreach my $idx (1..$len) {
             $fieldname = q{};
             #out print {*STDOUT} qq| \n parms $idx: $parms[$idx-1] \n |;
             if ($parms[$idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
