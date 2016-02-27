@@ -1,0 +1,81 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Should not skip assertcount"
+    method="cmd"
+    command="echo one one one > NUL"
+    assertcountONE="one|||4|||Expected count of 4"
+/>
+
+<case
+    id="20"
+    description1="Should not skip verifypositive"
+    method="cmd"
+    command="echo one one one one > NUL"
+    verifypositiveONE="two|||Expected to find two"
+/>
+
+<case
+    id="30"
+    description1="Should not skip verifynegative"
+    method="cmd"
+    command="echo one one one one > NUL"
+    verifynegativeONE="one|||Did not expect to find one"
+/>
+
+<case
+    id="40"
+    description1="Should not skip autoassertion"
+    method="cmd"
+    command="echo HTTP Error 404.0 . Not Found > NUL"
+/>
+
+<case
+    id="50"
+    description1="Should not skip smartassertion"
+    method="cmd"
+    command="echo Set-Cookie:  > NUL"
+/>
+
+<case
+    id="110"
+    description1="Should skip assertcount"
+    method="cmd"
+    command="echo one one one > NUL"
+    assertcount="one|||4|||Expected count of 4|||Production Bug"
+    assertcount5="one|||4|||Expected count of 4|||Production Bug"
+    assertcountONE="one|||4|||Expected count of 4|||Production Bug"
+    assertcount1ONE1="one|||4|||Expected count of 4|||Production Bug"
+    assertcountASSERTCOUNT="one|||4|||Expected count of 4|||Production Bug"
+/>
+
+<case
+    id="120"
+    description1="Should skip verifypositive"
+    method="cmd"
+    command="echo one one one one > NUL"
+    verifypositive="two|||Expected to find two|||Some type of issue"
+    verifypositive5="two|||Expected to find two|||Some type of issue"
+    verifypositiveONE="two|||Expected to find two|||Some type of issue"
+    verifypositive1ONE1="two|||Expected to find two|||Some type of issue"
+/>
+
+<case
+    id="130"
+    description1="Should skip verifynegative"
+    method="cmd"
+    command="echo one one one one > NUL"
+    verifynegative="one|||Did not expect to find one|||Relaxed the assertion"
+    verifynegative5="one|||Did not expect to find one|||Relaxed the assertion"
+    verifynegativeONE="one|||Did not expect to find one|||Relaxed the assertion"
+    verifynegative1ONE1="one|||Did not expect to find one|||Relaxed the assertion"
+/>
+
+
+</testcases>

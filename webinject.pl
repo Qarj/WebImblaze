@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.82';
+$VERSION = '1.83';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -2214,7 +2214,7 @@ sub _verify_autoassertion {
     foreach my $config_attribute ( sort keys %{ $userconfig->{autoassertions} } ) {
         if ( (substr $config_attribute, 0, 13) eq 'autoassertion' ) {
             my $verifynum = $config_attribute; ## determine index verifypositive index
-            $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
+            $verifynum =~ s/^autoassertion//g; ## remove autoassertion from string
             if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
             @verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
@@ -2260,7 +2260,7 @@ sub _verify_smartassertion {
     foreach my $config_attribute ( sort keys %{ $userconfig->{smartassertions} } ) {
         if ( (substr $config_attribute, 0, 14) eq 'smartassertion' ) {
             my $verifynum = $config_attribute; ## determine index verifypositive index
-            $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
+            $verifynum =~ s/^smartassertion//g; ## remove smartassertion from string
             if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
             @verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
             if ($verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
@@ -2308,7 +2308,7 @@ sub _verify_verifypositive {
     foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
         if ( (substr $case_attribute, 0, 14) eq 'verifypositive' ) {
             my $verifynum = $case_attribute; ## determine index verifypositive index
-            $verifynum =~ s/\D//g; #Remove all text from string - example 'verifypositive3'
+            $verifynum =~ s/^verifypositive//g; ## remove verifypositive from string
             if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
             @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
@@ -2356,7 +2356,7 @@ sub _verify_verifynegative {
         if ( (substr $case_attribute, 0, 14) eq 'verifynegative' ) {
             my $verifynum = $case_attribute; ## determine index verifypositive index
             #print {*STDOUT} "$case_attribute\n"; ##DEBUG
-            $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
+            $verifynum =~ s/^verifynegative//g; ## remove verifynegative from string
             if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
             @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify
             if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
@@ -2406,7 +2406,7 @@ sub _verify_assertcount {
         if ( (substr $case_attribute, 0, 11) eq 'assertcount' ) {
             my $verifynum = $case_attribute; ## determine index verifypositive index
             #print {*STDOUT} "$case_attribute\n"; ##DEBUG
-            $verifynum =~ s/\D//g; ## remove all text from string - example 'verifypositive3'
+            $verifynum =~ s/^assertcount//g; ## remove assertcount from string
             if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
             @verifycountparms = split /[|][|][|]/, $case{$case_attribute} ;
             my $count = 0;
@@ -2415,8 +2415,8 @@ sub _verify_assertcount {
             while ($tempstring =~ m/$verifycountparms[0]/ig) { $count++;} ## count how many times string is found
 
             if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                print {$RESULTS} qq|<span class="skip">Skipped Assertion Count - $verifycountparms[3]</span><br />\n|;
-                print {*STDOUT} "Skipped Assertion Count - $verifycountparms[2] \n";
+                print {$RESULTS} qq|<span class="skip">Skipped Assertion Count $verifynum - $verifycountparms[3]</span><br />\n|;
+                print {*STDOUT} "Skipped Assertion Count $verifynum - $verifycountparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }

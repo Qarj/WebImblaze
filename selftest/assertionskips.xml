@@ -1,0 +1,22 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">assertionskips</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 5"
+    verifypositive1="Skipped Assertion Count 0 - Expected count of 4"
+    verifypositive2="Skipped Assertion Count 1ONE1 - Expected count of 4"
+    verifypositive3="Skipped Assertion Count 5 - Expected count of 4"
+    verifypositive4="Skipped Assertion Count ASSERTCOUNT - Expected count of 4"
+    verifypositive5="Skipped Assertion Count ONE - Expected count of 4"
+    verifypositive6="Test Cases Passed: 3"
+/>
+
+</testcases>

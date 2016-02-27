@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.83 - Feb 27, 2016
+* messaging around assertion skips was buggy, now fixed and an appropriate selftest added
+* some code tidy up
+
 ### Version 1.82 - Feb 23, 2016
 * removed a feature - specifiying multiple test case files to process in the config (classic example of overengineering)
 * more code tidy up
