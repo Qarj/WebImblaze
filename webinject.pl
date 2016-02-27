@@ -2515,13 +2515,17 @@ sub processcasefile {  #get test case files to run (from command line or config 
         die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
 
+    if (($#ARGV + 1) > 2) {  #too many command line args were passed
+        die "\nERROR: Too many arguments\n\n";
+    }
+
     if (($#ARGV + 1) < 1) {  #no command line args were passed
         #if testcase filename is not passed on the command line, use files in config.xml
 
         if ($userconfig->{testcasefile}) {
             $currentcasefile = $userconfig->{testcasefile};
         } else {
-            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
+            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
         }
 
     }
@@ -2549,10 +2553,6 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
         #use testcase filename passed on command line (config.xml is only used for other options)
         $currentcasefile = $ARGV[0];  #first commandline argument is the test case file
-    }
-
-    elsif (($#ARGV + 1) > 2) {  #too many command line args were passed
-        die "\nERROR: Too many arguments\n\n";
     }
 
     #grab values for constants in config file:
