@@ -1412,7 +1412,6 @@ sub savepage {## save the page in a cache to enable auto substitution
    my $tempname = q{};
    my $saveidx = 0;
    my $len = 0;
-   my $count = 0;
 
    $page = $response->as_string;
 
@@ -1441,7 +1440,7 @@ sub savepage {## save the page in a cache to enable auto substitution
       ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
       ## $idx keeps track of the index, $idx = 0 means the first element in the array
       if ($pagenames[0]) {#if the array has something in it
-         for ($count = 1; $count <= $len; $count++) {
+         foreach my $count (1..$len) {
             if (lc $pagenames[$idx] eq lc $pagename) { ## compare the pagenames in lowercase
                #out print {*STDOUT} qq| pagenames for $idx now $pagenames[$idx] \n|;
                if ($idfoundflag eq 'false') { ## we are only interested in the first (most recent) match
