@@ -1403,9 +1403,9 @@ sub getassets { ## get page assets matching a list for a reference type
 #------------------------------------------------------------------
 sub savepage {## save the page in a cache to enable auto substitution
    my $page = q{};
-   my $pagenameaction = q{};
+   my $page_action = q{};
    my $pagename = q{};
-   my $pagefound = 'false';
+   my $actionfound = 'false';
    my $idx = 0; #For keeping track of index in foreach loop
    my $idfound = 0;
    my $idfoundflag = 'false';
@@ -1417,15 +1417,14 @@ sub savepage {## save the page in a cache to enable auto substitution
 
    ## decide if we want to save this page - needs a method post action
    if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
-      $pagenameaction = $1;
-      #print {*STDOUT} qq|\n ACTION $pagenameaction\n|;
-      $pagefound = 'true'; ## we will only save the page if we actually found one
-      #out print {*STDOUT} qq|\n|;
+      $page_action = $1;
+      #print {*STDOUT} qq|\n ACTION $page_action\n|;
+      $actionfound = 'true'; ## we will only save the page if we actually found one
    } else {
-      #out print {*STDOUT} qq|\n ACTION none\n\n|;
+      #print {*STDOUT} qq|\n ACTION none\n\n|;
    }
 
-   if ($pagefound eq 'true') { ## ok, so we save this page
+   if ($actionfound eq 'true') { ## ok, so we save this page
 
       $pagename = $case{url};
       #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
