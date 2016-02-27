@@ -781,18 +781,14 @@ sub writefinalxml {  #write summary and closing tags for XML results file
 #------------------------------------------------------------------
 sub writefinalstdout {  #write summary and closing text for STDOUT
 
-    print {*STDOUT}
-qq|
-Start Time: $currentdatetime
-Total Run Time: $totalruntime seconds
+    print {*STDOUT} qq|Start Time: $currentdatetime\n|;
+    print {*STDOUT} qq|Total Run Time: $totalruntime seconds\n\n|;
 
-Test Cases Run: $totalruncount
-Test Cases Passed: $casepassedcount
-Test Cases Failed: $casefailedcount
-Verifications Passed: $passedcount
-Verifications Failed: $failedcount
-
-|;
+    print {*STDOUT} qq|Test Cases Run: $totalruncount\n|;
+    print {*STDOUT} qq|Test Cases Passed: $casepassedcount\n|;
+    print {*STDOUT} qq|Test Cases Failed: $casefailedcount\n|;
+    print {*STDOUT} qq|Verifications Passed: $passedcount\n|;
+    print {*STDOUT} qq|Verifications Failed: $failedcount\n\n|;
 
     return;
 }
@@ -1112,7 +1108,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     my @resp1;
     my $foundit = 'true';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'true' ) {
+    while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
         eval { @resp1 = $sel->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
@@ -1123,7 +1119,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
         }
     }
 
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $trytime = ( int( (time - $timestart) *10 ) / 10);
 
     my $returnmsg;
     if ($foundit eq 'true') {
@@ -1149,7 +1145,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible('Searc
     my @resp1;
     my $foundit = 'false';
 
-    while ( (($timestart + $timeout) > time()) && $foundit eq 'false' ) {
+    while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
         eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
@@ -1676,7 +1672,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           $fieldfoundflag = 'false';
 
           if ($posttype eq 'normalpost') {
-             if ($postfields[$idx] =~ m/(.{0,70}?)\=\{DATA\}/s) {
+             if ($postfields[$idx] =~ m/(.{0,70}?)=[{]DATA}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
@@ -1684,7 +1680,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           }
 
           if ($posttype eq 'multipost') {
-             if ($postfields[$idx] =~ m/\'(.{0,70}?)\'.{0,70}?{DATA\}/s) {
+             if ($postfields[$idx] =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
