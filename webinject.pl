@@ -1557,16 +1557,17 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     my $pageid = _find_page_in_cache($posturl);
-    if (!$pageid) {
+    if (not defined $pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
+        print {*STDOUT} " TRY WITH $posturl \n";
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
     $startlooptimer = time;
 
     ## time for substitutions
-    if ($pageid) { ## did we find match?
-
+    if (defined $pageid) { ## did we find match?
+       print {*STDOUT} " ID MATCH $pageid \n";
        $len = @postfields; ## number of items in the array
        $idx = 0;
        for ($count = 1; $count <= $len; $count++) {
