@@ -1399,13 +1399,12 @@ sub getassets { ## get page assets matching a list for a reference type
     return;
 }
 
-
 #------------------------------------------------------------------
 sub savepage {## save the page in a cache to enable auto substitution
-   my $page = q{};
-   my $page_action = q{};
+
+   my $page = $response->as_string;
+   my $page_action;
    my $pagename = q{};
-   my $actionfound = 'false';
    my $idx = 0; #For keeping track of index in foreach loop
    my $idfound = 0;
    my $idfoundflag = 'false';
@@ -1413,26 +1412,22 @@ sub savepage {## save the page in a cache to enable auto substitution
    my $saveidx = 0;
    my $len = 0;
 
-   $page = $response->as_string;
-
    ## decide if we want to save this page - needs a method post action
    if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
       $page_action = $1;
       #print {*STDOUT} qq|\n ACTION $page_action\n|;
-      $actionfound = 'true'; ## we will only save the page if we actually found one
    } else {
       #print {*STDOUT} qq|\n ACTION none\n\n|;
    }
 
-   if ($actionfound eq 'true') { ## ok, so we save this page
+   if (defined $page_action) { ## ok, so we save this page
 
         $pagename = $page_action;
         #print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
         $pagename =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $pagename =~ s{http.?://}{}si; ## remove http:// and https://
-        #$pagename =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
         #print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
-        
+
         ## check to see if we already have this page
         $len = @pagenames; #number of elements in the array
         ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
@@ -1453,7 +1448,7 @@ sub savepage {## save the page in a cache to enable auto substitution
         } else {
          #out print {*STDOUT} qq| NOTHING in the array \n|;
         }
-        
+
         my $maxindexsize = 5;
         ## decide where to store the page in the cache - 1. new cache entry, 2. update existing cache entry for same page, 3. overwrite the oldest page in the cache
         if ($idfoundflag eq 'false') { ## the page is not in the cache
@@ -1473,14 +1468,14 @@ sub savepage {## save the page in a cache to enable auto substitution
          #out print {*STDOUT} qq| Found page at $idfound, we will overwrite \n\n|;
          $saveidx = $idfound;
         }
-        
+
         ## update the global variables
         $pageupdatetimes[$saveidx] = time; ## save time so we overwrite oldest when cache is full
         $pagenames[$saveidx] = $pagename; ## save page name
         $pages[$saveidx] = $page; ## save page source
-        
+
         #print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
-        
+
         #my $i=0; ## debug - write out the contents of the cache
         #foreach my $cachedpage (@pagenames) {
         #  print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
@@ -1717,7 +1712,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 }
 
 sub _find_page_in_cache {
-    
+
     my ($post_url) = @_;
 
     ## see if we have stored this page
@@ -1726,10 +1721,9 @@ sub _find_page_in_cache {
     my $len = @pagenames; #number of elements in the array of cached pages
     my $idx = 0;
     my $count;
-    
+
     if ($pagenames[0]) {#if the array has something in it
        for ($count = 1; $count <= $len; $count++) {
-          #if (lc $pagenames[$idx] eq lc $post_url) { ## do the comparison in lowercase
           if ($pagenames[$idx] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
             #print {*STDOUT} qq| MATCH at position $idx\n|; #debug
             return $idx;
