@@ -1427,7 +1427,7 @@ sub savepage {## save the page in a cache to enable auto substitution
    if ($actionfound eq 'true') { ## ok, so we save this page
 
         $pagename = $page_action;
-        #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
+        print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
         $pagename =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $pagename =~ s{http.?://}{}si; ## remove http:// and https://
         $pagename =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
