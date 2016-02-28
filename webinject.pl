@@ -1404,7 +1404,6 @@ sub savepage {## save the page in a cache to enable auto substitution
 
    my $page = $response->as_string;
    my $page_action;
-   my $pagename = q{};
    my $idx = 0; #For keeping track of index in foreach loop
    my $idfound = 0;
    my $idfoundflag = 'false';
@@ -1422,11 +1421,10 @@ sub savepage {## save the page in a cache to enable auto substitution
 
    if (defined $page_action) { ## ok, so we save this page
 
-        $pagename = $page_action;
-        #print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
-        $pagename =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-        $pagename =~ s{http.?://}{}si; ## remove http:// and https://
-        #print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
+        #print {*STDOUT} qq| SAVING $page_action (BEFORE)\n|;
+        $page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+        $page_action =~ s{http.?://}{}si; ## remove http:// and https://
+        #print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
         ## check to see if we already have this page
         $len = @pagenames; #number of elements in the array
@@ -1434,8 +1432,8 @@ sub savepage {## save the page in a cache to enable auto substitution
         ## $idx keeps track of the index, $idx = 0 means the first element in the array
         if ($pagenames[0]) {#if the array has something in it
          foreach my $count (1..$len) {
-            if (lc $pagenames[$idx] eq lc $pagename) { ## compare the pagenames in lowercase
-               #out print {*STDOUT} qq| pagenames for $idx now $pagenames[$idx] \n|;
+            if (lc $pagenames[$idx] eq lc $page_action) { ## compare the pagenames in lowercase
+               #out print {*STDOUT} qq| pagenames for $idx now $page_actions[$idx] \n|;
                if ($idfoundflag eq 'false') { ## we are only interested in the first (most recent) match
                  $idfound = $idx;
                  $idfoundflag = 'true'; ## do not look for it again
@@ -1471,7 +1469,7 @@ sub savepage {## save the page in a cache to enable auto substitution
 
         ## update the global variables
         $pageupdatetimes[$saveidx] = time; ## save time so we overwrite oldest when cache is full
-        $pagenames[$saveidx] = $pagename; ## save page name
+        $pagenames[$saveidx] = $page_action; ## save page name
         $pages[$saveidx] = $page; ## save page source
 
         #print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
