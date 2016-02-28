@@ -1729,7 +1729,8 @@ sub _find_page_in_cache {
     
     if ($pagenames[0]) {#if the array has something in it
        for ($count = 1; $count <= $len; $count++) {
-          if (lc $pagenames[$idx] eq lc $post_url) { ## do the comparison in lowercase
+          #if (lc $pagenames[$idx] eq lc $post_url) { ## do the comparison in lowercase
+          if ($pagenames[$idx] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
             #print {*STDOUT} qq| MATCH at position $idx\n|; #debug
             return $idx;
           } else {
