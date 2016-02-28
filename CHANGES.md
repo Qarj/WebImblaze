@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.84 - Feb 28, 2016
+* improved the auto substitution feature - should work in a wider range of scenarios - tested with .NET WebForms and MVC
+
 ### Version 1.83 - Feb 27, 2016
 * messaging around assertion skips was buggy, now fixed and an appropriate selftest added
 * some code tidy up

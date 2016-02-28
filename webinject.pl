@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.83';
+$VERSION = '1.84';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1418,7 +1418,7 @@ sub savepage {## save the page in a cache to enable auto substitution
    ## decide if we want to save this page - needs a method post action
    if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
       $page_action = $1;
-      print {*STDOUT} qq|\n ACTION $page_action\n|;
+      #print {*STDOUT} qq|\n ACTION $page_action\n|;
       $actionfound = 'true'; ## we will only save the page if we actually found one
    } else {
       #print {*STDOUT} qq|\n ACTION none\n\n|;
@@ -1427,11 +1427,11 @@ sub savepage {## save the page in a cache to enable auto substitution
    if ($actionfound eq 'true') { ## ok, so we save this page
 
         $pagename = $page_action;
-        print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
+        #print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
         $pagename =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $pagename =~ s{http.?://}{}si; ## remove http:// and https://
         #$pagename =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-        print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
+        #print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
         
         ## check to see if we already have this page
         $len = @pagenames; #number of elements in the array
@@ -1479,14 +1479,14 @@ sub savepage {## save the page in a cache to enable auto substitution
         $pagenames[$saveidx] = $pagename; ## save page name
         $pages[$saveidx] = $page; ## save page source
         
-        print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
+        #print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
         
-        my $i=0; ## debug - write out the contents of the cache
-        foreach my $cachedpage (@pagenames) {
-          print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
-          $i++;
-        }
-        print {*STDOUT} "\n";
+        #my $i=0; ## debug - write out the contents of the cache
+        #foreach my $cachedpage (@pagenames) {
+        #  print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
+        #  $i++;
+        #}
+        #print {*STDOUT} "\n";
 
    } # end if - action found
 
@@ -1554,12 +1554,12 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
     $posturl =~ s{http.?://}{}si; ## remove http:// and https://
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    print {*STDOUT} qq| POSTURL $posturl \n|; #debug
+    #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     my $pageid = _find_page_in_cache($posturl);
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        print {*STDOUT} " TRY WITH $posturl \n";
+        #print {*STDOUT} " TRY WITH $posturl \n";
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
@@ -1567,7 +1567,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
-       print {*STDOUT} " ID MATCH $pageid \n";
+       #print {*STDOUT} " ID MATCH $pageid \n";
        $len = @postfields; ## number of items in the array
        $idx = 0;
        for ($count = 1; $count <= $len; $count++) {
