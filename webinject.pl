@@ -1511,8 +1511,6 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my $len=0;
     my $count=0;
     my $idx=0;
-    my $pageid=0;
-    my $pagefoundflag = 'false';
     my $fieldid=0;
     my $fieldfoundflag = 'false';
     my $data;
@@ -1558,33 +1556,16 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
     print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
-    ## see if we have stored this page
-    ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
-    ## $idx keeps track of the index, $idx = 0 means the first element in the array
-    $len = @pagenames; #number of elements in the array
-    $idx = 0;
-    if ($pagenames[0]) {#if the array has something in it
-       for ($count = 1; $count <= $len; $count++) {
-          if (lc $pagenames[$idx] eq lc $posturl) { ## do the comparison in lowercase
-             if ($pagefoundflag eq 'false') { ## we are only interested in the first (most recent) match
-                $pageid = $idx;
-                $pagefoundflag = 'true'; #do not look for it again
-                #print {*STDOUT} qq| MATCH at position $pageid\n|; #debug
-             }
-          } else {
-                #print {*STDOUT} qq| NO MATCH on $idx:$pagenames[$idx]\n|; #debug
-          }
-
-          $idx++; ## keep track of where we are in the loop
-       }
-    } else {
-       #print {*STDOUT} qq| NO CACHED PAGES! \n|; #debug
+    my $pageid = _find_page_in_cache($posturl);
+    if (!$pageid) {
+        $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
+        $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
     $startlooptimer = time;
 
     ## time for substitutions
-    if ($pagefoundflag eq 'true') {
+    if ($pageid) { ## did we find match?
 
        $len = @postfields; ## number of items in the array
        $idx = 0;
@@ -1734,6 +1715,34 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     return $postbody;
 }
 
+sub _find_page_in_cache {
+    
+    my ($post_url) = @_;
+
+    ## see if we have stored this page
+    ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
+    ## $idx keeps track of the index, $idx = 0 means the first element in the array
+    my $len = @pagenames; #number of elements in the array of cached pages
+    my $idx = 0;
+    my $count;
+    
+    if ($pagenames[0]) {#if the array has something in it
+       for ($count = 1; $count <= $len; $count++) {
+          if (lc $pagenames[$idx] eq lc $post_url) { ## do the comparison in lowercase
+            #print {*STDOUT} qq| MATCH at position $idx\n|; #debug
+            return $idx;
+          } else {
+                #print {*STDOUT} qq| NO MATCH on $idx:$pagenames[$idx]\n|; #debug
+          }
+
+          $idx++; ## keep track of where we are in the loop
+       }
+    } else {
+       #print {*STDOUT} qq| NO CACHED PAGES! \n|; #debug
+    }
+
+    return;
+}
 #------------------------------------------------------------------
 sub httpget {  #send http request and read response
 
