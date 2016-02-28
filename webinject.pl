@@ -1418,7 +1418,7 @@ sub savepage {## save the page in a cache to enable auto substitution
    ## decide if we want to save this page - needs a method post action
    if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
       $page_action = $1;
-      #print {*STDOUT} qq|\n ACTION $page_action\n|;
+      print {*STDOUT} qq|\n ACTION $page_action\n|;
       $actionfound = 'true'; ## we will only save the page if we actually found one
    } else {
       #print {*STDOUT} qq|\n ACTION none\n\n|;
@@ -1426,19 +1426,18 @@ sub savepage {## save the page in a cache to enable auto substitution
 
    if ($actionfound eq 'true') { ## ok, so we save this page
 
-      $pagename = $case{url};
-      #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
-      if ($pagename =~ m{(.*?)[?]}s) { ## we only want everything to the left of the ? mark
-         $pagename = $1;
-      }
-      $pagename =~ s{http.?://}{}s; ## remove http:// and https://
-      #print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
-
-      ## check to see if we already have this page
-      $len = @pagenames; #number of elements in the array
-      ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
-      ## $idx keeps track of the index, $idx = 0 means the first element in the array
-      if ($pagenames[0]) {#if the array has something in it
+        $pagename = $page_action;
+        #out print {*STDOUT} qq| SAVING $pagename (BEFORE)\n|;
+        $pagename =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+        $pagename =~ s{http.?://}{}si; ## remove http:// and https://
+        $pagename =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+        print {*STDOUT} qq| SAVING $pagename (AFTER)\n\n|;
+        
+        ## check to see if we already have this page
+        $len = @pagenames; #number of elements in the array
+        ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
+        ## $idx keeps track of the index, $idx = 0 means the first element in the array
+        if ($pagenames[0]) {#if the array has something in it
          foreach my $count (1..$len) {
             if (lc $pagenames[$idx] eq lc $pagename) { ## compare the pagenames in lowercase
                #out print {*STDOUT} qq| pagenames for $idx now $pagenames[$idx] \n|;
@@ -1451,14 +1450,13 @@ sub savepage {## save the page in a cache to enable auto substitution
             $idx++; ## keep track of where we are in the loop
             #out print {*STDOUT} qq| idx now $idx \n|;
          }
-      } else {
+        } else {
          #out print {*STDOUT} qq| NOTHING in the array \n|;
-      }
-
-
-      my $maxindexsize = 5;
-      ## decide where to store the page in the cache - 1. new cache entry, 2. update existing cache entry for same page, 3. overwrite the oldest page in the cache
-      if ($idfoundflag eq 'false') { ## the page is not in the cache
+        }
+        
+        my $maxindexsize = 5;
+        ## decide where to store the page in the cache - 1. new cache entry, 2. update existing cache entry for same page, 3. overwrite the oldest page in the cache
+        if ($idfoundflag eq 'false') { ## the page is not in the cache
             if ($idx>=$maxindexsize) {## the cache is full - so we need to overwrite the oldest page in the cache
                my $oldestindex = 0;
                my $oldestpagetime = $pageupdatetimes[0];
@@ -1471,23 +1469,26 @@ sub savepage {## save the page in a cache to enable auto substitution
                $saveidx = $idx;
                #out print {*STDOUT} qq| Last Index position is $idx, saving at $saveidx \n\n|;
             }
-      } else {## we already have this page in the cache - so we just overwrite it with the latest version
+        } else {## we already have this page in the cache - so we just overwrite it with the latest version
          #out print {*STDOUT} qq| Found page at $idfound, we will overwrite \n\n|;
          $saveidx = $idfound;
-      }
+        }
+        
+        ## update the global variables
+        $pageupdatetimes[$saveidx] = time; ## save time so we overwrite oldest when cache is full
+        $pagenames[$saveidx] = $pagename; ## save page name
+        $pages[$saveidx] = $page; ## save page source
+        
+        print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
+        
+        my $i=0; ## debug - write out the contents of the cache
+        foreach my $cachedpage (@pagenames) {
+          print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
+          $i++;
+        }
+        print {*STDOUT} "\n";
 
-      ## update the global variables
-      $pageupdatetimes[$saveidx] = time; ## save time so we overwrite oldest when cache is full
-      $pagenames[$saveidx] = $pagename; ## save page name
-      $pages[$saveidx] = $page; ## save page source
-
-      #my $i=0; ## debug - write out the contents of the cache
-      #foreach my $cachedpage (@pagenames) {
-      #    print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
-      #    $i++;
-      #}
-
-   }
+   } # end if - action found
 
    return;
 }
@@ -1552,11 +1553,10 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
 
     ## work out pagename to use for matching purposes
-    if ($posturl =~ m{(.*?)\?}s) { ## we only want everything to the left of the ? mark
-       $posturl = $1;
-    }
-    $posturl =~ s{http.?://}{}s; ## remove http:// and https://
-    #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
+    $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+    $posturl =~ s{http.?://}{}si; ## remove http:// and https://
+    $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+    print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     ## see if we have stored this page
     ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
