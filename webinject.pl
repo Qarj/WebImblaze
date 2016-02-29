@@ -1405,8 +1405,7 @@ sub savepage {## save the page in a cache to enable auto substitution
    my $page = $response->as_string;
    my $page_action;
    my $idx = 0;
-   my $idfound;
-   my $idfoundflag = 'false';
+   my $page_index;
    my $tempname = q{};
    my $saveidx = 0;
    my $len = 0;
@@ -1427,15 +1426,14 @@ sub savepage {## save the page in a cache to enable auto substitution
         print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
         ## check to see if we already have this page
-        $idfound = _find_page_in_cache($page_action);
-        if (defined $idfound) {
-            $idx = $idfound;
-            $idfoundflag = 'true';
+        $page_index = _find_page_in_cache($page_action);
+        if (defined $page_index) {
+            $idx = $page_index;
         }
 
         my $maxindexsize = 5;
         ## decide where to store the page in the cache - 1. new cache entry, 2. update existing cache entry for same page, 3. overwrite the oldest page in the cache
-        if ($idfoundflag eq 'false') { ## the page is not in the cache
+        if (not defined $page_index) { ## the page is not in the cache
             if ($idx>=$maxindexsize) {## the cache is full - so we need to overwrite the oldest page in the cache
                my $oldestindex = 0;
                my $oldestpagetime = $pageupdatetimes[0];
@@ -1449,8 +1447,8 @@ sub savepage {## save the page in a cache to enable auto substitution
                #out print {*STDOUT} qq| Last Index position is $idx, saving at $saveidx \n\n|;
             }
         } else {## we already have this page in the cache - so we just overwrite it with the latest version
-         #out print {*STDOUT} qq| Found page at $idfound, we will overwrite \n\n|;
-         $saveidx = $idfound;
+         #out print {*STDOUT} qq| Found page at $page_index, we will overwrite \n\n|;
+         $saveidx = $page_index;
         }
 
         ## update the global variables
