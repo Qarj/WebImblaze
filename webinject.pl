@@ -1404,8 +1404,8 @@ sub savepage {## save the page in a cache to enable auto substitution
 
    my $page = $response->as_string;
    my $page_action;
-   my $idx = 0; #For keeping track of index in foreach loop
-   my $idfound = 0;
+   my $idx = 0;
+   my $idfound;
    my $idfoundflag = 'false';
    my $tempname = q{};
    my $saveidx = 0;
@@ -1424,27 +1424,13 @@ sub savepage {## save the page in a cache to enable auto substitution
         #print {*STDOUT} qq| SAVING $page_action (BEFORE)\n|;
         $page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $page_action =~ s{http.?://}{}si; ## remove http:// and https://
-        #print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
+        print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
         ## check to see if we already have this page
-        $len = @pagenames; #number of elements in the array
-        ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
-        ## $idx keeps track of the index, $idx = 0 means the first element in the array
-        if ($pagenames[0]) {#if the array has something in it
-         foreach my $count (1..$len) {
-            if (lc $pagenames[$idx] eq lc $page_action) { ## compare the pagenames in lowercase
-               #out print {*STDOUT} qq| pagenames for $idx now $page_actions[$idx] \n|;
-               if ($idfoundflag eq 'false') { ## we are only interested in the first (most recent) match
-                 $idfound = $idx;
-                 $idfoundflag = 'true'; ## do not look for it again
-                 #out print {*STDOUT} qq| Found at position $idfound in array\n|;
-               }
-            }
-            $idx++; ## keep track of where we are in the loop
-            #out print {*STDOUT} qq| idx now $idx \n|;
-         }
-        } else {
-         #out print {*STDOUT} qq| NOTHING in the array \n|;
+        $idfound = _find_page_in_cache($page_action);
+        if (defined $idfound) {
+            $idx = $idfound;
+            $idfoundflag = 'true';
         }
 
         my $maxindexsize = 5;
@@ -1472,14 +1458,14 @@ sub savepage {## save the page in a cache to enable auto substitution
         $pagenames[$saveidx] = $page_action; ## save page name
         $pages[$saveidx] = $page; ## save page source
 
-        #print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
+        print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
 
-        #my $i=0; ## debug - write out the contents of the cache
-        #foreach my $cachedpage (@pagenames) {
-        #  print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
-        #  $i++;
-        #}
-        #print {*STDOUT} "\n";
+        my $i=0; ## debug - write out the contents of the cache
+        foreach my $cachedpage (@pagenames) {
+          print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
+          $i++;
+        }
+        print {*STDOUT} "\n";
 
    } # end if - action found
 
@@ -1547,7 +1533,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
     $posturl =~ s{http.?://}{}si; ## remove http:// and https://
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
+    print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     my $pageid = _find_page_in_cache($posturl);
     if (not defined $pageid) {
@@ -1560,7 +1546,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
-       #print {*STDOUT} " ID MATCH $pageid \n";
+       print {*STDOUT} " ID MATCH $pageid \n";
        $len = @postfields; ## number of items in the array
        $idx = 0;
        for ($count = 1; $count <= $len; $count++) {
