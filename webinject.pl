@@ -1400,74 +1400,72 @@ sub getassets { ## get page assets matching a list for a reference type
 }
 
 #------------------------------------------------------------------
-sub savepage {## save the page in a cache to enable auto substitution
+sub savepage {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
-   my $page = $response->as_string;
-   my $page_action;
-   my $idx = 0;
-   my $page_index;
-   my $tempname = q{};
-   my $saveidx = 0;
-   my $len = 0;
+    my $page_action;
+    my $page_index; ## where to save the page in the cache (array of pages)
+    
+    ## decide if we want to save this page - needs a method post action
+    if ( ($response->as_string =~ m{method="post" action="(.*?)"}s) || ($response->as_string =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
+        $page_action = $1;
+        #print {*STDOUT} qq|\n ACTION $page_action\n|;
+    } else {
+        #print {*STDOUT} qq|\n ACTION none\n\n|;
+    }
 
-   ## decide if we want to save this page - needs a method post action
-   if ( ($page =~ m{method="post" action="(.*?)"}s) || ($page =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
-      $page_action = $1;
-      #print {*STDOUT} qq|\n ACTION $page_action\n|;
-   } else {
-      #print {*STDOUT} qq|\n ACTION none\n\n|;
-   }
-
-   if (defined $page_action) { ## ok, so we save this page
+    if (defined $page_action) { ## ok, so we save this page
 
         #print {*STDOUT} qq| SAVING $page_action (BEFORE)\n|;
         $page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $page_action =~ s{http.?://}{}si; ## remove http:// and https://
         print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
-        ## check to see if we already have this page
+        ## check to see if we already have this page in the cache, if so, just overwrite it
         $page_index = _find_page_in_cache($page_action);
-        if (defined $page_index) {
-            $idx = $page_index;
-        }
 
-        my $maxindexsize = 5;
-        ## decide where to store the page in the cache - 1. new cache entry, 2. update existing cache entry for same page, 3. overwrite the oldest page in the cache
+        my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
+        ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
         if (not defined $page_index) { ## the page is not in the cache
-            if ($idx>=$maxindexsize) {## the cache is full - so we need to overwrite the oldest page in the cache
-               my $oldestindex = 0;
-               my $oldestpagetime = $pageupdatetimes[0];
-               for (my $i=1; $i < $maxindexsize; $i++) {
-                    if ($pageupdatetimes[$i] < $oldestpagetime) { $oldestindex = $i; $oldestpagetime = $pageupdatetimes[$i]; }
-               }
-               $saveidx = $oldestindex;
-               #print {*STDOUT} qq|\n Overwriting - Oldest Page Index: $oldestindex\n\n|; #debug
+            if ($#pagenames == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
+                $page_index = _find_oldest_page_in_cache();
+                #print {*STDOUT} qq|\n Overwriting - Oldest Page Index: $page_index\n\n|; #debug
             } else {
-               $saveidx = $idx;
-               #out print {*STDOUT} qq| Last Index position is $idx, saving at $saveidx \n\n|;
+                $page_index = $#pagenames + 1;
+                #out print {*STDOUT} qq| Index $page_index available \n\n|;
             }
-        } else {## we already have this page in the cache - so we just overwrite it with the latest version
-         #out print {*STDOUT} qq| Found page at $page_index, we will overwrite \n\n|;
-         $saveidx = $page_index;
         }
 
         ## update the global variables
-        $pageupdatetimes[$saveidx] = time; ## save time so we overwrite oldest when cache is full
-        $pagenames[$saveidx] = $page_action; ## save page name
-        $pages[$saveidx] = $page; ## save page source
+        $pageupdatetimes[$page_index] = time; ## save time so we overwrite oldest when cache is full
+        $pagenames[$page_index] = $page_action; ## save page name
+        $pages[$page_index] = $response->as_string; ## save page source
 
-        print {*STDOUT} " Saved $pageupdatetimes[$saveidx]:$pagenames[$saveidx] \n\n";
+        print {*STDOUT} " Saved $pageupdatetimes[$page_index]:$pagenames[$page_index] \n\n";
 
         my $i=0; ## debug - write out the contents of the cache
         foreach my $cachedpage (@pagenames) {
-          print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
-          $i++;
+            print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
+            $i++;
         }
         print {*STDOUT} "\n";
 
-   } # end if - action found
+    } # end if - action found
+    
+    return;
+}
 
-   return;
+sub _find_oldest_page_in_cache {
+    
+    ## assume the first page in the cache is the oldest
+    my $oldest_index = 0;
+    my $oldest_page_time = $pageupdatetimes[0];
+
+    ## if we find an older updated time, use that instead
+    for my $i (0 .. $#pageupdatetimes) {
+        if ($pageupdatetimes[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $pageupdatetimes[$i]; }
+    }
+    
+    return $oldest_index;
 }
 
 #------------------------------------------------------------------
