@@ -1404,9 +1404,9 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
 
     my $page_action;
     my $page_index; ## where to save the page in the cache (array of pages)
-    
+
     ## decide if we want to save this page - needs a method post action
-    if ( ($response->as_string =~ m{method="post" action="(.*?)"}s) || ($response->as_string =~ m{action="(.*?)" method="post"}s) ) { ## look for the method post action
+    if ( ($response->as_string =~ m{method="post" action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)" method="post"}s) ) { ## look for the method post action
         $page_action = $1;
         #print {*STDOUT} qq|\n ACTION $page_action\n|;
     } else {
@@ -1450,12 +1450,12 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         print {*STDOUT} "\n";
 
     } # end if - action found
-    
+
     return;
 }
 
 sub _find_oldest_page_in_cache {
-    
+
     ## assume the first page in the cache is the oldest
     my $oldest_index = 0;
     my $oldest_page_time = $pageupdatetimes[0];
@@ -1464,7 +1464,7 @@ sub _find_oldest_page_in_cache {
     for my $i (0 .. $#pageupdatetimes) {
         if ($pageupdatetimes[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $pageupdatetimes[$i]; }
     }
-    
+
     return $oldest_index;
 }
 
@@ -1483,14 +1483,13 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     my @postfields;
     my $fieldname;
-    my $len=0;
+    my $len;
     my $count=0;
     my $idx=0;
     my $fieldid=0;
     my $fieldfoundflag = 'false';
     my $data;
     my $datafound = 'false';
-    my $startsubtimer=0;
     my $startlooptimer=0;
     my $endlooptimer=0;
     my $looplatency=0;
@@ -1503,9 +1502,6 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my $name=q{};
     my $realnamefound='false';
 
-    $startsubtimer = time;
-
-
     ## separate the fields
     if ($posttype eq 'normalpost') {
        @postfields = split /\&/, $postbody ; ## & is separator
@@ -1517,13 +1513,10 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
 
     ## debug - print the array
-    $len = @postfields; #number of items in the array
-    #print {*STDOUT} qq| \n There are $len fields in the postbody: \n |; #debug
-
-    for ($count = 1; $count <= $len; $count++) {
-        #print {*STDOUT} qq| Field $count: $postfields[$idx] \n|; #debug
-        $idx++;
-    }
+    #print {*STDOUT} " \n There are ".($#postfields+1)." fields in the postbody: \n"; #debug
+    #for my $i (0 .. $#postfields) {
+    #    print {*STDOUT} ' Field '.($i+1).": $postfields[$i] \n";
+    #}
 
     ## work out pagename to use for matching purposes
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
@@ -1538,14 +1531,13 @@ sub autosub {## auto substitution - {DATA} and {NAME}
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
+    ## there is heavy use of regex in this sub, we need to ensure they are optimised
     $startlooptimer = time;
 
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
        print {*STDOUT} " ID MATCH $pageid \n";
-       $len = @postfields; ## number of items in the array
-       $idx = 0;
-       for ($count = 1; $count <= $len; $count++) {
+       for my $i (0 .. $#postfields) {
           ## is there anything to subsitute
 
           $nameid=0;
@@ -1558,19 +1550,19 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           my $dotx='false';
           my $doty='false';
 
-          if ( $postfields[$idx] =~ m{[.]x[=']} ) { ## does it end in .x? #'
-             #out print {*STDOUT} qq| DOTX found in $postfields[$idx] \n|;
+          if ( $postfields[$i] =~ m{[.]x[=']} ) { ## does it end in .x? #'
+             #out print {*STDOUT} qq| DOTX found in $postfields[$i] \n|;
              $dotx = 'true';
-             $postfields[$idx] =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
+             $postfields[$i] =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
           }
 
-          if ( $postfields[$idx] =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-             #out print {*STDOUT} qq| DOTY found in $postfields[$idx] \n|;
+          if ( $postfields[$i] =~ m/[.]y[=']/ ) { ## does it end in .y? #'
+             #out print {*STDOUT} qq| DOTY found in $postfields[$i] \n|;
              $doty = 'true';
-             $postfields[$idx] =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
+             $postfields[$i] =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
           }
 
-          if ( $postfields[$idx] =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
+          if ( $postfields[$i] =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
              $lhsname = $1;
              $lhsname =~ s{\$}{\\\$}g;
              $lhsname =~ s{[.]}{\\\.}g;
@@ -1578,7 +1570,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
              $namefoundflag = 'true';
           }
 
-          if ( $postfields[$idx] =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
+          if ( $postfields[$i] =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
              $rhsname = $1;
              $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
              $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
@@ -1598,36 +1590,36 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
           ## now to substitute in the data
           if ($realnamefound eq 'true') {
-             if ($postfields[$idx] =~ s/{NAME}/$name/) {
-                #out print {*STDOUT} qq| SUBBED_NAME is $postfields[$idx] \n|;
+             if ($postfields[$i] =~ s/{NAME}/$name/) {
+                #out print {*STDOUT} qq| SUBBED_NAME is $postfields[$i] \n|;
              }
           }
 
           ## did we take out the .x or .y? we need to put it back
           if ($dotx eq 'true') {
              if ($posttype eq 'normalpost') {
-                $postfields[$idx] =~ s{[=]}{\.x\=};
+                $postfields[$i] =~ s{[=]}{\.x\=};
              } else {
-                $postfields[$idx] =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
+                $postfields[$i] =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
              }
-             #out print {*STDOUT} qq| DOTX restored to $postfields[$idx] \n|;
+             #out print {*STDOUT} qq| DOTX restored to $postfields[$i] \n|;
           }
 
           ## did we take out the .x or .y? we need to put it back
           if ($doty eq 'true') {
              if ($posttype eq 'normalpost') {
-                $postfields[$idx] =~ s{[=]}{\.y\=};
+                $postfields[$i] =~ s{[=]}{\.y\=};
              } else {
-                $postfields[$idx] =~ s{['][ ]?\=}{\.y\' \=}; #'
+                $postfields[$i] =~ s{['][ ]?\=}{\.y\' \=}; #'
              }
-             #out print {*STDOUT} qq| DOTY restored to $postfields[$idx] \n|;
+             #out print {*STDOUT} qq| DOTY restored to $postfields[$i] \n|;
           }
 
           $fieldid=0;
           $fieldfoundflag = 'false';
 
           if ($posttype eq 'normalpost') {
-             if ($postfields[$idx] =~ m/(.{0,70}?)=[{]DATA}/s) {
+             if ($postfields[$i] =~ m/(.{0,70}?)=[{]DATA}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
@@ -1635,7 +1627,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           }
 
           if ($posttype eq 'multipost') {
-             if ($postfields[$idx] =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
+             if ($postfields[$i] =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
                 $fieldname = $1;
                 #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
                 $fieldfoundflag = 'true';
@@ -1659,13 +1651,12 @@ sub autosub {## auto substitution - {DATA} and {NAME}
                 $data = url_escape($data);
                 #print {*STDOUT} qq| URLESCAPE!! \n|; #debug
              }
-             if ($postfields[$idx] =~ s/{DATA}/$data/) {
-                #print {*STDOUT} qq| SUBBED_FIELD is $postfields[$idx] \n|; #debug
+             if ($postfields[$i] =~ s/{DATA}/$data/) {
+                #print {*STDOUT} qq| SUBBED_FIELD is $postfields[$i] \n|; #debug
              }
           }
 
-          $idx++;
-          #print {*STDOUT} qq| idx now $idx for field $postfields[$idx] \n|; #debug
+          #print {*STDOUT} qq| idx now $i for field $postfields[$i] \n|; #debug
        }
     }
 
@@ -1682,11 +1673,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     $endlooptimer = time;
     $looplatency = (int(1000 * ($endlooptimer - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
-    $sublatency = (int(1000 * ($endlooptimer - $startsubtimer)) / 1000);  ## elapsed time rounded to thousandths
 
     ## debug - make sure all the regular expressions are efficient
     #print {*STDOUT} qq| Looping took $looplatency \n|; #debug
-    #print {*STDOUT} qq| All     took $sublatency \n|; #debug
 
     return $postbody;
 }
