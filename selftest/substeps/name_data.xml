@@ -26,5 +26,22 @@ Expected failures will be asserted by the master test file.
     verifypositive="Believe it or not, you just submitted a search"
 />
 
+<case
+    id="110"
+    description1="Get Advanced Search Page"
+    method="get"
+    url="http://www.totaljobs.com/JobSearch/AdvancedJobSearch.aspx"
+/>
+
+<case
+    id="120"
+    description1="5 Miles Holborn, Central London, keyword teset"
+    description2="Order by distance"
+    method="post"
+    url="http://www.totaljobs.com/JobSearch/AdvancedJobSearch.aspx"
+    postbody="__EVENTTARGET=btnSearch&__EVENTARGUMENT=&ddlStartingRate_SelectedValues=0&__VIEWSTATE={DATA}&ddlRadius=5&txtLocation=Holborn%2C+Central+London&ddlRateType=0&ddlStartingRate=0&lstIndustries=0&jtdJobTypes=0&txtKeywords=test&radAndOr=rdoAnyWords&txtNotKeywords=&radSort=rdoSortDistance&txtJobRef=&b{NAME}Search.x=18&{NAME}Search.y=7"
+    verifypositive="Object moved to"
+    verifypositive1="/JobSearch/Results.aspx\?Keywords=test"
+/>
 
 </testcases>

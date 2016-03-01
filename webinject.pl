@@ -1514,9 +1514,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## debug - print the array
     #print {*STDOUT} " \n There are ".($#postfields+1)." fields in the postbody: \n"; #debug
-    #for my $i (0 .. $#postfields) {
-    #    print {*STDOUT} ' Field '.($i+1).": $postfields[$i] \n";
-    #}
+    for my $i (0 .. $#postfields) {
+        print {*STDOUT} ' Field '.($i+1).": $postfields[$i] \n";
+    }
 
     ## work out pagename to use for matching purposes
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
@@ -1537,8 +1537,8 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
        print {*STDOUT} " ID MATCH $pageid \n";
-       for my $i (0 .. $#postfields) {
-          ## is there anything to subsitute
+       for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
+          ## is there anything to subsitute?
 
           $nameid=0;
           $namefoundflag = 'false';
@@ -1562,24 +1562,29 @@ sub autosub {## auto substitution - {DATA} and {NAME}
              $postfields[$i] =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
           }
 
+          ## look for characters to the left of {NAME} and save them
           if ( $postfields[$i] =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
              $lhsname = $1;
-             $lhsname =~ s{\$}{\\\$}g;
-             $lhsname =~ s{[.]}{\\\.}g;
-             #out print {*STDOUT} qq| LHS $lhsname has {NAME} \n|;
+             $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
+             $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
+             print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
              $namefoundflag = 'true';
           }
 
+          ## look for characters to the right of {NAME} and save them
           if ( $postfields[$i] =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
              $rhsname = $1;
              $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
              $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
              $rhsname =~ s{[.]}{\\\.}g; ## same for the .
-             #out print {*STDOUT} qq| RHS $rhsname has {NAME} \n|;
+             print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
              $namefoundflag = 'true';
           }
 
           ## time to find out what to substitute it with
+          ## saved page source will contain something like
+          ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
+          ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
           if ($namefoundflag eq 'true') {
              if ($pages[$pageid] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
                 $name = $1;
@@ -1588,10 +1593,10 @@ sub autosub {## auto substitution - {DATA} and {NAME}
              }
           }
 
-          ## now to substitute in the data
+          ## now to substitute {NAME} for the actual (dynamic) value
           if ($realnamefound eq 'true') {
              if ($postfields[$i] =~ s/{NAME}/$name/) {
-                #out print {*STDOUT} qq| SUBBED_NAME is $postfields[$i] \n|;
+                print {*STDOUT} qq| SUBBED_NAME is $postfields[$i] \n|;
              }
           }
 
@@ -1657,8 +1662,8 @@ sub autosub {## auto substitution - {DATA} and {NAME}
           }
 
           #print {*STDOUT} qq| idx now $i for field $postfields[$i] \n|; #debug
-       }
-    }
+       } ## end postfields loop
+    }## end did we find a loop condition
 
     ## done all the substitutions, now put it all together again
     if ($posttype eq 'normalpost') {
