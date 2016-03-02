@@ -1482,28 +1482,17 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my ($postbody, $posttype, $posturl) = @_;
 
     my @postfields;
-    my $fieldname;
-    my $len;
-    my $count=0;
-    my $idx=0;
-    my $fieldid=0;
-    my $fieldfoundflag = 'false';
-    my $data;
-    my $datafound = 'false';
-    my $startlooptimer=0;
-    my $endlooptimer=0;
-    my $looplatency=0;
-    my $sublatency=0;
-
+    my $startlooptimer;
+    my $looplatency;
 
     ## separate the fields
     if ($posttype eq 'normalpost') {
-       @postfields = split /\&/, $postbody ; ## & is separator
+        @postfields = split /\&/, $postbody ; ## & is separator
     } else {
-       ## assumes that double quotes on the outside, internally single qoutes
-       ## enhancements needed
-       ##   1. subsitute out blank space first between the field separators
-       @postfields = split /\'\,/, $postbody ; #separate the fields
+        ## assumes that double quotes on the outside, internally single qoutes
+        ## enhancements needed
+        ##   1. subsitute out blank space first between the field separators
+        @postfields = split /\'\,/, $postbody ; #separate the fields
     }
 
     ## debug - print the array
@@ -1535,72 +1524,28 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
-       print {*STDOUT} " ID MATCH $pageid \n";
-       for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
-          ## is there anything to subsitute?
+        print {*STDOUT} " ID MATCH $pageid \n";
+        for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
+            ## substitute {NAME} for actual
+            $postfields[$i] = _substitute_name($postfields[$i], $pageid, $posttype);
 
-          $datafound='false';
-
-          $postfields[$i] = _substitute_name($postfields[$i], $pageid, $posttype);
-
-          $fieldid=0;
-          $fieldfoundflag = 'false';
-
-          if ($posttype eq 'normalpost') {
-             if ($postfields[$i] =~ m/(.{0,70}?)=[{]DATA}/s) {
-                $fieldname = $1;
-                #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
-                $fieldfoundflag = 'true';
-             }
-          }
-
-          if ($posttype eq 'multipost') {
-             if ($postfields[$i] =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
-                $fieldname = $1;
-                #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
-                $fieldfoundflag = 'true';
-             }
-          }
-
-          ## time to find out what to substitute it with
-          if ($fieldfoundflag eq 'true') {
-             $fieldname =~ s{\$}{\\\$}; #replace $ with \$
-             $fieldname =~ s{[.]}{\\\.}; #replace . with \.
-             if ($pages[$pageid] =~ m/="$fieldname" [^\>]*value="(.*?)"/s) {
-                $data = $1;
-                $datafound = 'true';
-                #print {*STDOUT} qq| DATA is $data \n|; #debug
-             }
-          }
-
-          ## now to substitute in the data
-          if ($datafound eq 'true') {
-             if ($posttype eq 'normalpost') {## normal post must be escaped
-                $data = url_escape($data);
-                #print {*STDOUT} qq| URLESCAPE!! \n|; #debug
-             }
-             if ($postfields[$i] =~ s/{DATA}/$data/) {
-                #print {*STDOUT} qq| SUBBED_FIELD is $postfields[$i] \n|; #debug
-             }
-          }
-
-          #print {*STDOUT} qq| idx now $i for field $postfields[$i] \n|; #debug
-       } ## end postfields loop
-    }## end did we find a loop condition
+            ## substitute {DATA} for actual
+            $postfields[$i] = _substitute_data($postfields[$i], $pageid, $posttype);
+        }
+    }
 
     ## done all the substitutions, now put it all together again
     if ($posttype eq 'normalpost') {
-       $postbody = join q{&}, @postfields;
+        $postbody = join q{&}, @postfields;
     } else {
-       ## assumes that double quotes on the outside, internally single qoutes
-       ## enhancements needed
-       ##   1. subsitute out blank space first between the field separators
-       $postbody = join q{',}, @postfields; #'
+        ## assumes that double quotes on the outside, internally single qoutes
+        ## enhancements needed
+        ##   1. subsitute out blank space first between the field separators
+        $postbody = join q{',}, @postfields; #'
     }
     #out print {*STDOUT} qq|\n\n POSTBODY is $postbody \n|;
 
-    $endlooptimer = time;
-    $looplatency = (int(1000 * ($endlooptimer - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
+    $looplatency = (int(1000 * (time - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
 
     ## debug - make sure all the regular expressions are efficient
     print {*STDOUT} qq| Looping took $looplatency \n|; #debug
@@ -1674,6 +1619,50 @@ sub _substitute_name {
         $post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
      }
         print {*STDOUT} qq| DOTY restored to $post_field \n|;
+    }
+
+    return $post_field;
+}
+
+sub _substitute_data {
+    my ($post_field, $page_id, $post_type) = @_;
+
+    my $target_field;
+
+    if ($post_type eq 'normalpost') {
+        if ($post_field =~ m/(.{0,70}?)=[{]DATA}/s) {
+            $target_field = $1;
+            #print {*STDOUT} qq| Normal Field $fieldname has {DATA} \n|; #debug
+        }
+    }
+
+    if ($post_type eq 'multipost') {
+        if ($post_field =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
+            $target_field = $1;
+            #print {*STDOUT} qq| Multi Field $fieldname has {DATA} \n|; #debug
+        }
+    }
+
+    ## find out what to substitute it with, then do the substitution
+    if (defined $target_field) {
+        $target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
+        $target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
+        if ($pages[$page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
+            my $data = $1;
+            #print {*STDOUT} qq| DATA is $data \n|; #debug
+
+            ## normal post must be escaped
+            if ($post_type eq 'normalpost') {
+                $data = url_escape($data);
+                #print {*STDOUT} qq| URLESCAPE!! \n|; #debug
+            }
+
+            ## substitute in the data
+            if ($post_field =~ s/{DATA}/$data/) {
+                #print {*STDOUT} qq| SUBBED_FIELD is $postfields[$i] \n|; #debug
+            }
+
+        }
     }
 
     return $post_field;
