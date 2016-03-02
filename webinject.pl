@@ -1611,80 +1611,69 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 sub _substitute_name {
     my ($post_field, $page_id, $post_type) = @_;
 
-    my $namefoundflag = 'false';
-    my $lhsname=q{};
-    my $rhsname=q{};
-    my $name=q{};
-    my $dotx='false';
-    my $doty='false';
+    my $dotx;
+    my $doty;
 
     ## does the field name end in .x e.g. btnSubmit.x?
     if ( $post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
-     #out print {*STDOUT} qq| DOTX found in $post_field \n|;
-     $dotx = 'true';
-     $post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
+        #out print {*STDOUT} qq| DOTX found in $post_field \n|;
+        $dotx = 'true';
+        $post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
     }
     
     ## does the field name end in .y e.g. btnSubmit.y?
     if ( $post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-     #out print {*STDOUT} qq| DOTY found in $post_field \n|;
-     $doty = 'true';
-     $post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
+        #out print {*STDOUT} qq| DOTY found in $post_field \n|;
+        $doty = 'true';
+        $post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
     }
     
-    ## look for characters to the left of {NAME} and save them
-    if ( $post_field =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
-     $lhsname = $1;
-     $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
-     $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
-     print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
-     $namefoundflag = 'true';
-    }
-    
-    ## look for characters to the right of {NAME} and save them
-    if ( $post_field =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
-     $rhsname = $1;
-     $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
-     $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
-     $rhsname =~ s{[.]}{\\\.}g; ## same for the .
-     print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
-     $namefoundflag = 'true';
-    }
-    
-    ## find out what to substitute it with, then do the substitution
-    ##
-    ## saved page source will contain something like
-    ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
-    ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-    if ($namefoundflag eq 'true') {
-     if ($pages[$page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
-        $name = $1;
-        #out print {*STDOUT} qq| NAME is $name \n|;
-    
-        ## substitute {NAME} for the actual (dynamic) value
-        $post_field =~ s/{NAME}/$name/;
-        print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
-     }
+    ## look for characters to the left and right of {NAME} and save them
+    if ( $post_field =~ m/([^']{0,70}?)[{]NAME[}]([^=']{0,70})/s ) { ## ' was *?, {0,70}? much quicker
+        my $lhsname = $1;
+        $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
+        $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
+        print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
+
+        my $rhsname = $2;
+        $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
+        $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
+        $rhsname =~ s{[.]}{\\\.}g; ## same for the .
+        print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
+
+        ## find out what to substitute it with, then do the substitution
+        ##
+        ## saved page source will contain something like
+        ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
+        ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
+        if ($pages[$page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
+            my $name = $1;
+            #out print {*STDOUT} qq| NAME is $name \n|;
+            
+            ## substitute {NAME} for the actual (dynamic) value
+            $post_field =~ s/{NAME}/$name/;
+            print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
+        }
     }
     
     ## did we take out the .x? we need to put it back
-    if ($dotx eq 'true') {
-     if ($post_type eq 'normalpost') {
-        $post_field =~ s{[=]}{\.x\=};
-     } else {
-        $post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
-     }
-     print {*STDOUT} qq| DOTX restored to $post_field \n|;
+    if (defined $dotx) {
+        if ($post_type eq 'normalpost') {
+            $post_field =~ s{[=]}{\.x\=};
+        } else {
+            $post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
+        }
+        print {*STDOUT} qq| DOTX restored to $post_field \n|;
     }
     
     ## did we take out the .y? we need to put it back
-    if ($doty eq 'true') {
+    if (defined $doty) {
      if ($post_type eq 'normalpost') {
         $post_field =~ s{[=]}{\.y\=};
      } else {
         $post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
      }
-     print {*STDOUT} qq| DOTY restored to $post_field \n|;
+        print {*STDOUT} qq| DOTY restored to $post_field \n|;
     }
 
     return $post_field;
