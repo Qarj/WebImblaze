@@ -1495,12 +1495,6 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my $looplatency=0;
     my $sublatency=0;
 
-    my $nameid=0;
-    my $namefoundflag = 'false';
-    my $lhsname=q{};
-    my $rhsname=q{};
-    my $name=q{};
-    my $realnamefound='false';
 
     ## separate the fields
     if ($posttype eq 'normalpost') {
@@ -1526,8 +1520,13 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     my $pageid = _find_page_in_cache($posturl);
     if (not defined $pageid) {
-        $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
+        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
         #print {*STDOUT} " TRY WITH $posturl \n";
+        $pageid = _find_page_in_cache($posturl); ## try again without the full path
+    }
+    if (not defined $pageid) {
+        $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
+        #print {*STDOUT} " LAST TRY WITH $posturl \n";
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
@@ -1540,85 +1539,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
        for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
           ## is there anything to subsitute?
 
-          $nameid=0;
-          $namefoundflag = 'false';
-          $lhsname=q{};
-          $rhsname=q{};
-          $name=q{};
-          $realnamefound='false';
           $datafound='false';
-          my $dotx='false';
-          my $doty='false';
 
-          if ( $postfields[$i] =~ m{[.]x[=']} ) { ## does it end in .x? #'
-             #out print {*STDOUT} qq| DOTX found in $postfields[$i] \n|;
-             $dotx = 'true';
-             $postfields[$i] =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
-          }
-
-          if ( $postfields[$i] =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-             #out print {*STDOUT} qq| DOTY found in $postfields[$i] \n|;
-             $doty = 'true';
-             $postfields[$i] =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
-          }
-
-          ## look for characters to the left of {NAME} and save them
-          if ( $postfields[$i] =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
-             $lhsname = $1;
-             $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
-             $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
-             print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
-             $namefoundflag = 'true';
-          }
-
-          ## look for characters to the right of {NAME} and save them
-          if ( $postfields[$i] =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
-             $rhsname = $1;
-             $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
-             $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
-             $rhsname =~ s{[.]}{\\\.}g; ## same for the .
-             print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
-             $namefoundflag = 'true';
-          }
-
-          ## time to find out what to substitute it with
-          ## saved page source will contain something like
-          ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
-          ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-          if ($namefoundflag eq 'true') {
-             if ($pages[$pageid] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
-                $name = $1;
-                $realnamefound = 'true';
-                #out print {*STDOUT} qq| NAME is $name \n|;
-             }
-          }
-
-          ## now to substitute {NAME} for the actual (dynamic) value
-          if ($realnamefound eq 'true') {
-             if ($postfields[$i] =~ s/{NAME}/$name/) {
-                print {*STDOUT} qq| SUBBED_NAME is $postfields[$i] \n|;
-             }
-          }
-
-          ## did we take out the .x or .y? we need to put it back
-          if ($dotx eq 'true') {
-             if ($posttype eq 'normalpost') {
-                $postfields[$i] =~ s{[=]}{\.x\=};
-             } else {
-                $postfields[$i] =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
-             }
-             #out print {*STDOUT} qq| DOTX restored to $postfields[$i] \n|;
-          }
-
-          ## did we take out the .x or .y? we need to put it back
-          if ($doty eq 'true') {
-             if ($posttype eq 'normalpost') {
-                $postfields[$i] =~ s{[=]}{\.y\=};
-             } else {
-                $postfields[$i] =~ s{['][ ]?\=}{\.y\' \=}; #'
-             }
-             #out print {*STDOUT} qq| DOTY restored to $postfields[$i] \n|;
-          }
+          $postfields[$i] = _substitute_name($postfields[$i], $pageid, $posttype);
 
           $fieldid=0;
           $fieldfoundflag = 'false';
@@ -1680,9 +1603,91 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $looplatency = (int(1000 * ($endlooptimer - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
 
     ## debug - make sure all the regular expressions are efficient
-    #print {*STDOUT} qq| Looping took $looplatency \n|; #debug
+    print {*STDOUT} qq| Looping took $looplatency \n|; #debug
 
     return $postbody;
+}
+
+sub _substitute_name {
+    my ($post_field, $page_id, $post_type) = @_;
+
+    my $namefoundflag = 'false';
+    my $lhsname=q{};
+    my $rhsname=q{};
+    my $name=q{};
+    my $dotx='false';
+    my $doty='false';
+
+    ## does the field name end in .x e.g. btnSubmit.x?
+    if ( $post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
+     #out print {*STDOUT} qq| DOTX found in $post_field \n|;
+     $dotx = 'true';
+     $post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
+    }
+    
+    ## does the field name end in .y e.g. btnSubmit.y?
+    if ( $post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
+     #out print {*STDOUT} qq| DOTY found in $post_field \n|;
+     $doty = 'true';
+     $post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
+    }
+    
+    ## look for characters to the left of {NAME} and save them
+    if ( $post_field =~ m/([^']{0,70}?)[{]NAME[}]/s ) { ## ' was *?, {0,70}? much quicker
+     $lhsname = $1;
+     $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
+     $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
+     print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
+     $namefoundflag = 'true';
+    }
+    
+    ## look for characters to the right of {NAME} and save them
+    if ( $post_field =~ m/[{]NAME[}]([^=']{0,70})/s ) { ## '
+     $rhsname = $1;
+     $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
+     $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
+     $rhsname =~ s{[.]}{\\\.}g; ## same for the .
+     print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
+     $namefoundflag = 'true';
+    }
+    
+    ## find out what to substitute it with, then do the substitution
+    ##
+    ## saved page source will contain something like
+    ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
+    ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
+    if ($namefoundflag eq 'true') {
+     if ($pages[$page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
+        $name = $1;
+        #out print {*STDOUT} qq| NAME is $name \n|;
+    
+        ## substitute {NAME} for the actual (dynamic) value
+        $post_field =~ s/{NAME}/$name/;
+        print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
+     }
+    }
+    
+    ## did we take out the .x? we need to put it back
+    if ($dotx eq 'true') {
+     if ($post_type eq 'normalpost') {
+        $post_field =~ s{[=]}{\.x\=};
+     } else {
+        $post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
+     }
+     print {*STDOUT} qq| DOTX restored to $post_field \n|;
+    }
+    
+    ## did we take out the .y? we need to put it back
+    if ($doty eq 'true') {
+     if ($post_type eq 'normalpost') {
+        $post_field =~ s{[=]}{\.y\=};
+     } else {
+        $post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
+     }
+     print {*STDOUT} qq| DOTY restored to $post_field \n|;
+    }
+
+    return $post_field;
 }
 
 sub _find_page_in_cache {
