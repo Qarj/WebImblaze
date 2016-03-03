@@ -1442,10 +1442,9 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
 
         print {*STDOUT} " Saved $pageupdatetimes[$page_index]:$pagenames[$page_index] \n\n";
 
-        my $i=0; ## debug - write out the contents of the cache
-        foreach my $cachedpage (@pagenames) {
-            print {*STDOUT} qq| $i:$pageupdatetimes[$i]:$cachedpage \n|; #debug
-            $i++;
+        ## debug - write out the contents of the cache
+        for my $i (0 .. $#pagenames) {
+            print {*STDOUT} " $i:$pageupdatetimes[$i]:$pagenames[$i] \n"; #debug
         }
         print {*STDOUT} "\n";
 
@@ -1559,28 +1558,29 @@ sub _substitute_name {
     my $dotx;
     my $doty;
 
-    ## does the field name end in .x e.g. btnSubmit.x?
+    ## does the field name end in .x e.g. btnSubmit.x? The .x bit won't be in the saved page
     if ( $post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
         #out print {*STDOUT} qq| DOTX found in $post_field \n|;
         $dotx = 'true';
         $post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
     }
-    
-    ## does the field name end in .y e.g. btnSubmit.y?
+
+    ## does the field name end in .y e.g. btnSubmit.y? The .y bit won't be in the saved page
     if ( $post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
         #out print {*STDOUT} qq| DOTY found in $post_field \n|;
         $doty = 'true';
         $post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
     }
-    
+
     ## look for characters to the left and right of {NAME} and save them
     if ( $post_field =~ m/([^']{0,70}?)[{]NAME[}]([^=']{0,70})/s ) { ## ' was *?, {0,70}? much quicker
         my $lhsname = $1;
+        my $rhsname = $2;
+
         $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
         $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
         print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
 
-        my $rhsname = $2;
         $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
         $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
         $rhsname =~ s{[.]}{\\\.}g; ## same for the .
@@ -1594,13 +1594,13 @@ sub _substitute_name {
         if ($pages[$page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
             my $name = $1;
             #out print {*STDOUT} qq| NAME is $name \n|;
-            
+
             ## substitute {NAME} for the actual (dynamic) value
             $post_field =~ s/{NAME}/$name/;
             print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
         }
     }
-    
+
     ## did we take out the .x? we need to put it back
     if (defined $dotx) {
         if ($post_type eq 'normalpost') {
@@ -1610,7 +1610,7 @@ sub _substitute_name {
         }
         print {*STDOUT} qq| DOTX restored to $post_field \n|;
     }
-    
+
     ## did we take out the .y? we need to put it back
     if (defined $doty) {
      if ($post_type eq 'normalpost') {
@@ -1673,25 +1673,17 @@ sub _find_page_in_cache {
     my ($post_url) = @_;
 
     ## see if we have stored this page
-    ## $count keeps track of the item number in the array - so $count = 1 means first element in the array
-    ## $idx keeps track of the index, $idx = 0 means the first element in the array
-    my $len = @pagenames; #number of elements in the array of cached pages
-    my $idx = 0;
-    my $count;
-
-    if ($pagenames[0]) {#if the array has something in it
-       for ($count = 1; $count <= $len; $count++) {
-          if ($pagenames[$idx] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
-            #print {*STDOUT} qq| MATCH at position $idx\n|; #debug
-            return $idx;
-          } else {
-                #print {*STDOUT} qq| NO MATCH on $idx:$pagenames[$idx]\n|; #debug
-          }
-
-          $idx++; ## keep track of where we are in the loop
-       }
+    if ($pagenames[0]) { ## does the array contain at least one entry?
+        for my $i (0 .. $#pagenames) {
+            if ($pagenames[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
+            #print {*STDOUT} qq| MATCH at position $i\n|; #debug
+            return $i;
+            } else {
+                #print {*STDOUT} qq| NO MATCH on $i:$pagenames[$i]\n|; #debug
+            }
+        }
     } else {
-       #print {*STDOUT} qq| NO CACHED PAGES! \n|; #debug
+        #print {*STDOUT} qq| NO CACHED PAGES! \n|; #debug
     }
 
     return;
@@ -2219,35 +2211,36 @@ sub _verify_smartassertion {
                 print {*STDOUT} "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                return;
             }
-            else {
-                #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
-                if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
-                    if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
-                        #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                        print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
-                        #print {*STDOUT} "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
-                        $passedcount++;
-                        $retrypassedcount++;
+
+            ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
+            #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
+            if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
+                if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
+                    #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
+                    print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
+                    #print {*STDOUT} "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
+                    $passedcount++;
+                    $retrypassedcount++;
+                }
+                else {
+                    print {$RESULTS} qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
+                    print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
+                    if ($verifyparms[2]) { ## is there a custom assertion failure message?
+                       print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
+                       print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[2]</$config_attribute-message>\n|;
                     }
-                    else {
-                        print {$RESULTS} qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
-                        print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
-                        if ($verifyparms[2]) { ## is there a custom assertion failure message?
-                           print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                           print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[2]</$config_attribute-message>\n|;
-                        }
-                        print {*STDOUT} 'Failed Smart Assertion';
-                        if ($verifyparms[2]) {
-                           print {*STDOUT} ": $verifyparms[2]";
-                        }
-                        print {*STDOUT} "\n";
-                        $failedcount++;
-                        $retryfailedcount++;
-                        $isfailure++;
+                    print {*STDOUT} 'Failed Smart Assertion';
+                    if ($verifyparms[2]) {
+                       print {*STDOUT} ": $verifyparms[2]";
                     }
-                } ## end if - is pre-condition for smart assertion met?
-            }
+                    print {*STDOUT} "\n";
+                    $failedcount++;
+                    $retryfailedcount++;
+                    $isfailure++;
+                }
+            } ## end if - is pre-condition for smart assertion met?
         }
     }
 
