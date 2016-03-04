@@ -1418,7 +1418,7 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         #print {*STDOUT} qq| SAVING $page_action (BEFORE)\n|;
         $page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
         $page_action =~ s{http.?://}{}si; ## remove http:// and https://
-        print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
+        #print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
         ## check to see if we already have this page in the cache, if so, just overwrite it
         $page_index = _find_page_in_cache($page_action);
@@ -1440,13 +1440,13 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         $pagenames[$page_index] = $page_action; ## save page name
         $pages[$page_index] = $response->as_string; ## save page source
 
-        print {*STDOUT} " Saved $pageupdatetimes[$page_index]:$pagenames[$page_index] \n\n";
+        #print {*STDOUT} " Saved $pageupdatetimes[$page_index]:$pagenames[$page_index] \n\n";
 
         ## debug - write out the contents of the cache
-        for my $i (0 .. $#pagenames) {
-            print {*STDOUT} " $i:$pageupdatetimes[$i]:$pagenames[$i] \n"; #debug
-        }
-        print {*STDOUT} "\n";
+        #for my $i (0 .. $#pagenames) {
+        #    print {*STDOUT} " $i:$pageupdatetimes[$i]:$pagenames[$i] \n"; #debug
+        #}
+        #print {*STDOUT} "\n";
 
     } # end if - action found
 
@@ -1481,8 +1481,6 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my ($postbody, $posttype, $posturl) = @_;
 
     my @postfields;
-    my $startlooptimer;
-    my $looplatency;
 
     ## separate the fields
     if ($posttype eq 'normalpost') {
@@ -1496,15 +1494,15 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 
     ## debug - print the array
     #print {*STDOUT} " \n There are ".($#postfields+1)." fields in the postbody: \n"; #debug
-    for my $i (0 .. $#postfields) {
-        print {*STDOUT} ' Field '.($i+1).": $postfields[$i] \n";
-    }
+    #for my $i (0 .. $#postfields) {
+    #    print {*STDOUT} ' Field '.($i+1).": $postfields[$i] \n";
+    #}
 
     ## work out pagename to use for matching purposes
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
     $posturl =~ s{http.?://}{}si; ## remove http:// and https://
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    print {*STDOUT} qq| POSTURL $posturl \n|; #debug
+    #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     my $pageid = _find_page_in_cache($posturl);
     if (not defined $pageid) {
@@ -1519,11 +1517,11 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
-    $startlooptimer = time;
+    #my $startlooptimer = time;
 
     ## time for substitutions
     if (defined $pageid) { ## did we find match?
-        print {*STDOUT} " ID MATCH $pageid \n";
+        #print {*STDOUT} " ID MATCH $pageid \n";
         for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
             $postfields[$i] = _substitute_name($postfields[$i], $pageid, $posttype);
@@ -1544,10 +1542,9 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     }
     #out print {*STDOUT} qq|\n\n POSTBODY is $postbody \n|;
 
-    $looplatency = (int(1000 * (time - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
-
+    #my $looplatency = (int(1000 * (time - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
     ## debug - make sure all the regular expressions are efficient
-    print {*STDOUT} qq| Looping took $looplatency \n|; #debug
+    #print {*STDOUT} qq| Looping took $looplatency \n|; #debug
 
     return $postbody;
 }
@@ -1579,12 +1576,12 @@ sub _substitute_name {
 
         $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
         $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
-        print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
+        #print {*STDOUT} qq| LHS of {NAME}: [$lhsname] \n|;
 
         $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
         $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
         $rhsname =~ s{[.]}{\\\.}g; ## same for the .
-        print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
+        #print {*STDOUT} qq| RHS of {NAME}: [$rhsname] \n|;
 
         ## find out what to substitute it with, then do the substitution
         ##
@@ -1597,7 +1594,7 @@ sub _substitute_name {
 
             ## substitute {NAME} for the actual (dynamic) value
             $post_field =~ s/{NAME}/$name/;
-            print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
+            #print {*STDOUT} qq| SUBBED_NAME is $post_field \n|;
         }
     }
 
@@ -1608,7 +1605,7 @@ sub _substitute_name {
         } else {
             $post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
         }
-        print {*STDOUT} qq| DOTX restored to $post_field \n|;
+        #print {*STDOUT} qq| DOTX restored to $post_field \n|;
     }
 
     ## did we take out the .y? we need to put it back
@@ -1618,7 +1615,7 @@ sub _substitute_name {
      } else {
         $post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
      }
-        print {*STDOUT} qq| DOTY restored to $post_field \n|;
+        #print {*STDOUT} qq| DOTY restored to $post_field \n|;
     }
 
     return $post_field;
