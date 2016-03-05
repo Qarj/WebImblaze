@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.85 - Mar 5, 2016
+* refactored and improved the auto substitution feature to work in more edge case scenarios
+
 ### Version 1.84 - Feb 28, 2016
 * improved the auto substitution feature - should work in a wider range of scenarios - tested with .NET WebForms and MVC
 
