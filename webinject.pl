@@ -615,7 +615,10 @@ foreach ($start .. $repeat) {
 
             if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
-                if ($opt_driver) { startseleniumbrowser(); }
+                if ($opt_driver) { 
+                        print {*STDOUT} "RESTARTING SELENIUM SESSION ...\n";
+                        startseleniumbrowser(); 
+                    }
                 startsession();
             }
 
@@ -2863,8 +2866,10 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
     require Selenium::Chrome;
 
     if (defined $driver) { #shut down any existing selenium browser session
+        print {*STDOUT} " driver is defined so shutting down Selenium first\n";
         shutdown_selenium();
         sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
+        print {*STDOUT} " Done shutting down Selenium\n";
     }
     
     if ($opt_port) {
@@ -2906,14 +2911,15 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
             ## ChromeDriver without Selenium Server or JRE
             if ($opt_driver eq 'chromedriver') { 
                 if ($opt_proxy) {
-                    print {*STDOUT} "Starting ChromeDriver using $opt_proxy\n";
+                    print {*STDOUT} "Starting ChromeDriver using proxy at $opt_proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  'browser_name' => 'chrome',
                                                  'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
                                                  );
                 
                 } else {
-                    $driver = Selenium::Chrome->new (binary => 'C:\selenium-server\chromedriver.exe',
+                    print {*STDOUT} "Starting ChromeDriver without a proxy\n";
+                    $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  'browser_name' => 'chrome'
                                                  );
                 }
@@ -2987,7 +2993,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
 
 sub shutdown_selenium {
     if ($opt_driver) {
-        print {*STDOUT} "Shutting down Selenium Browser Session\n";
+        print {*STDOUT} " Shutting down Selenium Browser Session\n";
         
     #    my $close_handles = $driver->get_window_handles;
     #    for my $close_handle (reverse 0..@{$close_handles}) {
@@ -3000,6 +3006,7 @@ sub shutdown_selenium {
         if ($opt_driver eq 'chromedriver') {
             eval { $driver->shutdown_binary(); }; ## shut down chromedriver binary
         }
+        undef $driver;
     }
 
     return;
