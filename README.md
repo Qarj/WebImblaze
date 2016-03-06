@@ -2,7 +2,8 @@
 WebInject is a free Perl based tool for automated testing of web applications and web services.
 
 
-## Quick Start Guide - run your first test in 5 minutes!
+Quick Start Guide - run your first test in 5 minutes!
+-----------------------------------------------------
 
 WebInject is very easy to setup and run. An example is test included.
 
@@ -84,20 +85,51 @@ Then just change the verifypositive to look for something in the html on that we
 
 Save your changes then just run `webinject.pl` again. The three files in output will be overwitten with the results of the latest test.
 
-## The Manual
+The Manual
+----------
 
 The manual contains extensive details on how to use WebInject.
 
 [WebInject Manual - MANUAL.md](MANUAL.md)
 
 
-## Examples
+Examples
+--------
 
 There are many working examples in the examples folder.
 
 For additional examples, study the self tests in the selftest\substeps folder.
 
-## WebInject Self Test
+Selenium WebDriver using ChromeDriver
+-------------------------------------
+
+WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup is needed.
+
+### Windows
+
+1. Open a command prompt as an administrator and issue the following command:
+```
+cpan Selenium::Remote::Driver
+```
+
+2. Obtain ChromeDriver.exe from https://sites.google.com/a/chromium.org/chromedriver/ and save
+it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
+we'll put it here: `C:\ChromeDriver\chromedriver.exe`
+
+### Run the Example Selenium WebDriver test
+1. Open a command prompt as an administrator and issue the following command:
+
+```
+webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+```
+
+You should see Chrome open along with a process chromedriver.exe in the taskbar.
+
+After the tests run, you will see in the `output` folder that screenshots for each step
+are automatically taken.
+
+WebInject Self Test
+-------------------
 
 WebInject uses WebInject to test itself. The self tests are organised by feature name. 
 If you study the self tests for a feature you are interested, you will learn more about

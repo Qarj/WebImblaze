@@ -27,10 +27,7 @@ $VERSION = '1.85';
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
-
-#use Selenium::Remote::Driver; ## to use the clean version in the library
-#use Driver; ## using our own version of the package - had to stop it from dieing on error
-my $sel; ## support for Selenium test cases
+my $driver; ## support for Selenium WebDriver test cases
 
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
@@ -66,7 +63,7 @@ my ($currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegat
 my (%case);
 my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
-my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
+my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -127,8 +124,6 @@ getoptions();  #get command line options
 
 whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
 
-startseleniumbrowser();  #start selenium browser if applicable. If it is already started, close browser then start it again.
-
 processcasefile();
 
 startsession(); #starts, or restarts the webinject session
@@ -183,6 +178,8 @@ $start = $xmltestcases->{start};  #grab the start for repeating (for restart)
 if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
 $counter = $start - 1; #so starting position and counter are aligned
+
+if ($opt_driver) { startseleniumbrowser(); }  #start selenium browser if applicable. If it is already started, close browser then start it again.
 
 ## Repeat Loop
 foreach ($start .. $repeat) {
@@ -612,13 +609,13 @@ foreach ($start .. $repeat) {
 
             if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING BROWSER DUE TO FAIL ... \n|;
-                startseleniumbrowser();
+                if ($opt_driver) { startseleniumbrowser(); }
                 startsession();
             }
 
             if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
-                startseleniumbrowser();
+                if ($opt_driver) { startseleniumbrowser(); }
                 startsession();
             }
 
@@ -660,11 +657,8 @@ foreach ($start .. $repeat) {
 
 finaltasks();  #do return/cleanup tasks
 
-
 ## shut down the Selenium server last - it is less important than closing the files
-if ($opt_port) {  ## if -p is used, we need to close the browser and stop the selenium server
-    $selresp = $sel->quit(); ## shut down selenium browser session
-}
+shutdown_selenium();
 
 ## End main code
 
@@ -796,6 +790,8 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
 ## Selenium server support
 #------------------------------------------------------------------
 sub selenium {  ## send Selenium command and read response
+    require Selenium::Remote::Driver;
+    require Selenium::Chrome;
 
     my $command = q{};
     my $verifytext = q{};
@@ -855,11 +851,11 @@ sub selenium {  ## send Selenium command and read response
          $verifytext = $_;
          if ($verifytext eq 'get_body_text') {
             print "GET_BODY_TEXT:$verifytext\n";
-            eval { @verfresp =  $sel->find_element('body','tag_name')->get_text(); };
+            eval { @verfresp =  $driver->find_element('body','tag_name')->get_text(); };
          }
          else
          {
-            eval { @verfresp = $sel->$verifytext(); }; ## sometimes Selenium will return an array
+            eval { @verfresp = $driver->$verifytext(); }; ## sometimes Selenium will return an array
          }
          $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
          foreach my $vresp (@verfresp) {
@@ -895,7 +891,7 @@ sub selenium {  ## send Selenium command and read response
       eval
       {  ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
          #$timestart = time;
-         $png_base64 = $sel->screenshot();
+         $png_base64 = $driver->screenshot();
          #print "TIMER: selenium screenshot took " . (int(1000 * (time() - $timestart)) / 1000) . "\n";
       };
 
@@ -934,9 +930,9 @@ sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Loca
 
     my ($search_target, $locator, $labeltext) = @_;
 
-    my $elem1 = $sel->find_element("$search_target", "$locator");
-    #my $child = $sel->find_child_element($elem1, "./option[\@value='4']")->click();
-    my $child = $sel->find_child_element($elem1, "./option[. = '$labeltext']")->click();
+    my $elem1 = $driver->find_element("$search_target", "$locator");
+    #my $child = $driver->find_child_element($elem1, "./option[\@value='4']")->click();
+    my $child = $driver->find_child_element($elem1, "./option[. = '$labeltext']")->click();
 
     return $child;
 }
@@ -946,8 +942,8 @@ sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Tar
 
     my ($search_target, $locator, $sendkeys) = @_;
 
-    my $elem1 = $sel->find_element("$search_target", "$locator")->clear();
-    my $resp1 = $sel->find_element("$search_target", "$locator")->send_keys("$sendkeys");
+    my $elem1 = $driver->find_element("$search_target", "$locator")->clear();
+    my $resp1 = $driver->find_element("$search_target", "$locator")->send_keys("$sendkeys");
 
     return $resp1;
 }
@@ -957,8 +953,8 @@ sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Sear
 
     my ($search_target, $locator, $xoffset, $yoffset) = @_;
 
-    my $elem1 = $sel->find_element("$search_target", "$locator");
-    my $child = $sel->mouse_move_to_location($elem1, $xoffset, $yoffset);
+    my $elem1 = $driver->find_element("$search_target", "$locator");
+    my $child = $driver->mouse_move_to_location($elem1, $xoffset, $yoffset);
 
     return $child;
 }
@@ -969,9 +965,9 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
 
     my ($windownumber) = @_;
 
-    my $handles = $sel->get_window_handles;
+    my $handles = $driver->get_window_handles;
     print {*Dumper} $handles;
-    my $resp1 =  $sel->switch_to_window($handles->[$windownumber]);
+    my $resp1 =  $driver->switch_to_window($handles->[$windownumber]);
 
     return $resp1;
 }
@@ -986,7 +982,7 @@ sub custom_js_click { ## usage: custom_js_click(id);
         var elem = window.document.getElementById(arg1).click();
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$id_to_click);
+    my $resp1 = $driver->execute_script($script,$id_to_click);
 
     return $resp1;
 }
@@ -1004,7 +1000,7 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
         var elem = window.document.getElementById(arg1).value=arg2;
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$id_to_set_value,$value_to_set);
+    my $resp1 = $driver->execute_script($script,$id_to_set_value,$value_to_set);
 
     return $resp1;
 }
@@ -1020,7 +1016,7 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
         var elem = window.document.getElementById(arg1).style.height = '5px';
         return elem;
     };
-    my $resp1 = $sel->execute_script($script,$id_to_set_css);
+    my $resp1 = $driver->execute_script($script,$id_to_set_css);
 
     return $resp1;
 }
@@ -1034,7 +1030,7 @@ sub custom_check_element_within_pixels {     ## usage: custom_check_element_with
     ## http://www.troubleshooters.com/codecorn/littperl/perlscal.htm
     ## the array will look something like this
     # { 'y' => 325, 'hCode' => 25296896, 'x' => 193, 'class' => 'org.openqa.selenium.Point' };
-    my ($location) = $sel->find_element("$search_target", "$locator")->get_element_location();
+    my ($location) = $driver->find_element("$search_target", "$locator")->get_element_location();
 
     ## if the element doesn't exist, we get an empty output, so presumably this subroutine just dies and the program carries on
 
@@ -1069,7 +1065,7 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Searc
     my $foundit = 'false';
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
-        eval { @resp1 = $sel->get_page_source(); };
+        eval { @resp1 = $driver->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
                 $foundit = 'true';
@@ -1109,7 +1105,7 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     my $foundit = 'true';
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
-        eval { @resp1 = $sel->get_page_source(); };
+        eval { @resp1 = $driver->get_page_source(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
                 sleep 0.1; ## sleep for 0.1 seconds
@@ -1146,7 +1142,7 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible('Searc
     my $foundit = 'false';
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
-        eval { @resp1 = $sel->find_element($target,$locator)->get_text(); };
+        eval { @resp1 = $driver->find_element($target,$locator)->get_text(); };
         foreach my $resp (@resp1) {
             if ($resp =~ m{$searchtext}si) {
                 $foundit = 'true';
@@ -1187,7 +1183,7 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     my $foundit = 'true'; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
-        eval { @resp1 = $sel->find_element('body','tag_name')->get_text(); };
+        eval { @resp1 = $driver->find_element('body','tag_name')->get_text(); };
         foreach my $resp (@resp1) {
             if (not ($resp =~ m{$searchtext}si)) {
                 $foundit = 'false';
@@ -1226,7 +1222,7 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
     {
-        eval { $find_element = $sel->find_element("$element_name","$element_type"); };
+        eval { $find_element = $driver->find_element("$element_name","$element_type"); };
         if ($find_element)
         {
             $foundit = 'true';
@@ -1265,7 +1261,7 @@ sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible(
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
     {
-        eval { $find_element = $sel->find_element("$element_name","$element_type")->is_displayed(); };
+        eval { $find_element = $driver->find_element("$element_name","$element_type")->is_displayed(); };
         if ($find_element)
         {
             $foundit = 'true';
@@ -2863,110 +2859,151 @@ sub whackoldfiles {  #delete any files leftover from previous run if they exist
 
 #------------------------------------------------------------------
 sub startseleniumbrowser {     ## start Selenium Remote Control browser if applicable
-    if ($opt_port) ## if -p is used, we need to start up a selenium server
-    {
-        if (defined $sel) { #shut down any existing selenium browser session
-            $selresp = $sel->quit();
-            sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
-        }
-        print {*STDOUT} "\nStarting Selenium Remote Control server on port $opt_port \n";
+    require Selenium::Remote::Driver;
+    require Selenium::Chrome;
 
-        ## connecting to the Selenium server is done in a retry loop in case of slow startup
-        ## see http://www.perlmonks.org/?node_id=355817
-        my $max = 30;
-        my $try = 0;
-
-        ## --load-extension Loads an extension from the specified directory
-        ## --whitelisted-extension-id
-        ## http://rdekleijn.nl/functional-test-automation-over-a-proxy/
-        ## http://bmp.lightbody.net/
-        ATTEMPT:
-        {
-            eval
-            {
-
-                ## Phantomjs
-                if ($opt_driver eq 'phantomjs') {
-                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                        'port' => $opt_port,
-                                                        'browser_name' => 'phantomjs',
-                                                        );
-                }
-
-                ## Firefox
-                if ($opt_driver eq 'firefox') {
-                    print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
-                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                        'port' => $opt_port,
-                                                        'browser_name' => 'firefox',
-                                                        'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
-                                                        );
-                 }
-
-                ## Chrome
-                if ($opt_driver eq 'chrome') {
-                    print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
-                    $sel = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                        'port' => $opt_port,
-                                                        'browser_name' => 'chrome',
-                                                        'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
-                                                        'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
-                                                        );
-                 }
-
-                                                       #'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
-                                                       #'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
-                                                       #'extra_capabilities' => {'chromeOptions' => {'args' => ['incognito','window-size=1260,960']}}
-
-                                                       #'extra_capabilities'
-                                                       #   => {'chromeOptions' => {'args'  =>         ['window-size=1260,960','incognito'],
-                                                       #                           'prefs' => {'session' => {'restore_on_startup' =>4, 'urls_to_restore_on_startup' => ['http://www.google.com','http://www.example.com']},
-                                                       #                                       'first_run_tabs' => ['http://www.mywebsite.com','http://www.google.de']
-                                                       #                                      }
-                                                       #                          }
-                                                       #      }
-
-            }; ## end eval
-
-            if ( $@ and $try++ < $max )
-            {
-                print "\nError: $@ Failed try $try to connect to Selenium Server on port $opt_port, retrying...\n";
-                sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
-                redo ATTEMPT;
-            }
-        } ## end ATTEMPT
-
-        if ($@)
-            {
-                print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
-                die "WebInject Aborted - could not connect to Selenium Server\n";
-            }
-
-        ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
-        my $thetime = time;
-        $sel->get("http://127.0.0.1:87/?windowidentify_$thetime-time"); ## we put the current time stamp in the window title, so this is multi-thread safe
-        #Set timeout as 5 seconds (was 140)
-        $sel->set_timeout(5000);
-        my $allchromehandle = (`GetWindows.exe`); ## this is a separate simple .NET C# program that lists all open windows and what their title is
-        #print {*STDOUT} qq|$allchromehandle\n|;
-        $allchromehandle =~ m{(\d+), http:..127.0.0.1:87..windowidentify_$thetime}s;
-        if ($1)
-        {
-            $chromehandle = $1;
-        }
-        else
-        {
-            $chromehandle = 0;
-        }
-        print {*STDOUT} qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
-
-        #$sel->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
-        $sel->set_window_size(968, 1260); ## y,x
+    if (defined $driver) { #shut down any existing selenium browser session
+        shutdown_selenium();
+        sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
     }
+    
+    if ($opt_port) {
+        print {*STDOUT} "\nConnecting to Selenium Remote Control server on port $opt_port \n";
+    }
+
+    ## connecting to the Selenium server is done in a retry loop in case of slow startup
+    ## see http://www.perlmonks.org/?node_id=355817
+    my $max = 30;
+    my $try = 0;
+
+    ## --load-extension Loads an extension from the specified directory
+    ## --whitelisted-extension-id
+    ## http://rdekleijn.nl/functional-test-automation-over-a-proxy/
+    ## http://bmp.lightbody.net/
+    ATTEMPT:
+    {
+        eval
+        {
+
+            ## Phantomjs
+            if ($opt_driver eq 'phantomjs') {
+                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
+                                                    'port' => $opt_port,
+                                                    'browser_name' => 'phantomjs',
+                                                    );
+            }
+
+            ## Firefox
+            if ($opt_driver eq 'firefox') {
+                print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
+                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
+                                                    'port' => $opt_port,
+                                                    'browser_name' => 'firefox',
+                                                    'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
+                                                    );
+             }
+            
+            ## ChromeDriver without Selenium Server or JRE
+            if ($opt_driver eq 'chromedriver') { 
+                if ($opt_proxy) {
+                    print {*STDOUT} "Starting ChromeDriver using $opt_proxy\n";
+                    $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
+                                                 'browser_name' => 'chrome',
+                                                 'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
+                                                 );
+                
+                } else {
+                    $driver = Selenium::Chrome->new (binary => 'C:\selenium-server\chromedriver.exe',
+                                                 'browser_name' => 'chrome'
+                                                 );
+                }
+            }
+
+            ## Chrome
+            if ($opt_driver eq 'chrome') {
+                print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
+                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
+                                                    'port' => $opt_port,
+                                                    'browser_name' => 'chrome',
+                                                    'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
+                                                    'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
+                                                    );
+             }
+
+                                                   #'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
+                                                   #'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
+                                                   #'extra_capabilities' => {'chromeOptions' => {'args' => ['incognito','window-size=1260,960']}}
+                                                   #'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
+
+                                                   #'extra_capabilities'
+                                                   #   => {'chromeOptions' => {'args'  =>         ['window-size=1260,960','incognito'],
+                                                   #                           'prefs' => {'session' => {'restore_on_startup' =>4, 'urls_to_restore_on_startup' => ['http://www.google.com','http://www.example.com']},
+                                                   #                                       'first_run_tabs' => ['http://www.mywebsite.com','http://www.google.de']
+                                                   #                                      }
+                                                   #                          }
+                                                   #      }
+
+        }; ## end eval
+
+        if ( $@ and $try++ < $max )
+        {
+            print "\nError: $@ Failed try $try to connect to Selenium Server on port $opt_port, retrying...\n";
+            sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
+            redo ATTEMPT;
+        }
+    } ## end ATTEMPT
+
+    if ($@)
+        {
+            print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
+            die "WebInject Aborted - could not connect to Selenium Server\n";
+        }
+
+    ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
+    my $thetime = time;
+    eval { $driver->get("http://127.0.0.1:87/?windowidentify_$thetime-time"); }; ## we put the current time stamp in the window title, so this is multi-thread safe
+    #Set timeout as 5 seconds (was 140)
+#        $driver->set_timeout(5000);
+#    $driver->set_implicit_wait_timeout(5000);
+
+    my $allchromehandle = (`plugins/GetWindows.exe`); ## this is a separate simple .NET C# program that lists all open windows and what their title is
+    #print {*STDOUT} qq|$allchromehandle\n|;
+    $allchromehandle =~ m{(\d+), http:..127.0.0.1:87..windowidentify_$thetime}s;
+    if ($1)
+    {
+        $chromehandle = $1;
+    }
+    else
+    {
+        $chromehandle = 0;
+    }
+    print {*STDOUT} qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
+
+    #$driver->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
+    #eval { $driver->set_window_size(968, 1260); }; ## y,x
 
     return;
 }
 
+sub shutdown_selenium {
+    if ($opt_driver) {
+        print {*STDOUT} "Shutting down Selenium Browser Session\n";
+        
+    #    my $close_handles = $driver->get_window_handles;
+    #    for my $close_handle (reverse 0..@{$close_handles}) {
+    #       print {*STDOUT} "Shutting down window $close_handle\n";
+    #       $driver->switch_to_window($close_handles->[$close_handle]);
+    #       $driver->close();
+    #    }
+    
+        eval { $driver->quit(); }; ## shut down selenium browser session
+        if ($opt_driver eq 'chromedriver') {
+            eval { $driver->shutdown_binary(); }; ## shut down chromedriver binary
+        }
+    }
+
+    return;
+}
 #------------------------------------------------------------------
 sub startsession {     ## creates the webinject user agent
     #contsruct objects
@@ -3033,6 +3070,7 @@ sub getoptions {  #shell options
         'x|proxy=s'   => \$opt_proxy,
         'b|basefolder=s'   => \$opt_basefolder,
         'd|driver=s'   => \$opt_driver,
+        'y|binary=s'   => \$opt_chromedriver_binary,
         'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'h|help'   => \$opt_help,
@@ -3052,12 +3090,22 @@ sub getoptions {  #shell options
         print_usage();
         exit;
     }
+    
+    if (defined $opt_driver) {
+        if ($opt_driver eq 'chromedriver') {
+            if (not defined $opt_chromedriver_binary) {
+                print "\nLocation of chromedriver binary must be specified when chromedriver selected.\n\n";
+                print '--binary C:\selenium-server\chromedriver.exe'."\n";
+                exit;
+            }
+        }
+    }
 
     if ($opt_output) {  #use output location if it is passed from the command line
         $output = $opt_output;
     }
     else {
-        $output = $dirname.'output/'; ## default to the output folder under the current folder
+        $output = 'output/'; ## default to the output folder under the current folder
     }
     $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
 
@@ -3082,6 +3130,7 @@ Usage: webinject.pl <<options>>
 -b|--basefolder baselined image folder              -b examples/basefoler/
 testcase_file [XPath]                               examples/simple.xml testcases/case[20]
 -d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
+-y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 
