@@ -2916,7 +2916,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                     print {*STDOUT} "Starting ChromeDriver using proxy at $opt_proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  binary_port => $port,
-                                                 _binary_args => " --port=$port --url-base=/wd/hub --log-path=$output".'chromedriver.log',
+                                                 _binary_args => " --port=$port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome',
                                                  'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
                                                  );
@@ -2925,7 +2925,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                     print {*STDOUT} "Starting ChromeDriver without a proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  binary_port => $port,
-                                                 _binary_args => " --port=$port --url-base=/wd/hub --log-path=$output".'chromedriver.log',
+                                                 _binary_args => " --port=$port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome'
                                                  );
                 }
@@ -2974,9 +2974,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
     ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
     my $thetime = time;
     eval { $driver->get("http://127.0.0.1:87/?windowidentify_$thetime-time"); }; ## we put the current time stamp in the window title, so this is multi-thread safe
-    #Set timeout as 5 seconds (was 140)
-#        $driver->set_timeout(5000);
-#    $driver->set_implicit_wait_timeout(5000);
 
     my $allchromehandle = (`plugins/GetWindows.exe`); ## this is a separate simple .NET C# program that lists all open windows and what their title is
     #print {*STDOUT} qq|$allchromehandle\n|;
@@ -2991,7 +2988,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
     }
     print {*STDOUT} qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
 
-    #$driver->set_implicit_wait_timeout(10); ## wait specified number of seconds before failing - but proceed immediately if possible
     #eval { $driver->set_window_size(968, 1260); }; ## y,x
 
     return;
