@@ -40,6 +40,7 @@ use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use IO::Handle;
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses)
 use Data::Dumper;  #uncomment to dump hashes for debugging
@@ -2909,10 +2910,13 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
              }
             
             ## ChromeDriver without Selenium Server or JRE
-            if ($opt_driver eq 'chromedriver') { 
+            if ($opt_driver eq 'chromedriver') {
+                my $port = find_available_port(9585); ## find a free port to bind to, starting from this number
                 if ($opt_proxy) {
                     print {*STDOUT} "Starting ChromeDriver using proxy at $opt_proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
+                                                 binary_port => $port,
+                                                 _binary_args => " --port=$port --url-base=/wd/hub --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome',
                                                  'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
                                                  );
@@ -2920,6 +2924,8 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                 } else {
                     print {*STDOUT} "Starting ChromeDriver without a proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
+                                                 binary_port => $port,
+                                                 _binary_args => " --port=$port --url-base=/wd/hub --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome'
                                                  );
                 }
@@ -2953,7 +2959,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
 
         if ( $@ and $try++ < $max )
         {
-            print "\nError: $@ Failed try $try to connect to Selenium Server on port $opt_port, retrying...\n";
+            print "\nError: $@ Failed try $try to connect to Selenium Server, retrying...\n";
             sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
             redo ATTEMPT;
         }
@@ -2989,6 +2995,34 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
     #eval { $driver->set_window_size(968, 1260); }; ## y,x
 
     return;
+}
+
+sub port_available {
+    my ($port) = @_;
+
+    my $family = PF_INET;
+    my $type   = SOCK_STREAM;
+    my $proto  = getprotobyname('tcp')  or die "getprotobyname: $!";
+    my $host   = INADDR_ANY;  # Use inet_aton for a specific interface
+
+    socket(my $sock, $family, $type, $proto) or die "socket: $!";
+    my $name = sockaddr_in($port, $host)     or die "sockaddr_in: $!";
+
+    bind($sock, $name) and return 'available';
+    return 'in use';
+}
+
+sub find_available_port {
+    my ($start_port) = @_;
+
+    my $max_attempts = 20;
+    foreach my $i (0..$max_attempts) {
+        if (port_available($start_port + $i) eq 'available') {
+            return $start_port + $i;
+        }
+    }
+
+    return 'none';
 }
 
 sub shutdown_selenium {
