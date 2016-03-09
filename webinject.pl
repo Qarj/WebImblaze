@@ -1420,8 +1420,12 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         $page_action =~ s{http.?://}{}si; ## remove http:// and https://
         #print {*STDOUT} qq| SAVING $page_action (AFTER)\n\n|;
 
+        ## we want to overwrite any page with the same name in the cache to prevent weird errors
+        my $match_url = $page_action;
+        $match_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+
         ## check to see if we already have this page in the cache, if so, just overwrite it
-        $page_index = _find_page_in_cache($page_action);
+        $page_index = _find_page_in_cache($match_url);
 
         my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
         ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
@@ -1507,12 +1511,12 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     my $pageid = _find_page_in_cache($posturl);
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #print {*STDOUT} " TRY WITH $posturl \n";
+        #print {*STDOUT} " TRY WITH PAGE NAME ONLY: $posturl \n";
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        #print {*STDOUT} " LAST TRY WITH $posturl \n";
+        #print {*STDOUT} " DESPERATE MODE - LAST TRY: $posturl \n";
         $pageid = _find_page_in_cache($posturl); ## try again without the full path
     }
 
