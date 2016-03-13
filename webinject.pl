@@ -797,10 +797,6 @@ sub selenium {  ## send Selenium command and read response
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
 
-    my $grab = q{};
-    my $jswait = q{};
-    my $timestart;
-
     $starttimer = time;
 
     my $combined_response = q{};
@@ -808,37 +804,28 @@ sub selenium {  ## send Selenium command and read response
 
     ## commands must be run in this order
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
-       if ($case{$_}) {#perform command
-          my $command = $case{$_};
-          undef $selresp;
-          my $eval_response = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
-          #print {*STDOUT} "EVALRESP:$eval_response\n";
-          if (defined $selresp) { ## phantomjs does not return a defined response sometimes
-              if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                  my $dumper_response = Dumper($selresp);
-                  print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response";
-                  $selresp = "selresp:DUMPED:$dumper_response";
-              }
-              else {
-                  print {*STDOUT} "SELRESP:$selresp\n";
-                  $selresp = "selresp:$selresp";
-              }
-          }
-          else {
-              print {*STDOUT} "SELRESP:<undefined>\n";
-              $selresp = 'selresp:<undefined>';
-          }
-          $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
-       }
+        if ($case{$_}) {#perform command
+            my $command = $case{$_};
+            undef $selresp;
+            my $eval_response = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
+            #print {*STDOUT} "EVALRESP:$eval_response\n";
+            if (defined $selresp) { ## phantomjs does not return a defined response sometimes
+                if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
+                    my $dumper_response = Dumper($selresp);
+                    print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response";
+                    $selresp = "selresp:DUMPED:$dumper_response";
+                } else {
+                    print {*STDOUT} "SELRESP:$selresp\n";
+                    $selresp = "selresp:$selresp";
+                }
+            } else {
+                print {*STDOUT} "SELRESP:<undefined>\n";
+                $selresp = 'selresp:<undefined>';
+            }
+            $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
+        }
     }
     $selresp = $combined_response;
-
-    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
-
-    _get_verifytext();
-
-    _screenshot();
 
     if ($selresp =~ /^ERROR/) { ## Selenium returned an error
        $selresp =~ s{^}{HTTP/1.1 500 Selenium returned an error\n\n}; ## pretend this is an HTTP response - 100 means continue
@@ -846,8 +833,15 @@ sub selenium {  ## send Selenium command and read response
     else {
        $selresp =~ s{^}{HTTP/1.1 100 OK\n\n}; ## pretend this is an HTTP response - 100 means continue
     }
-    $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
     #print $response->as_string; print "\n\n";
+
+    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+
+    _get_verifytext(); ## will be injected into $selresp
+    $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
+
+    _screenshot();
 
     return;
 } ## end sub
@@ -862,7 +856,6 @@ sub _get_verifytext {
         foreach (@parseverify) {
             my $verifytext = $_;
             print {*STDOUT} "$verifytext\n";
-            my $idx = 0;
             my @verfresp;
 
             if ($verifytext eq 'get_body_text') {
@@ -873,9 +866,10 @@ sub _get_verifytext {
             }
 
             $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
-                foreach my $vresp (@verfresp) {
+            my $idx = 0;
+            foreach my $vresp (@verfresp) {
                 $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
-                $idx++; ## keep track of where we are in the loop
+                $idx++; ## we number the verifytexts from 1 onwards to tell them apart in the tags
                 $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
                 if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                     my $dumper_response = Dumper($vresp);
