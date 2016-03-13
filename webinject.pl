@@ -858,33 +858,33 @@ sub _get_verifytext {
 
     ## multiple verifytexts are separated by commas
     if ($case{verifytext}) {
-      my @parseverify = split /,/, $case{verifytext} ;
-      foreach (@parseverify) {
-         my $verifytext = $_;
-         print {*STDOUT} "$verifytext\n";
-         my $idx = 0;
-         my @verfresp;
-         if ($verifytext eq 'get_body_text') {
-            print "GET_BODY_TEXT:$verifytext\n";
-            eval { @verfresp =  $driver->find_element('body','tag_name')->get_text(); };
-         }
-         else
-         {
-            eval { @verfresp = $driver->$verifytext(); }; ## sometimes Selenium will return an array
-         }
-         $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
-         foreach my $vresp (@verfresp) {
-            $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
-            $idx++; ## keep track of where we are in the loop
-            $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
-            if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-               my $dumper_response = Dumper($vresp);
-               my $dumped = 'dumped';
-               $selresp =~ s{$}{<$verifytext$dumped$idx>$dumper_response</$verifytext$dumped$idx>\n}; ## include it in the response
-               ## ^ means match start of string, $ end of string
+        my @parseverify = split /,/, $case{verifytext} ;
+        foreach (@parseverify) {
+            my $verifytext = $_;
+            print {*STDOUT} "$verifytext\n";
+            my $idx = 0;
+            my @verfresp;
+
+            if ($verifytext eq 'get_body_text') {
+                print "GET_BODY_TEXT:$verifytext\n";
+                eval { @verfresp =  $driver->find_element('body','tag_name')->get_text(); };
+            } else {
+                eval { @verfresp = $driver->$verifytext(); }; ## sometimes Selenium will return an array
             }
-         }
-      }
+
+            $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
+                foreach my $vresp (@verfresp) {
+                $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
+                $idx++; ## keep track of where we are in the loop
+                $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
+                if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
+                    my $dumper_response = Dumper($vresp);
+                    my $dumped = 'dumped';
+                    $selresp =~ s{$}{<$verifytext$dumped$idx>$dumper_response</$verifytext$dumped$idx>\n}; ## include it in the response
+                    ## ^ means match start of string, $ end of string
+                }
+            }
+        }
     }
 
     $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
