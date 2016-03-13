@@ -16,7 +16,7 @@
     description1="Get SSL Loging Page"
     method="selenium"
     command="$selresp = $driver->get('https://www.totaljobs.com/Authenticated/Login.aspx');"
-    verifytext="get_page_source"
+    verifytext="get_page_source,get_body_text"
     verifypositive="password"
 />
 
