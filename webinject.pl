@@ -820,8 +820,8 @@ sub selenium {  ## send Selenium command and read response
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                   my $dumper_response = Dumper($selresp);
-                  print {*STDOUT} "SELRESP:$dumper_response";
-                  $selresp = "selresp:$dumper_response";
+                  print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response\n";
+                  $selresp = "selresp:DUMPED:$dumper_response";
               }
               else {
                   print {*STDOUT} "SELRESP:$selresp\n";
