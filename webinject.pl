@@ -797,7 +797,6 @@ sub selenium {  ## send Selenium command and read response
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
 
-    my $command = q{};
     my $verifytext = q{};
     my @verfresp = ();
     my $idx = 0; #For keeping track of index in foreach loop
@@ -808,14 +807,16 @@ sub selenium {  ## send Selenium command and read response
 
     $starttimer = time;
 
-    my $combinedresp = q{};
+    my $combined_response = q{};
     $request = HTTP::Request->new('GET','WebDriver');
+
+    ## commands must be run in this order
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
        if ($case{$_}) {#perform command
-          $command = $case{$_};
+          my $command = $case{$_};
           $selresp = q{};
-          my $evalresp = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
-          print {*STDOUT} "EVALRESP:$@\n";
+          my $eval_response = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
+          #print {*STDOUT} "EVALRESP:$eval_response\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                   my $dumpresp = Dumper($selresp);
@@ -832,7 +833,7 @@ sub selenium {  ## send Selenium command and read response
               $selresp = 'selresp:<undefined>';
           }
           #$request = new HTTP::Request('GET',"$case{command}");
-          $combinedresp =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
+          $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
        }
     }
 
@@ -842,7 +843,7 @@ sub selenium {  ## send Selenium command and read response
 
     $starttimer = time; ## measure latency for the verification
 
-    $selresp = $combinedresp;
+    $selresp = $combined_response;
 
     sleep 0.02; ## Sleep for 20 milliseconds
 
@@ -1908,7 +1909,7 @@ sub httppost_form_data {  #send multipart/form-data HTTP request and read respon
 #------------------------------------------------------------------
 sub cmd {  ## send terminal command and read response
 
-    my $combinedresp=q{};
+    my $combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
     $starttimer = time;
 
@@ -1919,11 +1920,11 @@ sub cmd {  ## send terminal command and read response
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combinedresp =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
+            $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
     }
-    $combinedresp =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
-    $response = HTTP::Response->parse($combinedresp); ## pretend the response is a http response - inject it into the object
+    $combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
+    $response = HTTP::Response->parse($combined_response); ## pretend the response is a http response - inject it into the object
     $endtimer = time;
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
@@ -1934,7 +1935,7 @@ sub cmd {  ## send terminal command and read response
 sub commandonerror {  ## command only gets run on error - it does not count as part of the test
                       ## intended for scenarios when you want to give something a kick - e.g. recycle app pool
 
-    my $combinedresp = $response->as_string; ## take the existing test response
+    my $combined_response = $response->as_string; ## take the existing test response
 
     for (qw/commandonerror/) {
         if ($case{$_}) {## perform command
@@ -1942,10 +1943,10 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combinedresp =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
+            $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
     }
-    $response = HTTP::Response->parse($combinedresp); ## put the test response along with the command on error response back in the response
+    $response = HTTP::Response->parse($combined_response); ## put the test response along with the command on error response back in the response
 
     return;
 }
