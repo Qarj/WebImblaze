@@ -814,13 +814,13 @@ sub selenium {  ## send Selenium command and read response
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
        if ($case{$_}) {#perform command
           my $command = $case{$_};
-          $selresp = q{};
+          undef $selresp;
           my $eval_response = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
           #print {*STDOUT} "EVALRESP:$eval_response\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                   my $dumper_response = Dumper($selresp);
-                  print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response\n";
+                  print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response";
                   $selresp = "selresp:DUMPED:$dumper_response";
               }
               else {
@@ -832,7 +832,6 @@ sub selenium {  ## send Selenium command and read response
               print {*STDOUT} "SELRESP:<undefined>\n";
               $selresp = 'selresp:<undefined>';
           }
-          #$request = new HTTP::Request('GET',"$case{command}");
           $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
        }
     }
@@ -840,18 +839,17 @@ sub selenium {  ## send Selenium command and read response
     $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
-
     $starttimer = time; ## measure latency for the verification
 
     $selresp = $combined_response;
 
-    sleep 0.02; ## Sleep for 20 milliseconds
+    sleep 0.020; ## Sleep for 20 milliseconds
 
     ## multiple verifytexts are separated by commas
     if ($case{verifytext}) {
       @parseverify = split /,/, $case{verifytext} ;
       foreach (@parseverify) {
-         print "$_\n";
+         print {*STDOUT} "$_\n";
          $idx = 0;
          $verifytext = $_;
          if ($verifytext eq 'get_body_text') {

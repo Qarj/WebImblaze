@@ -6,7 +6,8 @@
     description1="Get Totaljobs Home Page"
     method="selenium"
     command='$selresp = $driver->get("http://www.totaljobs.com");'
-    verifytext="get_page_source"
+    command1='$selresp = $driver->get_all_cookies();'
+    verifytext="get_page_source,get_current_url"
     verifypositive="Location"
 />
 
