@@ -819,9 +819,9 @@ sub selenium {  ## send Selenium command and read response
           #print {*STDOUT} "EVALRESP:$eval_response\n";
           if (defined $selresp) { ## phantomjs does not return a defined response sometimes
               if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                  my $dumpresp = Dumper($selresp);
-                  print {*STDOUT} "SELRESP:$dumpresp";
-                  $selresp = "selresp:$dumpresp";
+                  my $dumper_response = Dumper($selresp);
+                  print {*STDOUT} "SELRESP:$dumper_response";
+                  $selresp = "selresp:$dumper_response";
               }
               else {
                   print {*STDOUT} "SELRESP:$selresp\n";
@@ -868,9 +868,9 @@ sub selenium {  ## send Selenium command and read response
             $idx++; ## keep track of where we are in the loop
             $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
             if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-               my $dumpresp = Dumper($vresp);
+               my $dumper_response = Dumper($vresp);
                my $dumped = 'dumped';
-               $selresp =~ s{$}{<$verifytext$dumped$idx>$dumpresp</$verifytext$dumped$idx>\n}; ## include it in the response
+               $selresp =~ s{$}{<$verifytext$dumped$idx>$dumper_response</$verifytext$dumped$idx>\n}; ## include it in the response
                ## ^ means match start of string, $ end of string
             }
          }
