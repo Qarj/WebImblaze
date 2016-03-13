@@ -831,20 +831,13 @@ sub selenium {  ## send Selenium command and read response
           $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
        }
     }
+    $selresp = $combined_response;
 
     $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
-    $starttimer = time; ## measure latency for the verification
-
-    $selresp = $combined_response;
-
-    sleep 0.020; ## Sleep for 20 milliseconds
 
     _get_verifytext();
-
-    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-    $verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
     $starttimer = time; ## measure latency for the screenshot
 
@@ -897,6 +890,8 @@ sub selenium {  ## send Selenium command and read response
 } ## end sub
 
 sub _get_verifytext {
+    $starttimer = time; ## measure latency for the verification
+    sleep 0.020; ## Sleep for 20 milliseconds
 
     ## multiple verifytexts are separated by commas
     if ($case{verifytext}) {
@@ -928,6 +923,9 @@ sub _get_verifytext {
          }
       }
     }
+
+    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
     return;
 }
