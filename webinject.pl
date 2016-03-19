@@ -2451,9 +2451,9 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
-        $configfilepath = "$dirname"."$opt_configfile";
+        $configfilepath = $opt_configfile;
     } else {
-        $configfilepath = "$dirname".'config.xml';
+        $configfilepath = 'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
 
