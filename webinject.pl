@@ -2573,7 +2573,7 @@ sub convtestcases {
 
     my @xmltoconvert;
 
-    open my $XMLTOCONVERT, '<', "$dirname"."$currentcasefile" or die "\nError: Failed to open test case file\n\n";  #open file handle
+    open my $XMLTOCONVERT, '<', $currentcasefile or die "\nError: Failed to open test case file\n\n";  #open file handle
     @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
     close $XMLTOCONVERT or die "\nCould not close test case file\n\n";
 
