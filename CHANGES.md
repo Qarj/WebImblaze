@@ -8,6 +8,14 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.86 - Mar 20, 2016
+* can now specify location of chromedriver.exe instead of a selenium server port
+* chromedriver log file will be written to the output folder (--verbose)
+* improved logic for overwriting pages in the cache
+* refactored sub selenium to make it a lot easier to understand
+* absolute path is now supported for config file and testcase file
+* fixed introduced bug - processcasefile needs to be called after startsession so the agent can be set
+
 ### Version 1.85 - Mar 5, 2016
 * refactored and improved the auto substitution feature to work in more edge case scenarios
 
