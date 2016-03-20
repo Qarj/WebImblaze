@@ -50,7 +50,7 @@ local $| = 1; #don't buffer output to STDOUT
 
 
 ## Variable declarations
-my ($timestamp, $dirname, $testfilename);
+my ($timestamp, $testfilename);
 my (%parsedresult);
 my (%varvar);
 my ($useragent, $request, $response);
@@ -119,8 +119,6 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 
 
 ## Startup
-getdirname();  #get the directory webinject engine is running from
-
 getoptions();  #get command line options
 
 whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
@@ -3081,18 +3079,6 @@ sub startsession {     ## creates the webinject user agent
     return;
 }
 
-#------------------------------------------------------------------
-sub getdirname {  #get the directory webinject engine is running from
-
-    $dirname = $0;
-    $dirname =~ s{(.*/).*}{$1};  #for nix systems
-    $dirname =~ s{(.*\\).*}{$1}; #for windoz systems
-    if ($dirname eq $0) {
-        $dirname = q{./};
-    }
-
-    return;
-}
 #------------------------------------------------------------------
 sub getoptions {  #shell options
 
