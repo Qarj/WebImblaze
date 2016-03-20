@@ -125,9 +125,9 @@ getoptions();  #get command line options
 
 whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
 
-processcasefile();
-
 startsession(); #starts, or restarts the webinject session
+
+processcasefile();
 
 #open file handles
 open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
@@ -1787,7 +1787,7 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     #read the xml file specified in the testcase
     $case{postbody} =~ m/file=>(.*)/i;
-    open my $XMLBODY, '<', "$dirname"."$1" or die "\nError: Failed to open text/xml file\n\n";  #open file handle
+    open my $XMLBODY, '<', $1 or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
     my @xmlbody = <$XMLBODY>;  #read the file into an array
     close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
 
@@ -2513,10 +2513,10 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
     if ($userconfig->{useragent}) {
         $setuseragent = $userconfig->{useragent};
+        print "\nuseragent : $setuseragent \n\n";
         if ($setuseragent) { #http useragent that will show up in webserver logs
             $useragent->agent($setuseragent);
         }
-        #print "\nuseragent : $setuseragent \n\n";
     }
 
     if ($userconfig->{httpauth}) {
