@@ -32,6 +32,7 @@ my $driver; ## support for Selenium WebDriver test cases
 use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 use File::Basename; ## So gethrefs can determine the filename of the asset from the path
+use File::Spec;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use XML::Simple;
@@ -888,14 +889,16 @@ sub _get_verifytext {
 sub _screenshot {
     $starttimer = time; ## measure latency for the screenshot
 
+    my $_abs_screenshot_full = File::Spec->rel2abs( "$output$testnumlog$jumpbacksprint$retriesprint.png" );
+
     if ($case{screenshot} && (lc($case{screenshot}) eq 'false' || lc($case{screenshot}) eq 'no')) #lc = lowercase
     {
         ## take a very fast screenshot - visible window only, only works for interactive sessions
         if ($chromehandle > 0) {
             print {*STDOUT} "Taking Fast WindowCapture Screenshot\n";
-            my $minicap = (`WindowCapture "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" $chromehandle`);
-            #my $minicap = (`minicap -save "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -capturehwnd $chromehandle -exit`);
-            #my $minicap = (`screenshot-cmd -o "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" -wh "$hexchromehandle"`);
+            my $minicap = (`WindowCapture "$_abs_screenshot_full" $chromehandle`);
+            #my $minicap = (`minicap -save "$_abs_screenshot_full" -capturehwnd $chromehandle -exit`);
+            #my $minicap = (`screenshot-cmd -o "$_abs_screenshot_full" -wh "$hexchromehandle"`);
         }
     } else { 
         ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
@@ -909,7 +912,7 @@ sub _screenshot {
             print {*STDOUT} "ERROR:$@";
         } else {
             require MIME::Base64;
-            open my $FH, '>', "$cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png" or die "\nCould not open $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png for writing\n";
+            open my $FH, '>', "$_abs_screenshot_full" or die "\nCould not open $_abs_screenshot_full for writing\n";
             binmode $FH; ## set binary mode
             print {$FH} MIME::Base64::decode_base64($png_base64);
             close $FH or die "\nCould not close page capture file handle\n";
