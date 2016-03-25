@@ -3023,14 +3023,14 @@ sub find_available_port {
 
 sub shutdown_selenium {
     if ($opt_driver) {
-        print {*STDOUT} " Shutting down Selenium Browser Session\n";
+        #print {*STDOUT} " Shutting down Selenium Browser Session\n";
         
-    #    my $close_handles = $driver->get_window_handles;
-    #    for my $close_handle (reverse 0..@{$close_handles}) {
-    #       print {*STDOUT} "Shutting down window $close_handle\n";
-    #       $driver->switch_to_window($close_handles->[$close_handle]);
-    #       $driver->close();
-    #    }
+        #my $close_handles = $driver->get_window_handles;
+        #for my $close_handle (reverse 0..@{$close_handles}) {
+        #   print {*STDOUT} "Shutting down window $close_handle\n";
+        #   $driver->switch_to_window($close_handles->[$close_handle]);
+        #   $driver->close();
+        #}
     
         eval { $driver->quit(); }; ## shut down selenium browser session
         if ($opt_driver eq 'chromedriver') {
