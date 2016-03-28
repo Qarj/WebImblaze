@@ -2933,15 +2933,25 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
 
             ## Chrome
             if ($opt_driver eq 'chrome') {
-                print {*STDOUT} qq|opt_proxy $opt_proxy\n|;
-                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                    'port' => $opt_port,
-                                                    'browser_name' => 'chrome',
-                                                    'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
-                                                    'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
-                                                    );
+                my $_chrome_proxy = q{};
+                if ($opt_proxy) {
+                    print {*STDOUT} qq|Starting Chrome using proxy on port $opt_proxy\n|;
+                    $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
+                                                        'port' => $opt_port,
+                                                        'browser_name' => 'chrome',
+                                                        'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
+                                                        'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
+                                                        );
+                } else {
+                    $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
+                                                        'port' => $opt_port,
+                                                        'browser_name' => 'chrome',
+                                                        'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
+                                                        );
+                }
              }
 
+                                                   #'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                    #'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
                                                    #'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
                                                    #'extra_capabilities' => {'chromeOptions' => {'args' => ['incognito','window-size=1260,960']}}
