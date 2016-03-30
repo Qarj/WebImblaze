@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.86
+# Manual for WebInject version 1.87
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -229,7 +229,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 ### 1.2 - Summary
 
 WebInject is a HTTP level test automation tool initiated from the command line. WebInject sends
-HTTP GET or POST requests to the target web site (System Under Test), and runs assertions against the response.
+HTTP GET, POST, PUT or DELETE requests to the target web site (System Under Test), and runs assertions against the response.
 
 WebInject is well suited to running large suites of functional automated regression tests / checks against multiple
 test environments, or even production.
@@ -712,7 +712,7 @@ Both parameters are optional, but it is highly recommended to always use descrip
 
 <a name="method"></a>
 #### method
-HTTP request method, can be "get" or "post".  This defaults to "get" if the parameter is omitted.
+HTTP request method, can be "get", "post", "put" or "delete".  This defaults to "get" if the parameter is omitted.
 
 ```
     method="get"

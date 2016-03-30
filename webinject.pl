@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.86';
+$VERSION = '1.87';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -458,8 +458,10 @@ foreach ($start .. $repeat) {
 
             if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
                if ($case{method}) {
+                   if ($case{method} eq 'delete') { httpdelete(); }
                    if ($case{method} eq 'get') { httpget(); }
                    if ($case{method} eq 'post') { httppost(); }
+                   if ($case{method} eq 'put') { httpput(); }
                    if ($case{method} eq 'cmd') { cmd(); }
                    if ($case{method} eq 'selenium') { selenium(); }
                }
@@ -615,9 +617,9 @@ foreach ($start .. $repeat) {
 
             if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
-                if ($opt_driver) { 
+                if ($opt_driver) {
                         print {*STDOUT} "RESTARTING SELENIUM SESSION ...\n";
-                        startseleniumbrowser(); 
+                        startseleniumbrowser();
                     }
                 startsession();
             }
@@ -900,7 +902,7 @@ sub _screenshot {
             #my $minicap = (`minicap -save "$_abs_screenshot_full" -capturehwnd $chromehandle -exit`);
             #my $minicap = (`screenshot-cmd -o "$_abs_screenshot_full" -wh "$hexchromehandle"`);
         }
-    } else { 
+    } else {
         ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
 
         ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
@@ -1720,17 +1722,42 @@ sub httpget {  #send http request and read response
 }
 
 #------------------------------------------------------------------
-sub httppost {  #post request based on specified encoding
+sub httpdelete {
+
+    httpsend('DELETE');
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub httppost {
+
+    httpsend('POST');
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub httpput {
+
+    httpsend('PUT');
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub httpsend {  # send request based on specified encoding and method (verb)
+    my ($_verb) = @_;
 
     if ($case{posttype}) {
-         if (($case{posttype} =~ m{application/x-www-form-urlencoded}) or ($case{posttype} =~ m{application/json})) { httppost_form_urlencoded(); } ## application/json support
-         elsif ($case{posttype} =~ m{multipart/form-data}) { httppost_form_data(); }
-         elsif (($case{posttype} =~ m{text/xml}) or ($case{posttype} =~ m{application/soap+xml})) { httppost_xml(); }
+         if (($case{posttype} =~ m{application/x-www-form-urlencoded}) or ($case{posttype} =~ m{application/json})) { httpsend_form_urlencoded($_verb); } ## application/json support
+         elsif ($case{posttype} =~ m{multipart/form-data}) { httpsend_form_data($_verb); }
+         elsif (($case{posttype} =~ m{text/xml}) or ($case{posttype} =~ m{application/soap+xml})) { httpsend_xml($_verb); }
          else { print {*STDERR} qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
        }
     else {
         $case{posttype} = 'application/x-www-form-urlencoded';
-        httppost_form_urlencoded();  #use "x-www-form-urlencoded" if no encoding is specified
+        httpsend_form_urlencoded($_verb);  #use "x-www-form-urlencoded" if no encoding is specified
     }
 
     savepage (); ## for auto substitutions
@@ -1739,12 +1766,13 @@ sub httppost {  #post request based on specified encoding
 }
 
 #------------------------------------------------------------------
-sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or application/json HTTP request and read response
+sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or application/json HTTP request and read response
+    my ($_verb) = @_;
 
     my $substituted_postbody; ## auto substitution
     $substituted_postbody = autosub("$case{postbody}", 'normalpost', "$case{url}");
 
-    $request = HTTP::Request->new('POST',"$case{url}");
+    $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}");
     #$request->content("$case{postbody}");
     $request->content("$substituted_postbody");
@@ -1777,7 +1805,8 @@ sub httppost_form_urlencoded {  #send application/x-www-form-urlencoded or appli
 }
 
 #------------------------------------------------------------------
-sub httppost_xml{  #send text/xml HTTP request and read response
+sub httpsend_xml{  #send text/xml HTTP request and read response
+    my ($_verb) = @_;
 
     my @parms;
     my $len;
@@ -1836,11 +1865,11 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 
     }
 
-    $request = HTTP::Request->new('POST', "$case{url}");
+    $request = HTTP::Request->new($_verb, "$case{url}");
     $request->content_type("$case{posttype}");
     $request->content(join q{ }, @xmlbody);  #load the contents of the file into the request body
 
-## moved cookie management up above addheader as per httppost_form_data
+## moved cookie management up above addheader as per httpsend_form_data
     $cookie_jar->add_cookie_header($request);
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
@@ -1866,16 +1895,21 @@ sub httppost_xml{  #send text/xml HTTP request and read response
 }
 
 #------------------------------------------------------------------
-sub httppost_form_data {  #send multipart/form-data HTTP request and read response
+sub httpsend_form_data {  #send multipart/form-data HTTP request and read response
+    my ($_verb) = @_;
 
     my $substituted_postbody; ## auto substitution
     $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
     my %my_content_;
     eval "\%my_content_ = $substituted_postbody"; ## no critic(ProhibitStringyEval)
-    $request = POST "$case{url}",
-               Content_Type => "$case{posttype}",
-               Content => \%my_content_;
+    if ($_verb eq 'POST') {
+        $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%my_content_;
+    } elsif ($_verb eq 'PUT') {
+        $request = PUT "$case{url}", Content_Type => "$case{posttype}", Content => \%my_content_;
+    } else {
+        die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
+    }
     $cookie_jar->add_cookie_header($request);
     #print $request->as_string; print "\n\n";
 
@@ -2872,7 +2906,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
         print {*STDOUT} " Done shutting down Selenium\n";
     }
-    
+
     if ($opt_port) {
         print {*STDOUT} "\nConnecting to Selenium Remote Control server on port $opt_port \n";
     }
@@ -2908,7 +2942,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                                                     'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                     );
              }
-            
+
             ## ChromeDriver without Selenium Server or JRE
             if ($opt_driver eq 'chromedriver') {
                 my $port = find_available_port(9585); ## find a free port to bind to, starting from this number
@@ -2920,7 +2954,7 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                                                  'browser_name' => 'chrome',
                                                  'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
                                                  );
-                
+
                 } else {
                     print {*STDOUT} "Starting ChromeDriver without a proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
@@ -3034,14 +3068,14 @@ sub find_available_port {
 sub shutdown_selenium {
     if ($opt_driver) {
         #print {*STDOUT} " Shutting down Selenium Browser Session\n";
-        
+
         #my $close_handles = $driver->get_window_handles;
         #for my $close_handle (reverse 0..@{$close_handles}) {
         #   print {*STDOUT} "Shutting down window $close_handle\n";
         #   $driver->switch_to_window($close_handles->[$close_handle]);
         #   $driver->close();
         #}
-    
+
         eval { $driver->quit(); }; ## shut down selenium browser session
         if ($opt_driver eq 'chromedriver') {
             eval { $driver->shutdown_binary(); }; ## shut down chromedriver binary
@@ -3125,7 +3159,7 @@ sub getoptions {  #shell options
         print_usage();
         exit;
     }
-    
+
     if (defined $opt_driver) {
         if ($opt_driver eq 'chromedriver') {
             if (not defined $opt_chromedriver_binary) {

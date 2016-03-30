@@ -8,6 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.87 - Mar 30, 2016
+* absoulte output folder path supported (in addition to relative)
+* can now start a Chrome browser without a proxy
+* PUT and DELETE http REST verbs supported
+
 ### Version 1.86 - Mar 20, 2016
 * can now specify location of chromedriver.exe instead of a selenium server port
 * chromedriver log file will be written to the output folder (--verbose)
