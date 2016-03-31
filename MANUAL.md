@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.87
+# Manual for WebInject version 1.88
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -904,6 +904,10 @@ section of this manual for details and examples on how to use this parameter.
 
 Use "leftboundary|rightboundary|decode" when you want to decode html entities - for example
 converting &amp;amp; back to &amp; and &amp;lt; back to < - which you may need to do in some circumstances.
+
+Use "leftboundary|rightboundary|quotemeta" to quote meta characters (i.e. with backslashes). This is useful if you want
+to use the result of a parseresponse in a regular expression - any special characters will be treated
+as literal characters. 
 
 If you specify the text "regex" as the right boundary, the left boundary will be treated as a custom regular expression.
 

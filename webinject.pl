@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.87';
+$VERSION = '1.88';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -2460,12 +2460,15 @@ sub parseresponse {  #parse values from responses for use in future request (for
                 if ($escape eq 'escape') {
                     $parsedresult{$case_attribute} = url_escape($parsedresult{$case_attribute});
                 }
-            }
 
-            ## decode html entities - e.g. convert &amp; to & and &lt; to <
-            if ($escape) {
+                ## decode html entities - e.g. convert &amp; to & and &lt; to <
                 if ($escape eq 'decode') {
                     $parsedresult{$case_attribute} = decode_entities($parsedresult{$case_attribute});
+                }
+
+                ## quote meta characters so they will be treated as literal in regex
+                if ($escape eq 'quotemeta') {
+                    $parsedresult{$case_attribute} = quotemeta($parsedresult{$case_attribute});
                 }
             }
 

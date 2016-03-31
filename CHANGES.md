@@ -8,8 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.88 - Mar 31, 2016
+* support quotemeta in addition to escape and decode as a parseresponse result modifier (see manual)
+
 ### Version 1.87 - Mar 30, 2016
-* absoulte output folder path supported (in addition to relative)
+* absolute output folder path supported (in addition to relative)
 * can now start a Chrome browser without a proxy
 * PUT and DELETE http REST verbs supported
 
