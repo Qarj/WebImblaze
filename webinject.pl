@@ -2461,6 +2461,11 @@ sub parseresponse {  #parse values from responses for use in future request (for
                     $parsedresult{$case_attribute} = url_escape($parsedresult{$case_attribute});
                 }
 
+                if ($escape eq 'uri_escape') {
+                    $parsedresult{$case_attribute} = uri_escape($parsedresult{$case_attribute});
+                    print "ran uri escape\n";
+                }
+
                 ## decode html entities - e.g. convert &amp; to & and &lt; to <
                 if ($escape eq 'decode') {
                     $parsedresult{$case_attribute} = decode_entities($parsedresult{$case_attribute});
@@ -2786,6 +2791,14 @@ sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     }
 
     return;
+}
+#------------------------------------------------------------------
+sub uri_escape {
+    my ($_string) = @_;
+
+    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; #'
+
+    return $_string;
 }
 
 #------------------------------------------------------------------
