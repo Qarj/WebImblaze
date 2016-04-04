@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.88';
+$VERSION = '1.89';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1652,7 +1652,7 @@ sub _substitute_data {
 
             ## normal post must be escaped
             if ($post_type eq 'normalpost') {
-                $data = url_escape($data);
+                $data = uri_escape($data);
                 #print {*STDOUT} qq| URLESCAPE!! \n|; #debug
             }
 
@@ -2457,13 +2457,9 @@ sub parseresponse {  #parse values from responses for use in future request (for
             }
 
             if ($escape) {
+                ## convert special characters into %20 and so on
                 if ($escape eq 'escape') {
-                    $parsedresult{$case_attribute} = url_escape($parsedresult{$case_attribute});
-                }
-
-                if ($escape eq 'uri_escape') {
                     $parsedresult{$case_attribute} = uri_escape($parsedresult{$case_attribute});
-                    print "ran uri escape\n";
                 }
 
                 ## decode html entities - e.g. convert &amp; to & and &lt; to <
@@ -2799,18 +2795,6 @@ sub uri_escape {
     $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; #'
 
     return $_string;
-}
-
-#------------------------------------------------------------------
-sub url_escape {  #escapes difficult characters with %hexvalue
-    #LWP handles url encoding already, but use this to escape valid chars that LWP won't convert (like +)
-
-    my @a = @_;  #make a copy of the arguments
-
-## escape change - changed the mapping around so / would be escaped
-    map { s/[^-\w.,!~'()\/ ]/sprintf "%%%02x", ord $&/eg } @a;  ## no critic(ProhibitMutatingListFunctions) ## changed escape to prevent problems with __VIEWSTATE #'
-#   map { s¦[-,^+!~()\\/' ]¦sprintf "%%%02x", ord $&¦eg } @a; #(1.41 version of escape)
-    return wantarray ? @a : $a[0];
 }
 
 #------------------------------------------------------------------

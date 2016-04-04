@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.89 - Apr 4, 2016
+* escape modifier on parseresponse changed to use a uri escape regex
+
 ### Version 1.88 - Mar 31, 2016
 * support quotemeta in addition to escape and decode as a parseresponse result modifier (see manual)
 

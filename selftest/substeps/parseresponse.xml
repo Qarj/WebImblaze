@@ -29,7 +29,7 @@ Expected failures will be asserted by the master test file.
     command3="echo parseresponseDECODE:{DECODE}"
     verifypositive="parseresponse:text to parse"
     verifypositive1="parseresponse1:three"
-    verifypositive2="parseresponse5000:%5e%22%5e%26%5e%26%5e%26%5e%22"
+    verifypositive2="parseresponse5000:%22%26%26%26%22"
     verifypositive3="parseresponseDECODE:\&\&\&"
 />
 
