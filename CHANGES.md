@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.90 - Apr 5, 2016
+* now can generate random strings and numbers {RANDOM:5:NUMERIC} {RANDDOM:10:ALPHANUMERIC} {RANDOM:6:ALPHA}
+
 ### Version 1.89 - Apr 4, 2016
 * escape modifier on parseresponse changed to use a uri escape regex
 

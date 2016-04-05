@@ -1,0 +1,26 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">random</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+/>
+
+<case
+    id="20"
+    description1="view http.log"
+    method="cmd"
+    command1="type selftest\output\${feature}subhttp.log"
+    verifypositive1="numeric \[[0-9]{10,10}\]"
+    verifypositive2="alpha \[[A-Z]{10,10}\]"
+    verifypositive3="alphanumeric \[[A-Z0-9]{10,10}\]"
+/>
+
+
+</testcases>

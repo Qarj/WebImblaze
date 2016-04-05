@@ -1,0 +1,29 @@
+<testcases repeat="1">
+ 
+ 
+<case
+    varMYNUM="{RANDOM:10:NUMERIC}"
+    varMYALPHA="{RANDOM:10:ALPHA}"
+    varMYAN="{RANDOM:10:ALPHANUMERIC}"
+    id="10"
+    description1="numeric [{MYNUM}], alpha [{MYALPHA}]"
+    description2="alphanumeric [{MYAN}]"
+    method="cmd"
+    command1="echo {MYNUM}"
+    command2="echo {MYALPHA}"
+    command3="echo {MYAN}"
+    command4="echo {RANDOM:5:NUMERIC}"
+    command5="echo {RANDOM:5:ALPHA}"
+    command6="echo {RANDOM:5:ALPHANUMERIC}"
+/>
+ 
+<case
+    id="20"
+    description1="{RANDOM:60:ALPHANUMERIC} alphanumeric"
+    description2="{RANDOM:60:NUMERIC} numeric"
+    method="cmd"
+    command="echo {RANDOM:20:ALPHANUMERIC}"
+/>
+ 
+ 
+</testcases>

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.89';
+$VERSION = '1.90';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -2694,6 +2694,13 @@ sub convertbackxml {  #converts replaced xml with substitutions
      $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
+    while ( $_[0] =~ m/{RANDOM:(\d+)(:[a-zA-Z]+)}/g ) {
+        my $_d1 = $1;
+        my $_d2 = $2;
+        my $_random = _get_random_string($_d1, $_d2);
+        $_[0] =~ s/{RANDOM:$_d1$_d2}/$_random/;
+    }
+
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
     $_[0] =~ s/{DAY}/$DAYOFMONTH/g;
     $_[0] =~ s/{MONTH}/$MONTHS[$MONTH]/g;
@@ -2739,6 +2746,86 @@ sub convertbackxml {  #converts replaced xml with substitutions
 
     return;
 }
+
+#------------------------------------------------------------------
+sub _get_random_string {
+    my ($_length, $_type) = @_;
+
+    require Math::Random::ISAAC;
+
+    my $_rng = Math::Random::ISAAC->new(time);
+
+    my $_random;
+    my $_last;
+    my $_next;
+    foreach my $_i (1..$_length) {
+        $_next = _get_char($_rng->irand(), $_type);
+
+        ## this clause stops two consecutive characters being the same
+        ## some search engines will filter out words containing more than 2 letters the same in a row
+        if (defined $_last) {
+            while ($_next eq $_last) {
+                $_next = _get_char($_rng->irand(), $_type);
+            }
+        }
+
+        $_last = $_next;
+        $_random .= $_last;
+    }
+
+    return $_random;
+}
+
+#------------------------------------------------------------------
+sub _get_char {
+    my ($_raw_rnd, $_type) = @_;
+
+    ## here we need to turn our unsigned 32 bit integer into a character of the desired type
+    ## supported types :ALPHANUMERIC, :ALPHA, :NUMERIC
+
+    if (not defined $_type) {
+        $_type = ':ALPHANUMERIC';
+    }
+    
+    my $_min_desired_rnd = 1;
+    my $_max_desired_rnd;
+    my $_max_possible_rnd = 4294967296;
+    my $_number;
+    my $_char;
+
+    if (uc $_type eq ':ALPHANUMERIC') {
+        my $_max_desired_rnd = 36;
+        $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
+        # now we should have a number in the range 1 to 36
+        if ($_number < 11) {
+            $_char = chr($_number + 47);
+        } else {
+            $_char = chr($_number + 54);  ## i.e. 64 - 10
+        }
+    }
+    
+    if (uc $_type eq ':ALPHA') {
+        my $_max_desired_rnd = 26;
+        $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
+        $_char = chr($_number + 64);
+    }
+
+    if (uc $_type eq ':NUMERIC') {
+        my $_max_desired_rnd = 10;
+        $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
+        $_char = chr($_number + 47);
+    }
+
+    return $_char;
+}
+
+#------------------------------------------------------------------
+sub _get_number_in_range {
+    my ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd) = @_;
+
+    return ( ($_raw_rnd * $_max_desired_rnd) / $_max_possible_rnd ) + $_min_desired_rnd;
+}
+
 
 #------------------------------------------------------------------
 sub convertbackxmldynamic {## some values need to be updated after each retry

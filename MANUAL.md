@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.89
+# Manual for WebInject version 1.90
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -1964,6 +1964,9 @@ Variable | Description
 **{TESTNUM}** | Id number of the current test step
 **{LENGTH}** | Length of the response for the previous test step
 **{TESTSTEPTIME:510}** | Latency for test step number 510
+**{RANDOM:5:ALPHA}** | Random string of 5 alphabetic characters in upper case
+**{RANDOM:8:NUMERIC}** | Random string of 8 numeric characters
+**{RANDOM:15:ALPHANUMERIC}** | Random string of 15 alphanumeric characters
 **{COUNTER}** | What loop number we are on - corresponding to the `repeat="5"` (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
 **{}** | Result of the response parsing from a `parseresponse` test case parameter
@@ -1973,6 +1976,14 @@ Variable | Description
 
 (See the "Parsing Response Data & Embedded Session ID's" section for details and examples on how to use these variables
 created by means of a `parseresponse`.)
+
+
+#### Special note on random
+Due to the nature of the systems being tested by the author, the randomly generated strings will not
+contain two characters in a row that are the same.
+
+The random generator used is seeded with the time from Time::HiRes on each use. See Math::Random::ISAAC on cpan for further
+information.
 
 <br />
 
