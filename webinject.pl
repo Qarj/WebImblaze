@@ -3009,11 +3009,10 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         }
     } ## end ATTEMPT
 
-    if ($@)
-        {
-            print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
-            die "WebInject Aborted - could not connect to Selenium Server\n";
-        }
+    if ($@) {
+        print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
+        die "WebInject Aborted - could not connect to Selenium Server\n";
+    }
 
     ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
     my $thetime = time;
