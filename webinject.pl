@@ -76,6 +76,7 @@ my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as 
 my ($starttime); ## to store a copy of $startruntimer in a global variable
 my ($cmdresp); ## response from running a terminal command
 my ($selresp); ## response from a Selenium command
+my ($element); ## for element selectors
 my (@verifyparms); ## friendly error message to show when an assertion fails
 my (@verifycountparms); ## regex match occurences must much a particular count for the assertion to pass
 my ($output, $outputfolder); ## output path including possible filename prefix, output path without filename prefix
@@ -1220,12 +1221,12 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
 
     my $timestart = time;
     my $foundit = 'false';
-    my $find_element;
+    undef $element;
 
     while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
     {
-        eval { $find_element = $driver->find_element("$element_name","$element_type"); };
-        if ($find_element)
+        eval { $element = $driver->find_element("$element_name","$element_type"); };
+        if ($element)
         {
             $foundit = 'true';
         }
