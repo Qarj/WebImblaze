@@ -1,0 +1,18 @@
+<testcases repeat="1">
+
+<!--
+
+This example demonstrates that sometimes you can create results xml that cannot parsed
+if you are not careful with what characters you attempt to display in the xml results.
+
+-->
+
+<case
+    varBAD="&"
+    id="10"
+    description1="Deliberate Corruption {BAD}"
+    method="cmd"
+    command="echo NOP"
+/>
+
+</testcases>
