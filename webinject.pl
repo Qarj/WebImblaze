@@ -770,6 +770,7 @@ sub writefinalxml {  #write summary and closing tags for XML results file
     print {$RESULTSXML} qq|        <max-response-time>$maxresponse</max-response-time>\n|;
     print {$RESULTSXML} qq|        <min-response-time>$minresponse</min-response-time>\n|;
     print {$RESULTSXML} qq|        <sanity-check-passed>$sanityresult</sanity-check-passed>\n|;
+    print {$RESULTSXML} qq|        <test-file-name>$testfilename</test-file-name>\n|;
     print {$RESULTSXML} qq|    </test-summary>\n\n|;
 
     print {$RESULTSXML} qq|</results>\n|;
