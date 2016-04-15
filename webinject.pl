@@ -3121,6 +3121,8 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
 
     #eval { $driver->set_window_size(968, 1260); }; ## y,x
 
+    eval { $driver->set_timeout('page load', 30_000); };
+
     return;
 }
 
