@@ -122,6 +122,13 @@ To demo wif.pl - WebInject Framework.
 
 <case
     section="retry"
+    id="400"
+    description1="test both types of retry in this section"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
     id="410"
     description1="retry fail"
     method="cmd"
@@ -129,6 +136,7 @@ To demo wif.pl - WebInject Framework.
     verifypositiveNOP="NOP"
     retry="3"
 />
+
 
 <case
     id="420"

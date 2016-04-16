@@ -92,10 +92,12 @@ my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled wit
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
+my @MONTHS_TEXT = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
 my @WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
 my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYOFYEAR, $DAYLIGHTSAVINGS) = localtime;
 my $YEAR = 1900 + $YEAROFFSET;
 my $YY = substr $YEAR, 2; #year as 2 digits
+my $MONTH_TEXT = $MONTHS_TEXT[$MONTH];
 $DAYOFMONTH = sprintf '%02d', $DAYOFMONTH;
 my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
 my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
@@ -103,6 +105,7 @@ $MINUTE = sprintf '%02d', $MINUTE; #put in up to 2 leading zeros
 $SECOND = sprintf '%02d', $SECOND;
 $HOUR = sprintf '%02d', $HOUR;
 my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
+$currentdatetime = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
 my $cwd = (`cd`); ## find current Windows working directory using backtick method
 $cwd =~ s/\n//g; ## remove newline character
@@ -154,7 +157,6 @@ $stop = 'no';
 
 $globalretries=0; ## total number of retries for this run across all test cases
 
-$currentdatetime = localtime time;  #get current date and time for results report
 $startruntimer = time;  #timer for entire test run
 $starttime = $startruntimer; ## need a global variable to make a copy of the start run timer
 
