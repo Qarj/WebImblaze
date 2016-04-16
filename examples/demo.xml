@@ -250,12 +250,41 @@ To demo wif.pl - WebInject Framework.
     checkresponsecode="404"
 />
 
-<!-- These are needed for plain results view
-searchimage,  logresponseasfile, commandonerror
+<case
+    section="many failures in the one step"
+    id="910"
+    description1="many things gone wrong :-("
+    method="cmd"
+    command1="echo NOP Austria, France and Spain, but not Switzerland"
+    command2="echo HTTP Error 404.0 - Not Found"
+    command3="echo Set-Cookie: sessionid=12345"
+    command4="echo Cache-Control: private"
+    verifypositive1="Yallambee"
+    verifypositive2="Winberongen"
+    verifypositive3="Santorini"
+    verifynegative1="Austria"
+    verifynegative2="France"
+    verifynegative3="Spain"
+    verifynegative4="Swizterland"
+    verifynegative5="France and Spain"
+    verifyresponsecode="600"
+/>
+
+<case
+    section="commandonerror"
+    id="1010"
+    description1="commandonerror invoke"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="I expect many things"
+    commandonerror="echo restarting IIS"
+/>
+
+<!-- searchimage - should go into a separate file due to dependencies
 -->
 
 <!-- These parameters steps need to be added for testing the individual step results view 
-gethrefs, getsrcs, getbackgroundimage, decodequotedprintable, screenshot, formatxml, formatjson
+gethrefs, getsrcs, getbackgroundimage, decodequotedprintable, screenshot, formatxml, formatjson, logresponseasfile
 -->
 
 <case
