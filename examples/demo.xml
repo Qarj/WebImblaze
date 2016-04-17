@@ -92,7 +92,7 @@ To demo wif.pl - WebInject Framework.
     description1="verifynegativeNOP with fail message"
     method="cmd"
     command="echo No Operation"
-    verifynegativeNOP="No Operation|||Expected to see no operation"
+    verifynegativeNOP="No Operation|||No Operation should never be shown"
 />
 
 <case
