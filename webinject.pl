@@ -425,7 +425,7 @@ foreach ($start .. $repeat) {
 
             print {$RESULTS} qq|<br />\n|;
 
-            ## display and log the verifications to do
+            ## display and log the verifications to do to stdout and html - xml output is done with the verification itself
             ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
             ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
             foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
@@ -435,7 +435,6 @@ foreach ($start .. $repeat) {
                     @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
                     print {$RESULTS} qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
                     print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
-                    print {$RESULTSXML} qq|            <$case_attribute>$verifyparms[0]</$case_attribute>\n|;
                 }
             }
 
@@ -2297,9 +2296,11 @@ sub _verify_verifypositive {
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }
             else {
+                print {$RESULTSXML} qq|            <$case_attribute>\n|;
+                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                     print {$RESULTS} qq|<span class="pass">Passed Positive Verification</span><br />\n|;
-                    print {$RESULTSXML} qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>true</success>\n|;
                     print {*STDOUT} "Passed Positive Verification \n";
                     #print {*STDOUT} $verifynum." Passed Positive Verification \n"; ##DEBUG
                     $lastpositive[$verifynum] = 'pass'; ## remember fact that this verifypositive passed
@@ -2308,10 +2309,10 @@ sub _verify_verifypositive {
                 }
                 else {
                     print {$RESULTS} qq|<span class="fail">Failed Positive Verification:</span>$verifyparms[0]<br />\n|;
-                    print {$RESULTSXML} qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       print {$RESULTSXML} qq|            <$case_attribute-message>$verifyparms[1]</$case_attribute-message>\n|;
+                       print {$RESULTSXML} qq|                <message>$verifyparms[1]</message>\n|;
                     }
                     print {*STDOUT} "Failed Positive Verification \n";
                     if ($verifyparms[1]) {
@@ -2322,6 +2323,7 @@ sub _verify_verifypositive {
                     $retryfailedcount++;
                     $isfailure++;
                 }
+                print {$RESULTSXML} qq|            </$case_attribute>\n|;
             }
         }
     }
@@ -2345,12 +2347,14 @@ sub _verify_verifynegative {
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }
             else {
+                print {$RESULTSXML} qq|            <$case_attribute>\n|;
+                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
                     print {$RESULTS} qq|<span class="fail">Failed Negative Verification</span><br />\n|;
-                    print {$RESULTSXML} qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) {
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                         print {$RESULTSXML} qq|            <$case_attribute-message>$verifyparms[1]</$case_attribute-message>\n|;
+                         print {$RESULTSXML} qq|            <message>$verifyparms[1]</message>\n|;
                     }
                     print {*STDOUT} "Failed Negative Verification \n";
                     if ($verifyparms[1]) {
@@ -2366,12 +2370,13 @@ sub _verify_verifynegative {
                 }
                 else {
                     print {$RESULTS} qq|<span class="pass">Passed Negative Verification</span><br />\n|;
-                    print {$RESULTSXML} qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
+                    print {$RESULTSXML} qq|            <success>true</success>\n|;
                     print {*STDOUT} "Passed Negative Verification \n";
                     $lastnegative[$verifynum] = 'pass'; ## remember fact that this verifynegative passed
                     $passedcount++;
                     $retrypassedcount++;
                 }
+                print {$RESULTSXML} qq|            </$case_attribute>\n|;
             }
         }
     }
