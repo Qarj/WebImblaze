@@ -2201,10 +2201,12 @@ sub _verify_autoassertion {
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }
             else {
+                print {$RESULTSXML} qq|            <$config_attribute>\n|;
+                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
                 #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                     #print {$RESULTS} qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                    print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>true</success>\n|;
                     #print {*STDOUT} "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
                     #print {*STDOUT} $verifynum." Passed Auto Assertion \n"; ##DEBUG
                     $passedcount++;
@@ -2212,10 +2214,10 @@ sub _verify_autoassertion {
                 }
                 else {
                     print {$RESULTS} qq|<span class="fail">Failed Auto Assertion:</span>$verifyparms[0]<br />\n|;
-                    print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[1]</$config_attribute-message>\n|;
+                       print {$RESULTSXML} qq|                <message>$verifyparms[1]</message>\n|;
                     }
                     print {*STDOUT} "Failed Auto Assertion \n";
                     if ($verifyparms[1]) {
@@ -2225,6 +2227,7 @@ sub _verify_autoassertion {
                     $retryfailedcount++;
                     $isfailure++;
                 }
+                print {$RESULTSXML} qq|            </$config_attribute>\n|;
             }
         }
     }
