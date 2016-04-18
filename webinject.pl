@@ -65,7 +65,8 @@ my ($currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegat
 my (%case);
 my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
-my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder, $opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary); ## $opt_port, $opt_basefolder, $opt_proxy, $opt_proxyrules
+my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder);
+my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -3253,6 +3254,7 @@ sub getoptions {  #shell options
         'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'h|help'   => \$opt_help,
+        'u|publish-to' => \$opt_publish_full,
         )
         or do {
             print_usage();
@@ -3312,6 +3314,7 @@ testcase_file [XPath]                               examples/simple.xml testcase
 -y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
+-u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
 
 or
 
