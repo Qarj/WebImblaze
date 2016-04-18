@@ -117,7 +117,7 @@ To demo wif.pl - WebInject Framework.
     description1="smartassertion fail"
     method="cmd"
     command1="echo Set-Cookie: sessionid=12345"
-    command2="echo Cache-Control: private"
+    command2="echo Cache-Control: public"
 />
 
 <case

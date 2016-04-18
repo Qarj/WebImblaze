@@ -2254,19 +2254,21 @@ sub _verify_smartassertion {
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
             #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
+                print {$RESULTSXML} qq|            <$config_attribute>\n|;
+                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
                     #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
-                    print {$RESULTSXML} qq|            <$config_attribute-success>true</$config_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>true</success>\n|;
                     #print {*STDOUT} "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else {
                     print {$RESULTS} qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
-                    print {$RESULTSXML} qq|            <$config_attribute-success>false</$config_attribute-success>\n|;
+                    print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[2]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                       print {$RESULTSXML} qq|            <$config_attribute-message>$verifyparms[2]</$config_attribute-message>\n|;
+                       print {$RESULTSXML} qq|                <message>$verifyparms[2]</message>\n|;
                     }
                     print {*STDOUT} 'Failed Smart Assertion';
                     if ($verifyparms[2]) {
@@ -2277,6 +2279,7 @@ sub _verify_smartassertion {
                     $retryfailedcount++;
                     $isfailure++;
                 }
+                print {$RESULTSXML} qq|            </$config_attribute>\n|;
             } ## end if - is pre-condition for smart assertion met?
         }
     }
