@@ -3290,6 +3290,11 @@ sub getoptions {  #shell options
     }
     $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
 
+    # default the publish to location for the individual html step files
+    if (not defined $opt_publish_full) {
+        $opt_publish_full = $output;
+    }
+
     return;
 }
 
