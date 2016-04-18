@@ -309,6 +309,7 @@ gethrefs, getsrcs, getbackgroundimage, decodequotedprintable, screenshot, format
     description2="here endeth the test execution"
     method="cmd"
     command="echo NOP"
+    sanitycheck="true"
 />
 
 <case
