@@ -2008,23 +2008,25 @@ sub searchimage {  ## search for images in the actual result
                 my $location;
                 if ($1) {$location = $1;}
 
+                print {$RESULTSXML} qq|            <$_>\n|;
+                print {$RESULTSXML} qq|                <assert>case{$_}</assert>\n|;
+
                 if ($siresp =~ m/was found/s) { ## was the image found?
                     print {$RESULTS} qq|<span class="found">Found image: $case{$_}</span><br />\n|;
-                    print {$RESULTSXML} qq|            <$_-success>true</$_-success>\n|;
-                    print {$RESULTSXML} qq|            <$_-name>$case{$_}</$_-name>\n|;
+                    print {$RESULTSXML} qq|                <success>true</success>\n|;
                     print {*STDOUT} "Found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else { #the image was not found within the bigger image
                     print {$RESULTS} qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
-                    print {$RESULTSXML} qq|            <$_-success>false</$_-success>\n|;
-                    print {$RESULTSXML} qq|            <$_-name>$case{$_}</$_-name>\n|;
+                    print {$RESULTSXML} qq|                <success>false</success>\n|;
                     print {*STDOUT} "Not found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
                 }
+                print {$RESULTSXML} qq|            </$_>\n|;
             } else {#We were not able to find the image to search for
                 print {*STDOUT} "SearchImage error - Was the filename correct?\n";
             }
