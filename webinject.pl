@@ -2915,30 +2915,27 @@ sub httplog {  #write requests and responses to http.log file
     my $formatresponse = q{};
     $textrequest = $request->as_string;
     $textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
-    #print "http request ---- ", $textrequest, "\n\n";
 
-## log separator enhancement
-## from version 1.42 log separator is now written before each test case along with case number and test description
-    print {$HTTPLOGFILE} "\n************************* LOG SEPARATOR *************************\n\n\n";
-    print {$HTTPLOGFILE} "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+    my $_log = "\n************************* LOG SEPARATOR *************************\n\n\n";
+    $_log .= "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
     ## log descrption1 and description2
-    print {$HTTPLOGFILE} "<desc1>$desc1log</desc1>\n";
+    $_log .= "<desc1>$desc1log</desc1>\n";
     if ($desc2log) {
-       print {$HTTPLOGFILE} "<desc2>$desc2log</desc2>\n";
+       $_log .= "<desc2>$desc2log</desc2>\n";
     }
 
-    print {$HTTPLOGFILE} "\n";
+    $_log .= "\n";
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
-            print {$HTTPLOGFILE} "<searchimage>$case{$_}</searchimage>\n";
+            $_log .= "<searchimage>$case{$_}</searchimage>\n";
         }
     }
-    print {$HTTPLOGFILE} "\n";
+    $_log .= "\n";
 
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        print {$HTTPLOGFILE} "<logastext> \n";
+        $_log .= "<logastext> \n";
     }
-    print {$HTTPLOGFILE} "\n\n";
+    $_log .= "\n\n";
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
@@ -2967,12 +2964,14 @@ sub httplog {  #write requests and responses to http.log file
         close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
-    print {$HTTPLOGFILE} $textrequest, "\n\n";
-    print {$HTTPLOGFILE} $response->as_string, "\n\n";
+    $_log .= $textrequest . "\n\n";
+    $_log .= $response->as_string . "\n\n";
 
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        print {$HTTPLOGFILE} "</logastext> \n";
+        $_log .=  "</logastext> \n";
     }
+
+    print {$HTTPLOGFILE} $_log;
 
     return;
 }
@@ -3254,7 +3253,7 @@ sub getoptions {  #shell options
         'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'h|help'   => \$opt_help,
-        'u|publish-to' => \$opt_publish_full,
+        'u|publish-to=s' => \$opt_publish_full,
         )
         or do {
             print_usage();
@@ -3306,15 +3305,15 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-Usage: webinject.pl <<options>>
+Usage: webinject.pl testcase_file [XPath] <<options>>    
 
+                                                    examples/simple.xml testcases/case[20]
 -c|--config config_file                             -c config.xml
 -o|--output output_location                         -o output/
 -A|--autocontroller                                 -a
 -p|--port selenium_port                             -p 8325
 -x|--proxy proxy_server                             -x localhost:9222
 -b|--basefolder baselined image folder              -b examples/basefoler/
-testcase_file [XPath]                               examples/simple.xml testcases/case[20]
 -d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
 -y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
