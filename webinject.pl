@@ -70,7 +70,7 @@ my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
-my ($testnumlog, $desc1log, $desc2log); ## log separator enhancement
+my ($testnumlog); ## log separator enhancement
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
 my ($forcedretry); ## force retry when specific http error code received
 my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
@@ -379,15 +379,6 @@ foreach ($start .. $repeat) {
             set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
             foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
                     convertback_variables($case{$case_attribute});
-            }
-
-            $desc1log = $case{description1};
-            if ($case{description2}) {
-               $desc2log = $case{description2};
-            }
-            else
-            {
-               $desc2log = q{}; ## must blank it out if not being used
             }
 
             if ($config{globalretry}) {
@@ -2908,19 +2899,24 @@ sub uri_escape {
 }
 
 #------------------------------------------------------------------
-sub httplog {  #write requests and responses to http.log file
+sub httplog {  # write requests and responses to http.log file
 
-    ## show a single space instead of %20 in the http.log
-    my $textrequest = q{};
-    my $formatresponse = q{};
-    $textrequest = $request->as_string;
-    $textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
+    ## save the http response to a file - e.g. for file downloading, css
+    if ($case{logresponseasfile}) {
+        my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+        open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
+        binmode $RESPONSEASFILE; ## set binary mode
+        print {$RESPONSEASFILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
+        close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
+    }
 
-    my $_step_info .= "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+#    my $_step_info .= "Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+    my $_step_info .= "Test Step: $testnumlog$jumpbacksprint$retriesprint - ";
+
     ## log descrption1 and description2
-    $_step_info .= "<desc1>$desc1log</desc1>\n";
-    if ($desc2log) {
-       $_step_info .= "<desc2>$desc2log</desc2>\n";
+    $_step_info .=  $case{description1};
+    if (defined $case{description2}) {
+       $_step_info .= ' ['.$case{description2}.']';
     }
     $_step_info .= "\n";
 
@@ -2929,6 +2925,58 @@ sub httplog {  #write requests and responses to http.log file
             $_step_info .= "<searchimage>$case{$_}</searchimage>\n";
         }
     }
+
+    my $_request_headers = $request->as_string;
+
+    my $_request_content_length = length $request->content;
+    if ($_request_content_length) {
+        $_request_headers .= 'Request Content Length: '.$_request_content_length." bytes\n";
+    }
+    
+    #$textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
+
+    my $_core_info = "\n".$response->status_line( )."\n";
+
+    if ( defined $response->base( ) ) {
+        $_core_info .= 'Base for relative URLs: '.$response->base( )."\n";
+        $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
+    }
+
+    #my $_age = $response->current_age( );
+    #my $_days  = int($_age/86400);       $_age -= $_days * 86400;
+    #my $_hours = int($_age/3600);        $_age -= $_hours * 3600;
+    #my $_mins  = int($_age/60);          $_age -= $_mins    * 60;
+    #my $_secs  = $_age;
+    #$_core_info .= "The document is $_days days, $_hours hours, $_mins minutes, and $_secs seconds old.\n";
+
+    my $_response_content_ref = $response->content_ref( );
+    my $_response_headers = $response->headers_as_string;
+
+    _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
+
+    my $_display_as_text;
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
+        $_display_as_text =  'true';
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _write_http_log {
+    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
+
+    my $_log_separator = "\n************************* LOG SEPARATOR *************************\n";
+    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", $$_response_content_ref;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _write_step_html {
+    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
+
+    my $formatresponse = q{};
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
@@ -2949,47 +2997,6 @@ sub httplog {  #write requests and responses to http.log file
          $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
     }
 
-    if ($case{logresponseasfile}) {  #Save the http response to a file - e.g. for file downloading, css
-        my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
-        binmode $RESPONSEASFILE; ## set binary mode
-        print {$RESPONSEASFILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
-        close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
-    }
-
-
-    my $_core_info = $response->status_line( )."\n\n";
-    $_core_info .= 'Base for relative URLs: '.$response->base( )."\n";
-
-    #my $_age = $response->current_age( );
-    #my $_days  = int($_age/86400);       $_age -= $_days * 86400;
-    #my $_hours = int($_age/3600);        $_age -= $_hours * 3600;
-    #my $_mins  = int($_age/60);          $_age -= $_mins    * 60;
-    #my $_secs  = $_age;
-    #$_core_info .= "The document is $_days days, $_hours hours, $_mins minutes, and $_secs seconds old.\n";
-
-    $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
-
-    my $_response_content_ref = $response->content_ref( );
-    my $_response_headers = $response->headers_as_string;
-
-    _write_http_log($_step_info, $textrequest, $_core_info, $_response_headers, $_response_content_ref);
-
-    my $_display_as_text;
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        $_display_as_text =  'true';
-    }
-
-    return;
-}
-
-#------------------------------------------------------------------
-sub _write_http_log {
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
-
-    my $_log_separator = "\n************************* LOG SEPARATOR *************************\n\n\n";
-    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", $$_response_content_ref;
-
     return;
 }
 
@@ -3004,7 +3011,6 @@ sub finaltasks {  #do ending tasks
 
     writefinalxml();  #write summary and closing tags for XML results file
 
-    print {$HTTPLOGFILE} "\n************************* LOG SEPARATOR *************************\n\n\n";
     close $HTTPLOGFILE or die "\nCould not close http log file\n\n";
     close $RESULTS or die "\nCould not close html results file\n\n";
     close $RESULTSXML or die "\nCould not close xml results file\n\n";
