@@ -2910,7 +2910,6 @@ sub httplog {  # write requests and responses to http.log file
         close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
-#    my $_step_info .= "Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
     my $_step_info .= "Test Step: $testnumlog$jumpbacksprint$retriesprint - ";
 
     ## log descrption1 and description2
@@ -2953,11 +2952,7 @@ sub httplog {  # write requests and responses to http.log file
     my $_response_headers = $response->headers_as_string;
 
     _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
-
-    my $_display_as_text;
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        $_display_as_text =  'true';
-    }
+    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
 
     return;
 }
@@ -2976,26 +2971,46 @@ sub _write_http_log {
 sub _write_step_html {
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
 
-    my $formatresponse = q{};
+    my $_response_content = $$_response_content_ref;
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
-         $formatresponse = $response->as_string; ## get the response output
-         ## put in carriage returns
-         $formatresponse =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
-         $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
+         $_response_content =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
     }
 
     if ($case{formatjson}) {
          ## makes a JSON response easier to read by putting in a few carriage returns
-         $formatresponse = $response->as_string; #get the response out
-         ## put in carriage returns
-         $formatresponse =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
-         $formatresponse =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
-         $formatresponse =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
-         $formatresponse =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
-         $response = HTTP::Response->parse($formatresponse); ## inject it back into the response
+         $_response_content =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
+         $_response_content =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
+         $_response_content =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
+         $_response_content =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
     }
+
+    my $_display_as_text;
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
+        $_display_as_text =  'true';
+    }
+
+    my $_html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
+    $_html .= "\n<html>\n<body>\n";
+
+    $_html .= $_step_info;
+
+    $_html .= "\n<xmp>\n".$_request_headers."\n</xmp>\n";
+    $_html .= "\n<xmp>\n".$_core_info."\n".$_response_headers."\n</xmp>\n";
+
+    if (defined $_display_as_text) {
+        $_html .= "\n<xmp>\n".$_response_content."\n</xmp>\n";
+    } else {
+        $_html .= $_response_content;
+    }
+
+    $_html .= "\n</body>\n</html>\n";
+
+    my $_file_full = $opt_publish_full.'/'."$testnumlog$jumpbacksprint$retriesprint".'.html'; 
+    open my $_FILE, '>', "$_file_full" or die "\nERROR: Failed to create $_file_full\n\n";
+    print {$_FILE} $_html;
+    close $_FILE or die "\nERROR: Failed to close $_file_full\n\n";
 
     return;
 }
