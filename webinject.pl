@@ -2916,26 +2916,19 @@ sub httplog {  #write requests and responses to http.log file
     $textrequest = $request->as_string;
     $textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
 
-    my $_log = "\n************************* LOG SEPARATOR *************************\n\n\n";
-    $_log .= "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
+    my $_step_info .= "       Test: $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n";
     ## log descrption1 and description2
-    $_log .= "<desc1>$desc1log</desc1>\n";
+    $_step_info .= "<desc1>$desc1log</desc1>\n";
     if ($desc2log) {
-       $_log .= "<desc2>$desc2log</desc2>\n";
+       $_step_info .= "<desc2>$desc2log</desc2>\n";
     }
+    $_step_info .= "\n";
 
-    $_log .= "\n";
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
-            $_log .= "<searchimage>$case{$_}</searchimage>\n";
+            $_step_info .= "<searchimage>$case{$_}</searchimage>\n";
         }
     }
-    $_log .= "\n";
-
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        $_log .= "<logastext> \n";
-    }
-    $_log .= "\n\n";
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
@@ -2964,14 +2957,38 @@ sub httplog {  #write requests and responses to http.log file
         close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
-    $_log .= $textrequest . "\n\n";
-    $_log .= $response->as_string . "\n\n";
 
+    my $_core_info = $response->status_line( )."\n\n";
+    $_core_info .= 'Base for relative URLs: '.$response->base( )."\n";
+
+    #my $_age = $response->current_age( );
+    #my $_days  = int($_age/86400);       $_age -= $_days * 86400;
+    #my $_hours = int($_age/3600);        $_age -= $_hours * 3600;
+    #my $_mins  = int($_age/60);          $_age -= $_mins    * 60;
+    #my $_secs  = $_age;
+    #$_core_info .= "The document is $_days days, $_hours hours, $_mins minutes, and $_secs seconds old.\n";
+
+    $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
+
+    my $_response_content_ref = $response->content_ref( );
+    my $_response_headers = $response->headers_as_string;
+
+    _write_http_log($_step_info, $textrequest, $_core_info, $_response_headers, $_response_content_ref);
+
+    my $_display_as_text;
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
-        $_log .=  "</logastext> \n";
+        $_display_as_text =  'true';
     }
 
-    print {$HTTPLOGFILE} $_log;
+    return;
+}
+
+#------------------------------------------------------------------
+sub _write_http_log {
+    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
+
+    my $_log_separator = "\n************************* LOG SEPARATOR *************************\n\n\n";
+    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", $$_response_content_ref;
 
     return;
 }
