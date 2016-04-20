@@ -2992,7 +2992,7 @@ sub _write_step_html {
     }
 
     my $_html = '<!DOCTYPE html>';
-    $_html .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
+    $_html .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; font:80% Verdana, sans-serif;">\n|;
 
     $_html .= qq|        <head>\n|;
     $_html .= qq|            <style>\n|;
@@ -3001,15 +3001,15 @@ sub _write_step_html {
     $_html .= qq|                wi_h2 a { text-decoration:none; font-weight:bolder; }\n|;
     $_html .= qq|                wi_h2 a:hover { color:#5BAB03; text-decoration: underline; }\n|;
     $_html .= qq|                wi_h2 a:visited { color:SlateGray; }\n|;
-    $_html .= qq|                .wi_heading { font:80% Verdana, sans-serif; font-weight:normal; padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; margin-bottom:0.3em; font-family: Verdana, sans-serif; color:#D1E6E7;}\n|;
-    $_html .= qq|                .wi_heading wi_h1 {  font-size:2.5em; }\n|;
-    $_html .= qq|                .wi_heading wi_h2 {  font-size:1.5em; }\n|;
-    $_html .= qq|                .wi_heading wi_h3 {  font-size:1.5em; }\n|;
+    $_html .= qq|                .wi_heading { padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em;}\n|;
+    $_html .= qq|                .wi_heading wi_h1 {  font-size:2.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
+    $_html .= qq|                .wi_heading wi_h2 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
+    $_html .= qq|                .wi_heading wi_h3 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em; line-height:1.5em;}\n|;
     $_html .= qq|                .wi_alignleft {float: left;}\n|;
     $_html .= qq|                .wi_alignright {float: right;}\n|;
     $_html .= qq|            </style>\n|;
     $_html .= qq|        </head>\n|;
-    $_html .= qq|        <div class="wi_heading" >\n|;
+    $_html .= qq|        <div class="wi_heading">\n|;
     $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
     $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
     $_html .= qq|              $case{description1}\n|;
