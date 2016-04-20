@@ -2991,13 +2991,42 @@ sub _write_step_html {
         $_display_as_text =  'true';
     }
 
-    my $_html = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">';
-    $_html .= "\n<html>\n<body>\n";
+    my $_html = '<!DOCTYPE html>';
+    $_html .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
-    $_html .= $_step_info;
+    $_html .= qq|        <head>\n|;
+    $_html .= qq|            <style>\n|;
+    $_html .= qq|                wi_h1, wi_h2, wi_h3 { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
+    $_html .= qq|                wi_h2 a:link { color:SlateGray; }\n|;
+    $_html .= qq|                wi_h2 a { text-decoration:none; font-weight:bolder; }\n|;
+    $_html .= qq|                wi_h2 a:hover { color:#5BAB03; text-decoration: underline; }\n|;
+    $_html .= qq|                wi_h2 a:visited { color:SlateGray; }\n|;
+    $_html .= qq|                .wi_heading { font:80% Verdana, sans-serif; font-weight:normal; padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; margin-bottom:0.3em; font-family: Verdana, sans-serif; color:#D1E6E7;}\n|;
+    $_html .= qq|                .wi_heading wi_h1 {  font-size:2.5em; }\n|;
+    $_html .= qq|                .wi_heading wi_h2 {  font-size:1.5em; }\n|;
+    $_html .= qq|                .wi_heading wi_h3 {  font-size:1.5em; }\n|;
+    $_html .= qq|                .wi_alignleft {float: left;}\n|;
+    $_html .= qq|                .wi_alignright {float: right;}\n|;
+    $_html .= qq|            </style>\n|;
+    $_html .= qq|        </head>\n|;
+    $_html .= qq|        <div class="wi_heading" >\n|;
+    $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
+    $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
+    $_html .= qq|              $case{description1}\n|;
+    $_html .= qq|            </wi_h3>\n|;
+    $_html .= qq|            <div style="clear: both;"></div>\n|;
+    $_html .= qq|            <br />\n|;
+    $_html .= qq|            <wi_h2>\n|;
+    $_html .= qq|                <a href="/"> Summary </a> -&gt; <a href="/"> Batch Summary </a> -&gt; Run Results -&gt; Step\n|;
+    $_html .= qq|            </wi_h2>\n|;
+    $_html .= qq|        </div>\n|;
+
+    #$_html .= $_step_info;
 
     $_html .= "\n<xmp>\n".$_request_headers."\n</xmp>\n";
     $_html .= "\n<xmp>\n".$_core_info."\n".$_response_headers."\n</xmp>\n";
+    $_html .= qq|    </wi_body>\n|;
+    $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
     if (defined $_display_as_text) {
         $_html .= "\n<xmp>\n".$_response_content."\n</xmp>\n";
@@ -3005,7 +3034,7 @@ sub _write_step_html {
         $_html .= $_response_content;
     }
 
-    $_html .= "\n</body>\n</html>\n";
+    $_html .= "\n    </body>\n</html>\n";
 
     my $_file_full = $opt_publish_full.'/'."$testnumlog$jumpbacksprint$retriesprint".'.html'; 
     open my $_FILE, '>', "$_file_full" or die "\nERROR: Failed to create $_file_full\n\n";
