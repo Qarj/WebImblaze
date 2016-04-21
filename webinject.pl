@@ -3017,7 +3017,7 @@ sub _write_step_html {
     $_html .= qq|            <div style="clear: both;"></div>\n|;
     $_html .= qq|            <br />\n|;
     $_html .= qq|            <wi_h2>\n|;
-    $_html .= qq|                <a href="/"> Summary </a> -&gt; <a href="/"> Batch Summary </a> -&gt; Run Results -&gt; Step\n|;
+    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="/"> Batch Summary </a> -&gt; Run Results -&gt; Step\n|;
     $_html .= qq|            </wi_h2>\n|;
     $_html .= qq|        </div>\n|;
 
