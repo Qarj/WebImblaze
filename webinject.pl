@@ -2991,6 +2991,15 @@ sub _write_step_html {
         $_display_as_text =  'true';
     }
 
+    my ($_wif_batch, $_wif_run_number);
+    if (defined $userconfig->{wif}->{batch} ) {
+        $_wif_batch = $userconfig->{wif}->{batch};
+        $_wif_run_number = $userconfig->{wif}->{run_number};
+    } else {
+        $_wif_batch = 'needs_webinject_framework';
+        $_wif_run_number = 'needs_webinject_framework';
+    }
+
     my $_html = '<!DOCTYPE html>';
     $_html .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; font:80% Verdana, sans-serif;">\n|;
 
@@ -3028,7 +3037,7 @@ sub _write_step_html {
     $_html .= qq|            <wi_div style="clear: both;"></wi_div>\n|;
     $_html .= qq|            <br />\n|;
     $_html .= qq|            <wi_h2>\n|;
-    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$userconfig->{wif}->{batch}.xml"> Batch Summary </a> -&gt; <a href="results_$userconfig->{wif}->{run_number}.xml"> Run Results </a> -&gt; Step\n|;
+    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
     $_html .= qq|            </wi_h2>\n|;
     $_html .= qq|        </wi_div>\n|;
 
