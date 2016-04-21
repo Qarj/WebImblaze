@@ -70,7 +70,7 @@ my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver
 
 my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
-my ($testnumlog); ## log separator enhancement
+my ($testnumlog, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
 my ($forcedretry); ## force retry when specific http error code received
 my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
@@ -485,6 +485,7 @@ foreach ($start .. $repeat) {
             getbackgroundimages(); ## get specified web page src assets
 
             httplog();  #write to http.log file
+            $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
 
             if ($entrycriteriaok) { ## do not want to parseresponse on junk
                parseresponse();  #grab string from response to send later
@@ -3038,6 +3039,9 @@ sub _write_step_html {
     $_html .= qq|            <br />\n|;
     $_html .= qq|            <wi_h2>\n|;
     $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
+    if (defined $previous_test_step) {
+        $_html .= qq|                &nbsp; &nbsp; [<a href="$previous_test_step.html"> prev </a>]\n|;
+    }
     $_html .= qq|            </wi_h2>\n|;
     $_html .= qq|        </wi_div>\n|;
 
@@ -3059,15 +3063,39 @@ sub _write_step_html {
     $_html .= "\n    </body>\n</html>\n";
 
     my $_file_full = $opt_publish_full.'/'."$testnumlog$jumpbacksprint$retriesprint".'.html'; 
-    open my $_FILE, '>', "$_file_full" or die "\nERROR: Failed to create $_file_full\n\n";
-    print {$_FILE} $_html;
-    close $_FILE or die "\nERROR: Failed to close $_file_full\n\n";
+    #open my $_FILE, '>', "$_file_full" or die "\nERROR: Failed to create $_file_full\n\n";
+    #print {$_FILE} $_html;
+    #close $_FILE or die "\nERROR: Failed to close $_file_full\n\n";
+    _delayed_write_step_html($_file_full, $_html);
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _delayed_write_step_html {
+    my ($_file_full, $_html) = @_;
+    
+    if (defined $delayed_file_full) {
+        # substitute in the next test step number now that we know what it is
+        if (defined $_html) {
+            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$testnumlog$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
+        }
+        open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
+        print {$_FILE} $delayed_html;
+        close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
+    }
+
+    $delayed_file_full = $_file_full; 
+    $delayed_html = $_html; 
 
     return;
 }
 
 #------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
+
+    # write out the html for the final test step
+    _delayed_write_step_html(undef, undef);
 
     writefinalhtml();  #write summary and closing tags for results file
 
