@@ -3035,9 +3035,9 @@ sub _write_step_html {
     #$_html .= $_step_info;
 
     $_html .= qq|        <a class="wif_headers" href="javascript:wif_toggle('wif_toggle_request');">Request Headers</a>\n|;
-    $_html .= qq|\n<xmp id="wif_toggle_request" style="display: none">\n|.$_request_headers.qq|\n</xmp>\n|;
+    $_html .= qq|\n<xmp id="wif_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_request_headers.qq|\n</xmp>\n|;
     $_html .= qq|        <a class="wif_headers" href="javascript:wif_toggle('wif_toggle_response');">Response Headers</a>\n|;
-    $_html .= qq|\n<xmp id="wif_toggle_response" style="display: none">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
+    $_html .= qq|\n<xmp id="wif_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
