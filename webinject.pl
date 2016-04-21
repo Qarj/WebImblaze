@@ -3063,9 +3063,6 @@ sub _write_step_html {
     $_html .= "\n    </body>\n</html>\n";
 
     my $_file_full = $opt_publish_full.'/'."$testnumlog$jumpbacksprint$retriesprint".'.html'; 
-    #open my $_FILE, '>', "$_file_full" or die "\nERROR: Failed to create $_file_full\n\n";
-    #print {$_FILE} $_html;
-    #close $_FILE or die "\nERROR: Failed to close $_file_full\n\n";
     _delayed_write_step_html($_file_full, $_html);
 
     return;
@@ -3075,9 +3072,9 @@ sub _write_step_html {
 sub _delayed_write_step_html {
     my ($_file_full, $_html) = @_;
     
-    if (defined $delayed_file_full) {
-        # substitute in the next test step number now that we know what it is
-        if (defined $_html) {
+    if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
+        if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
+            # substitute in the next test step number now that we know what it is
             $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$testnumlog$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
         }
         open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
@@ -3094,7 +3091,7 @@ sub _delayed_write_step_html {
 #------------------------------------------------------------------
 sub finaltasks {  #do ending tasks
 
-    # write out the html for the final test step
+    # write out the html for the final test step, there is no new content to put in the buffer
     _delayed_write_step_html(undef, undef);
 
     writefinalhtml();  #write summary and closing tags for results file
