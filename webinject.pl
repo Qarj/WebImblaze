@@ -2996,7 +2996,7 @@ sub _write_step_html {
 
     $_html .= qq|        <head>\n|;
     $_html .= qq|            <style>\n|;
-    $_html .= qq|                wi_h1, wi_h2, wi_h3 { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
+    $_html .= qq|                wi_h1, wi_h2, wi_h3, wi_div { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
     $_html .= qq|                wi_h2 a:link, .wif_headers:link { color:SlateGray; }\n|;
     $_html .= qq|                wi_h2 a, .wif_headers { text-decoration:none; font-weight:bolder; }\n|;
     $_html .= qq|                wi_h2 a:hover, .wif_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
@@ -3020,17 +3020,17 @@ sub _write_step_html {
     $_html .= qq|                } \n|;
     $_html .= qq|            </script>\n|;
     $_html .= qq|        </head>\n|;
-    $_html .= qq|        <div class="wi_heading">\n|;
+    $_html .= qq|        <wi_div class="wi_heading">\n|;
     $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
     $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
     $_html .= qq|              $case{description1}\n|;
     $_html .= qq|            </wi_h3>\n|;
-    $_html .= qq|            <div style="clear: both;"></div>\n|;
+    $_html .= qq|            <wi_div style="clear: both;"></wi_div>\n|;
     $_html .= qq|            <br />\n|;
     $_html .= qq|            <wi_h2>\n|;
     $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$userconfig->{wif}->{batch}.xml"> Batch Summary </a> -&gt; <a href="results_$userconfig->{wif}->{run_number}.xml"> Run Results </a> -&gt; Step\n|;
     $_html .= qq|            </wi_h2>\n|;
-    $_html .= qq|        </div>\n|;
+    $_html .= qq|        </wi_div>\n|;
 
     #$_html .= $_step_info;
 
