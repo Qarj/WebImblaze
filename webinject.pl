@@ -2997,10 +2997,10 @@ sub _write_step_html {
     $_html .= qq|        <head>\n|;
     $_html .= qq|            <style>\n|;
     $_html .= qq|                wi_h1, wi_h2, wi_h3, wi_div { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
-    $_html .= qq|                wi_h2 a:link, .wif_headers:link { color:SlateGray; }\n|;
-    $_html .= qq|                wi_h2 a, .wif_headers { text-decoration:none; font-weight:bolder; }\n|;
-    $_html .= qq|                wi_h2 a:hover, .wif_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
-    $_html .= qq|                wi_h2 a:visited, .wif_headers:visited { color:SlateGray; }\n|;
+    $_html .= qq|                wi_h2 a:link, .wi_headers:link { color:SlateGray; }\n|;
+    $_html .= qq|                wi_h2 a, .wi_headers { text-decoration:none; font-weight:bolder; }\n|;
+    $_html .= qq|                wi_h2 a:hover, .wi_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
+    $_html .= qq|                wi_h2 a:visited, .wi_headers:visited { color:SlateGray; }\n|;
     $_html .= qq|                .wi_heading { padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em;}\n|;
     $_html .= qq|                .wi_heading wi_h1 {  font-size:2.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
     $_html .= qq|                .wi_heading wi_h2 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
@@ -3009,8 +3009,8 @@ sub _write_step_html {
     $_html .= qq|                .wi_alignright {float: right;}\n|;
     $_html .= qq|            </style>\n|;
     $_html .= qq|            <script language="javascript">\n|;
-    $_html .= qq|                function wif_toggle(wif_toggle_ele) {\n|;
-    $_html .= qq|                	var ele = document.getElementById(wif_toggle_ele);\n|;
+    $_html .= qq|                function wi_toggle(wi_toggle_ele) {\n|;
+    $_html .= qq|                	var ele = document.getElementById(wi_toggle_ele);\n|;
     $_html .= qq|                	if(ele.style.display == "block") {\n|;
     $_html .= qq|                    		ele.style.display = "none";\n|;
     $_html .= qq|                  	}\n|;
@@ -3034,10 +3034,10 @@ sub _write_step_html {
 
     #$_html .= $_step_info;
 
-    $_html .= qq|        <a class="wif_headers" href="javascript:wif_toggle('wif_toggle_request');">Request Headers</a>\n|;
-    $_html .= qq|\n<xmp id="wif_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_request_headers.qq|\n</xmp>\n|;
-    $_html .= qq|        <a class="wif_headers" href="javascript:wif_toggle('wif_toggle_response');">Response Headers</a>\n|;
-    $_html .= qq|\n<xmp id="wif_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
+    $_html .= qq|        <a class="wi_headers" href="javascript:wi_toggle('wi_toggle_request');">Request Headers</a>\n|;
+    $_html .= qq|\n<xmp id="wi_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_request_headers.qq|\n</xmp>\n|;
+    $_html .= qq|        <a class="wi_headers" href="javascript:wi_toggle('wi_toggle_response');">Response Headers</a>\n|;
+    $_html .= qq|\n<xmp id="wi_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
