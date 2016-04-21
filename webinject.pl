@@ -3008,6 +3008,17 @@ sub _write_step_html {
     $_html .= qq|                .wi_alignleft {float: left;}\n|;
     $_html .= qq|                .wi_alignright {float: right;}\n|;
     $_html .= qq|            </style>\n|;
+    $_html .= qq|            <script language="javascript">\n|;
+    $_html .= qq|                function wif_toggle(wif_toggle_ele) {\n|;
+    $_html .= qq|                	var ele = document.getElementById(wif_toggle_ele);\n|;
+    $_html .= qq|                	if(ele.style.display == "block") {\n|;
+    $_html .= qq|                    		ele.style.display = "none";\n|;
+    $_html .= qq|                  	}\n|;
+    $_html .= qq|                	else {\n|;
+    $_html .= qq|                		ele.style.display = "block";\n|;
+    $_html .= qq|                	}\n|;
+    $_html .= qq|                } \n|;
+    $_html .= qq|            </script>\n|;
     $_html .= qq|        </head>\n|;
     $_html .= qq|        <div class="wi_heading">\n|;
     $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
@@ -3017,14 +3028,16 @@ sub _write_step_html {
     $_html .= qq|            <div style="clear: both;"></div>\n|;
     $_html .= qq|            <br />\n|;
     $_html .= qq|            <wi_h2>\n|;
-    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="/"> Batch Summary </a> -&gt; Run Results -&gt; Step\n|;
+    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$userconfig->{wif}->{batch}.xml"> Batch Summary </a> -&gt; <a href="results_$userconfig->{wif}->{run_number}.xml"> Run Results </a> -&gt; Step\n|;
     $_html .= qq|            </wi_h2>\n|;
     $_html .= qq|        </div>\n|;
 
     #$_html .= $_step_info;
 
-    $_html .= "\n<xmp>\n".$_request_headers."\n</xmp>\n";
-    $_html .= "\n<xmp>\n".$_core_info."\n".$_response_headers."\n</xmp>\n";
+    $_html .= qq|        <a href="javascript:wif_toggle('wif_toggle_request');">Request Headers</a>\n|;
+    $_html .= qq|\n<xmp id="wif_toggle_request" style="display: none">\n|.$_request_headers.qq|\n</xmp>\n|;
+    $_html .= qq|        <a href="javascript:wif_toggle('wif_toggle_response');">Response Headers</a>\n|;
+    $_html .= qq|\n<xmp id="wif_toggle_response" style="display: none">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
