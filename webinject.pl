@@ -1812,10 +1812,12 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
     my $subname;
 
     #read the xml file specified in the testcase
-    $case{postbody} =~ m/file=>(.*)/i;
-    open my $XMLBODY, '<', $1 or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
-    my @xmlbody = <$XMLBODY>;  #read the file into an array
-    close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
+    my @xmlbody;
+    if ( $case{postbody} =~ m/file=>(.*)/i ) {
+        open my $XMLBODY, '<', $1 or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
+        @xmlbody = <$XMLBODY>;  #read the file into an array
+        close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
+    }
 
     if ($case{parms}) { #is there a postbody for this testcase - if so need to subtitute in fields
        @parms = split /\&/, $case{parms} ; #& is separator
@@ -2484,7 +2486,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
                 ## quote meta characters so they will be treated as literal in regex
                 if ($escape eq 'quotemeta') {
-                    $parsedresult{$case_attribute} = quotemeta($parsedresult{$case_attribute});
+                    $parsedresult{$case_attribute} = quotemeta $parsedresult{$case_attribute};
                 }
             }
 
@@ -2801,15 +2803,15 @@ sub _get_char {
     if (not defined $_type) {
         $_type = ':ALPHANUMERIC';
     }
-    
+
     my $_min_desired_rnd = 1;
     my $_max_desired_rnd;
-    my $_max_possible_rnd = 4294967296;
+    my $_max_possible_rnd = 4_294_967_296;
     my $_number;
     my $_char;
 
     if (uc $_type eq ':ALPHANUMERIC') {
-        my $_max_desired_rnd = 36;
+        $_max_desired_rnd = 36;
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
         # now we should have a number in the range 1 to 36
         if ($_number < 11) {
@@ -2818,15 +2820,15 @@ sub _get_char {
             $_char = chr($_number + 54);  ## i.e. 64 - 10
         }
     }
-    
+
     if (uc $_type eq ':ALPHA') {
-        my $_max_desired_rnd = 26;
+        $_max_desired_rnd = 26;
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
         $_char = chr($_number + 64);
     }
 
     if (uc $_type eq ':NUMERIC') {
-        my $_max_desired_rnd = 10;
+        $_max_desired_rnd = 10;
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
         $_char = chr($_number + 47);
     }
@@ -2911,7 +2913,7 @@ sub httplog {  # write requests and responses to http.log file
         close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
-    my $_step_info .= "Test Step: $testnumlog$jumpbacksprint$retriesprint - ";
+    my $_step_info = "Test Step: $testnumlog$jumpbacksprint$retriesprint - ";
 
     ## log descrption1 and description2
     $_step_info .=  $case{description1};
@@ -2932,7 +2934,7 @@ sub httplog {  # write requests and responses to http.log file
     if ($_request_content_length) {
         $_request_headers .= 'Request Content Length: '.$_request_content_length." bytes\n";
     }
-    
+
     #$textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
 
     my $_core_info = "\n".$response->status_line( )."\n";
@@ -2963,7 +2965,7 @@ sub _write_http_log {
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
 
     my $_log_separator = "\n************************* LOG SEPARATOR *************************\n";
-    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", $$_response_content_ref;
+    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref };
 
     return;
 }
@@ -2972,7 +2974,7 @@ sub _write_http_log {
 sub _write_step_html {
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
 
-    my $_response_content = $$_response_content_ref;
+    my $_response_content = ${ $_response_content_ref };
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
@@ -3020,13 +3022,13 @@ sub _write_step_html {
     $_html .= qq|            </style>\n|;
     $_html .= qq|            <script language="javascript">\n|;
     $_html .= qq|                function wi_toggle(wi_toggle_ele) {\n|;
-    $_html .= qq|                	var ele = document.getElementById(wi_toggle_ele);\n|;
-    $_html .= qq|                	if(ele.style.display == "block") {\n|;
-    $_html .= qq|                    		ele.style.display = "none";\n|;
-    $_html .= qq|                  	}\n|;
-    $_html .= qq|                	else {\n|;
-    $_html .= qq|                		ele.style.display = "block";\n|;
-    $_html .= qq|                	}\n|;
+    $_html .= qq|                   var ele = document.getElementById(wi_toggle_ele);\n|;
+    $_html .= qq|                   if(ele.style.display == "block") {\n|;
+    $_html .= qq|                           ele.style.display = "none";\n|;
+    $_html .= qq|                   }\n|;
+    $_html .= qq|                   else {\n|;
+    $_html .= qq|                       ele.style.display = "block";\n|;
+    $_html .= qq|                   }\n|;
     $_html .= qq|                } \n|;
     $_html .= qq|            </script>\n|;
     $_html .= qq|        </head>\n|;
@@ -3062,7 +3064,7 @@ sub _write_step_html {
 
     $_html .= "\n    </body>\n</html>\n";
 
-    my $_file_full = $opt_publish_full.'/'."$testnumlog$jumpbacksprint$retriesprint".'.html'; 
+    my $_file_full = $opt_publish_full."$testnumlog$jumpbacksprint$retriesprint".'.html';
     _delayed_write_step_html($_file_full, $_html);
 
     return;
@@ -3071,7 +3073,7 @@ sub _write_step_html {
 #------------------------------------------------------------------
 sub _delayed_write_step_html {
     my ($_file_full, $_html) = @_;
-    
+
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
@@ -3082,8 +3084,8 @@ sub _delayed_write_step_html {
         close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
     }
 
-    $delayed_file_full = $_file_full; 
-    $delayed_html = $_html; 
+    $delayed_file_full = $_file_full;
+    $delayed_html = $_html;
 
     return;
 }
@@ -3266,13 +3268,16 @@ sub port_available {
 
     my $family = PF_INET;
     my $type   = SOCK_STREAM;
-    my $proto  = getprotobyname('tcp')  or die "getprotobyname: $!";
+    my $proto  = getprotobyname 'tcp' or die "getprotobyname: $!\n";
     my $host   = INADDR_ANY;  # Use inet_aton for a specific interface
 
-    socket(my $sock, $family, $type, $proto) or die "socket: $!";
-    my $name = sockaddr_in($port, $host)     or die "sockaddr_in: $!";
+    socket my $sock, $family, $type, $proto or die "socket: $!\n";
+    my $name = sockaddr_in($port, $host)     or die "sockaddr_in: $!\n";
 
-    bind($sock, $name) and return 'available';
+    if (bind $sock, $name) {
+        return 'available';
+    }
+
     return 'in use';
 }
 
@@ -3389,7 +3394,7 @@ sub getoptions {  #shell options
         if ($opt_driver eq 'chromedriver') {
             if (not defined $opt_chromedriver_binary) {
                 print "\nLocation of chromedriver binary must be specified when chromedriver selected.\n\n";
-                print '--binary C:\selenium-server\chromedriver.exe'."\n";
+                print "--binary C:\\selenium-server\\chromedriver.exe\n";
                 exit;
             }
         }
