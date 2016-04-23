@@ -3076,21 +3076,21 @@ sub _write_step_html {
 
     return;
 }
+
 #------------------------------------------------------------------
 sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
 
-#            $ururl = URI::URL->new($assetref, $case{url}); ## join the current page url together with the href of the asset
-#            $asseturl = $ururl->abs; ## determine the absolute address of the asset
-#            #print "$asseturl\n\n";
-#            $path = $asseturl->path; ## get the path portion of the asset location
     while ( 
             ${ $_response_content_ref } =~ s{
-                                             (action|href|src)
-                                             =
-                                             "                     #"
-                                             (/[^"]*)
-                                             "
+                                                 (action|href|src)
+                                                 =
+                                                 "                                                     #"
+                                                 (
+                                                     [/\.a-gik-zA-GIK-Z~]                              # will not match http or javascript
+                                                     [^"]*
+                                                 )
+                                                 "
                                              }
                                              {
                                                 $1
@@ -3112,7 +3112,12 @@ sub _determine_absolute_url {
 
     my $_ur_url = URI::URL->new($_ref, $_response_base);
     my $_abs_url = $_ur_url->abs;
-    #print "$_abs_url\n";
+
+    # we must return a url beginning with http (or javascript), otherwise WebInject will get stuck in an infinite loop
+    # if the url we are processing begins with something like android-app://, URI:URL will not turn it into a http url - better just to get rid of it
+    if ( (substr $_abs_url, 0, 1) ne 'h') {
+        $_abs_url = 'http://webinject_could_not_determine_absolute_url';
+    }
 
     return $_abs_url;
 }
