@@ -2939,8 +2939,10 @@ sub httplog {  # write requests and responses to http.log file
 
     my $_core_info = "\n".$response->status_line( )."\n";
 
+    my $_response_base;
     if ( defined $response->base( ) ) {
-        $_core_info .= 'Base for relative URLs: '.$response->base( )."\n";
+        $_response_base = $response->base( );
+        $_core_info .= 'Base for relative URLs: '.$_response_base."\n";
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
@@ -2955,7 +2957,7 @@ sub httplog {  # write requests and responses to http.log file
     my $_response_headers = $response->headers_as_string;
 
     _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
-    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
+    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base);
 
     return;
 }
@@ -2972,23 +2974,24 @@ sub _write_http_log {
 
 #------------------------------------------------------------------
 sub _write_step_html {
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
+    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base) = @_;
 
-    my $_response_content = ${ $_response_content_ref };
+    #my $_response_content = ${ $_response_content_ref };
 
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
-         $_response_content =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
+         ${ $_response_content_ref } =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
     }
 
     if ($case{formatjson}) {
          ## makes a JSON response easier to read by putting in a few carriage returns
-         $_response_content =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
-         $_response_content =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
-         $_response_content =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
-         $_response_content =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
+         ${ $_response_content_ref }  =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
+         ${ $_response_content_ref }  =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
+         ${ $_response_content_ref }  =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
+         ${ $_response_content_ref }  =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
     }
 
+    # To Do: make this automatic - i.e. if no html and body tags found
     my $_display_as_text;
     if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
         $_display_as_text =  'true';
@@ -3056,10 +3059,14 @@ sub _write_step_html {
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
+    if (defined $_response_base) {
+        _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
+    }
+
     if (defined $_display_as_text) {
-        $_html .= "\n<xmp>\n".$_response_content."\n</xmp>\n";
+        $_html .= "\n<xmp>\n".${ $_response_content_ref } ."\n</xmp>\n";
     } else {
-        $_html .= $_response_content;
+        $_html .= ${ $_response_content_ref } ;
     }
 
     $_html .= "\n    </body>\n</html>\n";
@@ -3068,6 +3075,46 @@ sub _write_step_html {
     _delayed_write_step_html($_file_full, $_html);
 
     return;
+}
+#------------------------------------------------------------------
+sub _replace_relative_urls_with_absolute {
+    my ($_response_content_ref, $_response_base) = @_;
+
+#            $ururl = URI::URL->new($assetref, $case{url}); ## join the current page url together with the href of the asset
+#            $asseturl = $ururl->abs; ## determine the absolute address of the asset
+#            #print "$asseturl\n\n";
+#            $path = $asseturl->path; ## get the path portion of the asset location
+    while ( 
+            ${ $_response_content_ref } =~ s{
+                                             (action|href|src)
+                                             =
+                                             "                     #"
+                                             (/[^"]*)
+                                             "
+                                             }
+                                             {
+                                                $1
+                                                .'="'.
+                                                _determine_absolute_url($2, $_response_base)
+                                                .'"'
+                                             }exg
+          )
+    {
+        #print "$&\n";
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _determine_absolute_url {
+    my ($_ref, $_response_base) = @_;
+
+    my $_ur_url = URI::URL->new($_ref, $_response_base);
+    my $_abs_url = $_ur_url->abs;
+    #print "$_abs_url\n";
+
+    return $_abs_url;
 }
 
 #------------------------------------------------------------------
