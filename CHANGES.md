@@ -8,6 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.91 - Apr 23, 2016
+* improved date time format for start_time in results.xml
+* restructured results.xml format for verifypositive, verifynegative, autoassertions, smartassertions and searchimage
+* create a html file for every single test step e.g. 10.html, 20.html
+
 ### Version 1.90 - Apr 5, 2016
 * now can generate random strings and numbers {RANDOM:5:NUMERIC} {RANDDOM:10:ALPHANUMERIC} {RANDOM:6:ALPHA}
 

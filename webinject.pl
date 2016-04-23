@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.90';
+$VERSION = '1.91';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -3081,13 +3081,13 @@ sub _write_step_html {
 sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
 
-    while ( 
+    while (
             ${ $_response_content_ref } =~ s{
                                                  (action|href|src)
                                                  =
                                                  "                                                     #"
                                                  (
-                                                     [/\.a-gik-zA-GIK-Z~]                              # will not match http or javascript
+                                                     [./a-gik-zA-GIK-Z~]                              # will not match http or javascript
                                                      [^"]*
                                                  )
                                                  "

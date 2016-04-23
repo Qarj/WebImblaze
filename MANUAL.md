@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.90
+# Manual for WebInject version 1.91
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -37,6 +37,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [Auto Assertions (autoassertions)](#autoassertions)
 
 [Smart Assertions (smartassertions)](#smartassertions)
+
+[WebInject Framework (webinjectframework)](#webinjectframework)
 
 ### [2.2 - Test Case Files (specifying in configuration file)](#filenames)
 
@@ -205,6 +207,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ### [5.4 - HTTP Log File (http.log)](#outputhttp)
 
+### [5.5 - Individual step html files (10.html ...)](#stephtml)
+
 ## [6 - Session Handling and State Management](#sessstate)
 
 ### [6.1 - Summary](#sesssummary)
@@ -246,13 +250,13 @@ likely to suffer from the test flakiniess that is inherit with Selenium WebDrive
 <a name="file"></a>
 ### 2.1 - Configuration File (config.xml)
 
-There is a configuration file named 'config.xml' that is used to store configuration settings for your project.  You can 
+There is a configuration file named 'config.xml' that is used to store configuration settings for your project.  You can
 use this to specify which test case files to run (see below) and to set some constants and settings to be used by WebInject.
 
-If you use WebInject in console mode, you can specify an alternate config file name by using the option -c or --config. See the 
+If you use WebInject in console mode, you can specify an alternate config file name by using the option -c or --config. See the
 "Command Line Options" section of this manual for more information.
 
-All settings and constants must be enclosed in the proper tags, and simply need to be added to the config.xml file 
+All settings and constants must be enclosed in the proper tags, and simply need to be added to the config.xml file
 (order does not matter).
 
 Available config settings are:
@@ -269,26 +273,26 @@ example: `<proxy>http://127.0.0.1:8080</proxy>`
 You can also do proxy authentication like this:
 
 example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
-    
+
 <a name="useragent"></a>
 
 <br />
 
 
 #### useragent
-Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default 
+Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default
 User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
 
 example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>`
-    
+
 <br />
 
 
 <a name="httpauth"></a>
 #### httpauth
 
-Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response 
-authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication 
+Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response
+authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication
 information.  This configuration parameter takes a list of 5 colon delimited values that correspond to:
 <em>servername:portnumber:realm-name:username:password</em>
 
@@ -317,14 +321,14 @@ example: `<baseurl>http://myserver</baseurl>`
 
 Creates the constant {BASEURL1} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
- 
+
 <br />
 
 
 #### baseurl2
 Creates the constant {BASEURL2} which can be used in test cases (see 'Variables and Constants' section below).  This works
 in the same way as the 'baseurl' example above.
-    
+
 <br />
 
 
@@ -338,10 +342,10 @@ example: `<comment>this will be ignored</comment>`
 
 <br />
 
-    
+
 <a name="timeout"></a>
 #### timeout
-Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than 
+Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than
 this threshold, the HTTP request times out and the case is marked as failed.  The default timeout if you do not specify one
 is 180 seconds.
 
@@ -349,7 +353,7 @@ is 180 seconds.
 example: `<timeout>10</timeout>`
 
 Note: This timeout setting may not always work when using SSL/HTTPS.
-    
+
 <br />
 
 
@@ -361,7 +365,7 @@ badly, then there will be no more than 50 retry attempts rather than 120.
 
 
 example: `<globalretry>50</globalretry>`
-    
+
 <br />
 
 
@@ -407,9 +411,9 @@ In the test step that you only want to run on automation controllers, specify th
 You can create your own abitrary config values that can be accessed as constants in the test steps.
 
 ```xml
-<userdefined> 
-    <adminuser>admin@example.com</adminuser> 
-    <adminpass>topsecret</adminpass> 
+<userdefined>
+    <adminuser>admin@example.com</adminuser>
+    <adminpass>topsecret</adminpass>
 </userdefined>
 ```
 
@@ -425,10 +429,10 @@ It is possible to specify assertions that run automatically on every single test
 A possible usage is to check that you have not obtained an error page.
 
 ```xml
-<autoassertions> 
-   <autoassertion1>^((?!error.stacktrace).)*$|||A java stacktrace has occurred</autoassertion1> 
-   <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2> 
-</autoassertions> 
+<autoassertions>
+   <autoassertion1>^((?!error.stacktrace).)*$|||A java stacktrace has occurred</autoassertion1>
+   <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2>
+</autoassertions>
 ```
 
 In the example above, the regular expression is constructed in such a way that the assertion will
@@ -438,9 +442,9 @@ on failure is specified.
 
 <br />
 ```xml
-<autoassertions> 
-   <autoassertion1>Copyright Example Company 2016</autoassertion1> 
-</autoassertions> 
+<autoassertions>
+   <autoassertion1>Copyright Example Company 2016</autoassertion1>
+</autoassertions>
 ```
 
 This second example automatically asserts that this copyright message appears in every response.
@@ -455,9 +459,9 @@ It is possible to specify assertions that run conditionally on every single test
 The condition is set as part of the smart assertion.
 
 ```xml
-<smartassertions> 
-   <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
-</smartassertions> 
+<smartassertions>
+   <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1>
+</smartassertions>
 ```
 
 In the example above, the condition is specified first, before the `|||`.
@@ -467,12 +471,35 @@ match in the response output.
 
 If the condition is met, then the regular expression after the `|||` is executed.
 
-If one or match is found, then the smart assertion passes (silently). 
+If one or match is found, then the smart assertion passes (silently).
 
 If a match is not found, the message after the final `|||` is logged and the test step is failed.
 
-This feature is really useful for asserting that various standards are followed. In the event 
+This feature is really useful for asserting that various standards are followed. In the event
 that exceptions are agreed, the ignoresmartassertions parameter can be used.
+
+<br />
+
+
+<a name="webinjectframework"></a>
+#### WebInject Framework
+
+The WebInject Framework passes the batch name, the parent folder of the test case file, and the
+current run number to WebInject. WebInject uses this information to create links back to the
+WebInject Framework results summary. These links can be found in the individual html step files
+(e.g. 10.html, 20.html).
+
+This section looks like:
+
+```
+<wif>
+    <batch>security</batch>
+    <folder>examples</folder>
+    <run_number>1038</run_number>
+</wif>
+```
+
+If this section is not present, the links will be null.
 
 <br />
 
@@ -480,8 +507,8 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 <a name="filenames"></a>
 ### 2.2 - Test Case Files (specifying in configuration file)
 
-One of the configuration 
-file settings in config.xml is used to name a test case files that you have created.  You may specify one test case 
+One of the configuration
+file settings in config.xml is used to name a test case files that you have created.  You may specify one test case
 file to process by placing the file name inside the (<testcasefile>) xml tags.
 
 A configuration file containing a test case files to process (tests_1.xml) may look something like:
@@ -516,40 +543,40 @@ Usage:
 
 **-c** or **--config**
 
-This option is followed by a config file name.  This is used to specify an 
-alternate configuration file besides the default (config.xml).  To specify a config file in a different 
+This option is followed by a config file name.  This is used to specify an
+alternate configuration file besides the default (config.xml).  To specify a config file in a different
 directory, you must use the relative path to it.
 
 Note: relative path from the webinject directory.
-**-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output 
-files.  This is used to specify the location for writing output files (http.log, results.html, and 
-results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to 
-add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted, 
-it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination 
+**-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output
+files.  This is used to specify the location for writing output files (http.log, results.html, and
+results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to
+add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted,
+it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination
 of a directory and prefix.
-                                        
+
 To clarify, here are some examples:
 
 
-To have all your output files written to the /foo directory: 
+To have all your output files written to the /foo directory:
 `perl webinject.pl -o /foo/`
 
 To have all your output files written to the foo subdirectory under your WebInject home directory:
 `perl webinject.pl -o ./foo/`
 
-To create a prefix for your output files (this will create output files named foohttp.log, fooresults.html, 
+To create a prefix for your output files (this will create output files named foohttp.log, fooresults.html,
 and fooresults.xml in the WebInject home directory):
 `perl webinject.pl -o foo`
 
-To use a combination of a directory and a prefix (this will create output files named foohttp.log, 
-fooresults.html, and fooresults.xml in the /bar directory): 
+To use a combination of a directory and a prefix (this will create output files named foohttp.log,
+fooresults.html, and fooresults.xml in the /bar directory):
 `perl webinject.pl -o /bar/foo`
 
-Note: MS Windows style directory naming also works. 
+Note: MS Windows style directory naming also works.
 
-Note: You must still have write access to the directory where WebInject resides, even when writing output 
+Note: You must still have write access to the directory where WebInject resides, even when writing output
 elsewhere.
-                                        
+
 **-a** or **--autocontroller**
 
 Specifies to run autocontrolleronly testcases.
@@ -564,15 +591,15 @@ Displays the version number and other information.
 <a name="passingfile"></a>
 #### Passing a Test Case Filename
 
-When you launch WebInject in console mode, you can optionally supply an argument for a testcase file to run.  It will look for this 
+When you launch WebInject in console mode, you can optionally supply an argument for a testcase file to run.  It will look for this
 file in the directory that webinject.pl resides in.
 
 
 `perl webinject.pl mytests.xml`
 
 
-If no filename is passed from the command line, it will look in config.xml for `testcasefile` declarations.  If no files 
-are specified, it will look for a default file named 'testcases.xml' in the current [WebInject] directory.  If none of these are 
+If no filename is passed from the command line, it will look in config.xml for `testcasefile` declarations.  If no files
+are specified, it will look for a default file named 'testcases.xml' in the current [WebInject] directory.  If none of these are
 found, the engine will stop and give you an error.
 
 
@@ -585,7 +612,7 @@ config file, the files specified in the config file will not be processed (but a
 <a name="xpathxnode"></a>
 #### XPath/XNode
 
-When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a 
+When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a
 single XPath/XNode.  This will only execute the test case residing in the XPath/XNode you supply.
 
 For example, to run only testcase 2 from your file named mytests.xml, you would call it like this:
@@ -621,15 +648,15 @@ use defaults config.xml and testcase.xml files located in the same directory as 
 `perl /usr/local/webinject/webinject.pl`
 
 
-4) Launching webinject.pl from a different directory and specifying an alternate test case file and config file. As an example, 
-you installed webinject in /usr/local/webinject.  This will use myconfig.xml and mytests.xml files located in the same directory 
+4) Launching webinject.pl from a different directory and specifying an alternate test case file and config file. As an example,
+you installed webinject in /usr/local/webinject.  This will use myconfig.xml and mytests.xml files located in the same directory
 as webinject.pl:
 
 
 `perl /usr/local/webinject/webinject.pl mytests.pl -c myconfig.xml`
 
 
-4) Launching webinject.pl and specifying a relative path to an alternate testcase file and config file. As an example, you have 
+4) Launching webinject.pl and specifying a relative path to an alternate testcase file and config file. As an example, you have
 your test case file and config file are located in a subdirectory named 'myfiles':
 
 
@@ -644,14 +671,14 @@ your test case file and config file are located in a subdirectory named 'myfiles
 <a name="summary"></a>
 ### 3.1 - Summary
 
-Test cases are written in XML files (using XML elements and attributes) and passed to the WebInject engine 
-for execution against the application/service under test. This abstracts the internals of WebInject's 
-implementation away from the non-technical tester, while using an open architecture [written in Perl] 
+Test cases are written in XML files (using XML elements and attributes) and passed to the WebInject engine
+for execution against the application/service under test. This abstracts the internals of WebInject's
+implementation away from the non-technical tester, while using an open architecture [written in Perl]
 for those that require more customization or modifications.
 
-There are several parameters (attributes) you can use in your cases, depending on what you are trying to 
-accomplish.  The only required parameters are the 'id' and the 'url'.  If no verification parameters 
-(verifypositive, verifynegative, verifyresponsecode, etc) are provided, the test case will be marked as 
+There are several parameters (attributes) you can use in your cases, depending on what you are trying to
+accomplish.  The only required parameters are the 'id' and the 'url'.  If no verification parameters
+(verifypositive, verifynegative, verifyresponsecode, etc) are provided, the test case will be marked as
 "FAILED" if the HTTP request returns an HTTP Response Code that is not in the 100-399 range.  
 See the "Pass/Fail Critera" section of this manual for more information.
 
@@ -699,7 +726,7 @@ then it gives you room to insert additional steps (e.g. 15, 25) without having t
 #### description1 description2
 
 Text description for results report.
-    
+
 ```
     description1="Get Search Form"
     description2="(soft logged in)"
@@ -733,7 +760,7 @@ full examples section for an example.
 
 <br />
 
-    
+
 <a name="url"></a>
 #### url
 
@@ -745,10 +772,10 @@ Full HTTP URL to request.  You can use an IP Address or Host Name.
 
 <br />
 
-    
+
 <a name="posttype"></a>
 #### posttype
-This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field 
+This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field
 in the HTTP Header).  This is only used in an HTTP POST (method="post").  The possible values are:
 
 ```
@@ -795,7 +822,7 @@ of the HTTP::Request::Common module.
 
 ```
     method="post"
-    posttype="multipart/form-data" 
+    posttype="multipart/form-data"
 	postbody=" ( 'companyName' => 'Example', 'companyId' => '55201', 'companyLogo' => ['testdata\logos\Example.jpg'] ) "
 ```
 
@@ -809,7 +836,7 @@ quotes within the postbody itself for the JSON.
 ```
 
 
-If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file 
+If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file
 that contains the text (xml payload) that will be sent in the body of your request.  This is done using the `file=>` syntax.
 Example: `postbody="file=>soap_payload.xml"`
 
@@ -825,7 +852,7 @@ Example: `postbody="file=>soap_payload.xml"`
 
 <a name="verpos"></a>
 #### verifypositive
-String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched 
+String in response for positive verification. Verification fails if this string does not exist in the HTTP response.  This is matched
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
 You can also specify that a custom message be output if the verification fails by placing ||| then your message on the right hand side
@@ -857,11 +884,11 @@ another three `|||` and writing any message after the custom error message.
 ```
 
 <br />
-   
-    
+
+
 <a name="verneg"></a>
 #### verifynegative
-String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched 
+String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched
 as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
 
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
@@ -892,14 +919,14 @@ another three `|||` and writing any message after the custom error message.
 
 <a name="parse"></a>
 #### parseresponse
-Parse a string from the HTTP response for use in subsequent requests.  This is mostly 
-used for passing Session ID's, but can be applied to any case where you need to pass a 
-dynamically generated value.  It takes the arguments in the format 
+Parse a string from the HTTP response for use in subsequent requests.  This is mostly
+used for passing Session ID's, but can be applied to any case where you need to pass a
+dynamically generated value.  It takes the arguments in the format
 "leftboundary|rightboundary", and one of two optional third arguments.
 
-Use "leftboundary|rightboundary|escape" when you want to force escaping of all 
-non-alphanumeric characters. See the "Session Handling and State 
-Management - Parsing Response Data &amp; Embedded Session ID's" 
+Use "leftboundary|rightboundary|escape" when you want to force escaping of all
+non-alphanumeric characters. See the "Session Handling and State
+Management - Parsing Response Data &amp; Embedded Session ID's"
 section of this manual for details and examples on how to use this parameter.
 
 Use "leftboundary|rightboundary|decode" when you want to decode html entities - for example
@@ -907,7 +934,7 @@ converting &amp;amp; back to &amp; and &amp;lt; back to < - which you may need t
 
 Use "leftboundary|rightboundary|quotemeta" to quote meta characters (i.e. with backslashes). This is useful if you want
 to use the result of a parseresponse in a regular expression - any special characters will be treated
-as literal characters. 
+as literal characters.
 
 If you specify the text "regex" as the right boundary, the left boundary will be treated as a custom regular expression.
 
@@ -1123,7 +1150,7 @@ testdata\AddJob.xml might look like:
 ```xml
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <FILE>
-	<JOB	
+	<JOB
 		JOBID="333211"
 		TITLE="Test Automation Engineer"
 		DESCRIPTION="Great new test automation opportunity"
@@ -1131,7 +1158,7 @@ testdata\AddJob.xml might look like:
 		SALARYTYPE="ANNUAL"
 		SALARYMIN="__SALMIN__"
 		SALARYMAX="__SALMAX__"
-		SALARYDESC="Great Benefits" 
+		SALARYDESC="Great Benefits"
 	/>
 </FILE>
 ```
@@ -1205,7 +1232,7 @@ code you receive.
 Asserts that the response time is no greater than the specified time.
 
 ```
-    verifyresponsetime="2.505" 
+    verifyresponsetime="2.505"
 ```
 
 In this example, the assertion will fail if the response time is greater than 2.505 seconds.
@@ -1267,7 +1294,7 @@ an asynchronous manner, but you don't know how long it will take.
 
 You normally would use this parameter in conjunction with the sleep parameter so that there is a pause
 before the test case is tried again.
- 
+
 In this example, if any of the verifypositives fail, or the assertcount fails, then WebInject
 will wait 5 seconds, then retry the test step - up to 10 times. (After each failure, WebInject will
 wait 5 seconds.) If and when the test step passes, WebInject will not wait 5 seconds before proceeding.
@@ -1277,11 +1304,11 @@ wait 5 seconds.) If and when the test step passes, WebInject will not wait 5 sec
 ```
 
 If one of the verifynegatives fail, the test case will not be retried further. The logic is that you are
-prepared to wait for something you expect to see (verifypositive etc), but if you find something you 
+prepared to wait for something you expect to see (verifypositive etc), but if you find something you
 don't want to see (like an error page), there is no point retrying further. This is called fail fast.
 
 If you do want to do a retry on a verifynegative, encode it as a verifypositive instead. The following example
-shows how to do this: 
+shows how to do this:
 ```
     verifypositive20="^((?!ErrorPage.aspx).)*$|||Error detected"
 ```
@@ -1388,7 +1415,7 @@ All cookies will be dumped.
 <a name="sleep"></a>
 #### sleep
 
-Number of seconds to sleep after the test case.  This used to add spacing between cases in order to 
+Number of seconds to sleep after the test case.  This used to add spacing between cases in order to
 throttle the rate it sends requests.
 
 Sleep 5 seconds before proceeding:
@@ -1427,8 +1454,8 @@ Note: This feature was added to deal with intermediate email files in quoted-pri
 
 <a name="errmsg"></a>
 #### errormessage
-If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line 
-(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed 
+If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line
+(on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed
 test means, like "couldn't connect to the application" or "couldn't access the login page".
 
 ```
@@ -1463,7 +1490,7 @@ Improves readability of xml responses.
     formatxml="true"
 ```
 
-Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read. 
+Sometimes when you receive a response in xml format, the response comes back without a single carriage return. It can be difficult to read.
 Specifying this parameter puts a carriage return between every >< found in the response.
 
 <br />
@@ -1474,7 +1501,7 @@ Specifying this parameter puts a carriage return between every >< found in the r
 
 Gets the hrefs referred to in the html response, and writes them to the output folder.
 
-Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
 ```
 	gethrefs=".css|.less"
@@ -1488,7 +1515,7 @@ Multiple patterns are separated with a `|`. The pattern specifies the end of the
 
 Gets the srcs referred to in the html response, and writes them to the output folder.
 
-Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
 ```
 	getsrcs=".jpg|.png|.js"
@@ -1502,7 +1529,7 @@ Multiple patterns are separated with a `|`. The pattern specifies the end of the
 
 Gets the background images referred to in the html response, and writes them to the output folder.
 
-Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match. 
+Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
 ```
     getbackgroundimages=".jpg"
@@ -1584,7 +1611,7 @@ for information on how to configure the config file.
 In your config.xml, you would have the following line:
 
 ```xml
-    <testonly>Allow</testonly> 
+    <testonly>Allow</testonly>
 ```
 
 <br />
@@ -1601,7 +1628,7 @@ Works exactly the same was as testonly.
 In your config.xml, you would have the following line:
 
 ```xml
-    <liveonly>Allow</liveonly> 
+    <liveonly>Allow</liveonly>
 ```
 
 <br />
@@ -1720,11 +1747,11 @@ the image cannot be found exactly. This is useful if the baseline image is captu
 operating system, but tested on another.
 
 ```
-    searchimage="RunningMan_Company_Logo.png"` 
+    searchimage="RunningMan_Company_Logo.png"`
 ```
 
 The subimages are stored in a folder named baseline under the testcases folder. The specific imagie is in an addtional
-subfolder that has the same name as the testcase you are running. 
+subfolder that has the same name as the testcase you are running.
 
 For example, refering to the example above, RunningMan_Company_Logo.png can be found at
 ```
@@ -1744,7 +1771,7 @@ Separate additional items with commas. Example:
 ```
     verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"
 ```
- 
+
 <br />
 
 
@@ -1783,15 +1810,15 @@ Sample test case file using multiple parameters:
 Here is a sample test case showing a "multipart/form-data" encoded form-based file upload:
 
 ```xml
-<case 
-    id="10" 
-    description1="sample test case - POST" 
-    description2="verify file upload" 
-    method="post" 
-    url="http://cgi-lib.berkeley.edu/ex/fup.cgi" 
-    postbody="( upfile => ['config.xml'], note => 'MYCOMMENT' )" 
-    posttype="multipart/form-data" 
-    verifypositive="MYCOMMENT" 
+<case
+    id="10"
+    description1="sample test case - POST"
+    description2="verify file upload"
+    method="post"
+    url="http://cgi-lib.berkeley.edu/ex/fup.cgi"
+    postbody="( upfile => ['config.xml'], note => 'MYCOMMENT' )"
+    posttype="multipart/form-data"
+    verifypositive="MYCOMMENT"
 />
 ```
 
@@ -1800,7 +1827,7 @@ Here is a sample test case showing usage of the "cmd" method:
 
 
 ```xml
-<case 
+<case
     id="10"
     description1="Prepare JobFile with unique ids that will be accessible from webinject"
     method="cmd"
@@ -1814,8 +1841,8 @@ Here is a sample test case showing usage of the "cmd" method:
 <a name="numcases"></a>
 ### 3.5 - Numbering Test Cases and Execution Order
 
-Test Cases are numbered using the `id=` parameter.  They will be sorted and executed in sequential order based on 
-these numbers, not the physical position of the Test Case within your file.  You are allowed to leave gaps in the 
+Test Cases are numbered using the `id=` parameter.  They will be sorted and executed in sequential order based on
+these numbers, not the physical position of the Test Case within your file.  You are allowed to leave gaps in the
 numbering and have them in any order in the file.
 
 <br />
@@ -1837,7 +1864,7 @@ and end with:
 `</testcases>`
 
 
-There is also a "repeat" attribute you can set within the parent tag to specify the number of times you would 
+There is also a "repeat" attribute you can set within the parent tag to specify the number of times you would
 like a file of test cases to run.
 
 
@@ -1851,14 +1878,14 @@ For example, to have a test case file run 5 times, your file should open with:
 <a name="validxml"></a>
 ### 3.7 - Valid XML and Using Reserved XML Characters
 
-You may only use valid XML in your test cases.  Malformed XML or mixed content will not be accepted by the parser 
+You may only use valid XML in your test cases.  Malformed XML or mixed content will not be accepted by the parser
 that is used to read the test cases.
 
 
-However, you may find it necessary to use such characters within an XML Attribute to define your test case.  Most 
-of these situations are handled programmatically behind the scenes for you as a user.  For example, the "&amp;" 
-character would normally not be acceptable to an XML parser since it is a reserved character.  Since this character 
-is used in URL query strings (which are necessary in many/most test cases), it is handled as a special case and you 
+However, you may find it necessary to use such characters within an XML Attribute to define your test case.  Most
+of these situations are handled programmatically behind the scenes for you as a user.  For example, the "&amp;"
+character would normally not be acceptable to an XML parser since it is a reserved character.  Since this character
+is used in URL query strings (which are necessary in many/most test cases), it is handled as a special case and you
 may use them within your test case XML.
 
 
@@ -1866,7 +1893,7 @@ There are two special cases to be aware of:
 
 #### less than (<) character:
 
-Anywhere you use this character in your test cases (except of course, enclosing your actual XML tags), you must escape it 
+Anywhere you use this character in your test cases (except of course, enclosing your actual XML tags), you must escape it
 with a backslash (failure to do so will make the test case parser croak).
 
 
@@ -1901,9 +1928,9 @@ In regular expressions, a single dot, i.e. `.` will match any single character.
 
 #### quotes (single or double):
 
-If you need to use quotes anywhere within a test case parameter, you need to 
-make sure that the quotes are nested properly.  The quotes (single or double) 
-used to encapsulate your attribute must be different from the quotes you use within 
+If you need to use quotes anywhere within a test case parameter, you need to
+make sure that the quotes are nested properly.  The quotes (single or double)
+used to encapsulate your attribute must be different from the quotes you use within
 your attribute (both single and double quotes are valid to encapsulate an XML attribute).
 
 
@@ -1939,7 +1966,7 @@ is also valid.
 <a name="varconst"></a>
 ### 3.8 - Variables and Constants
 
-Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case 
+Certain constants and variables can be passed from your test cases to the WebInject engine.  They may be used in a test case
 as a keyword contained within curly braces, and are evaluated/substituted at runtime.
 
 The first set of variables are the most dynamic. They can change each time a test case is retried as
@@ -1988,7 +2015,7 @@ information.
 <br />
 
 
-The values of the constants are set at the run start time. They will not change while the test case file is being run. 
+The values of the constants are set at the run start time. They will not change while the test case file is being run.
 
 Constant | Description
 :------- | :----------
@@ -2000,7 +2027,7 @@ Constant | Description
 **{MONTH}** | The month number of the year at run start with leading 0, e.g. 05 [denoting May]
 **{YEAR}** | The year at run start as 4 digits, e.g. 2016
 **{YY}** | The year at run start as 2 digits, e.g. 16
-**{HH}** | The run start hour in 24hr time with leading 0, e.g. 15 
+**{HH}** | The run start hour in 24hr time with leading 0, e.g. 15
 **{MM}** | The run start minute with leading 0, e.g. 09
 **{SS}** | The run start second with leading 0
 **{WEEKOFMONTH}** | The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
@@ -2010,7 +2037,7 @@ Constant | Description
 **{OUTPUT}** | WebInject output directory name, or "no output" if output is suppressed
 **{HOSTNAME}** | Name of the computer currently running WebInject
 **{CONCURRENCY}** | Output folder name only - not the full path
-**{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder 
+**{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXYRULES}** | What proxyrules option was specified via the command line to webinject.pl
 **{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
@@ -2042,8 +2069,8 @@ This is helpful if you want to point your tests at different environments by cha
 
 #### Setting Variables/Constants Within Test Case Files:
 
-You may also set constants in your test case file that you can reference from your test cases.  This makes it 
-convenient to change data in a single place that is easy to reference from multiple test cases. 
+You may also set constants in your test case file that you can reference from your test cases.  This makes it
+convenient to change data in a single place that is easy to reference from multiple test cases.
 
 
 The following example of a test case file shows how you can use them:
@@ -2056,7 +2083,7 @@ The following example of a test case file shows how you can use them:
     <testvar varname="LOGIN1">bob</testvar>
     <testvar varname="PASSWD1">sponge</testvar>
     <testvar varname="SUCCESSFULL_TEST_TEXT">Welcome Bob</testvar>
-     
+
     <case
         id="1"
         description1="login test case"
@@ -2080,7 +2107,7 @@ The following example of a test case file shows how you can use them:
 ### 4.1 - Verifications
 
 
-In each test case, you can set Verifications that will pass or fail depending on the existence of a specified text string 
+In each test case, you can set Verifications that will pass or fail depending on the existence of a specified text string
 (or regex) in the content of the HTTP response you receive.
 
 `verifypositive` - This Verification fails if the string you specified does not exist in the HTTP response you receive.
@@ -2099,11 +2126,11 @@ work the same way.
 
 In each test case, you can set a Verifications that will pass or fail depending on the HTTP response code.
 
-`verifyresponsecode` - This Verification fails if the HTTP response code you specified does not match the HTTP response code 
+`verifyresponsecode` - This Verification fails if the HTTP response code you specified does not match the HTTP response code
 you receive.
 
-If you do not specify this test case parameter, the HTTP Response Code Verification is marked as "Failed" if the HTTP request 
-returns an HTTP response code that is not in the success range (100-399).  It is marked as "Passed" if the HTTP 
+If you do not specify this test case parameter, the HTTP Response Code Verification is marked as "Failed" if the HTTP request
+returns an HTTP response code that is not in the success range (100-399).  It is marked as "Passed" if the HTTP
 Response Code is in the success range (100-399).
 
 If you are testing an error page, you will need to use this parameter.
@@ -2123,8 +2150,8 @@ If you are testing an error page, you will need to use this parameter.
 ### 4.3 - Test Case Pass/Fail Status
 
 If any of the Verifications defined within a test case fail, or if the HTTP Response Code Verification fails,
-the test case is marked as "FAILED".  If all of the Verifications defined within a test case pass, and the 
-HTTP Response Code Verification passes, the test case is marked as "PASSED".  These items are updated in 
+the test case is marked as "FAILED".  If all of the Verifications defined within a test case pass, and the
+HTTP Response Code Verification passes, the test case is marked as "PASSED".  These items are updated in
 real-time during execution.
 
 <br />
@@ -2139,7 +2166,7 @@ real-time during execution.
 An HTML file (results.html) is generated to display detailed results of the test execution.
 It is written into the WebInject output folder and is overwritten each time the tool runs.
 
-The file contains data passed from the test case file (test case identifiers/descriptions, etc) as 
+The file contains data passed from the test case file (test case identifiers/descriptions, etc) as
 well as information generated from the test engine (test case pass/fail status, execution times, etc).
 
 <br />
@@ -2151,7 +2178,7 @@ well as information generated from the test engine (test case pass/fail status, 
 An XML file (results.xml) is generated to display results of the test execution.
 It is written into the directory that WebInject runs from and is overwritten each time the tool runs.
 
-The file contains data passed from the test case file (test case identifiers/descriptions, etc) as 
+The file contains data passed from the test case file (test case identifiers/descriptions, etc) as
 well as information generated from the test engine (test case pass/fail status, execution times, etc).
 
 If you put an xsl stylesheet against this file, you can get a customised display of the test run results.
@@ -2169,13 +2196,28 @@ Results are also sent [in plain text format] to the STDOUT channel as the tests 
 <a name="outputhttp"></a>
 ### 5.4 - HTTP Log File (http.log)
 
-A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system 
-under test and HTTP responses that are received from the system under test.  Whether or not HTTP logging is 
-turned on depends on a setting in the configuration file and if you have logging parameters turned on in each 
+A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system
+under test and HTTP responses that are received from the system under test.  Whether or not HTTP logging is
+turned on depends on a setting in the configuration file and if you have logging parameters turned on in each
 test case.  See the "Configuration - Configuration File (config.xml)" and "Test Case Setup - Available Parameters"
 sections of this manual for more information on logging to the http.log file.
 
 Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoing HTTP POST requests, but are not shown in http.log.  
+
+<br />
+
+
+<a name="stephtml"></a>
+### 5.4 - Individual step html files (10.html, ...)
+
+For each test step, an html file will be created according to the step name.
+
+This allows you to review the actual result as html, rather than having to try and make sense
+of the html code itself.
+
+In order to provide a reasonable render of the html, the relative href links to the css and JavaScript
+will be replaced with absolute references back to your target test server. The target server will need to be
+available for this to work effectively.
 
 <br />
 
@@ -2187,9 +2229,9 @@ Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoi
 <a name="sesssummary"></a>
 ### 6.1 - Summary
 
-HTTP is a stateless protocol, meaning each request is discrete and unrelated to those that precede or follow.  Because of the 
-stateless nature of the protocol itself, web applications or services use various other methods to maintain state.  This allows 
-client connections to be tracked and connection-specific data to be maintained.  If your server requires the client to maintain 
+HTTP is a stateless protocol, meaning each request is discrete and unrelated to those that precede or follow.  Because of the
+stateless nature of the protocol itself, web applications or services use various other methods to maintain state.  This allows
+client connections to be tracked and connection-specific data to be maintained.  If your server requires the client to maintain
 state during a session, then your test tool must be able to handle this as well.
 
 <br />
@@ -2198,8 +2240,8 @@ state during a session, then your test tool must be able to handle this as well.
 <a name="sesscookie"></a>
 ### 6.2 - Cookies
 
-One way to maintain session state is with HTTP Cookies.  WebInject automatically handles Cookies for you (like a browser would). 
-When a "Set-Cookie" is sent back in the HTTP header from the web server, the Cookie is automatically stored and sent back with 
+One way to maintain session state is with HTTP Cookies.  WebInject automatically handles Cookies for you (like a browser would).
+When a "Set-Cookie" is sent back in the HTTP header from the web server, the Cookie is automatically stored and sent back with
 subsequent requests to the domain it was set from.
 
 <br />
@@ -2208,9 +2250,9 @@ subsequent requests to the domain it was set from.
 <a name="sessid"></a>
 ### 6.3 - Parsing Response Data &amp; Embedded Session ID's (Cookieless)
 
-Embedded Session ID's ("Cookieless" session management) is another approach to maintaining state.  Session ID's are written 
-to the content of the HTTP response that is sent to the client.  When the client makes a subsequent HTTP request, the Session 
-ID string must be sent back to the server so it can identify the request and match it with a unique session variable it is 
+Embedded Session ID's ("Cookieless" session management) is another approach to maintaining state.  Session ID's are written
+to the content of the HTTP response that is sent to the client.  When the client makes a subsequent HTTP request, the Session
+ID string must be sent back to the server so it can identify the request and match it with a unique session variable it is
 storing internally.  The client sends the string embedded in the URL or embedded in the post body data of each HTTP request.
 
 In order to do this, WebInject provides a method of parsing data from an HTTP response to be resent in subsequent requests.  This
@@ -2224,12 +2266,12 @@ Parse Parameter | Corresponding Variable
 :-------------- | :---------------------
 parseresponse1 |{1}
 parseresponse5000 | {5000}
-parseresponseUSERNAME | {USERNAME} 
+parseresponseUSERNAME | {USERNAME}
 parseresponseUSERGUID | {USERGUID}
 parseresponseCOMPANYID | {COMPANYID}
 parseresponsePARSEDRESULT3 | {PARSEDRESULT3}
 
-Note: This parsing mechanism may be used for any situation where you need to resend data to the server that was sent to you in 
+Note: This parsing mechanism may be used for any situation where you need to resend data to the server that was sent to you in
 a previous response.  There are other circumstances besides maintaining session where this may be useful.
 
 <br />
@@ -2237,7 +2279,7 @@ a previous response.  There are other circumstances besides maintaining session 
 
 #### Example of maintaining the ViewState with ASP.NET:
 
-ASP.NET may use a "__VIEWSTATE" variable to maintain state between requests.  When you request a page that uses this, you will see it 
+ASP.NET may use a "__VIEWSTATE" variable to maintain state between requests.  When you request a page that uses this, you will see it
 as a hidden form field within the HTML source:
 
 
@@ -2252,7 +2294,7 @@ as a hidden form field within the HTML source:
 ```
 
 
-To maintain state, you need to grab this value so you can resend it in subsequent requests.  To do this, you would add the 
+To maintain state, you need to grab this value so you can resend it in subsequent requests.  To do this, you would add the
 following parameter to your test case:
 
 
@@ -2261,9 +2303,9 @@ following parameter to your test case:
 ```
 
 
-This will grab whatever is between the left boundary (__VIEWSTATE" value=") and the right boundary (") and assign to the system variable 
-named {}.  Since the 'escape' argument was used, it will also escape all of the non-alphanumeric characters with 
-their url hex values (.NET requires this).  (Notice I switched to using single quotes for the parameter value so it wouldn't get confused 
+This will grab whatever is between the left boundary (__VIEWSTATE" value=") and the right boundary (") and assign to the system variable
+named {}.  Since the 'escape' argument was used, it will also escape all of the non-alphanumeric characters with
+their url hex values (.NET requires this).  (Notice I switched to using single quotes for the parameter value so it wouldn't get confused
 with the double quotes I was using in my boundaries.)
 
 
@@ -2285,7 +2327,7 @@ Will be sent to the server as:
 
 #### Example of parsing the Session ID from an HTTP response header and sending it as part of the URL:
 
-You may receive a Session ID in a HTTP response header that needs to be parsed 
+You may receive a Session ID in a HTTP response header that needs to be parsed
 and resent to the server as part of a URL rather than in a cookie.
 
 
@@ -2303,7 +2345,7 @@ You would add the following parameter to your test case:
 ```
 
 
-This will grab whatever is between the left boundary (JSESSIONID=) and the right boundary (;) and 
+This will grab whatever is between the left boundary (JSESSIONID=) and the right boundary (;) and
 assign to the system variable named {}.
 
 
@@ -2316,7 +2358,7 @@ Now whenever you use the {} variable in a subsequent test case, it will be subst
 ```
 
 
-Will be sent to the server as: 
+Will be sent to the server as:
 
 `http://myserver/search.jsp?value=123&JSESSIONID=16CD67F723A6D2218CE73AEAEA899FD9`
 
