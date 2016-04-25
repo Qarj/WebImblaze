@@ -3063,8 +3063,14 @@ sub _write_step_html {
         _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
     }
 
+    # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
         $_html .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
+    }
+
+    # if we have grabbed an email file, link to it
+    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
+        $_html .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
     if (defined $_display_as_text) {
