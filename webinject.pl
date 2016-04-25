@@ -2733,6 +2733,7 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$output/g;
+    $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;
 ## CWD Current Working Directory
     $_[0] =~ s/{CWD}/$cwd/g;
