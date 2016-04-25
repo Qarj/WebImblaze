@@ -887,7 +887,7 @@ sub _get_verifytext {
 sub _screenshot {
     $starttimer = time; ## measure latency for the screenshot
 
-    my $_abs_screenshot_full = File::Spec->rel2abs( "$output$testnumlog$jumpbacksprint$retriesprint.png" );
+    my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" );
 
     if ($case{screenshot} && (lc($case{screenshot}) eq 'false' || lc($case{screenshot}) eq 'no')) #lc = lowercase
     {
@@ -3061,6 +3061,10 @@ sub _write_step_html {
 
     if (defined $_response_base) {
         _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
+    }
+
+    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
+        $_html .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
     }
 
     if (defined $_display_as_text) {
