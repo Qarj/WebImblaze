@@ -3092,6 +3092,21 @@ sub _write_step_html {
 sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
 
+    # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
+    foreach my $_sub ( keys %{ $userconfig->{baseurl_subs} } ) {
+        print "_sub:$_sub:$userconfig->{baseurl_subs}{$_sub}\n";
+        my @_regex = split /[|][|][|]/, $userconfig->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+        my $_rhsbits = $_regex[1];
+        print "regex1:$_regex[1]\n";
+        my $_rhs = '"$_rhsbits"';
+        print "_rhs:$_rhs\n";
+        print eval("_rhs:$_rhs"), "\n";
+        $_response_base =~ s{$_regex[0]}{$_rhs}ee;
+        print "D1:$1\n";
+        print eval(eval("_rhs:$_rhs")), "\n";
+        print "_response_base:$_response_base\n";
+    }
+
     while (
             ${ $_response_content_ref } =~ s{
                                                  (action|href|src)
