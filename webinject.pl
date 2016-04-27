@@ -3060,10 +3060,6 @@ sub _write_step_html {
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
-    if (defined $_response_base) {
-        _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
-    }
-
     # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
         $_html .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
@@ -3073,6 +3069,12 @@ sub _write_step_html {
     if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
         $_html .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
+
+    if (defined $_response_base) {
+        _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
+    }
+
+    _response_content_substitutions( $_response_content_ref );
 
     if (defined $_display_as_text) {
         $_html .= "\n<xmp>\n".${ $_response_content_ref } ."\n</xmp>\n";
@@ -3088,6 +3090,18 @@ sub _write_step_html {
     return;
 }
 
+#------------------------------------------------------------------
+sub _response_content_substitutions {
+    my ($_response_content_ref) = @_;
+
+    foreach my $_sub ( keys %{ $userconfig->{content_subs} } ) {
+        #print "_sub:$_sub:$userconfig->{content_subs}{$_sub}\n";
+        my @_regex = split /[|][|][|]/, $userconfig->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+        ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
+    }
+
+    return;
+}
 #------------------------------------------------------------------
 sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
