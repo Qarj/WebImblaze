@@ -3094,17 +3094,11 @@ sub _replace_relative_urls_with_absolute {
 
     # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
     foreach my $_sub ( keys %{ $userconfig->{baseurl_subs} } ) {
-        print "_sub:$_sub:$userconfig->{baseurl_subs}{$_sub}\n";
+        #print "_sub:$_sub:$userconfig->{baseurl_subs}{$_sub}\n";
+        #print "orig _response_base:$_response_base\n";
         my @_regex = split /[|][|][|]/, $userconfig->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
-        my $_rhsbits = $_regex[1];
-        print "regex1:$_regex[1]\n";
-        my $_rhs = '"$_rhsbits"';
-        print "_rhs:$_rhs\n";
-        print eval("_rhs:$_rhs"), "\n";
-        $_response_base =~ s{$_regex[0]}{$_rhs}ee;
-        print "D1:$1\n";
-        print eval(eval("_rhs:$_rhs")), "\n";
-        print "_response_base:$_response_base\n";
+        $_response_base =~ s{$_regex[0]}{$_regex[1]}ee;
+        #print "new _response_base:$_response_base\n";
     }
 
     while (
