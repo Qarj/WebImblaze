@@ -90,6 +90,7 @@ my (@pageupdatetimes); ## last time the page was updated in the cache
 my $chromehandle = 0; ## windows handle of chrome browser window - for screenshots
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
+my (@hrefs, @srcs, @bg_images); ## substitute in grabbed assets to step results html
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -1310,7 +1311,7 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
     if ($case{gethrefs}) {
         my $match = 'href=';
         my $delim = q{"}; #"
-        getassets ($match,$delim,$delim,$case{gethrefs});
+        getassets ($match,$delim,$delim,$case{gethrefs}, 'hrefs');
     }
 
     return;
@@ -1322,7 +1323,7 @@ sub getsrcs { ## get page src assets matching a list of ending patterns, separat
     if ($case{getsrcs}) {
         my $match = 'src=';
         my $delim = q{"}; #"
-        getassets ($match, $delim, $delim, $case{getsrcs});
+        getassets ($match, $delim, $delim, $case{getsrcs}, 'srcs');
     }
 
     return;
@@ -1335,7 +1336,7 @@ sub getbackgroundimages { ## style="background-image: url( )"
         my $match = 'style="background-image: url';
         my $leftdelim = '\(';
         my $rightdelim = '\)';
-        getassets ($match,$leftdelim,$rightdelim,$case{getbackgroundimages});
+        getassets ($match,$leftdelim,$rightdelim,$case{getbackgroundimages}, 'bg-images');
     }
 
     return;
@@ -1345,7 +1346,7 @@ sub getbackgroundimages { ## style="background-image: url( )"
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ('href',q{"},q{"},'.less|.css')
 
-    my ($match, $leftdelim, $rightdelim, $assetlist) = @_;
+    my ($match, $leftdelim, $rightdelim, $assetlist, $_type) = @_;
 
     my ($startassetrequest, $endassetrequest, $assetlatency);
     my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse);
@@ -1381,6 +1382,10 @@ sub getassets { ## get page assets matching a list for a reference type
             binmode $RESPONSEASFILE; ## set binary mode
             print {$RESPONSEASFILE} $assetresponse->content, q{}; ## content just outputs the content, whereas as_string includes the response header
             close $RESPONSEASFILE or die "\nCould not close asset file\n";
+
+            if ($_type eq 'hrefs') { push @hrefs, $filename; }
+            if ($_type eq 'srcs') { push @srcs, $filename; }
+            if ($_type eq 'bg-images') { push @bg_images, $filename; }
 
             $endassetrequest = time;
             $assetlatency = (int(1000 * ($endassetrequest - $startassetrequest)) / 1000);  ## elapsed time rounded to thousandths
@@ -3100,8 +3105,63 @@ sub _response_content_substitutions {
         ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
     }
 
+    if (@hrefs) {
+        ${ $_response_content_ref } =~ s{href="([^"]+)}{_grabbed_href($1)}eg;
+    }
+
+    if (@srcs) {
+        ${ $_response_content_ref } =~ s{src="([^"]+)}{_grabbed_src($1)}eg;
+    }
+
+    if (@bg_images) {
+        ${ $_response_content_ref } =~ s{style="background-image: url\(([^\)]+)}{_grabbed_background_image($1)}eg; #"
+    }
+
     return;
 }
+
+#------------------------------------------------------------------
+sub _grabbed_href {
+    my ($_href) = @_;
+
+    foreach (@hrefs) {
+        if ($_href =~ m/$_/) {
+            return 'href="'.$_;
+        }
+    }
+
+    # we did not grab that asset, so we will substitute it with itself
+    return 'href="'.$1;
+}
+
+#------------------------------------------------------------------
+sub _grabbed_src {
+    my ($_src) = @_;
+
+    foreach (@srcs) {
+        if ($_src =~ m/$_/) {
+            return 'src="'.$_;
+        }
+    }
+
+    # we did not grab that asset, so we will substitute it with itself
+    return 'src="'.$1;
+}
+
+#------------------------------------------------------------------
+sub _grabbed_background_image {
+    my ($_bg_image) = @_;
+
+    foreach (@bg_images) {
+        if ($_bg_image =~ m/$_/) {
+            return 'style="background-image: url\('.$_;
+        }
+    }
+
+    # we did not grab that asset, so we will substitute it with itself
+    return 'style="background-image: url\('.$1;
+}
+
 #------------------------------------------------------------------
 sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
