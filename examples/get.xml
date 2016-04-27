@@ -15,9 +15,19 @@ Defining substitutions of {HTTP} and {HTTPS} would be just silly.
 <case
     id="10"
     description1="Get Totaljobs Home Page"
+    description2="Description 2 is used to display additional information about the test step at hand"
     method="get"
     url="http://{TOTALJOBS}"
     verifypositive="recommended"
+/>
+
+<case
+    id="20"
+    description1="Get Totaljobs Account Register Page"
+    description2="Runs over https"
+    method="get"
+    url="https://{TOTALJOBS}/account/register"
+    verifypositive="mandatory"
 />
 
 </testcases>
