@@ -484,12 +484,12 @@ foreach ($start .. $repeat) {
             getsrcs(); ## get specified web page src assets
             getbackgroundimages(); ## get specified web page src assets
 
-            httplog();  #write to http.log file
-            $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
-
             if ($entrycriteriaok) { ## do not want to parseresponse on junk
                parseresponse();  #grab string from response to send later
             }
+
+            httplog();  #write to http.log file
+            $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
 
             ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
             if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
