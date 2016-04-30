@@ -3071,7 +3071,7 @@ sub _write_step_html {
     }
 
     # if we have grabbed an email file, link to it
-    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
+    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.eml" ) {
         $_html .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
