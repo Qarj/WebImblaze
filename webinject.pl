@@ -1507,7 +1507,12 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
     #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
-    my $pageid = _find_page_in_cache($posturl);
+    my $pageid = _find_page_in_cache($posturl.'$');
+    if (not defined $pageid) {
+        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
+        #print {*STDOUT} " TRY WITHOUT EOL ANCHOR: $posturl \n";
+        _find_page_in_cache($posturl);
+    }
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
         #print {*STDOUT} " TRY WITH PAGE NAME ONLY: $posturl \n";
