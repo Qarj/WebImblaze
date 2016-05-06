@@ -1505,23 +1505,27 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
     $posturl =~ s{http.?://}{}si; ## remove http:// and https://
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    #print {*STDOUT} qq| POSTURL $posturl \n|; #debug
+    print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
     my $pageid = _find_page_in_cache($posturl.'$');
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #print {*STDOUT} " TRY WITHOUT EOL ANCHOR: $posturl \n";
-        _find_page_in_cache($posturl);
+        #print {*STDOUT} " TRY WITH PAGE NAME ONLY    : $posturl".'$'."\n";
+        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
     }
     if (not defined $pageid) {
-        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #print {*STDOUT} " TRY WITH PAGE NAME ONLY: $posturl \n";
-        $pageid = _find_page_in_cache($posturl); ## try again without the full path
+        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
+        #print {*STDOUT} " REMOVE PATH                : $posturl".'$'."\n";
+        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
     }
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        #print {*STDOUT} " DESPERATE MODE - LAST TRY: $posturl \n";
-        $pageid = _find_page_in_cache($posturl); ## try again without the full path
+        #print {*STDOUT} " REMOVE LEADING /           : $posturl".'$'."\n";
+        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
+    }
+    if (not defined $pageid) {
+        #print {*STDOUT} " DESPERATE MODE - NO ANCHOR : $posturl\n";
+        _find_page_in_cache($posturl);
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
