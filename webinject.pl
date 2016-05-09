@@ -83,6 +83,7 @@ my (@verifycountparms); ## regex match occurences must much a particular count f
 my ($output, $outputfolder); ## output path including possible filename prefix, output path without filename prefix
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
+my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $totalassertionskips = 0;
 my (@pages); ## page source of previously visited pages
 my (@pagenames); ## page name of previously visited pages
@@ -2618,6 +2619,16 @@ sub processcasefile {  #get test case files to run (from command line or config 
     $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
 
+    if (defined $userconfig->{ports_variable}) {
+        if ($userconfig->{ports_variable} eq 'convert_back') {
+            $convert_back_ports = 'true';
+        }
+    
+        if ($userconfig->{ports_variable} eq 'null') {
+            $convert_back_ports_null = 'true';
+        }
+    }
+
     return;
 }
 
@@ -2730,6 +2741,12 @@ sub convertbackxml {  #converts replaced xml with substitutions
         my $_d2 = $2;
         my $_random = _get_random_string($_d1, $_d2);
         $_[0] =~ s/{RANDOM:$_d1$_d2}/$_random/;
+    }
+
+    if (defined $convert_back_ports) {
+        $_[0] =~ s/{:(\d+)}/:$1/;
+    } elsif (defined $convert_back_ports_null) {
+        $_[0] =~ s/{:(\d+)}//;
     }
 
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started

@@ -28,6 +28,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Global Jumpbacks (globaljumpbacks)](#globaljumpbacks)
 
+[Ports Variable (ports_variable)](#ports_variable)
+
 [Test Only (testonly)](#testonly)
 
 [Auto Controller Only (autocontrolleronly)](#autocontrolleronly)
@@ -375,6 +377,16 @@ example: `<globalretry>50</globalretry>`
 Limits the number of times the retryfromstep parameter is followed. Stops tests potentially running forever.
 
 If not present, defaulted to 20.
+
+<br />
+
+
+<a name="ports_variable"></a>
+#### ports_variable
+
+When set to `convert_back` will change `{:4040}` to `:4040`.
+
+When set to `null` will change `{:4040}` to `` i.e. null.
 
 <br />
 
