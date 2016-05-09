@@ -227,7 +227,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 <a name="archdiagram"></a>
 ### 1.1 - Architecture Diagram
 
-![Alt text](/images/webinject_arch.png?raw=true "Architecture Diagram")
+![Alt text](images/webinject_arch.png?raw=true "Architecture Diagram")
 
 <a name="archsummary"></a>
 ### 1.2 - Summary
