@@ -386,7 +386,7 @@ If not present, defaulted to 20.
 
 When set to `convert_back` will change `{:4040}` to `:4040`.
 
-When set to `null` will change `{:4040}` to `` i.e. null.
+When set to `null` will change `{:4040}` to null.
 
 <br />
 
