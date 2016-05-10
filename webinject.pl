@@ -3205,12 +3205,12 @@ sub _replace_relative_urls_with_absolute {
             ${ $_response_content_ref } =~ s{
                                                  (action|href|src)
                                                  =
-                                                 "                                                     #"
+                                                 ["']                                                     #" (fix editor code highlight)
                                                  (
-                                                     [./a-gik-zA-GIK-Z~]                              # will not match http or javascript
-                                                     [^"]*
+                                                     [./a-gik-zA-GIK-Z~]                                  # will not match http or javascript
+                                                     [^"']*                                               #" (fix editor code highlight)
                                                  )
-                                                 "
+                                                 ["']                                                     #" (fix editor code highlight)
                                              }
                                              {
                                                 $1
