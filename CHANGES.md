@@ -8,6 +8,14 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.92 - May 11, 2016
+* link to Selenium page grabs in the step results
+* link to email files in the step results
+* parseresponse before writing log files
+* resources from gethrefs and getcss and getbackgroundimages are now substituted into the step results
+* auto substitution logic improvement
+* can now specify ports in format {:4040} - the port will be removed entirely if desired, or converted to :4040
+
 ### Version 1.91 - Apr 23, 2016
 * improved date time format for start_time in results.xml
 * restructured results.xml format for verifypositive, verifynegative, autoassertions, smartassertions and searchimage
