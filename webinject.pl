@@ -1508,21 +1508,21 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
     print {*STDOUT} qq| POSTURL $posturl \n|; #debug
 
-    my $pageid = _find_page_in_cache($posturl.'$');
+    my $pageid = _find_page_in_cache($posturl.q{$});
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
         #print {*STDOUT} " TRY WITH PAGE NAME ONLY    : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
+        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
         #print {*STDOUT} " REMOVE PATH                : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
+        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
     if (not defined $pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
         #print {*STDOUT} " REMOVE LEADING /           : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.'$'); ## try again without the full path
+        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
     if (not defined $pageid) {
         #print {*STDOUT} " DESPERATE MODE - NO ANCHOR : $posturl\n";
@@ -2623,7 +2623,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         if ($userconfig->{ports_variable} eq 'convert_back') {
             $convert_back_ports = 'true';
         }
-    
+
         if ($userconfig->{ports_variable} eq 'null') {
             $convert_back_ports_null = 'true';
         }
@@ -2736,7 +2736,7 @@ sub convertbackxml {  #converts replaced xml with substitutions
      $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
-    while ( $_[0] =~ m/{RANDOM:(\d+)(:[a-zA-Z]+)}/g ) {
+    while ( $_[0] =~ m/{RANDOM:(\d+)(:[[:alpha:]]+)}/g ) {
         my $_d1 = $1;
         my $_d2 = $2;
         my $_random = _get_random_string($_d1, $_d2);
@@ -2847,22 +2847,22 @@ sub _get_char {
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
         # now we should have a number in the range 1 to 36
         if ($_number < 11) {
-            $_char = chr($_number + 47);
+            $_char = chr $_number + 47;
         } else {
-            $_char = chr($_number + 54);  ## i.e. 64 - 10
+            $_char = chr $_number + 54;  ## i.e. 64 - 10
         }
     }
 
     if (uc $_type eq ':ALPHA') {
         $_max_desired_rnd = 26;
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
-        $_char = chr($_number + 64);
+        $_char = chr $_number + 64;
     }
 
     if (uc $_type eq ':NUMERIC') {
         $_max_desired_rnd = 10;
         $_number = _get_number_in_range ($_min_desired_rnd, $_max_desired_rnd, $_max_possible_rnd, $_raw_rnd);
-        $_char = chr($_number + 47);
+        $_char = chr $_number + 47;
     }
 
     return $_char;
@@ -2928,7 +2928,7 @@ sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 sub uri_escape {
     my ($_string) = @_;
 
-    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; #'
+    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; ##no critic(RegularExpressions::ProhibitEnumeratedClasses) #' 
 
     return $_string;
 }
@@ -3140,7 +3140,7 @@ sub _response_content_substitutions {
     }
 
     if (@bg_images) {
-        ${ $_response_content_ref } =~ s{style="background-image: url\(([^\)]+)}{_grabbed_background_image($1)}eg; #"
+        ${ $_response_content_ref } =~ s{style="background-image: url[(]([^)]+)}{_grabbed_background_image($1)}eg; #"
     }
 
     return;
@@ -3157,7 +3157,7 @@ sub _grabbed_href {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'href="'.$1;
+    return 'href="'.$1; ##no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
@@ -3171,7 +3171,7 @@ sub _grabbed_src {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'src="'.$1;
+    return 'src="'.$1; ##no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
@@ -3185,7 +3185,7 @@ sub _grabbed_background_image {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'style="background-image: url\('.$1;
+    return 'style="background-image: url\('.$1; ##no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
