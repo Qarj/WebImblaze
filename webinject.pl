@@ -33,6 +33,7 @@ use LWP;
 use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 use File::Basename; ## So gethrefs can determine the filename of the asset from the path
 use File::Spec;
+use File::Slurp;
 use HTTP::Request::Common;
 use HTTP::Cookies;
 use XML::Simple;
@@ -129,8 +130,6 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 ## Startup
 getoptions();  #get command line options
 
-whackoldfiles();  #delete files leftover from previous run (do this here so they are whacked each run)
-
 startsession(); #starts, or restarts the webinject session
 
 processcasefile();
@@ -166,16 +165,7 @@ $starttime = $startruntimer; ## need a global variable to make a copy of the sta
 $currentcasefilename = basename($currentcasefile); ## with extension
 $testfilename = fileparse($currentcasefile, '.xml'); ## without extension
 
-convtestcases();
-
-fixsinglecase();
-
-$xmltestcases = XMLin("$outputfolder$currentcasefilename.$$.tmp", VarAttr => 'varname'); #slurp test case file to parse (and specify variables tag)
-#print Dumper($xmltestcases);  #for debug, dump hash of xml
-#print keys %{$configfile};  #for debug, print keys from dereferenced hash
-
-#delete the temp file as soon as we are done reading it
-if (-e "$outputfolder$currentcasefilename.$$.tmp") { unlink "$outputfolder$currentcasefilename.$$.tmp"; }
+read_test_case_file();
 
 $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
@@ -2648,57 +2638,32 @@ sub _push_httpauth {
 }
 
 #------------------------------------------------------------------
-sub convtestcases {
-    #here we do some pre-processing of the test case file and write it out to a temp file.
-    #we convert certain chars so xml parser doesn't puke.
+sub read_test_case_file {
 
-    my @xmltoconvert;
+    my $_xml = read_file($currentcasefile);
 
-    open my $XMLTOCONVERT, '<', $currentcasefile or die "\nError: Failed to open test case file\n\n";  #open file handle
-    @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
-    close $XMLTOCONVERT or die "\nCould not close test case file\n\n";
+    # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
+    $_xml =~ s/&/{AMPERSAND}/g;
+    $_xml =~ s/\\</{LESSTHAN}/g;
 
     $casecount = 0;
-
-    foreach (@xmltoconvert){
-
-        #convert escaped chars and certain reserved chars to temporary values that the parser can handle
-        #these are converted back later in processing
-        s/&/{AMPERSAND}/g;
-        s/\\</{LESSTHAN}/g;
-
-        #count cases while we are here
-        if ($_ =~ /<case/) {  #count test cases based on '<case' tag
-            $casecount++;
-        }
+    while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag
+        $casecount++;
     }
 
-    open my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle to temp file
-    print {$CONVERTEDXML} @xmltoconvert;  #overwrite file with converted array
-    close $CONVERTEDXML or die "\nCould not closed converted XML file\n\n";
-
-    return;
-}
-
-#------------------------------------------------------------------
-sub fixsinglecase{ #xml parser creates a hash in a different format if there is only a single testcase.
-                   #add a dummy testcase to fix this situation
-
-    my @xmltoconvert;
-
     if ($casecount == 1) {
+        $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
+    }
+    
+    # here we parse the xml file in an eval, and capture any error returned (in $@)
+    my $_message;
+    $xmltestcases = eval { XMLin($_xml, VarAttr => 'varname') };
 
-        open my $XMLTOCONVERT, '<', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nError: Failed to open temp file\n\n";  #open file handle
-        @xmltoconvert = <$XMLTOCONVERT>;  #read the file into an array
-
-        for(@xmltoconvert) {
-            s/<\/testcases>/<case id="2" description1="dummy test case"\/><\/testcases>/g;  #add dummy test case to end of file
-        }
-        close $XMLTOCONVERT or die "\nCould not close XML to convert for single test case\n\n";
-
-        open my $CONVERTEDXML, '>', "$outputfolder"."$currentcasefilename".".$$".'.tmp' or die "\nERROR: Failed to open temp file for writing\n\n";  #open file handle
-        print {$CONVERTEDXML} @xmltoconvert;  #overwrite file with converted array
-        close $CONVERTEDXML or die "\nCould not close converted XML for single test case\n\n";;
+    if ($@) {
+        $_message = $@;
+        $_message =~ s{ at C:.*}{}g; # remove misleading reference Parser.pm
+        $_message =~ s{\n}{}g; # remove line feeds
+        die "\n".$_message." in $currentcasefile\n";
     }
 
     return;
@@ -3281,15 +3246,6 @@ sub finaltasks {  #do ending tasks
     close $HTTPLOGFILE or die "\nCould not close http log file\n\n";
     close $RESULTS or die "\nCould not close html results file\n\n";
     close $RESULTSXML or die "\nCould not close xml results file\n\n";
-
-    return;
-}
-
-#------------------------------------------------------------------
-sub whackoldfiles {  #delete any files leftover from previous run if they exist
-
-    ## delete tmp files in the output folder
-    if (glob("$outputfolder".'*.xml.*.tmp')) { unlink glob("$output".'*.xml.*.tmp'); }
 
     return;
 }
