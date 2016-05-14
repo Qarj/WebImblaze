@@ -92,7 +92,7 @@ Expected failures will be asserted by the master test file.
     description1="TESTSTEPTIME:90 is {SUB}"
     method="cmd"
     command="echo {SUB} > NUL"
-    verifypositive="_\d*\.\d{3,3}_"
+    verifypositive="_\d*\.\d{1,3}_"
 />
 
 <case
