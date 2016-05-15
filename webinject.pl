@@ -44,7 +44,6 @@ local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use IO::Handle;
-use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses)
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -2494,7 +2493,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
                 ## decode html entities - e.g. convert &amp; to & and &lt; to <
                 if ($escape eq 'decode') {
-                    $parsedresult{$case_attribute} = decode_entities($parsedresult{$case_attribute});
+                    _decode_html_entities($case_attribute);
                 }
 
                 ## quote meta characters so they will be treated as literal in regex
@@ -2506,6 +2505,17 @@ sub parseresponse {  #parse values from responses for use in future request (for
             #print "\n\nParsed String: $parsedresult{$_}\n\n";
         }
     }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _decode_html_entities {
+    my ($_case_attribute) = @_;
+
+    require HTML::Entities;
+ 
+    $parsedresult{$_case_attribute} = HTML::Entities::decode_entities($parsedresult{$_case_attribute});
 
     return;
 }
