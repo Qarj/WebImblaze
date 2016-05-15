@@ -45,8 +45,6 @@ use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use IO::Handle;
 use HTML::Entities; #for decoding html entities (you may comment this out if aren't using decode function when parsing responses)
-use Data::Dumper;  #uncomment to dump hashes for debugging
-use MIME::QuotedPrint; ## for decoding quoted-printable with decodequotedprintable parameter and parseresponse dequote feature
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -465,10 +463,7 @@ foreach ($start .. $repeat) {
 
             searchimage(); ## search for images within actual screen or page grab
 
-			if ($case{decodequotedprintable}) {
-				 my $decoded = decode_qp($response->as_string); ## decode the response output
-				 $response = HTTP::Response->parse($decoded); ## inject it back into the response
-			}
+            decode_quoted_printable();
 
             verify(); #verify result from http response
 
@@ -785,6 +780,7 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
 sub selenium {  ## send Selenium command and read response
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
+    require Data::Dumper;
 
     $starttimer = time;
 
@@ -800,7 +796,7 @@ sub selenium {  ## send Selenium command and read response
             #print {*STDOUT} "EVALRESP:$eval_response\n";
             if (defined $selresp) { ## phantomjs does not return a defined response sometimes
                 if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                    my $dumper_response = Dumper($selresp);
+                    my $dumper_response = Data::Dumper::Dumper($selresp);
                     print {*STDOUT} "SELRESP: DUMPED:\n$dumper_response";
                     $selresp = "selresp:DUMPED:$dumper_response";
                 } else {
@@ -861,7 +857,7 @@ sub _get_verifytext {
                 $idx++; ## we number the verifytexts from 1 onwards to tell them apart in the tags
                 $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
                 if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                    my $dumper_response = Dumper($vresp);
+                    my $dumper_response = Data::Dumper::Dumper($vresp);
                     my $dumped = 'dumped';
                     $selresp =~ s{$}{<$verifytext$dumped$idx>$dumper_response</$verifytext$dumped$idx>\n}; ## include it in the response
                     ## ^ means match start of string, $ end of string
@@ -952,14 +948,15 @@ sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Sear
 sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
                               ##        custom_switch_to_window(0);
                               ##        custom_switch_to_window(1);
+    require Data::Dumper;
 
-    my ($windownumber) = @_;
+    my ($_window_number) = @_;
 
     my $handles = $driver->get_window_handles;
-    print {*Dumper} $handles;
-    my $resp1 =  $driver->switch_to_window($handles->[$windownumber]);
+    print Data::Dumper::Dumper($handles);
+    my $_resp =  $driver->switch_to_window($handles->[$_window_number]);
 
-    return $resp1;
+    return $_resp;
 }
 
 sub custom_js_click { ## usage: custom_js_click(id);
@@ -2042,7 +2039,18 @@ sub searchimage {  ## search for images in the actual result
     return;
 } ## end sub
 
+#------------------------------------------------------------------
+sub decode_quoted_printable {
 
+    require MIME::QuotedPrint;
+
+	if ($case{decodequotedprintable}) {
+		 my $decoded = MIME::QuotedPrint::decode_qp($response->as_string); ## decode the response output
+		 $response = HTTP::Response->parse($decoded); ## inject it back into the response
+	}
+
+    return;
+}
 
 #------------------------------------------------------------------
 sub verify {  #do verification of http response and print status to HTML/XML/STDOUT/UI
