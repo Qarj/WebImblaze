@@ -23,7 +23,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive9="retryfromstep.xml - 110-10"
     verifynegative9="retryfromstep.xml - 110-11"
     assertcount="and also mynum variable  four  will be|||8"
-    verifyresponsetime="19"
+    verifyresponsetime="29"
 />
 
 <!-- Test both retryfromstep and retry in the same test case file -->
@@ -39,7 +39,6 @@ Self test master file. All test steps in this file should pass.
     verifynegative2="retryfromstep1.xml - 20-1.4"
     verifypositive3="retryfromstep1.xml - 20-2.2"
     verifynegative3="retryfromstep1.xml - 20-2.3"
-    verifyresponsetime="19"
 />
 
 </testcases>
