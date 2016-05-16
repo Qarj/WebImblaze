@@ -160,13 +160,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [autocontrolleronly](#autocontrolleronly)
 
 
-#### [3.3.7 - Parameters to skip test steps if previous test steps failed](#sanity)
-
-[checkpositive](#checkpositive)
-
-[checknegative](#checknegative)
-
-[checkresponsecode](#checkresponsecode)
+#### [3.3.7 - Parameters to end execution early due to assertion failures](#sanity)
 
 [sanitycheck](#sanitycheck)
 
