@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.92';
+$VERSION = '1.93';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -66,7 +66,6 @@ my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder);
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
-my (@lastpositive, @lastnegative, $lastresponsecode, $entrycriteriaok, $entryresponse); ## skip tests if prevous ones failed
 my ($testnum, $xmltestcases); ## $testnum made global
 my ($testnumlog, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
@@ -273,53 +272,13 @@ foreach ($start .. $repeat) {
             }
         }
 
-        $entrycriteriaok = 'true'; ## assume entry criteria met
-        $entryresponse = q{};
-
-        $case{checkpositive} = $xmltestcases->{case}->{$testnum}->{checkpositive};
-        if (defined $case{checkpositive}) { ## is the checkpositive value set for this testcase?
-            if ($lastpositive[$case{checkpositive}] eq 'pass') { ## last verifypositive for this indexed passed
-                ## ok to run this test case
-            }
-            else {
-                $entrycriteriaok = q{};
-                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n/;
-                ## print "ENTRY CRITERIA NOT MET ... (last verifypositive$case{checkpositive} failed)\n";
-                ## $cmdresp =~ s!^!HTTP/1.1 100 OK\n!; ## pretend this is an HTTP response - 100 means continue
-            }
-        }
-
-        $case{checknegative} = $xmltestcases->{case}->{$testnum}->{checknegative};
-        if (defined $case{checknegative}) { ## is the checkpositive value set for this testcase?
-            if ($lastnegative[$case{checknegative}] eq 'pass') { ## last verifynegative for this indexed passed
-                ## ok to run this test case
-            }
-            else {
-                $entrycriteriaok = q{};
-                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n/;
-                ## print "ENTRY CRITERIA NOT MET ... (last verifynegative$case{checknegative} failed)\n";
-            }
-        }
-
-        $case{checkresponsecode} = $xmltestcases->{case}->{$testnum}->{checkresponsecode};
-        if (defined $case{checkresponsecode}) { ## is the checkpositive value set for this testcase?
-            if ($lastresponsecode == $case{checkresponsecode}) { ## expected response code last test case equals actual
-                ## ok to run this test case
-            }
-            else {
-                $entrycriteriaok = q{};
-                $entryresponse =~ s/^/ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n/;
-                ## print "ENTRY CRITERIA NOT MET ... (expected last response code of $case{checkresponsecode} got $lastresponsecode)\n";
-            }
-        }
-
         # populate variables with values from testcase file, do substitutions, and revert converted values back
         ## old parmlist, kept for reference of what attributes are supported
         ##
         ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", "command2", "command3", "command4", "command5", "command6", "command7", "command8", "command9", "command10", "", "command11", "command12", "command13", "command14", "command15", "command16", "command17", "command18", "command19", "command20", "parms", "verifytext",
         ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
         ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
-        ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "checkpositive", "checknegative", "checkresponsecode", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
+        ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
         ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly", "decodequotedprintable");
         ##
         ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
@@ -439,25 +398,16 @@ foreach ($start .. $repeat) {
 
             $RESULTS->autoflush();
 
-            if ($entrycriteriaok) { ## do not run it if the case has not met entry criteria
-               if ($case{method}) {
-                   if ($case{method} eq 'delete') { httpdelete(); }
-                   if ($case{method} eq 'get') { httpget(); }
-                   if ($case{method} eq 'post') { httppost(); }
-                   if ($case{method} eq 'put') { httpput(); }
-                   if ($case{method} eq 'cmd') { cmd(); }
-                   if ($case{method} eq 'selenium') { selenium(); }
-               }
-               else {
-                  httpget();  #use "get" if no method is specified
-               }
+            if ($case{method}) {
+                if ($case{method} eq 'delete') { httpdelete(); }
+                if ($case{method} eq 'get') { httpget(); }
+                if ($case{method} eq 'post') { httppost(); }
+                if ($case{method} eq 'put') { httpput(); }
+                if ($case{method} eq 'cmd') { cmd(); }
+                if ($case{method} eq 'selenium') { selenium(); }
             }
             else {
-                 # Response code 412 means Precondition failed
-                 print {*STDOUT} $entryresponse;
-                 $entryresponse =~ s{^}{412 \n};
-                 $response = HTTP::Response->parse($entryresponse);
-                 $latency = 0.001; ## Prevent latency bleeding over from previous test step
+               httpget();  #use "get" if no method is specified
             }
 
             searchimage(); ## search for images within actual screen or page grab
@@ -470,9 +420,7 @@ foreach ($start .. $repeat) {
             getsrcs(); ## get specified web page src assets
             getbackgroundimages(); ## get specified web page src assets
 
-            if ($entrycriteriaok) { ## do not want to parseresponse on junk
-               parseresponse();  #grab string from response to send later
-            }
+            parseresponse();  #grab string from response to send later
 
             httplog();  #write to http.log file
             $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
@@ -2059,69 +2007,57 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 
     ## auto assertions
-    if ($entrycriteriaok && !$case{ignoreautoassertions}) {
+    if (!$case{ignoreautoassertions}) {
         ## autoassertion, autoassertion1, ..., autoassertion4, ..., autoassertion10000 (or more)
         _verify_autoassertion();
     }
 
     ## smart assertions
-    if ($entrycriteriaok && !$case{ignoresmartassertions}) {
+    if (!$case{ignoresmartassertions}) {
         _verify_smartassertion();
     }
 
     ## verify positive
-    if ($entrycriteriaok) {
-        ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
-        _verify_verifypositive();
-    }
+    ## verifypositive, verifypositive1, ..., verifypositive25, ..., verifypositive10000 (or more)
+    _verify_verifypositive();
 
     ## verify negative
-    if ($entrycriteriaok) {
-        _verify_verifynegative();
-        ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
-    }
+    ## verifynegative, verifynegative1, ..., verifynegative25, ..., verifynegative10000 (or more)
+    _verify_verifynegative();
 
     ## assert count
-    if ($entrycriteriaok) {
-        _verify_assertcount();
-    } ## end if entrycriteriaOK
+    _verify_assertcount();
 
-    if ($entrycriteriaok) {
-         if ($case{verifyresponsetime}) { ## verify that the response time is less than or equal to given amount in seconds
-             if ($latency <= $case{verifyresponsetime}) {
-                    print {$RESULTS} qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
-                    print {$RESULTSXML} qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
-                    print {*STDOUT} "Passed Response Time Verification \n";
-                    $passedcount++;
-                    $retrypassedcount++;
-             }
-             else {
-                    print {$RESULTS} qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
-                    print {$RESULTSXML} qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
-                    print {$RESULTSXML} qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
-                    print {*STDOUT} "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n";
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
-            }
+     if ($case{verifyresponsetime}) { ## verify that the response time is less than or equal to given amount in seconds
+         if ($latency <= $case{verifyresponsetime}) {
+                print {$RESULTS} qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
+                print {$RESULTSXML} qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
+                print {*STDOUT} "Passed Response Time Verification \n";
+                $passedcount++;
+                $retrypassedcount++;
          }
-    }
-
-    if ($entrycriteriaok) {
-        $forcedretry='false';
-        if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
-            if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
-                print {$RESULTS} qq|<span class="pass">Will retry on response code </span><br />\n|;
-                print {$RESULTSXML} qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
-                print {$RESULTSXML} qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
-                print {*STDOUT} qq|Found Retry HTTP Response Code \n|;
-                $forcedretry='true'; ## force a retry even though we received a potential error code
-            }
+         else {
+                print {$RESULTS} qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
+                print {$RESULTSXML} qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
+                print {$RESULTSXML} qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
+                print {*STDOUT} "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n";
+                $failedcount++;
+                $retryfailedcount++;
+                $isfailure++;
+        }
+     }
+ 
+    $forcedretry='false';
+    if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
+        if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
+            print {$RESULTS} qq|<span class="pass">Will retry on response code </span><br />\n|;
+            print {$RESULTSXML} qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
+            print {$RESULTSXML} qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
+            print {*STDOUT} qq|Found Retry HTTP Response Code \n|;
+            $forcedretry='true'; ## force a retry even though we received a potential error code
         }
     }
 
-    $lastresponsecode = $response->code(); ## remember the last response code for checking entry criteria for the next test case
-    #print "\n\n\ DEBUG    $lastresponsecode \n\n";
     if ($case{verifyresponsecode}) {
         if ($case{verifyresponsecode} == $response->code()) { #verify returned HTTP response code matches verifyresponsecode set in test case
             print {$RESULTS} qq|<span class="pass">Passed HTTP Response Code Verification </span><br />\n|;
@@ -2154,13 +2090,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }
         else {
             $response->as_string() =~ /(HTTP\/1.)(.*)/i;
-            if (!$entrycriteriaok){ ## test wasn't run due to entry criteria not being met
-                print {$RESULTS} qq|<span class="fail">Failed - Entry criteria not met</span><br />\n|; #($1$2) is HTTP response code
-                print {$RESULTSXML} qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                print {$RESULTSXML} qq|            <verifyresponsecode-message>Failed - Entry criteria not met</verifyresponsecode-message>\n|;
-                print {*STDOUT} "Failed - Entry criteria not met \n"; #($1$2) is HTTP response code
-            }
-            elsif ($1) {  #this is true if an HTTP response returned
+            if ($1) {  #this is true if an HTTP response returned
                 print {$RESULTS} qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
                 print {$RESULTSXML} qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                 print {$RESULTSXML} qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
@@ -2323,7 +2253,6 @@ sub _verify_verifypositive {
                     print {$RESULTSXML} qq|                <success>true</success>\n|;
                     print {*STDOUT} "Passed Positive Verification \n";
                     #print {*STDOUT} $verifynum." Passed Positive Verification \n"; ##DEBUG
-                    $lastpositive[$verifynum] = 'pass'; ## remember fact that this verifypositive passed
                     $passedcount++;
                     $retrypassedcount++;
                 }
@@ -2338,7 +2267,6 @@ sub _verify_verifypositive {
                     if ($verifyparms[1]) {
                        print {*STDOUT} "$verifyparms[1] \n";
                     }
-                    $lastpositive[$verifynum] = 'fail'; ## remember fact that this verifypositive failed
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
@@ -2380,7 +2308,6 @@ sub _verify_verifynegative {
                     if ($verifyparms[1]) {
                        print {*STDOUT} "$verifyparms[1] \n";
                     }
-                    $lastnegative[$verifynum] = 'fail'; ## remember fact that this verifynegative failed
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
@@ -2392,7 +2319,6 @@ sub _verify_verifynegative {
                     print {$RESULTS} qq|<span class="pass">Passed Negative Verification</span><br />\n|;
                     print {$RESULTSXML} qq|            <success>true</success>\n|;
                     print {*STDOUT} "Passed Negative Verification \n";
-                    $lastnegative[$verifynum] = 'pass'; ## remember fact that this verifynegative passed
                     $passedcount++;
                     $retrypassedcount++;
                 }
@@ -3008,7 +2934,7 @@ sub _write_step_html {
 
     # To Do: make this automatic - i.e. if no html and body tags found
     my $_display_as_text;
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20} || !$entrycriteriaok) { #Always log as text when a selenium command is present, or entry criteria not met
+    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20}) { #Always log as text when a selenium command is present
         $_display_as_text =  'true';
     }
 

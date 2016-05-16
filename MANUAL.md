@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.92
+# Manual for WebInject version 1.93
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -1675,44 +1675,7 @@ webinject.pl -a
 
 
 <a name="sanity"></a>
-### 3.3.7 - Parameters to skip test steps if previous test steps failed
-
-<a name="checkpositive"></a>
-#### checkpositive
-
-```
-    checkpositive="8"
-```
-
-In this example, this test step will not be run, unless the most recent verifypositive8 passed.
-Allows us to skip test steps where we know they will fail since a previous dependent step failed.
-
-<br />
-
-
-<a name="checknegative"></a>
-#### checknegative
-
-```
-    checknegative="3"
-```
-
-In this example, this test step will not be run, unless the most recent verifynegative3 passed.
-
-<br />
-
-
-<a name="checkresponsecode"></a>
-#### checkresponsecode
-```
-    checkresponsecode="200"
-```
-
-In this example, this test step will not be run, unless the responsecode of the previous test
-step was 200 (if that test step was run).
-
-<br />
-
+### 3.3.7 - Parameters to halt execution early if assertions have failed
 
 <a name="sanitycheck"></a>
 #### sanitycheck

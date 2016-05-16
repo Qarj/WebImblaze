@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.93 - May 16, 2016
+* removed checkpositive, checknegative and checkresponsecode feature - hard to understand and not compatible with verifyresponseTEXT
+
 ### Version 1.92 - May 11, 2016
 * link to Selenium page grabs in the step results
 * link to email files in the step results
