@@ -17,6 +17,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive4="10.03"
     verifypositive5="20.03"
     verifypositive6="[important_user]"
+    verifypositive7="not included[^\n]*expire_job_ad"
 />
 
 </testcases>

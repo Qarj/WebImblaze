@@ -2626,18 +2626,21 @@ sub _include_file {
 
     if ($_match =~ /testonly/) {
         if (not $config{testonly}) {
+            print {*STDOUT} "not included: [id $_id] $_file (testonly)\n";
             return q{};
         }
     }
 
     if ($_match =~ /autocontrolleronly/) {
         if (not $opt_autocontroller) {
+            print {*STDOUT} "not included: [id $_id] $_file (autocontrolleronly)\n";
             return q{};
         }
     }
 
     if ($_match =~ /liveonly/) {
         if ($config{testonly}) {
+            print {*STDOUT} "not included: [id $_id] $_file (liveonly)\n";
             return q{};
         }
     }
