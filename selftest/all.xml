@@ -194,33 +194,6 @@ Run all self tests
 />
 
 <case
-    id="230"
-    description1="checkpositive"
-    method="cmd"
-    command="webinject.pl -o selftest\output\checkpositive selftest\checkpositive.xml"
-    verifypositive="TEST CASE PASSED"
-    verifynegative="TEST CASE FAILED"
-/>
-
-<case
-    id="240"
-    description1="checknegative"
-    method="cmd"
-    command="webinject.pl -o selftest\output\checknegative selftest\checknegative.xml"
-    verifypositive="TEST CASE PASSED"
-    verifynegative="TEST CASE FAILED"
-/>
-
-<case
-    id="250"
-    description1="checkresponsecode"
-    method="cmd"
-    command="webinject.pl -o selftest\output\checkresponsecode selftest\checkresponsecode.xml"
-    verifypositive="TEST CASE PASSED"
-    verifynegative="TEST CASE FAILED"
-/>
-
-<case
     id="260"
     description1="sanitycheck"
     method="cmd"
@@ -420,6 +393,16 @@ Run all self tests
 <case
     varFEATURE="random"
     id="460"
+    description1="{FEATURE}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
+    varFEATURE="include"
+    id="470"
     description1="{FEATURE}"
     method="cmd"
     command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"

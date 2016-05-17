@@ -1,0 +1,59 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    section="SETUP"
+    varUSERNAME="important_user"
+    id="1"
+    description1="Setup variables"
+    method="cmd"
+    command="NOP"
+/>
+
+<case
+    id="10"
+    include="selftest\helpers\setup\login.xml"
+/>
+
+<case
+    id="20"
+    include="selftest\helpers\setup\create_job_ad.xml"
+/>
+
+<case
+    id="100"
+    description1="View job {JOB_ID}"
+    method="cmd"
+    command="echo you are viewing the job description and salary for {JOB_ID}"
+    verifypositive="salary for (\d)+"
+/>
+
+<case
+    id="110"
+    description1="Apply for job"
+    method="cmd"
+    command="echo you have applied for the job ok"
+    verifypositive="applied for the job ok"
+/>
+
+<case
+    section="TEARDOWN"
+    id="1000"
+    description1="Expire job ad"
+    method="cmd"
+    command="NOP"
+    liveonly="true"
+/>
+
+<case
+    id="1010"
+    include="selftest\helpers\teardown\expire_job_ad.xml"
+    liveonly="true"
+/>
+
+
+</testcases>

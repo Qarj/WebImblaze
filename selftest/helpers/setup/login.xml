@@ -1,0 +1,22 @@
+
+<case
+    section="selftest\helpers\setup\login.xml [{USERNAME}]"
+    id="01"
+    description1="Get the login page"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="02"
+    description1="Submit {USERNAME} and password"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="03"
+    description1="Info - logged in as {USERNAME}"
+    method="cmd"
+    command="echo NOP"
+/>

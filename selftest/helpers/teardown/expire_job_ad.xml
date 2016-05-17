@@ -1,0 +1,23 @@
+
+<case
+    section="selftest\helpers\teardown\expire_job_ad.xml [{JOB_ID}]"
+    id="01"
+    description1="Get expire jobs page"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="02"
+    description1="Submit {JOB_ID} to expire"
+    method="cmd"
+    command="echo your job has been expired ok"
+    verifypositive="expired ok"
+/>
+
+<case
+    id="03"
+    description1="Info - expired job {JOB_ID}"
+    method="cmd"
+    command="echo NOP"
+/>

@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.93';
+$VERSION = '1.94';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -130,6 +130,10 @@ startsession(); #starts, or restarts the webinject session
 
 processcasefile();
 
+if (!$xnode) { #skip regular STDOUT output if using an XPath
+    writeinitialstdout();  #write opening tags for STDOUT.
+}
+
 #open file handles
 open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
 open $RESULTS, '>', "$output".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
@@ -137,10 +141,6 @@ open $RESULTSXML, '>', "$output".'results.xml' or die "\nERROR: Failed to open r
 
 print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
 writeinitialhtml();  #write opening tags for results file
-
-if (!$xnode) { #skip regular STDOUT output if using an XPath
-    writeinitialstdout();  #write opening tags for STDOUT.
-}
 
 $totalruncount = 0;
 $casepassedcount = 0;
@@ -173,6 +173,8 @@ $counter = $start - 1; #so starting position and counter are aligned
 
 if ($opt_driver) { startseleniumbrowser(); }  #start selenium browser if applicable. If it is already started, close browser then start it again.
 
+print {*STDOUT} "-------------------------------------------------------\n";
+
 ## Repeat Loop
 foreach ($start .. $repeat) {
 
@@ -191,6 +193,9 @@ foreach ($start .. $repeat) {
 
         ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
         $testnumlog = $testnum + ($counter*10_000) - 10_000;
+        $testnumlog = sprintf("%.2f", $testnumlog); ## maximul of 2 decimal places
+        $testnumlog =~ s/0+\z// if $testnumlog =~ /\./; ## remove trailing non significant zeros
+        $testnumlog =~ s/\.\z//; ## remove decimal point if nothing after
 
         if ($xnode) {  #if an XPath Node is defined, only process the single Node
             $testnum = $xnode;
@@ -639,7 +644,6 @@ sub writeinitialstdout {  #write initial text for STDOUT
 
     print {*STDOUT} "\n";
     print {*STDOUT} "Starting WebInject Engine...\n\n";
-    print {*STDOUT} "-------------------------------------------------------\n";
 
     return;
 }
@@ -2586,6 +2590,9 @@ sub read_test_case_file {
 
     my $_xml = read_file($currentcasefile);
 
+    # substitute in the included test step files
+    $_xml =~ s/<case[^>]*?id="(\d*)"[^>]*?include="([^"]*)"[^>]*>/_include_file($2,$1,$&)/sge; # "
+
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
     $_xml =~ s/&/{AMPERSAND}/g;
     $_xml =~ s/\\</{LESSTHAN}/g;
@@ -2598,7 +2605,7 @@ sub read_test_case_file {
     if ($casecount == 1) {
         $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
-    
+
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
     $xmltestcases = eval { XMLin($_xml, VarAttr => 'varname') };
@@ -2611,6 +2618,36 @@ sub read_test_case_file {
     }
 
     return;
+}
+
+#------------------------------------------------------------------
+sub _include_file {
+    my ($_file, $_id, $_match) = @_;
+
+    if ($_match =~ /testonly/) {
+        if (not $config{testonly}) {
+            return q{};
+        }
+    }
+
+    if ($_match =~ /autocontrolleronly/) {
+        if (not $opt_autocontroller) {
+            return q{};
+        }
+    }
+
+    if ($_match =~ /liveonly/) {
+        if ($config{testonly}) {
+            return q{};
+        }
+    }
+
+    print {*STDOUT} "include: [id $_id] $_file\n";
+
+    my $_include = read_file($_file);
+    $_include =~ s{id="}{id="$_id.}g; #"
+
+    return $_include;
 }
 
 #------------------------------------------------------------------
