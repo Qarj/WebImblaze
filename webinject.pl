@@ -2591,7 +2591,12 @@ sub read_test_case_file {
     my $_xml = read_file($currentcasefile);
 
     # substitute in the included test step files
-    $_xml =~ s/<include[^>]*?id[ ]*=[ ]*["'](\d*)["'][^>]*?file[ ]*=[ ]*["']([^"']*)["'][^>]*>/_include_file($2,$1,$&)/sge; # '
+    $_xml =~ s/<include[^>]*?
+               id[ ]*=[ ]*["'](\d*)["']                 # id = "10"
+               [^>]*?
+               file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
+               [^>]*>
+               /_include_file($2,$1,$&)/gsex; # '       # the actual file content
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
     $_xml =~ s/&/{AMPERSAND}/g;
