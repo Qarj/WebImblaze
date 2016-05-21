@@ -8,11 +8,17 @@ if you are not careful with what characters you attempt to display in the xml re
 -->
 
 <case
-    varBAD="&"
     id="10"
-    description1="Deliberate Corruption {BAD}"
+    description1="Creates a corrupt results.xml by forcing WebInject.pl to crash during execution"
     method="cmd"
     command="echo NOP"
 />
+
+<case
+    id="20"
+    description1="Get undef"
+    method="get"
+/>
+
 
 </testcases>

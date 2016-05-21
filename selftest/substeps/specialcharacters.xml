@@ -11,14 +11,14 @@ Expected failures will be asserted by the master test file.
     method="cmd"
     command="echo NOP"
     verifypositive="one > two"
-    verifypositive1="one \< two"
+    verifypositive1="one < two"
     verifypositive2="one & two"
 />
 
 <case
     id="20"
-    description1="less than \< greater than > & ampersand"
-    description2=" \<&> in description too"
+    description1="less than < greater than > & ampersand"
+    description2=" <&> in description too"
     method="cmd"
     command="echo NOP"
 />
@@ -27,7 +27,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="Assertion should be ignored"
     method="cmd"
-    command="echo one \< NUL"
+    command="echo one < NUL"
 />
 
 

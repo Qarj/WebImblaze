@@ -2611,7 +2611,8 @@ sub read_test_case_file {
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
     $_xml =~ s/&/{AMPERSAND}/g;
-    $_xml =~ s/\\</{LESSTHAN}/g;
+    $_xml =~ s/\w\s*=\s*"[^"]*\K<([^"]*")/{LESSTHAN}$1/sg;
+    $_xml =~ s/\w\s*=\s*'[^']*\K<([^']*')/{LESSTHAN}$1/sg;
 
     $casecount = 0;
     while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag

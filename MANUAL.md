@@ -1898,56 +1898,24 @@ For example, to have a test case file run 5 times, your file should open with:
 <a name="validxml"></a>
 ### 3.7 - Valid XML and Using Reserved XML Characters
 
-You may only use valid XML in your test cases.  Malformed XML or mixed content will not be accepted by the parser
-that is used to read the test cases.
+XML does not allow the ampersand, `&` or the less than symbol `<` in attribute values.
 
+Unfortunately this limitation makes things somewhat difficult since both characters appear frequently in html.
 
-However, you may find it necessary to use such characters within an XML Attribute to define your test case.  Most
-of these situations are handled programmatically behind the scenes for you as a user.
-
-For example, the "&amp;" character would normally not be acceptable to an XML parser since it is a reserved character.
-Since this character is used in URL query strings (which are necessary in many/most test cases), it is handled
-as a special case and you may use them within your test case XML.
-
-
-There are two special cases to be aware of:
-
-#### less than (<) character:
-
-Anywhere you use this character in your test cases (except of course, enclosing your actual XML tags), you must escape it
-with a backslash (failure to do so will make the test case parser croak).
-
-
-For example, the following testcase parameter will not work like this:
+If fact the ampersand symbol in particular appears in many URL query strings.
 
 ```
-    verifypositive="<OPTION SELECTED>APPLE"
+    url="http://example.com/search?location=London&radius=10&keyword=coffee"
 ```
 
+WebInject deals with these characters in attribute values by substituting them with {AMPERSAND} and {LESSTHAN}.
 
-Instead, it should be written like:
+Then it feeds this in-memory modified test case file to the XML parser which will happily parse the corrected xml.
 
-```
-    verifypositive="\<OPTION SELECTED>APPLE"
-```
+Then just before each test step is executed, it turns {AMPERSAND} and {LESSTHAN} back to `&` and `<`. This is done
+automatically for you.
 
-When the test case file is loaded, WebInject will see the `\<` combination and substitute it with `{LESSTHAN}`.
-Then just before the test step is executed, it is turned back to `<`.
-
-Or you could just leave it out altogether for a cleaner look:
-
-```
-    verifypositive="OPTION SELECTED>APPLE"
-```
-
-In fact you can get away with just writing a dot instead of any special character.
-In regular expressions, a single dot, i.e. `.` will match any single character.
-
-```
-    verifypositive="OPTION SELECTED.APPLE"
-```
-
-<br />
+However there is a special case to be aware of:
 
 
 #### quotes (single or double):
