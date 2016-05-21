@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.94 - May 21, 2016
+* added a feature to make it easy to reuse common test steps - e.g. login, register an account
+
 ### Version 1.93 - May 16, 2016
 * removed checkpositive, checknegative and checkresponsecode feature - hard to understand and not compatible with verifyresponseTEXT
 

@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.93
+# Manual for WebInject version 1.94
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -98,6 +98,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [useragent](#useragentparameter)
 
+[include] (#include)
+
 #### [3.3.3 - Additional Assertion Parameters](#asserts)
 
 [assertcount](#assertcount)
@@ -172,6 +174,12 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [searchimage searchimage1 ... searchimage5](#searchimage)
 
 [verifytext](#verifytext)
+
+
+
+#### [3.3.9 - Test step re-use](#reuse)
+
+[include](#include)
 
 
 
@@ -1740,6 +1748,49 @@ Separate additional items with commas. Example:
 ```
     verifytext="get_active_element,get_all_cookies,get_current_url,get_window_position,get_body_text,get_page_source"
 ```
+
+<br />
+
+
+<a name="reuse"></a>
+### 3.3.9 - Test step re-use
+
+<a name="include"></a>
+#### include
+
+It is possible to reference test step snippets saved in another file. This means you do not need to copy paste common
+test steps. Examples - log in, register a new account.
+
+To do this effectively, you need to setup the the variables the test steps require. Then you put in the include step.
+
+If you examine the include selftest, you'll see a full example of the structure. Refer to `selftest\substeps\include.xml`.
+
+The include step looks like this:
+
+```
+<include
+    id="10"
+    file="selftest\helpers\setup\login.xml"
+/>
+```
+
+What this will do is include the test steps in login.xml at id 10. It uses numbering to the right of the decimal point.
+
+So if login.xml has 5 steps, they could be numbered 01, 02, 03, 04 and 05.
+
+Then when they get included in the master test case file, they will become 10.01, 10.02, 10.03, 10.04 and 10.05 (given
+this example).
+
+This feature has been implemented using regular expressions so there are some limitations. However in practice it works well.
+
+Within the include step, you may also use the testonly, liveonly and autocontrolleronly parameters. **No other parameters are
+supported for the include step.**
+
+##### Usage notes / limitations
+* The id within the include step must be on a line of its own (see example above)
+* The id also must use double quotes, not single (see example above)
+* The steps within the referenced file must not have the `<testcases>` and `</testcases>` tags. That is because the entire
+file is substituted for the include step.
 
 <br />
 
