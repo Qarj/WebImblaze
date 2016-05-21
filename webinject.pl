@@ -2694,12 +2694,14 @@ sub convertbackxml {  #converts replaced xml with substitutions
      $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
-    while ( $_[0] =~ m/{RANDOM:(\d+)(:[[:alpha:]]+)}/g ) {
-        my $_d1 = $1;
-        my $_d2 = $2;
-        my $_random = _get_random_string($_d1, $_d2);
-        $_[0] =~ s/{RANDOM:$_d1$_d2}/$_random/;
-    }
+#    while ( $_[0] =~ m/{RANDOM:(\d+)(:*[[:alpha:]]*)}/g ) {
+#        my $_d1 = $1;
+#        my $_d2 = $2;
+#        my $_random = _get_random_string($_d1, $_d2);
+#        $_[0] =~ s/{RANDOM:$_d1$_d2}/$_random/;
+#    }
+
+    $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
 
     if (defined $convert_back_ports) {
         $_[0] =~ s/{:(\d+)}/:$1/;
@@ -2758,6 +2760,10 @@ sub convertbackxml {  #converts replaced xml with substitutions
 sub _get_random_string {
     my ($_length, $_type) = @_;
 
+    if (not $_type) {
+        $_type = ':ALPHANUMERIC';
+    }
+
     require Math::Random::ISAAC;
 
     my $_rng = Math::Random::ISAAC->new(time);
@@ -2789,10 +2795,6 @@ sub _get_char {
 
     ## here we need to turn our unsigned 32 bit integer into a character of the desired type
     ## supported types :ALPHANUMERIC, :ALPHA, :NUMERIC
-
-    if (not defined $_type) {
-        $_type = ':ALPHANUMERIC';
-    }
 
     my $_min_desired_rnd = 1;
     my $_max_desired_rnd;

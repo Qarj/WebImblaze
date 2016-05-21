@@ -25,5 +25,11 @@
     command="echo {RANDOM:20:ALPHANUMERIC}"
 />
  
- 
+<case
+    id="30"
+    description1="{RANDOM:10} default to alphanumeric"
+    method="cmd"
+    command="echo NOP"
+/>
+
 </testcases>
