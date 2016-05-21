@@ -544,7 +544,7 @@ foreach ($start .. $repeat) {
             $teststeptime{$testnumlog}=$latency; ## store latency for step
 
             if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
-                print {*STDOUT} qq|RESTARTING BROWSER DUE TO FAIL ... \n|;
+                print {*STDOUT} qq|RESTARTING SESSION DUE TO FAIL ... \n|;
                 if ($opt_driver) { startseleniumbrowser(); }
                 startsession();
             }
@@ -552,7 +552,7 @@ foreach ($start .. $repeat) {
             if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
                 if ($opt_driver) {
-                        print {*STDOUT} "RESTARTING SELENIUM SESSION ...\n";
+                        print {*STDOUT} "RESTARTING SESSION ...\n";
                         startseleniumbrowser();
                     }
                 startsession();
