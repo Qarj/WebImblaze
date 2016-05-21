@@ -1903,10 +1903,11 @@ that is used to read the test cases.
 
 
 However, you may find it necessary to use such characters within an XML Attribute to define your test case.  Most
-of these situations are handled programmatically behind the scenes for you as a user.  For example, the "&amp;"
-character would normally not be acceptable to an XML parser since it is a reserved character.  Since this character
-is used in URL query strings (which are necessary in many/most test cases), it is handled as a special case and you
-may use them within your test case XML.
+of these situations are handled programmatically behind the scenes for you as a user.
+
+For example, the "&amp;" character would normally not be acceptable to an XML parser since it is a reserved character.
+Since this character is used in URL query strings (which are necessary in many/most test cases), it is handled
+as a special case and you may use them within your test case XML.
 
 
 There are two special cases to be aware of:
@@ -1929,6 +1930,9 @@ Instead, it should be written like:
 ```
     verifypositive="\<OPTION SELECTED>APPLE"
 ```
+
+When the test case file is loaded, WebInject will see the `\<` combination and substitute it with `{LESSTHAN}`.
+Then just before the test step is executed, it is turned back to `<`.
 
 Or you could just leave it out altogether for a cleaner look:
 

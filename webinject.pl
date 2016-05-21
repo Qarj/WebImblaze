@@ -365,7 +365,7 @@ foreach ($start .. $repeat) {
                 next unless defined $case{$_};
                 print {$RESULTS} qq|$case{$_} <br />\n|;
                 print {*STDOUT} qq|$case{$_} \n|;
-                print {$RESULTSXML} qq|            <$_>$case{$_}</$_>\n|;
+                print {$RESULTSXML} qq|            <$_>|._sub_xml_special($case{$_}).qq|</$_>\n|;
             }
 
             print {$RESULTS} qq|<br />\n|;
@@ -435,7 +435,7 @@ foreach ($start .. $repeat) {
                 print {$RESULTSXML} qq|            <success>false</success>\n|;
                 if ($case{errormessage}) { #Add defined error message to the output
                     print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
-                    print {$RESULTSXML} qq|            <result-message>$case{errormessage}</result-message>\n|;
+                    print {$RESULTSXML} qq|            <result-message>|._sub_xml_special($case{errormessage}).qq|</result-message>\n|;
                     print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
                 }
                 else { #print regular error output
@@ -2203,7 +2203,7 @@ sub _verify_smartassertion {
             #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
                 print {$RESULTSXML} qq|            <$config_attribute>\n|;
-                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
+                print {$RESULTSXML} qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
                     #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     print {$RESULTSXML} qq|                <success>true</success>\n|;
@@ -2216,7 +2216,7 @@ sub _verify_smartassertion {
                     print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[2]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                       print {$RESULTSXML} qq|                <message>$verifyparms[2]</message>\n|;
+                       print {$RESULTSXML} qq|                <message>|._sub_xml_special($verifyparms[2]).qq|</message>\n|;
                     }
                     print {*STDOUT} 'Failed Smart Assertion';
                     if ($verifyparms[2]) {
@@ -2251,7 +2251,7 @@ sub _verify_verifypositive {
             }
             else {
                 print {$RESULTSXML} qq|            <$case_attribute>\n|;
-                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
+                print {$RESULTSXML} qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                     print {$RESULTS} qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     print {$RESULTSXML} qq|                <success>true</success>\n|;
@@ -2265,7 +2265,7 @@ sub _verify_verifypositive {
                     print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       print {$RESULTSXML} qq|                <message>$verifyparms[1]</message>\n|;
+                       print {$RESULTSXML} qq|                <message>|._sub_xml_special($verifyparms[1]).qq|</message>\n|;
                     }
                     print {*STDOUT} "Failed Positive Verification \n";
                     if ($verifyparms[1]) {
@@ -2300,13 +2300,13 @@ sub _verify_verifynegative {
             }
             else {
                 print {$RESULTSXML} qq|            <$case_attribute>\n|;
-                print {$RESULTSXML} qq|                <assert>$verifyparms[0]</assert>\n|;
+                print {$RESULTSXML} qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
                     print {$RESULTS} qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     print {$RESULTSXML} qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) {
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                         print {$RESULTSXML} qq|            <message>$verifyparms[1]</message>\n|;
+                         print {$RESULTSXML} qq|            <message>|._sub_xml_special($verifyparms[1]).qq|</message>\n|;
                     }
                     print {*STDOUT} "Failed Negative Verification \n";
                     if ($verifyparms[1]) {
@@ -2367,7 +2367,7 @@ sub _verify_assertcount {
                     if ($verifycountparms[2]) {## if there is a custom message, write it out
                         print {$RESULTS} qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
                         print {$RESULTS} qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
-                        print {$RESULTSXML} qq|            <$case_attribute-message>$verifycountparms[2] [got $count]</$case_attribute-message>\n|;
+                        print {$RESULTSXML} qq|            <$case_attribute-message>|._sub_xml_special($verifycountparms[2]).qq| [got $count]</$case_attribute-message>\n|;
                     }
                     else {# we make up a standard message
                         print {$RESULTS} qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
@@ -2583,6 +2583,17 @@ sub _push_httpauth {
     }
 
     return;
+}
+
+#------------------------------------------------------------------
+sub _sub_xml_special {
+    my ($_clean) = @_;
+
+    $_clean =~ s/&/{AMPERSAND}/g;
+    $_clean =~ s/</{LESSTHAN}/g;
+    $_clean =~ s/>/{GREATERTHAN}/g;
+
+    return $_clean;
 }
 
 #------------------------------------------------------------------

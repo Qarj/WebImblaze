@@ -410,4 +410,14 @@ Run all self tests
     verifynegative="TEST CASE FAILED"
 />
 
+<case
+    varFEATURE="specialcharacters"
+    id="480"
+    description1="{FEATURE}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
 </testcases>

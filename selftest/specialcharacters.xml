@@ -1,0 +1,27 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">specialcharacters</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 1"
+/>
+
+<case
+    id="20"
+    description1="view xml results.xml file"
+    method="cmd"
+    command1="type selftest\output\${feature}subresults.xml"
+    verifypositive1="[{]AMPERSAND[}]"
+    verifypositive2="[{]LESSTHAN[}]"
+    verifypositive3="[{]GREATERTHAN[}]"
+/>
+
+
+</testcases>
