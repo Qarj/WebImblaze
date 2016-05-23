@@ -25,9 +25,24 @@ Expected failures will be asserted by the master test file.
 
 <case
     id="30"
-    description1="Assertion should be ignored"
+    description1="Assertions should pass"
     method="cmd"
     command="echo one < NUL"
+    verifynegative1='\<option selected="selected" value="Relevancy#0">Relevance\</option>|||Expected Search to be ordered by Relevance'
+    verifynegative2="\<option selected='selected' value='Relevancy#0'>Relevance\</option>|||Expected Search to be ordered by Relevance"
+    verifynegative3="'<<<"
+    verifynegative4='"<<<'
+    verifynegative5="<<'<"
+    verifynegative6='<<"<'
+/>
+
+<case
+    id="40"
+    description1="More special characters'&<>"
+    method="cmd"
+    command="echo one < NUL"
+    verifynegative1='<start>option "id="52" other="3"\<\end>'
+    verifynegative2="<start>option 'id='51' & other='3'/\\<\\end>"
 />
 
 

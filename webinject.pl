@@ -2611,8 +2611,9 @@ sub read_test_case_file {
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
     $_xml =~ s/&/{AMPERSAND}/g;
-    $_xml =~ s/\w\s*=\s*"[^"]*\K<([^"]*")/{LESSTHAN}$1/sg;
-    $_xml =~ s/\w\s*=\s*'[^']*\K<([^']*')/{LESSTHAN}$1/sg;
+    while ( $_xml =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
+    while ( $_xml =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
+    #$_xml =~ s/\\</{LESSTHAN}/g;
 
     $casecount = 0;
     while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag
@@ -2622,6 +2623,9 @@ sub read_test_case_file {
     if ($casecount == 1) {
         $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
+
+    # see the final test case file after all alerations for debug purposes
+    #write_file('final_test_case_file_'.int(rand(999)).'.xml', $_xml);
 
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
