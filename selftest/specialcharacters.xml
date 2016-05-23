@@ -11,7 +11,9 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 1"
+    verifypositive1="Test Cases Run: 4"
 />
+<!-- Test Cases Run is important - if the regex goes wrong, some test cases may be skipped -->
 
 <case
     id="20"
