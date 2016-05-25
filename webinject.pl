@@ -44,6 +44,7 @@ local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use IO::Handle;
+use File::Copy qw(copy), qw(move);
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -1935,56 +1936,65 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 #------------------------------------------------------------------
 sub searchimage {  ## search for images in the actual result
 
-    my $unmarked = 'true';
-    my $imagecopy;
+    my $_unmarked = 'true';
+    my $_imagecopy;
 
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
-            if (-e "$cwd$opt_basefolder$case{$_}") { ## imageinimage bigimage smallimage markimage
-                if ($unmarked eq 'true') {
-                   $imagecopy = (`copy $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
-                   $unmarked = 'false';
+            if (-e "$case{$_}") { ## imageinimage.py bigimage smallimage markimage
+                if ($_unmarked eq 'true') {
+                   copy "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png";
+                   $_unmarked = 'false';
                 }
-                my $siresp = (`imageinimage.py $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png "$cwd$opt_basefolder$case{$_}" $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png`);
-                $siresp =~ m/primary confidence (\d+)/s;
-                my $primaryconfidence;
-                if ($1) {$primaryconfidence = $1;}
-                $siresp =~ m/alternate confidence (\d+)/s;
-                my $alternateconfidence;
-                if ($1) {$alternateconfidence = $1;}
-                $siresp =~ m/min_loc (.*?)X/s;
+
+                my $_image_in_image_result = (`plugins\\image_in_image.py $opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png`);
+
+                $_image_in_image_result =~ m/primary confidence (\d+)/s;
+                my $_primary_confidence;
+                if ($1) {$_primary_confidence = $1;}
+
+                $_image_in_image_result =~ m/alternate confidence (\d+)/s;
+                my $_alternate_confidence;
+                if ($1) {$_alternate_confidence = $1;}
+
+                $_image_in_image_result =~ m/min_loc (.*?)X/s;
                 my $location;
                 if ($1) {$location = $1;}
 
                 print {$RESULTSXML} qq|            <$_>\n|;
                 print {$RESULTSXML} qq|                <assert>case{$_}</assert>\n|;
 
-                if ($siresp =~ m/was found/s) { ## was the image found?
+                if ($_image_in_image_result =~ m/was found/s) { ## was the image found?
                     print {$RESULTS} qq|<span class="found">Found image: $case{$_}</span><br />\n|;
                     print {$RESULTSXML} qq|                <success>true</success>\n|;
-                    print {*STDOUT} "Found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
+                    print {*STDOUT} "Found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $location location\n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else { #the image was not found within the bigger image
                     print {$RESULTS} qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
                     print {$RESULTSXML} qq|                <success>false</success>\n|;
-                    print {*STDOUT} "Not found: $case{$_}\n   $primaryconfidence primary confidence\n   $alternateconfidence alternate confidence\n   $location location\n";
+                    print {*STDOUT} "Not found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $location location\n";
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
                 }
                 print {$RESULTSXML} qq|            </$_>\n|;
             } else {#We were not able to find the image to search for
-                print {*STDOUT} "SearchImage error - Was the filename correct?\n";
+                print {$RESULTS} qq|<span class="notfound">SearchImage error - was the file path correct? $case{$_}</span><br />\n|;
+                print {$RESULTSXML} qq|                <success>false</success>\n|;
+                print {*STDOUT} "SearchImage error - was the file path correct? $case{$_}\n";
+                $failedcount++;
+                $retryfailedcount++;
+                $isfailure++;
             }
         } ## end first if
     } ## end for
 
-    if ($unmarked eq 'false') {
+    if ($_unmarked eq 'false') {
        #keep an unmarked image, make the marked the actual result
-       $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-unmarked.png`);
-       $imagecopy = (`move $cwd\\$output$testnumlog$jumpbacksprint$retriesprint-marked.png $cwd\\$output$testnumlog$jumpbacksprint$retriesprint.png`);
+       move "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-unmarked.png";
+       move "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png";
     }
 
     return;
@@ -3070,6 +3080,15 @@ sub _write_step_html {
     # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
         $_html .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
+    }
+
+    # if we have search images, copy them to the results and link to them
+    for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
+        if ( $case{$_} && -e $case{$_} ) {
+            copy "$case{$_}", "$opt_publish_full";
+            my ($_image_name, $_image_path) = fileparse( $case{$_} );
+            $_html .= qq|<br />$_image_name<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="searchimage $case{$_}" src="$_image_name"><br />|;
+        }
     }
 
     # if we have grabbed an email file, link to it
