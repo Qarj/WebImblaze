@@ -2958,7 +2958,7 @@ sub httplog {  # write requests and responses to http.log file
     my $_core_info = "\n".$response->status_line( )."\n";
 
     my $_response_base;
-    if ( defined $response->base( ) ) {
+    if ( eval { defined $response->base( ) } ) {
         $_response_base = $response->base( );
         $_core_info .= 'Base for relative URLs: '.$_response_base."\n";
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
