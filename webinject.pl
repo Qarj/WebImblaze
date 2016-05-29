@@ -1947,7 +1947,7 @@ sub searchimage {  ## search for images in the actual result
                    $_unmarked = 'false';
                 }
 
-                my $_image_in_image_result = (`plugins\\image_in_image.py $opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png`);
+                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png`);
 
                 $_image_in_image_result =~ m/primary confidence (\d+)/s;
                 my $_primary_confidence;

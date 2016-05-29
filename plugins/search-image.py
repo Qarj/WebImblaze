@@ -1,18 +1,27 @@
-#find the smallimage inside the bigimage, if found optionally mark a rectangle on markfile
+# http://stackoverflow.com/questions/4720168/image-in-image-algorithm
+
+#find the image_to_find inside the target_image, if found optionally mark a rectangle on markfile
 import sys, subprocess, cv
 from PIL import Image, ImageDraw
 
 if (len(sys.argv) > 2):
    print sys.argv[1], sys.argv[2]
-   bigimage = sys.argv[1]
-   smallimage = sys.argv[2]
+   target_image = sys.argv[1]
+   image_to_find = sys.argv[2]
 else:
-   print 'Please specify image to search followed by the template.'
-   print 'Example: image_in_image.py bigimage.png smallimage.png [markfile.png]'
+   print 'Specify target image, followed by the image to search for.'
+   print 'Example: search-image.py target_image.png image_to_find.png [markfile.png]'
    sys.exit()
 
-im = cv.LoadImage(bigimage)
-tmp = cv.LoadImage(smallimage)
+# Example 1:
+# search-image.py examples\100-orig.png examples\menu_hamburger.png
+#
+# Example 2:
+# copy examples\100-orig.png marked_result.png
+# search-image.py examples\100-orig.png examples\menu_hamburger.png marked_result.png
+
+im = cv.LoadImage(target_image)
+tmp = cv.LoadImage(image_to_find)
 
 image_size = cv.GetSize(im)
 template_size = cv.GetSize(tmp)
