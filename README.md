@@ -10,7 +10,7 @@ WebInject is very easy to setup and run. An example is test included.
 
 ### Windows
 
-1. Download WebInject from GitHub as a ZIP and extract it somewhere. 
+1. Download WebInject from GitHub as a ZIP and extract it somewhere.
     * There is no need install it, or build or compile anything.
 
 2. Install Strawberry Perl.
@@ -64,7 +64,7 @@ Verifications Passed: 6
 Verifications Failed: 0
 ```
 
-So what happened? 
+So what happened?
 
 Since you didn't specify any options when you started WebInject, WebInject read the config.xml file and discovered that there was a default testcasefile called `examples\simple.xml`.
 
@@ -78,7 +78,7 @@ Three files were created in the folder called `output`:
 
 ### Creating your own tests
 
-If you examine `examples\simple.xml` in a text editor you'll see that it is pretty obvious how it works. 
+If you examine `examples\simple.xml` in a text editor you'll see that it is pretty obvious how it works.
 
 You can just change the url to the website you want to test.
 
@@ -109,9 +109,9 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
 ### Windows
 
 1. Open a command prompt as an administrator and issue the following command:
-```
-cpan Selenium::Remote::Driver
-```
+    ```
+    cpan Selenium::Remote::Driver
+    ```
 
 2. Obtain ChromeDriver.exe from https://sites.google.com/a/chromium.org/chromedriver/ and save
 it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
@@ -120,9 +120,9 @@ we'll put it here: `C:\ChromeDriver\chromedriver.exe`
 ### Run the Example Selenium WebDriver test
 1. Open a command prompt as an administrator and issue the following command:
 
-```
-webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
-```
+    ```
+    webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+    ```
 
 You should see Chrome open along with a process chromedriver.exe in the taskbar.
 
@@ -132,7 +132,7 @@ are automatically taken.
 WebInject Self Test
 -------------------
 
-WebInject uses WebInject to test itself. The self tests are organised by feature name. 
+WebInject uses WebInject to test itself. The self tests are organised by feature name.
 If you study the self tests for a feature you are interested, you will learn more about
 how that feature works.
 
@@ -148,3 +148,11 @@ Or you can run just one self test like this:
 webinject.pl selftest\verifypositive.xml
 ```
 
+Plugins
+-------
+
+### search-image.py
+
+To use the searchimage parameter (see manual), you need to install the dependencies for the search-image.py plugin. (The plugin itself is already installed in the plugins folder.)
+
+See https://github.com/Qarj/search-image for full installation instructions.
