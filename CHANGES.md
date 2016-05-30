@@ -8,6 +8,13 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.95 - May 30, 2016
+* {RANDOM:10} was meant to produce 10 random alphanumeric characters but did not do anything - fixed
+* in certain circumstances `<`, `>` and `&` was being written within results.xml tags - now substituted with {LESSTHAN}, {GREATERTHAN} and {AMPERSAND} respectively
+* there is now no need to escape `<` when used in test case attributes
+* stopped Response.pm croacking webinject.pl when the request url is empty
+* renamed image_in_image.py to search-image.py (and separated it to its own project on GitHub)
+
 ### Version 1.94 - May 21, 2016
 * added a feature to make it easy to reuse common test steps - e.g. login, register an account
 

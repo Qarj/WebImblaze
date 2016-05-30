@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.94';
+$VERSION = '1.95';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
