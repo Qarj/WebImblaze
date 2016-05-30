@@ -156,3 +156,12 @@ Plugins
 To use the searchimage parameter (see manual), you need to install the dependencies for the search-image.py plugin. (The plugin itself is already installed in the plugins folder.)
 
 See https://github.com/Qarj/search-image for full installation instructions.
+
+To test that it works, run the following. If all test steps pass, then everything is setup ok.
+
+```
+webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\searchimage.xml
+```
+
+You can also check the result by looking at `output\100.png' and also `output\200.png`. You'll see that
+search-image.py has marked the locations of the result screenshot where it found the images.
