@@ -1962,7 +1962,7 @@ sub searchimage {  ## search for images in the actual result
                 if ($1) {$location = $1;}
 
                 print {$RESULTSXML} qq|            <$_>\n|;
-                print {$RESULTSXML} qq|                <assert>case{$_}</assert>\n|;
+                print {$RESULTSXML} qq|                <assert>$case{$_}</assert>\n|;
 
                 if ($_image_in_image_result =~ m/was found/s) { ## was the image found?
                     print {$RESULTS} qq|<span class="found">Found image: $case{$_}</span><br />\n|;
