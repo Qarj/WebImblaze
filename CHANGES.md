@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.96 - Jun 12, 2016
+* replaced liveonly and testonly parameters with all-purpose runon
+* bug fix - searchimage filename should show in results xsl if not found
+
 ### Version 1.95 - May 30, 2016
 * {RANDOM:10} was meant to produce 10 random alphanumeric characters but did not do anything - fixed
 * in certain circumstances `<`, `>` and `&` was being written within results.xml tags - now substituted with {LESSTHAN}, {GREATERTHAN} and {AMPERSAND} respectively
