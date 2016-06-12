@@ -23,5 +23,4 @@
     <httpauth>myserver.mydomain.ds:8080::MYDOMAIN\MYUSER:MYPASSWORD</httpauth>
     <httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>
     <httpauth>www.example.com:8080:my_area:foo2:welcome2</httpauth>
-
 </root> 

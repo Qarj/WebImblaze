@@ -167,19 +167,10 @@ Run all self tests
 />
 
 <case
-    id="200"
-    description1="liveonly"
-    method="cmd"
-    command="webinject.pl -o selftest\output\liveonly selftest\liveonly.xml"
-    verifypositive="TEST CASE PASSED"
-    verifynegative="TEST CASE FAILED"
-/>
-
-<case
     id="210"
-    description1="testonly"
+    description1="runon"
     method="cmd"
-    command="webinject.pl -o selftest\output\testonly selftest\testonly.xml"
+    command="webinject.pl -o selftest\output\testonly selftest\runon.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />

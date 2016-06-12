@@ -30,7 +30,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Ports Variable (ports_variable)](#ports_variable)
 
-[Test Only (testonly)](#testonly)
+[Run On (runon)](#runon)
 
 [Auto Controller Only (autocontrolleronly)](#autocontrolleronly)
 
@@ -155,9 +155,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 #### [3.3.6 - Parameters to skip test steps depending on target environment](#skip)
 
-[liveonly](#liveonly)
-
-[testonly](#testonly)
+[runon](#runon)
 
 [autocontrolleronly](#autocontrolleronly)
 
@@ -393,16 +391,25 @@ When set to `null` will change `{:4040}` to null.
 <br />
 
 
-<a name="testonly"></a>
-#### testonly
-Used in conjunction with the testonly test case parameter. If this configuration item is present
-and set to any value, the test cases with the testonly parameter set will be run.
+<a name="environment"></a>
+#### environment
+Used in conjunction with the runon test case parameter. Test that have the runon parameter will only
+be run if one of the environments specified match the environment configure here.
 
-example: `<testonly>Allow</testonly>`
-To use this feature, specify this value in your test config files, and leave it out of your
-config files for your live servers.
+Example - in the config file:
+```
+    <wif>
+        <environment>DEV</environment>
+    </wif>
+```
 
-In the test step that you only want to run on test environments, specify the parameter `testonly="true"`
+In the test case specify:
+```
+    runon="DEV|PAT"
+```
+
+In this example, the test step will be run since the environment is defined as DEV in the config file
+and we have specified to allow the test to run on DEV and PAT.
 
 <a name="autocontrolleronly"></a>
 
@@ -410,7 +417,7 @@ In the test step that you only want to run on test environments, specify the par
 
 
 #### autocontrolleronly
-Similar to testonly. Allows you to designate certain servers as an automation controller.
+Allows you to designate certain servers as an automation controller.
 This enables you to specify that certain test steps should only be run from the automation controller.
 
 example: `<automationcontrolleronly>Allow</automationcontrolleronly>`
@@ -1611,38 +1618,22 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 <a name="skip"></a>
 ### 3.3.6 - Parameters to skip test steps depending on target environment
 
-<a name="testonly"></a>
-#### testonly
+<a name="runon"></a>
+#### runon
 
-If you run your test cases against both test and live environments, you can specify that selected
-test cases are skipped when run against your live config file. See the configuration file section
-for information on how to configure the config file.
+You can specify that selected test cases are skipped depending on the environment defined in the
+config file. See the environment section of the configuration file section for information on how to configure the config file.
 
 ```
-    testonly="true"
+    runon="PAT|PROD"
 ```
 
-In your config.xml, you would have the following line:
+In your config.xml, if you had the following, then the test step would be skipped:
 
 ```xml
-    <testonly>Allow</testonly>
-```
-
-<br />
-
-<a name="liveonly"></a>
-#### liveonly
-
-Works exactly the same was as testonly.
-
-```
-    liveonly="true"
-```
-
-In your config.xml, you would have the following line:
-
-```xml
-    <liveonly>Allow</liveonly>
+    <wif>
+        <environment>DEV</environment>
+    </wif>
 ```
 
 <br />
@@ -1783,7 +1774,7 @@ this example).
 
 This feature has been implemented using regular expressions so there are some limitations. However in practice it works well.
 
-Within the include step, you may also use the testonly, liveonly and autocontrolleronly parameters. **No other parameters are
+Within the include step, you may also use the runon and autocontrolleronly parameters. **No other parameters are
 supported for the include step.**
 
 ##### Usage notes / limitations

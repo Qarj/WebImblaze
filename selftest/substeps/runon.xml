@@ -1,0 +1,47 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Can be executed in any environment"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="20"
+    description1="Can be executed in DEV, PAT or PROD"
+    method="cmd"
+    command="echo NOP"
+    runon="DEV|PAT|PROD"
+/>
+
+<case
+    id="30"
+    description1="Can be executed in DEV only"
+    method="cmd"
+    command="echo NOP"
+    runon="DEV"
+/>
+
+<case
+    id="40"
+    description1="Can be executed in DEV or PAT only"
+    method="cmd"
+    command="echo NOP"
+    runon="DEV|PAT"
+/>
+
+<case
+    id="50"
+    description1="Can be executed in PROD only"
+    method="cmd"
+    command="echo NOP"
+    runon="PROD"
+/>
+
+</testcases>

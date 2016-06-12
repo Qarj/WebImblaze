@@ -1,7 +1,7 @@
 <root>
     <testcasefile>examples\simple.xml</testcasefile>
     <globalretry>10</globalretry> <!-- Global limit for the number of retries for a test run --> 
-    <globaljumpbacks>10</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
+    <globaljumpbacks>4</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
     <userdefined> 
         <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
         <ran>rimattest.azurewebsites.net</ran> <!-- RIMATTEST web site base url --> 
@@ -17,4 +17,11 @@
     <autoassertions> 
        <autoassertion1>^((?!HTTP Error 404.0 . Not Found).)*$|||Page not found error</autoassertion1> 
     </autoassertions> 
+    
+    <wif>
+        <environment>PROD</environment>
+        <batch>selftest</batch>
+        <folder>selftest</folder>
+        <run_number>1001</run_number>
+    </wif>
 </root> 

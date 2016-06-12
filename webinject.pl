@@ -213,16 +213,16 @@ foreach ($start .. $repeat) {
             $useragent->agent($case{useragent});
         }
 
-        $case{testonly} = $xmltestcases->{case}->{$testnum}->{testonly}; ## skip test cases marked as testonly when running against production
-        if ($case{testonly}) { ## is the testonly value set for this testcase?
-            if ($config{testonly}) { ## if so, does the config file allow us to run it?
+        $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
+        if ($case{runon}) { ## is this test step conditional on the target environment?
+            if ( _run_this_step($case{runon}) ) {
                 ## run this test case as normal since it is allowed
             }
             else {
-                  print {*STDOUT} "Skipping Test Case $testnum... (TESTONLY)\n";
-                  print {*STDOUT} qq|------------------------------------------------------- \n|;
+                print {*STDOUT} "Skipping Test Case $testnum... (run on $case{runon})\n";
+                print {*STDOUT} qq|------------------------------------------------------- \n|;
 
-                  next TESTCASE; ## skip this test case if a testonly parameter is not set in the global config
+                next TESTCASE; ## skip this test case if the current environment doesn't match one of the allowed
             }
         }
 
@@ -236,19 +236,6 @@ foreach ($start .. $repeat) {
                   print {*STDOUT} qq|------------------------------------------------------- \n|;
 
                   next TESTCASE; ## skip this test case if this isn't the test controller
-            }
-        }
-
-        $case{liveonly} = $xmltestcases->{case}->{$testnum}->{liveonly}; ## only run the test case against production
-        if ($case{liveonly}) { ## is the liveonly value set for this testcase?
-            if (!$config{testonly}) { ## assume that if the config doesn't contain the testonly item, then it is a live config
-                ## run this test case as normal since it is allowed
-            }
-            else {
-                  print {*STDOUT} "Skipping Test Case $testnum... (LIVEONLY)\n";
-                  print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                  next TESTCASE; ## skip this test case if a liveonly parameter is not set in the global config
             }
         }
 
@@ -723,6 +710,23 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
     print {*STDOUT} qq|Test Cases Failed: $casefailedcount\n|;
     print {*STDOUT} qq|Verifications Passed: $passedcount\n|;
     print {*STDOUT} qq|Verifications Failed: $failedcount\n\n|;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _run_this_step {
+    my ($_runon_parm) = @_;
+
+    my @_run_on = split /[|]/, $_runon_parm; ## get the list of environments that this test step can be run on
+    my $_run_this;
+    foreach (@_run_on) {
+        if (defined $userconfig->{wif}->{environment}) {
+            if ( $_ eq $userconfig->{wif}->{environment} ) {
+                return 'true';
+            }
+        }
+    }
 
     return;
 }
@@ -2523,7 +2527,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     #grab values for constants in config file:
-    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks testonly autocontrolleronly/) {
+    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
         if ($userconfig->{$config_const}) {
             $config{$config_const} = $userconfig->{$config_const};
             #print "\n$_ : $config{$_} \n\n";
@@ -2655,9 +2659,9 @@ sub read_test_case_file {
 sub _include_file {
     my ($_file, $_id, $_match) = @_;
 
-    if ($_match =~ /testonly/) {
-        if (not $config{testonly}) {
-            print {*STDOUT} "not included: [id $_id] $_file (testonly)\n";
+    if ( $_match =~ /runon[\s]*=[\s]*"([^"]*)/ ) {
+        if ( not _run_this_step($1) ) {
+            print {*STDOUT} "not included: [id $_id] $_file (run on $1)\n";
             return q{};
         }
     }
@@ -2665,13 +2669,6 @@ sub _include_file {
     if ($_match =~ /autocontrolleronly/) {
         if (not $opt_autocontroller) {
             print {*STDOUT} "not included: [id $_id] $_file (autocontrolleronly)\n";
-            return q{};
-        }
-    }
-
-    if ($_match =~ /liveonly/) {
-        if ($config{testonly}) {
-            print {*STDOUT} "not included: [id $_id] $_file (liveonly)\n";
             return q{};
         }
     }

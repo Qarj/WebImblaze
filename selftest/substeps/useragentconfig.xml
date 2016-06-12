@@ -18,6 +18,5 @@
        <autoassertion1>^((?!HTTP Error 404.0 . Not Found).)*$|||Page not found error</autoassertion1> 
     </autoassertions> 
     
-    <testonly>Allow</testonly> 
     <useragent>HTTP Test Tool</useragent>
 </root> 

@@ -1,0 +1,37 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">runon</testvar>
+<case
+    id="10"
+    description1="${feature} - with DEV config"
+    method="cmd"
+    command="webinject.pl -c selftest\substeps\${feature}_config_DEV.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 4"
+    verifypositive1="Skipping Test Case 50... \(run on PROD\)"
+/>
+
+<case
+    id="20"
+    description1="${feature} - with PAT config"
+    method="cmd"
+    command="webinject.pl -c selftest\substeps\${feature}_config_PAT.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 3"
+    verifypositive1="Skipping Test Case 30... \(run on DEV\)"
+    verifypositive2="Skipping Test Case 50... \(run on PROD\)"
+/>
+
+<case
+    id="30"
+    description1="${feature} - with PROD config"
+    method="cmd"
+    command="webinject.pl -c selftest\substeps\${feature}_config_PROD.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Run: 3"
+    verifypositive1="Skipping Test Case 30... \(run on DEV\)"
+    verifypositive2="Skipping Test Case 40... \(run on DEV|PAT\)"
+/>
+
+</testcases>

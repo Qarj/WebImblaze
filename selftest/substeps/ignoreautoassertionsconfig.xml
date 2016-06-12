@@ -19,6 +19,4 @@
        <autoassertion2>^((?!one two three four).)*$|||Should never see one two three four</autoassertion2> 
        <autoassertion3>one fish two fish|||Should always see one fish two fish</autoassertion3> 
     </autoassertions> 
-    
-    <testonly>Allow</testonly> 
 </root> 
