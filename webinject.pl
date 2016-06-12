@@ -2400,7 +2400,7 @@ sub _verify_assertcount {
 #------------------------------------------------------------------
 sub parseresponse {  #parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
 
-    my ($resptoparse, @parseargs);
+    my ($_response_to_parse, @parseargs);
     my ($leftboundary, $rightboundary, $escape);
 
     foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
@@ -2411,16 +2411,16 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
             $leftboundary = $parseargs[0]; $rightboundary = $parseargs[1]; $escape = $parseargs[2];
 
-            $resptoparse = $response->as_string;
-
             $parsedresult{$case_attribute} = undef; ## clear out any old value first
 
+            $_response_to_parse = $response->as_string;
+
             if ($rightboundary eq 'regex') {## custom regex feature
-                if ($resptoparse =~ m/$leftboundary/s) {
+                if ($_response_to_parse =~ m/$leftboundary/s) {
                     $parsedresult{$case_attribute} = $1;
                 }
             } else {
-                if ($resptoparse =~ m/$leftboundary(.*?)$rightboundary/s) {
+                if ($_response_to_parse =~ m/$leftboundary(.*?)$rightboundary/s) {
                     $parsedresult{$case_attribute} = $1;
                 }
             }
