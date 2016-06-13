@@ -137,10 +137,9 @@ if (!$xnode) { #skip regular STDOUT output if using an XPath
 
 #open file handles
 open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
-open $RESULTS, '>', "$output".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
-open $RESULTSXML, '>', "$output".'results.xml' or die "\nERROR: Failed to open results.xml file\n\n";
+open $RESULTS, '>', "$opt_publish_full".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
 
-print {$RESULTSXML} qq|<results>\n\n|;  #write initial xml tag
+write_initial_xml();
 writeinitialhtml();  #write opening tags for results file
 
 $totalruncount = 0;
@@ -623,6 +622,30 @@ sub writeinitialhtml {  #write opening tags for results file
     print {$RESULTS} qq|<body>\n|;
     print {$RESULTS} qq|<hr />\n|;
     print {$RESULTS} qq|-------------------------------------------------------<br />\n\n|;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub write_initial_xml {  #write opening tags for results file
+
+    # put a reference to the stylesheet in the results file
+    my $_results_xml = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n";
+    $_results_xml .= '<?xml-stylesheet type="text/xsl" href="../../../../../../../content/Results.xsl"?>'."\n";
+    $_results_xml .= "<results>\n\n";
+    my $_results_xml_file_name = 'results.xml';
+    if ( defined $userconfig->{wif}->{dd} && defined $userconfig->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
+        $_results_xml_file_name = 'results_'.$userconfig->{wif}->{run_number}.'.xml';
+        $_results_xml .= "    <wif>\n";
+        $_results_xml .= "        <environment>$userconfig->{wif}->{environment}</environment>\n";
+        $_results_xml .= "        <yyyy>$userconfig->{wif}->{yyyy}</yyyy>\n";
+        $_results_xml .= "        <mm>$userconfig->{wif}->{mm}</mm>\n";
+        $_results_xml .= "        <dd>$userconfig->{wif}->{dd}</dd>\n";
+        $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
+        $_results_xml .= "    </wif>\n";
+    }
+    open $RESULTSXML, '>', "$opt_publish_full".$_results_xml_file_name or die "\nERROR: Failed to open results.xml file\n\n";
+    print {$RESULTSXML} $_results_xml;  #write initial xml
 
     return;
 }
