@@ -207,7 +207,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 ### [5.3 - Results in STDOUT](#outputstdout)
 
-### [5.4 - HTTP Log File (http.log)](#outputhttp)
+### [5.4 - HTTP Log File (http.txt)](#outputhttp)
 
 ### [5.5 - Individual step html files (10.html ...)](#stephtml)
 
@@ -570,7 +570,7 @@ directory, you must use the relative path to it.
 
 Note: relative path from the webinject directory.
 **-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output
-files.  This is used to specify the location for writing output files (http.log, results.html, and
+files.  This is used to specify the location for writing output files (http.txt, results.html, and
 results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to
 add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted,
 it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination
@@ -585,11 +585,11 @@ To have all your output files written to the /foo directory:
 To have all your output files written to the foo subdirectory under your WebInject home directory:
 `perl webinject.pl -o ./foo/`
 
-To create a prefix for your output files (this will create output files named foohttp.log, fooresults.html,
+To create a prefix for your output files (this will create output files named foohttp.txt, fooresults.html,
 and fooresults.xml in the WebInject home directory):
 `perl webinject.pl -o foo`
 
-To use a combination of a directory and a prefix (this will create output files named foohttp.log,
+To use a combination of a directory and a prefix (this will create output files named foohttp.txt,
 fooresults.html, and fooresults.xml in the /bar directory):
 `perl webinject.pl -o /bar/foo`
 
@@ -1568,13 +1568,13 @@ This will match css background images that look like this in the html source:
 <a name="logastext"></a>
 #### logastext
 
-Putting this paramater on a test case will put tags around the test case in http.log file.
+Putting this paramater on a test case will put tags around the test case in http.txt file.
 
 ```
     logastext="true"
 ```
 
-This is useful if you parse the http.log into separate .html files and attempt to render it in the browser. This
+This is useful if you parse the http.txt into separate .html files and attempt to render it in the browser. This
 parameter lets you mark particular test cases to treat as text output (e.g. SOAP or AJAX tests) so that you render it as plain text rather
 than html.
 
@@ -1732,7 +1732,7 @@ For example, refering to the example above, RunningMan_Company_Logo.png can be f
 <a name="verifytext"></a>
 #### verifytext
 Fetches from WebDriver / Selenium the details you specify. Used in conjuction with a verifypostive or verifynegative.
-Or perhaps you just want those details to appear in the http.log.
+Or perhaps you just want those details to appear in the http.txt.
 
 Separate additional items with commas. Example:
 
@@ -2177,15 +2177,15 @@ Results are also sent [in plain text format] to the STDOUT channel as the tests 
 <br />
 
 <a name="outputhttp"></a>
-### 5.4 - HTTP Log File (http.log)
+### 5.4 - HTTP Log File (http.txt)
 
-A log file (http.log) is generated to capture HTTP requests that are sent to the web server of the system
+A log file (http.txt) is generated to capture HTTP requests that are sent to the web server of the system
 under test and HTTP responses that are received from the system under test.  Whether or not HTTP logging is
 turned on depends on a setting in the configuration file and if you have logging parameters turned on in each
 test case.  See the "Configuration - Configuration File (config.xml)" and "Test Case Setup - Available Parameters"
-sections of this manual for more information on logging to the http.log file.
+sections of this manual for more information on logging to the http.txt file.
 
-Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoing HTTP POST requests, but are not shown in http.log.  
+Note: "Content-Length" and "Host" HTTP headers are automatically added to outgoing HTTP POST requests, but are not shown in http.txt.  
 
 <br />
 

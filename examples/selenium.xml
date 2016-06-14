@@ -13,7 +13,7 @@
 
 <case
     id="20"
-    description1="Get SSL Loging Page"
+    description1="Get SSL Sign in Page"
     method="selenium"
     command="$selresp = $driver->get('https://www.totaljobs.com/Authenticated/Login.aspx');"
     verifytext="get_page_source,get_body_text"

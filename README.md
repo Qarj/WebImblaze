@@ -73,7 +73,7 @@ So WebInject just ran the tests in that file.
 Three files were created in the folder called `output`:
 * results.html is a html version of the results you saw in the command prompt - with colour.
 * results.xml is an xml version of the results.
-* http.log contains the response headers and the html that WebInject received.
+* http.txt contains the response headers and the html that WebInject received.
     * It is easy to find the html for step 20 - just search for ` - 20`
 
 ### Creating your own tests

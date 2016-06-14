@@ -14,7 +14,7 @@ Self test master file. All test steps in this file should pass.
 
 <case
     id="20"
-    description1="view http.log"
+    description1="view http.txt"
     method="cmd"
     command1="type selftest\output\${feature}sub20.html"
     verifypositive="/html>.*xmp>|||xmp tag not found - not logged as text"

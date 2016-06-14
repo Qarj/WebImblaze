@@ -136,7 +136,7 @@ if (!$xnode) { #skip regular STDOUT output if using an XPath
 }
 
 #open file handles
-open $HTTPLOGFILE, '>' ,"$output".'http.log' or die "\nERROR: Failed to open http.log file\n\n";
+open $HTTPLOGFILE, '>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
 open $RESULTS, '>', "$opt_publish_full".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
 
 write_initial_xml();
@@ -414,7 +414,7 @@ foreach ($start .. $repeat) {
 
             parseresponse();  #grab string from response to send later
 
-            httplog();  #write to http.log file
+            httplog();  #write to http.txt file
             $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
 
             ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
@@ -2940,7 +2940,7 @@ sub uri_escape {
 }
 
 #------------------------------------------------------------------
-sub httplog {  # write requests and responses to http.log file
+sub httplog {  # write requests and responses to http.txt file
 
     ## save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {

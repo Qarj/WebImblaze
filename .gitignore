@@ -1,6 +1,6 @@
 #WebInject Files to ignore
 
-http.log
+http.txt
 results.html
 results.xml
 *.tmp
