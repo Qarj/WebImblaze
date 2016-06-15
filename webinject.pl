@@ -225,6 +225,19 @@ foreach ($start .. $repeat) {
             }
         }
 
+        $case{donotrunon} = $xmltestcases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
+        if ($case{donotrunon}) { ## is this test step conditional on the target environment?
+            if ( not _run_this_step($case{donotrunon}) ) {
+                ## run this test case as normal since it is allowed
+            }
+            else {
+                print {*STDOUT} "Skipping Test Case $testnum... (do not run on $case{donotrunon})\n";
+                print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+                next TESTCASE; ## skip this test case if explicitly blocked for this environment
+            }
+        }
+
         $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
         if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
             if ($opt_autocontroller) { ## if so, was the auto controller option specified?
