@@ -19,7 +19,35 @@ WebInject is very easy to setup and run. An example is test included.
 
 That's it! You are now ready to run WebInject for the first time.
 
+### Linux - work in progress, does not yet work
+
+1. Clone WebInject with git
+    ```
+    cd ~
+    mkdir git
+    cd git
+    git clone https://github.com/Qarj/WebInject.git
+    ```
+
+2. Enter the following commands
+    ```
+    cd WebInject
+    chmod +x webinject.pl
+    su -
+    cpan File::Slurp
+    cpan XML::Simple
+    cpan Crypt::SSLeay
+    exit
+    ```
+
+3. Check that you can see the WebInject help info
+    ```
+    ./webinject.pl --help
+    ```
+
 ### Run the example WebInject test
+
+Note that these instructions are for Windows. If you are using Linux, then you already know what to do.
 
 1. Open the Command Prompt up as an Administrator
     * Press the Windows Key
@@ -116,6 +144,9 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
 2. Obtain ChromeDriver.exe from https://sites.google.com/a/chromium.org/chromedriver/ and save
 it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
 we'll put it here: `C:\ChromeDriver\chromedriver.exe`
+
+### Linux - work in progress, does not yet work
+
 
 ### Run the Example Selenium WebDriver test
 1. Open a command prompt as an administrator and issue the following command:
