@@ -26,4 +26,6 @@ LICENSE     text
 *.ico       binary
 *.dll       binary
 
+.gitignore  text
+
 *           text=auto
