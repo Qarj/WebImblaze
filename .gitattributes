@@ -1,0 +1,29 @@
+*.pl        text
+*.pm        text
+*.py        text
+*.md        text
+*.xml       text
+*.xsl       text
+*.css       text
+*.json      text
+*.cs        text
+*.js        text
+*.txt       text
+LICENSE     text
+*.config    text
+*.lua       text
+*.toc       text
+*.java      text
+*.html      text
+*.asax      text
+*.sln       text
+
+*.png       binary
+*.PNG       binary
+*.jpg       binary
+*.JPG       binary
+*.exe       binary
+*.ico       binary
+*.dll       binary
+
+*           text=auto
