@@ -599,8 +599,9 @@ finaltasks();  #do return/cleanup tasks
 ## shut down the Selenium server last - it is less important than closing the files
 shutdown_selenium();
 
+my $status = $casefailedcount cmp 0;
+exit $status;
 ## End main code
-
 
 #------------------------------------------------------------------
 #  SUBROUTINES
