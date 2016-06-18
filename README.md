@@ -20,6 +20,7 @@ WebInject is very easy to setup and run. An example is test included.
 That's it! You are now ready to run WebInject for the first time.
 
 ### Linux - work in progress, does not yet work
+Update 18/06: 25 of the 43 self tests now pass on Linux (Fedora 23), before today the self tests would not even run
 
 1. Clone WebInject with git
     ```
