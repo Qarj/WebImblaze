@@ -120,9 +120,8 @@ my ( $HTTPLOGFILE, $RESULTS, $RESULTSXML ); ## output file handles
 my ($startruntimer, $endruntimer, $repeat, $start);
 my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from here, made global
 
-my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## Windows hostname
+my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
-
 
 ## Startup
 getoptions();  #get command line options
