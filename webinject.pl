@@ -1941,6 +1941,11 @@ sub cmd {  ## send terminal command and read response
 
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+            if ($is_windows) { ## if the command starts with ./ or .\ we are just going to go and flip it around depending on the operating system
+                $cmd =~ s{^./}{.\\};
+            } else {
+                $cmd =~ s{^.\\}{./};
+            }
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
@@ -2503,6 +2508,19 @@ sub _decode_html_entities {
 }
 
 #------------------------------------------------------------------
+sub slash_me {
+    my ($_string) = @_;
+
+    if ($is_windows) {
+        $_string =~ s{/}{\\};
+    } else {
+        $_string =~ s{\\}{/};
+    }
+
+    return $_string;
+}
+
+#------------------------------------------------------------------
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
@@ -2512,7 +2530,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
-        $configfilepath = $opt_configfile;
+        $configfilepath = slash_me($opt_configfile);
     } else {
         $configfilepath = 'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
@@ -2532,7 +2550,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         #if testcase filename is not passed on the command line, use files in config.xml
 
         if ($userconfig->{testcasefile}) {
-            $currentcasefile = $userconfig->{testcasefile};
+            $currentcasefile = slash_me($userconfig->{testcasefile});
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
         }
@@ -2541,7 +2559,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
     elsif (($#ARGV + 1) == 1) {  #one command line arg was passed
         #use testcase filename passed on command line (config.xml is only used for other options)
-        $currentcasefile = $ARGV[0];  #first commandline argument is the test case file
+        $currentcasefile = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
     elsif (($#ARGV + 1) == 2) {  #two command line args were passed
@@ -2561,7 +2579,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         }
 
         #use testcase filename passed on command line (config.xml is only used for other options)
-        $currentcasefile = $ARGV[0];  #first commandline argument is the test case file
+        $currentcasefile = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
     #grab values for constants in config file:
