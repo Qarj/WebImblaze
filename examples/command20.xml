@@ -22,10 +22,10 @@ They will run in the following order:
     method="cmd"
     command="dir"
     command1="echo output of command 1"
-    command2="dir /?"
-    command20="help dir"
+    command20="echo output of command 20"
     verifypositive="webinject.pl"
     verifypositive1="output of command 1"
+    verifypositive2="output of command 20"
     verifypositive5="directory|||help dir should show help for dir command"
 />
 
