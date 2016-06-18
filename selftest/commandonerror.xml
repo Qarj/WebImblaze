@@ -9,7 +9,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="${feature}"
     method="cmd"
-    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     command1="type selftest\output\${feature}subhttp.txt"
     verifypositive="commandonerror in step 10 was run"
     verifynegative="commandonerror in step 20 was run"

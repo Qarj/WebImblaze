@@ -23,7 +23,7 @@ They will run in the following order:
     command="dir"
     command1="echo output of command 1"
     command20="echo output of command 20"
-    verifypositive="webinject.pl"
+    verifypositive=".\webinject.pl"
     verifypositive1="output of command 1"
     verifypositive2="output of command 20"
 />

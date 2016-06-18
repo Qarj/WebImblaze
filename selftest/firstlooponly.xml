@@ -9,7 +9,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="${feature}"
     method="cmd"
-    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 0"
     verifypositive1="Test Cases Run: 6"
     assertcount="Skipping Test Case 10|||4"

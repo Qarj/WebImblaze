@@ -9,7 +9,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="${feature} - filename prefix included as part of output path"
     method="cmd"
-    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
 />
 
 <case
@@ -26,7 +26,7 @@ Self test master file. All test steps in this file should pass.
     description1="${feature} - filename prefix not included as part of output path"
     method="cmd"
     command="if not exist selftest\output\temp mkdir selftest\output\temp"
-    command1="webinject.pl -o selftest\output\temp\ selftest\substeps\${feature}.xml"
+    command1=".\webinject.pl -o selftest\output\temp\ selftest\substeps\${feature}.xml"
 />
 
 <case

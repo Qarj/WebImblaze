@@ -8,7 +8,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="verifypositive"
     method="cmd"
-    command="webinject.pl -o selftest\output\verifypositivesub selftest\substeps\verifypositive.xml"
+    command=".\webinject.pl -o selftest\output\verifypositivesub selftest\substeps\verifypositive.xml"
     assertcount="Passed Positive Verification|||5|||Only Step 10 should have passed positive verifications"
     assertcount1="TEST CASE FAILED|||2|||Steps 20 and 30 should fail"
     assertcount2="Failed Positive Verification|||6|||Should be failed positive verifications in steps 20 and 30"

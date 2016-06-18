@@ -8,7 +8,7 @@ Run all self tests
     id="10"
     description1="verifypositive"
     method="cmd"
-    command="webinject.pl -o selftest\output\verifypositive selftest\verifypositive.xml"
+    command=".\webinject.pl -o selftest\output\verifypositive selftest\verifypositive.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -17,7 +17,7 @@ Run all self tests
     id="20"
     description1="verifynegative"
     method="cmd"
-    command="webinject.pl -o selftest\output\verifynegative selftest\verifynegative.xml"
+    command=".\webinject.pl -o selftest\output\verifynegative selftest\verifynegative.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -26,7 +26,7 @@ Run all self tests
     id="30"
     description1="parseresponse"
     method="cmd"
-    command="webinject.pl -o selftest\output\parseresponse selftest\parseresponse.xml"
+    command=".\webinject.pl -o selftest\output\parseresponse selftest\parseresponse.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -35,7 +35,7 @@ Run all self tests
     id="40"
     description1="assertcount"
     method="cmd"
-    command="webinject.pl -o selftest\output\assertcount selftest\assertcount.xml"
+    command=".\webinject.pl -o selftest\output\assertcount selftest\assertcount.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -44,7 +44,7 @@ Run all self tests
     id="50"
     description1="commandonerror"
     method="cmd"
-    command="webinject.pl -o selftest\output\commandonerror selftest\commandonerror.xml"
+    command=".\webinject.pl -o selftest\output\commandonerror selftest\commandonerror.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -53,7 +53,7 @@ Run all self tests
     id="60"
     description1="verifyresponsecode"
     method="cmd"
-    command="webinject.pl -o selftest\output\verifyresponsecode selftest\verifyresponsecode.xml"
+    command=".\webinject.pl -o selftest\output\verifyresponsecode selftest\verifyresponsecode.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -62,7 +62,7 @@ Run all self tests
     id="70"
     description1="verifyresponsetime"
     method="cmd"
-    command="webinject.pl -o selftest\output\verifyresponsetime selftest\verifyresponsetime.xml"
+    command=".\webinject.pl -o selftest\output\verifyresponsetime selftest\verifyresponsetime.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -71,7 +71,7 @@ Run all self tests
     id="80"
     description1="ignoreautoassertions"
     method="cmd"
-    command="webinject.pl -o selftest\output\ignoreautoassertions selftest\ignoreautoassertions.xml"
+    command=".\webinject.pl -o selftest\output\ignoreautoassertions selftest\ignoreautoassertions.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -80,7 +80,7 @@ Run all self tests
     id="90"
     description1="ignorehttpresponsecode"
     method="cmd"
-    command="webinject.pl -o selftest\output\ignorehttpresponsecode selftest\ignorehttpresponsecode.xml"
+    command=".\webinject.pl -o selftest\output\ignorehttpresponsecode selftest\ignorehttpresponsecode.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -89,7 +89,7 @@ Run all self tests
     id="110"
     description1="retry"
     method="cmd"
-    command="webinject.pl -o selftest\output\retry selftest\retry.xml"
+    command=".\webinject.pl -o selftest\output\retry selftest\retry.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -98,7 +98,7 @@ Run all self tests
     id="120"
     description1="retryfromstep"
     method="cmd"
-    command="webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.xml"
+    command=".\webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -107,7 +107,7 @@ Run all self tests
     id="130"
     description1="retryresponsecode"
     method="cmd"
-    command="webinject.pl -o selftest\output\retryresponsecode selftest\retryresponsecode.xml"
+    command=".\webinject.pl -o selftest\output\retryresponsecode selftest\retryresponsecode.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -116,7 +116,7 @@ Run all self tests
     id="140"
     description1="restartbrowseronfail"
     method="cmd"
-    command="webinject.pl -o selftest\output\restartbrowseronfail selftest\restartbrowseronfail.xml"
+    command=".\webinject.pl -o selftest\output\restartbrowseronfail selftest\restartbrowseronfail.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -125,7 +125,7 @@ Run all self tests
     id="150"
     description1="restartbrowser"
     method="cmd"
-    command="webinject.pl -o selftest\output\restartbrowser selftest\restartbrowser.xml"
+    command=".\webinject.pl -o selftest\output\restartbrowser selftest\restartbrowser.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -134,7 +134,7 @@ Run all self tests
     id="160"
     description1="errormessage"
     method="cmd"
-    command="webinject.pl -o selftest\output\errormessage selftest\errormessage.xml"
+    command=".\webinject.pl -o selftest\output\errormessage selftest\errormessage.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -143,7 +143,7 @@ Run all self tests
     id="170"
     description1="logastext"
     method="cmd"
-    command="webinject.pl -o selftest\output\logastext selftest\logastext.xml"
+    command=".\webinject.pl -o selftest\output\logastext selftest\logastext.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -152,7 +152,7 @@ Run all self tests
     id="180"
     description1="logresponseasfile"
     method="cmd"
-    command="webinject.pl -o selftest\output\logresponseasfile selftest\logresponseasfile.xml"
+    command=".\webinject.pl -o selftest\output\logresponseasfile selftest\logresponseasfile.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -161,7 +161,7 @@ Run all self tests
     id="190"
     description1="section"
     method="cmd"
-    command="webinject.pl -o selftest\output\section selftest\section.xml"
+    command=".\webinject.pl -o selftest\output\section selftest\section.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -170,7 +170,7 @@ Run all self tests
     id="210"
     description1="runon"
     method="cmd"
-    command="webinject.pl -o selftest\output\testonly selftest\runon.xml"
+    command=".\webinject.pl -o selftest\output\testonly selftest\runon.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -179,7 +179,7 @@ Run all self tests
     id="220"
     description1="autocontrolleronly"
     method="cmd"
-    command="webinject.pl -o selftest\output\autocontrolleronly selftest\autocontrolleronly.xml"
+    command=".\webinject.pl -o selftest\output\autocontrolleronly selftest\autocontrolleronly.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -188,7 +188,7 @@ Run all self tests
     id="260"
     description1="sanitycheck"
     method="cmd"
-    command="webinject.pl -o selftest\output\sanitycheck selftest\sanitycheck.xml"
+    command=".\webinject.pl -o selftest\output\sanitycheck selftest\sanitycheck.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -197,7 +197,7 @@ Run all self tests
     id="270"
     description1="ignoresmartassertions"
     method="cmd"
-    command="webinject.pl -o selftest\output\ignoresmartassertions selftest\ignoresmartassertions.xml"
+    command=".\webinject.pl -o selftest\output\ignoresmartassertions selftest\ignoresmartassertions.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -206,7 +206,7 @@ Run all self tests
     id="280"
     description1="decodequotedprintable"
     method="cmd"
-    command="webinject.pl -o selftest\output\decodequotedprintable selftest\decodequotedprintable.xml"
+    command=".\webinject.pl -o selftest\output\decodequotedprintable selftest\decodequotedprintable.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -216,7 +216,7 @@ Run all self tests
     id="290"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -226,7 +226,7 @@ Run all self tests
     id="300"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -236,7 +236,7 @@ Run all self tests
     id="310"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -246,7 +246,7 @@ Run all self tests
     id="320"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -256,7 +256,7 @@ Run all self tests
     id="330"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -266,7 +266,7 @@ Run all self tests
     id="340"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -276,7 +276,7 @@ Run all self tests
     id="350"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -286,7 +286,7 @@ Run all self tests
     id="360"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -296,7 +296,7 @@ Run all self tests
     id="370"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -306,7 +306,7 @@ Run all self tests
     id="380"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -316,7 +316,7 @@ Run all self tests
     id="390"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -326,7 +326,7 @@ Run all self tests
     id="400"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -336,7 +336,7 @@ Run all self tests
     id="410"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -346,7 +346,7 @@ Run all self tests
     id="420"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -356,7 +356,7 @@ Run all self tests
     id="430"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -366,7 +366,7 @@ Run all self tests
     id="440"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -376,7 +376,7 @@ Run all self tests
     id="450"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -386,7 +386,7 @@ Run all self tests
     id="460"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -396,7 +396,7 @@ Run all self tests
     id="470"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />
@@ -406,7 +406,7 @@ Run all self tests
     id="480"
     description1="{FEATURE}"
     method="cmd"
-    command="webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />

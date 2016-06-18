@@ -23,7 +23,7 @@ Potential uses in automated tests:
     description1="Get the directory listing of the current folder"
     method="cmd"
     command="dir"
-    verifypositive="webinject.pl"
+    verifypositive=".\webinject.pl"
 />
 
 

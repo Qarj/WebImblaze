@@ -9,7 +9,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="${feature}"
     method="cmd"
-    command="webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 3"
     verifypositive1="RETRYING... 2 to go"
     assertcount="Won't retry - received HTTP error code|||2"
