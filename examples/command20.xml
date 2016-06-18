@@ -26,7 +26,6 @@ They will run in the following order:
     verifypositive="webinject.pl"
     verifypositive1="output of command 1"
     verifypositive2="output of command 20"
-    verifypositive5="directory|||help dir should show help for dir command"
 />
 
 
