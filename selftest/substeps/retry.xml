@@ -9,10 +9,10 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Should not retry since the assertions pass"
     method="cmd"
-    command="echo one one one > NUL"
+    command="echo one one one"
     verifypositive="one"
     verifynegative="two"
-    assertcount="one|||3"
+    assertcount="one|||6"
     retry="5"
 />
 
@@ -22,11 +22,11 @@ is present - there is no point retrying i.e. fail fast -->
     id="20"
     description1="Should not retry since a verifynegative fails - fast fail"
     method="cmd"
-    command="echo one one one > NUL"
+    command="echo one one one"
     command1="echo critical error"
     verifypositive="one"
     verifynegative="critical error"
-    assertcount="one|||3"
+    assertcount="one|||6"
     retry="5"
 />
 

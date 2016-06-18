@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="hostname is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifynegative="__"
 />
 
@@ -19,7 +19,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="testnum is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_20_"
 />
 
@@ -28,7 +28,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="testfilename is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_substitutions_"
 />
 
@@ -37,7 +37,7 @@ Expected failures will be asserted by the master test file.
     id="40"
     description1="length is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*_"
 />
 
@@ -46,7 +46,7 @@ Expected failures will be asserted by the master test file.
     id="50"
     description1="ampersand"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\&_"
 />
 
@@ -55,7 +55,7 @@ Expected failures will be asserted by the master test file.
     id="60"
     description1="SINGLEQUOTE is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_'_"
 />
 
@@ -64,7 +64,7 @@ Expected failures will be asserted by the master test file.
     id="70"
     description1="TIMESTAMP is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*\.\d*_"
 />
 
@@ -73,7 +73,7 @@ Expected failures will be asserted by the master test file.
     id="80"
     description1="STARTTIME is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*\.\d*_"
 />
 
@@ -82,7 +82,7 @@ Expected failures will be asserted by the master test file.
     id="90"
     description1="LENGTH is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*_"
 />
 
@@ -91,7 +91,7 @@ Expected failures will be asserted by the master test file.
     id="100"
     description1="TESTSTEPTIME:90 is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*\.\d{1,3}_"
 />
 
@@ -100,7 +100,7 @@ Expected failures will be asserted by the master test file.
     id="110"
     description1="DAY MONTH YEAR is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d{10,10}_"
 />
 
@@ -109,7 +109,7 @@ Expected failures will be asserted by the master test file.
     id="120"
     description1="HH MM SS is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d{6,6}_"
 />
 
@@ -118,7 +118,7 @@ Expected failures will be asserted by the master test file.
     id="130"
     description1="WEEKOFMONTH is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d_"
 />
 
@@ -127,7 +127,7 @@ Expected failures will be asserted by the master test file.
     id="140"
     description1="DATETIME is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d{14,14}_"
 />
 
@@ -136,7 +136,7 @@ Expected failures will be asserted by the master test file.
     id="150"
     description1="FORMATDATETIME is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d\d\/\d\d\/\d{4,4}_\d\d:\d\d:\d\d_"
 />
 
@@ -145,7 +145,7 @@ Expected failures will be asserted by the master test file.
     id="160"
     description1="COUNTER is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_1_"
 />
 
@@ -154,8 +154,8 @@ Expected failures will be asserted by the master test file.
     id="170"
     description1="CONCURRENCY is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
-    verifypositive="_null_"
+    command="echo {SUB}"
+    verifypositive="_output_"
 />
 
 <case
@@ -163,7 +163,7 @@ Expected failures will be asserted by the master test file.
     id="180"
     description1="OUTPUT is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="output"
 />
 
@@ -172,7 +172,7 @@ Expected failures will be asserted by the master test file.
     id="190"
     description1="OUTSUM is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*_"
 />
 
@@ -181,7 +181,7 @@ Expected failures will be asserted by the master test file.
     id="200"
     description1="CWD is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifynegative="__"
 />
 
@@ -190,7 +190,7 @@ Expected failures will be asserted by the master test file.
     id="210"
     description1="RETRY is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_0_"
 />
 
@@ -199,7 +199,7 @@ Expected failures will be asserted by the master test file.
     id="220"
     description1="ELAPSED_SECONDS is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*_"
 />
 
@@ -208,7 +208,7 @@ Expected failures will be asserted by the master test file.
     id="230"
     description1="ELAPSED_MINUTES is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d*_"
 />
 
@@ -217,7 +217,7 @@ Expected failures will be asserted by the master test file.
     id="240"
     description1="NOW is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_\d\d\/\d\d\/\d{4,4}_\d\d:\d\d:\d\d_"
 />
 
@@ -226,7 +226,7 @@ Expected failures will be asserted by the master test file.
     id="250"
     description1="JUMPBACKS is {SUB}"
     method="cmd"
-    command="echo {SUB} > NUL"
+    command="echo {SUB}"
     verifypositive="_0_"
 />
 

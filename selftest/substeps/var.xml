@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Info - testemail: {TESTEMAIL}"
     method="cmd"
-    command="echo {TESTEMAIL} > NUL"
+    command="echo {TESTEMAIL}"
     verifypositive="_2_{YEAR}{MONTH}{DAY}"
     retry="3"
 />
@@ -19,7 +19,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="Further Processing"
     method="cmd"
-    command="echo NOP > NUL"
+    command="echo NOP"
 />
 
 <case
@@ -27,7 +27,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="Info - testemail: {TESTEMAIL}"
     method="cmd"
-    command="echo {TESTEMAIL} > NUL"
+    command="echo {TESTEMAIL}"
     verifypositive="_2_0_{YEAR}{MONTH}{DAY}"
     retryfromstep="20"
 />

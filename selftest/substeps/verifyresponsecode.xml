@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="verifyresponsecode should pass"
     method="cmd"
-    command="echo hello world > NUL"
+    command="echo hello world"
     verifyresponsecode="100"
 />
 
@@ -18,7 +18,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="verifyresponsecode should fail"
     method="cmd"
-    command="echo hello world > NUL"
+    command="echo hello world"
     verifyresponsecode="404"
 />
 

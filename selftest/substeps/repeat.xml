@@ -9,14 +9,14 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Step 10, loop number {COUNTER}"
     method="cmd"
-    command="echo NOP > NUL"
+    command="echo NOP"
 />
 
 <case
     id="20"
     description1="Step 20"
     method="cmd"
-    command="echo try number {RETRY} > NUL"
+    command="echo try number {RETRY}"
     verifypositive="try number 2"
     retry="3"
 />
