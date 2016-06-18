@@ -1945,6 +1945,7 @@ sub cmd {  ## send terminal command and read response
                 $cmd =~ s{^./}{.\\};
             } else {
                 $cmd =~ s{^.\\}{./};
+                $cmd =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
             }
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
@@ -2107,7 +2108,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $isfailure++;
         }
      }
- 
+
     $forcedretry='false';
     if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
         if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
@@ -2501,7 +2502,7 @@ sub _decode_html_entities {
     my ($_case_attribute) = @_;
 
     require HTML::Entities;
- 
+
     $parsedresult{$_case_attribute} = HTML::Entities::decode_entities($parsedresult{$_case_attribute});
 
     return;
@@ -2512,9 +2513,9 @@ sub slash_me {
     my ($_string) = @_;
 
     if ($is_windows) {
-        $_string =~ s{/}{\\};
+        $_string =~ s{/}{\\}g;
     } else {
-        $_string =~ s{\\}{/};
+        $_string =~ s{\\}{/}g;
     }
 
     return $_string;
@@ -2967,7 +2968,7 @@ sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 sub uri_escape {
     my ($_string) = @_;
 
-    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; ##no critic(RegularExpressions::ProhibitEnumeratedClasses) #' 
+    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; ##no critic(RegularExpressions::ProhibitEnumeratedClasses) #'
 
     return $_string;
 }
@@ -3637,7 +3638,7 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-Usage: webinject.pl testcase_file [XPath] <<options>>    
+Usage: webinject.pl testcase_file [XPath] <<options>>
 
                                                     examples/simple.xml testcases/case[20]
 -c|--config config_file                             -c config.xml
