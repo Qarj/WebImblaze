@@ -108,8 +108,8 @@ $HOUR = sprintf '%02d', $HOUR;
 my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
 $currentdatetime = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
-my $cwd = (`cd`); ## find current Windows working directory using backtick method
-$cwd =~ s/\n//g; ## remove newline character
+my $this_script_folder_full = dirname(__FILE__);
+chdir $this_script_folder_full;
 
 my $counter = 0; ## keeping track of the loop we are up to
 
@@ -2787,7 +2787,7 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;
 ## CWD Current Working Directory
-    $_[0] =~ s/{CWD}/$cwd/g;
+    $_[0] =~ s/{CWD}/$this_script_folder_full/g;
 
 ## parsedresults moved before config so you can have a parsedresult of {BASEURL2} say that in turn gets turned into the actual value
 
