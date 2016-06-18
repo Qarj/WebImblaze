@@ -123,6 +123,8 @@ my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 
+my $is_windows = $^O eq 'MSWin32' ? 1 : 0;
+
 ## Startup
 getoptions();  #get command line options
 
@@ -2753,12 +2755,12 @@ sub convertbackxml {  #converts replaced xml with substitutions
      $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
-#    while ( $_[0] =~ m/{RANDOM:(\d+)(:*[[:alpha:]]*)}/g ) {
-#        my $_d1 = $1;
-#        my $_d2 = $2;
-#        my $_random = _get_random_string($_d1, $_d2);
-#        $_[0] =~ s/{RANDOM:$_d1$_d2}/$_random/;
-#    }
+    # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
+    if ($is_windows) {
+        $_[0] =~ s/{SLASH}/\\/g;
+    } else {
+        $_[0] =~ s/{SLASH}/\//g;
+    }
 
     $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
 
