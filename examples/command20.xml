@@ -23,11 +23,10 @@ They will run in the following order:
     command="dir"
     command1="echo output of command 1"
     command2="dir /?"
-    command20="find /?"
+    command20="help dir"
     verifypositive="webinject.pl"
     verifypositive1="output of command 1"
-    verifypositive5="list of files|||dir /? should show help"
-    verifypositiveFIND="Searches for a text"
+    verifypositive5="directory|||help dir should show help for dir command"
 />
 
 
