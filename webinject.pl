@@ -2621,9 +2621,12 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     # find the name of the output folder only i.e. not full path
-    if ($output =~ m{\\([^\\]*)\\$}s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
-        $concurrency = $1;
-    }
+#    if ($output =~ m{\\([^\\]*)\\$}s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
+#        $concurrency = $1;
+#    }
+    ## this should be OS safe method of the above
+    my $_abs_output_full = File::Spec->rel2abs( $output );
+    $concurrency =  basename ( dirname($_abs_output_full) );
 
     $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
@@ -3620,11 +3623,14 @@ sub getoptions {  #shell options
     else {
         $output = 'output/'; ## default to the output folder under the current folder
     }
+    $output = slash_me($output);
     $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
 
     # default the publish to location for the individual html step files
     if (not defined $opt_publish_full) {
         $opt_publish_full = $output;
+    } else {
+        $opt_publish_full = slash_me($opt_publish_full);
     }
 
     return;
