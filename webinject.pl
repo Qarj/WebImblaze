@@ -2849,7 +2849,7 @@ sub _get_random_string {
 
     require Math::Random::ISAAC;
 
-    my $_rng = Math::Random::ISAAC->new(time);
+    my $_rng = Math::Random::ISAAC->new(time*100000); ## only integer portion is used in seed
 
     my $_random;
     my $_last;
