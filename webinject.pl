@@ -3041,7 +3041,14 @@ sub httplog {  # write requests and responses to http.txt file
 sub _write_http_log {
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref) = @_;
 
-    my $_log_separator = "\n************************* LOG SEPARATOR *************************\n";
+    my $_log_separator = "\n";
+    $_log_separator .= "      *****************************************************      \n";
+    $_log_separator .= "    *********************************************************    \n";
+    $_log_separator .= "  *************************************************************  \n";
+    $_log_separator .= "************************* LOG SEPARATOR *************************\n";
+    $_log_separator .= "  *************************************************************  \n";
+    $_log_separator .= "    *********************************************************    \n";
+    $_log_separator .= "      *****************************************************      \n\n";
     print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref };
 
     return;
