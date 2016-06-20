@@ -86,6 +86,15 @@ Run all self tests
 />
 
 <case
+    id="100"
+    description1="xml-parse-fail"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\retry selftest\xml-parse-fail.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
     id="110"
     description1="retry"
     method="cmd"

@@ -2709,10 +2709,34 @@ sub read_test_case_file {
         $_message = $@;
         $_message =~ s{ at C:.*}{}g; # remove misleading reference Parser.pm
         $_message =~ s{\n}{}g; # remove line feeds
-        die "\n".$_message." in $currentcasefile\n";
+        my $_file_name_full = _write_failed_xml($_xml);
+        die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
 
     return;
+}
+
+#------------------------------------------------------------------
+sub _write_failed_xml {
+    my ($_xml) = @_;
+
+    require File::Path;
+
+    ## output location might include a prefix that we do not want
+    my $_output_folder = dirname($output.'dummy');
+
+    my $_path = slash_me ($_output_folder.'/parse_error');
+
+    File::Path::make_path ( $_path );
+
+    my $_file_name = 'test_file_'.int(rand(999)).'.xml';
+    my $_file_name_full = slash_me ( $_path.'/'.$_file_name);
+
+    my $_abs_file_full = File::Spec->rel2abs( $_file_name_full );
+
+    write_file($_abs_file_full, $_xml);
+
+    return $_abs_file_full;
 }
 
 #------------------------------------------------------------------
