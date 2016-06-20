@@ -30,7 +30,7 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Ports Variable (ports_variable)](#ports_variable)
 
-[Run On (runon)](#runon)
+[Environment (environment)](#environment)
 
 [Auto Controller Only (autocontrolleronly)](#autocontrolleronly)
 
@@ -393,7 +393,7 @@ When set to `null` will change `{:4040}` to null.
 
 <a name="environment"></a>
 #### environment
-Used in conjunction with the runon test case parameter. Test that have the runon parameter will only
+Used in conjunction with the runon and donotrunon test case parameters. Tests that have the runon parameter will only
 be run if one of the environments specified match the environment configure here.
 
 Example - in the config file:
@@ -410,6 +410,17 @@ In the test case specify:
 
 In this example, the test step will be run since the environment is defined as DEV in the config file
 and we have specified to allow the test to run on DEV and PAT.
+
+On the other hand, tests that have the donotrunon will be treated inversely.
+
+So with the same config file as above, if we have this parameter:
+
+```
+    donotrunon="DEV|PAT"
+```
+
+Then the test step will be skipped.
+
 
 <a name="autocontrolleronly"></a>
 
@@ -1633,6 +1644,26 @@ In your config.xml, if you had the following, then the test step would be skippe
 ```xml
     <wif>
         <environment>DEV</environment>
+    </wif>
+```
+
+<br />
+
+
+<a name="donotrunon"></a>
+#### donotrunon
+
+As per runon, but the opposite.
+
+```
+    donotrunon="PAT|PROD"
+```
+
+In your config.xml, if you had the following, then the test step would be skipped:
+
+```xml
+    <wif>
+        <environment>PROD</environment>
     </wif>
 ```
 
