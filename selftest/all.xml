@@ -167,6 +167,15 @@ Run all self tests
 />
 
 <case
+    id="200"
+    description1="donotrunon"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\testonly selftest\donotrunon.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
     id="210"
     description1="runon"
     method="cmd"
