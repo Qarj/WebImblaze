@@ -24,8 +24,13 @@ Expected failures will be asserted by the master test file.
     file = 'selftest\helpers\setup\create_job_ad.xml'
 />
 
-<case
+<include
     id="100"
+    file="selftest\helpers\setup\apply_for_job.xml"
+/>
+
+<case
+    id="200"
     description1="View job {JOB_ID}"
     method="cmd"
     command="echo you are viewing the job description and salary for {JOB_ID}"
@@ -33,7 +38,7 @@ Expected failures will be asserted by the master test file.
 />
 
 <case
-    id="110"
+    id="210"
     description1="Apply for job"
     method="cmd"
     command="echo you have applied for the job ok"

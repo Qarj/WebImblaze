@@ -11,13 +11,16 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 0"
-    verifypositive1="Test Cases Run: 9"
+    verifypositive1="Test Cases Run: 21"
     verifypositive2="Info - created job 12345"
     verifypositive3="Skipping Test Case 1000"
     verifypositive4="10.03"
     verifypositive5="20.03"
     verifypositive6="[important_user]"
     verifypositive7="not included[^\n]*expire_job_ad"
+    verifypositive9="100.10"
+    verifynegative1="200.00"
+    verifynegative2="210.00"
 />
 
 </testcases>

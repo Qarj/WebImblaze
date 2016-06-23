@@ -196,7 +196,9 @@ foreach ($start .. $repeat) {
         $testnumlog = $testnum + ($counter*10_000) - 10_000;
         $testnumlog = sprintf("%.2f", $testnumlog); ## maximul of 2 decimal places
         $testnumlog =~ s/0+\z// if $testnumlog =~ /\./; ## remove trailing non significant zeros
-        $testnumlog =~ s/\.\z//; ## remove decimal point if nothing after
+        if (not ($testnumlog =~ s/\.\z//) ) { ## remove decimal point if nothing after
+            $testnumlog = sprintf("%.2f", $testnumlog); ## put back the non significant zero if we have a decimal point
+        }
 
         if ($xnode) {  #if an XPath Node is defined, only process the single Node
             $testnum = $xnode;
