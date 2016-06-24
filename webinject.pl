@@ -2709,8 +2709,7 @@ sub read_test_case_file {
 
     if ($@) {
         $_message = $@;
-        $_message =~ s{ at C:.*}{}g; # remove misleading reference Parser.pm
-        $_message =~ s{\n}{}g; # remove line feeds
+        $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
         my $_file_name_full = _write_failed_xml($_xml);
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
