@@ -947,14 +947,17 @@ sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Tar
 }
 
 sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
-                                    ##        custom_mouse_move_to_location('closeBtn','id','3','4');
+                                    ##        custom_mouse_move_to_location('closeBtn','id',3,4);
+                                    ##        custom_mouse_move_to_location('closeBtn','id'); # offsets are optional 
 
-    my ($search_target, $locator, $xoffset, $yoffset) = @_;
+    my ($_search_target, $_locator, $_xoffset, $_yoffset) = @_;
+    $_xoffset = int $_xoffset;
+    $_yoffset = int $_yoffset;
 
-    my $elem1 = $driver->find_element("$search_target", "$locator");
-    my $child = $driver->mouse_move_to_location($elem1, $xoffset, $yoffset);
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+    my $_child = $driver->mouse_move_to_location(element => $_element, xoffset => $_xoffset, yoffset => $_yoffset);
 
-    return $child;
+    return $_child;
 }
 
 sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
