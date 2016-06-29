@@ -12,11 +12,11 @@ Expected failures will be asserted by the master test file.
     command="echo Some example text to parse with the parse response parameter"
     command1="echo one two three four five six seven eight nine ten"
     command2='echo P_Jack {SHELL_ESCAPE}& Jill_P'
-    command3='echo A_{SHELL_ESCAPE}&amp;{SHELL_ESCAPE}&amp;{SHELL_ESCAPE}&amp;_A'
-    parseresponse="Some example | with the parse|"
-    parseresponse1="one two (\w*) four|regex|"
-    parseresponse5000="P_|_P|escape"
-    parseresponseDECODE="A_|_A|decode"
+    command3='echo A_{SHELL_ESCAPE}&amp{SHELL_ESCAPE};{SHELL_ESCAPE}&amp{SHELL_ESCAPE};{SHELL_ESCAPE}&amp{SHELL_ESCAPE};_A'
+    parseresponse="\RSome example | with the parse|"
+    parseresponse1="\Rone two (\w*) four|regex|"
+    parseresponse5000="\RP_|_P|escape"
+    parseresponseDECODE="\RA_|_A|decode"
 />
 
 <case
