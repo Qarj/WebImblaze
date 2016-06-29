@@ -16,24 +16,26 @@ Self test master file. All test steps in this file should pass.
     id="20"
     description1="view RIMATTEST_Home_Page.html"
     method="cmd"
-    command1='perl -ne "print" selftest\output\RIMATTEST_Home_Page.html'
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}RIMATTEST_Home_Page.html'
     verifypositive="RimAttest is a web site for automated testing examples"
     verifypositive1="html.*head.*body"
 />
 
+<!-- command1 should work for Windows, command2 for Linux -->
 <case
     id="30"
     description1="${feature} - filename prefix not included as part of output path"
     method="cmd"
-    command="if not exist selftest\output\temp mkdir selftest\output\temp"
-    command1=".\webinject.pl -o selftest\output\temp\ selftest\substeps\${feature}.xml"
+    command1='if not exist selftest\output\temp\ mkdir selftest\output\temp\'
+    command2='perl -MFile::Path=make_path -e "make_path(qq{selftest{SLASH}output{SLASH}temp{SLASH}})"'
+    command3=".\webinject.pl -o selftest\output\temp\ selftest\substeps\${feature}.xml"
 />
 
 <case
     id="40"
     description1="view RIMATTEST_Home_Page.html"
     method="cmd"
-    command1='perl -ne "print" selftest\output\temp\RIMATTEST_Home_Page.html'
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}RIMATTEST_Home_Page.html'
     verifypositive="RimAttest is a web site for automated testing examples"
     verifypositive1="html.*head.*body"
 />

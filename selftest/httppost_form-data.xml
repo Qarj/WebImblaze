@@ -10,7 +10,7 @@ Self test master file. All test steps in this file should pass.
     description1="${feature} - parameter"
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
-    command1='perl -ne "print" selftest\output\${feature}subhttp.txt'
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subhttp.txt'
     verifypositive="Test Cases Failed: 0"
     verifypositive1="Carbonara"
 />

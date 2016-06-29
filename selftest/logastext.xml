@@ -16,7 +16,7 @@ Self test master file. All test steps in this file should pass.
     id="20"
     description1="view http.txt"
     method="cmd"
-    command1='perl -ne "print" selftest\output\${feature}sub20.html'
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}sub20.html'
     verifypositive="/html>.*xmp>|||xmp tag not found - not logged as text"
 />
 

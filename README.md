@@ -38,6 +38,7 @@ Update 18/06: 25 of the 43 self tests now pass on Linux (Fedora 23), before toda
     cpan File::Slurp
     cpan XML::Simple
     cpan Crypt::SSLeay
+    cpan Math::Random::ISAAC
     exit
     ```
 
