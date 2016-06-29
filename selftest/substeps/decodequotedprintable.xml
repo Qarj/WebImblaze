@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Examine a quoted printable file with decode"
     method="cmd"
-    command="type selftest\testdata\quotedprintable.txt"
+    command='perl -ne "print" selftest\testdata\quotedprintable.txt'
     parseresponseSCALE10='width=device-width, initial |"|'
     decodequotedprintable="true"
 />
@@ -26,7 +26,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="Examine a quoted printable file without decode"
     method="cmd"
-    command="type selftest\testdata\quotedprintable.txt"
+    command='perl -ne "print" selftest\testdata\quotedprintable.txt'
     parseresponseSCALE30='width=device-width, initial |"|'
 />
 

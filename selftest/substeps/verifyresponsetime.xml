@@ -18,7 +18,7 @@ Expected failures will be asserted by the master test file.
     description1="Should fail verifyresponsetime"
     method="cmd"
     command="echo this will be slow"
-    command1='@CHOICE /T 2 /C YN /D Y /M "%date% %time% Waiting 2 seconds"'
+    command1='perl -e "sleep 2"'
     verifyresponsetime="1"
 />
 

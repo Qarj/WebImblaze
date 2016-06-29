@@ -16,7 +16,7 @@ Self test master file. All test steps in this file should pass.
     id="20"
     description1="view http.txt"
     method="cmd"
-    command1="type selftest\output\${feature}subhttp.txt"
+    command1='perl -ne "print" selftest\output\${feature}subhttp.txt'
     verifypositive1="numeric \[[0-9]{10,10}\]"
     verifypositive2="alpha \[[A-Z]{10,10}\]"
     verifypositive3="alphanumeric \[[A-Z0-9]{10,10}\]"

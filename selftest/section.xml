@@ -17,7 +17,7 @@ Self test master file. All test steps in this file should pass.
     id="20"
     description1="view xml results.xml file"
     method="cmd"
-    command1="type selftest\output\${feature}subresults.xml"
+    command1='perl -ne "print" selftest\output\${feature}subresults.xml'
     verifypositive="section.Register a new self service account"
 />
 
@@ -25,7 +25,7 @@ Self test master file. All test steps in this file should pass.
     id="30"
     description1="view html results.html file"
     method="cmd"
-    command1="type selftest\output\${feature}subresults.html"
+    command1='perl -ne "print" selftest\output\${feature}subresults.html'
     verifypositive="Register a new self service account"
 />
 

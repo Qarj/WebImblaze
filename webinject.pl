@@ -1992,6 +1992,12 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+            if ($is_windows) { ## if the command starts with ./ or .\ we are just going to go and flip it around depending on the operating system
+                $cmd =~ s{^./}{.\\};
+            } else {
+                $cmd =~ s{^.\\}{./};
+                $cmd =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
+            }
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
@@ -2824,8 +2830,10 @@ sub convertbackxml {  #converts replaced xml with substitutions
     # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
     if ($is_windows) {
         $_[0] =~ s/{SLASH}/\\/g;
+        $_[0] =~ s/{SHELL_ESCAPE}/\^/g;
     } else {
         $_[0] =~ s/{SLASH}/\//g;
+        $_[0] =~ s/{SHELL_ESCAPE}/\\/g;
     }
 
     $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
