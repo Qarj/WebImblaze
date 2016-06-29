@@ -1959,15 +1959,9 @@ sub cmd {  ## send terminal command and read response
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
         if ($case{$_}) {#perform command
-
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            if ($is_windows) { ## if the command starts with ./ or .\ we are just going to go and flip it around depending on the operating system
-                $cmd =~ s{^./}{.\\};
-            } else {
-                $cmd =~ s{^.\\}{./};
-                $cmd =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
-            }
+            _shell_adjust($cmd);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
@@ -1977,6 +1971,24 @@ sub cmd {  ## send terminal command and read response
     $response = HTTP::Response->parse($combined_response); ## pretend the response is a http response - inject it into the object
     $endtimer = time;
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _shell_adjust {
+
+    # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
+    if ($is_windows) {
+        $_[0] =~ s{^./}{.\\};
+        $_[0] =~ s/{SLASH}/\\/g;
+        $_[0] =~ s/{SHELL_ESCAPE}/\^/g;
+    } else {
+        $_[0] =~ s{^.\\}{./};
+        $_[0] =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
+        $_[0] =~ s/{SLASH}/\//g;
+        $_[0] =~ s/{SHELL_ESCAPE}/\\/g;
+    }
 
     return;
 }
@@ -1992,12 +2004,7 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            if ($is_windows) { ## if the command starts with ./ or .\ we are just going to go and flip it around depending on the operating system
-                $cmd =~ s{^./}{.\\};
-            } else {
-                $cmd =~ s{^.\\}{./};
-                $cmd =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
-            }
+            _shell_adjust($cmd);
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
@@ -2825,15 +2832,6 @@ sub convertbackxml {  #converts replaced xml with substitutions
     if ($1)
     {
      $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
-    }
-
-    # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
-    if ($is_windows) {
-        $_[0] =~ s/{SLASH}/\\/g;
-        $_[0] =~ s/{SHELL_ESCAPE}/\^/g;
-    } else {
-        $_[0] =~ s/{SLASH}/\//g;
-        $_[0] =~ s/{SHELL_ESCAPE}/\\/g;
     }
 
     $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
