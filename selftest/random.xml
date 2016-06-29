@@ -9,7 +9,7 @@ Self test master file. All test steps in this file should pass.
     id="10"
     description1="${feature}"
     method="cmd"
-    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    command="perl webinject.pl -o selftest{SLASH}output{SLASH}${feature}sub selftest{SLASH}substeps{SLASH}${feature}.xml"
 />
 
 <case
