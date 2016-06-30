@@ -910,7 +910,7 @@ sub _screenshot {
             print {*STDOUT} "ERROR:$@";
         } else {
             require MIME::Base64;
-            open my $FH, '>', "$_abs_screenshot_full" or die "\nCould not open $_abs_screenshot_full for writing\n";
+            open my $FH, '>', slash_me($_abs_screenshot_full) or die "\nCould not open $_abs_screenshot_full for writing\n";
             binmode $FH; ## set binary mode
             print {$FH} MIME::Base64::decode_base64($png_base64);
             close $FH or die "\nCould not close page capture file handle\n";
@@ -1831,7 +1831,7 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
     #read the xml file specified in the testcase
     my @xmlbody;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
-        open my $XMLBODY, '<', $1 or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
+        open my $XMLBODY, '<', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
         @xmlbody = <$XMLBODY>;  #read the file into an array
         close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
     }
