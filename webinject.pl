@@ -2792,7 +2792,7 @@ sub _include_file {
 
     print {*STDOUT} "include: [id $_id] $_file\n";
 
-    my $_include = read_file($_file);
+    my $_include = read_file(slash_me($_file));
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
 
     #open my $INCLUDE, '>', "$output".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
