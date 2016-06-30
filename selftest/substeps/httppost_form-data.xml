@@ -19,7 +19,7 @@ Expected failures will be asserted by the master test file.
     method="post"
     posttype="multipart/form-data"
     url="http://{RAN}/BulkUpload/Upload"
-    postbody="( 'fileUpload' => ['selftest\testdata\searches.csv'] )"
+    postbody="( 'fileUpload' => ['selftest/testdata/searches.csv'] )"
     verifypositive="/BulkUpload/Confirmation"
 />
 
