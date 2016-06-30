@@ -28,7 +28,8 @@ Self test master file. All test steps in this file should pass.
     id="30"
     description1="${feature}"
     method="cmd"
-    command="dir selftest\output\"
+    command1="dir selftest\output\"
+    command2="ls selftest/output/"
     verifypositive1="small_brickwork.jpg"
     verifypositive2="append_element.js"
 />
