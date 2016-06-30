@@ -82,7 +82,8 @@ Expected failures will be asserted by the master test file.
     id="90"
     description1="LENGTH is {SUB}"
     method="cmd"
-    command="echo {SUB}"
+    command1="echo {SUB}"
+    command2='perl -e "sleep 0.01"'
     verifypositive="_\d*_"
 />
 
@@ -91,8 +92,7 @@ Expected failures will be asserted by the master test file.
     id="100"
     description1="TESTSTEPTIME:90 is {SUB}"
     method="cmd"
-    command1="echo {SUB}"
-    command2='perl -e "sleep 0.01"'
+    command="echo {SUB}"
     verifypositive="_\d*\.\d{1,3}_"
 />
 
