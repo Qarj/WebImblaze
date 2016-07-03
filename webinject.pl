@@ -1961,7 +1961,7 @@ sub cmd {  ## send terminal command and read response
         if ($case{$_}) {#perform command
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust($cmd);
+            _shell_adjust(\$cmd);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
@@ -1977,17 +1977,18 @@ sub cmd {  ## send terminal command and read response
 
 #------------------------------------------------------------------
 sub _shell_adjust {
+    my ($_parm) = @_;
 
     # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
     if ($is_windows) {
-        $_[0] =~ s{^./}{.\\};
-        $_[0] =~ s/{SLASH}/\\/g;
-        $_[0] =~ s/{SHELL_ESCAPE}/\^/g;
+        ${$_parm} =~ s{^./}{.\\};
+        ${$_parm} =~ s/{SLASH}/\\/g;
+        ${$_parm} =~ s/{SHELL_ESCAPE}/\^/g;
     } else {
-        $_[0] =~ s{^.\\}{./};
-        $_[0] =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
-        $_[0] =~ s/{SLASH}/\//g;
-        $_[0] =~ s/{SHELL_ESCAPE}/\\/g;
+        ${$_parm} =~ s{^.\\}{./};
+        ${$_parm} =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
+        ${$_parm} =~ s/{SLASH}/\//g;
+        ${$_parm} =~ s/{SHELL_ESCAPE}/\\/g;
     }
 
     return;
@@ -2004,7 +2005,7 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 
             my $cmd = $case{$_};
             $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust($cmd);
+            _shell_adjust(\$cmd);
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
             $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
