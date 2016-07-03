@@ -138,7 +138,8 @@ if (!$xnode) { #skip regular STDOUT output if using an XPath
 }
 
 #open file handles
-open $HTTPLOGFILE, '>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
+#open $HTTPLOGFILE, '>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
+_whack($opt_publish_full.'http.txt');
 open $RESULTS, '>', "$opt_publish_full".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
 
 write_initial_xml();
@@ -647,6 +648,17 @@ sub writeinitialhtml {  #write opening tags for results file
 }
 
 #------------------------------------------------------------------
+sub _whack {
+    my ($_goner) = @_;
+
+    if (-e $_goner ) {
+        unlink $_goner or die "Could not unlink $_goner\n";
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
 sub write_initial_xml {  #write opening tags for results file
 
     # put a reference to the stylesheet in the results file
@@ -664,8 +676,7 @@ sub write_initial_xml {  #write opening tags for results file
         $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
-    my $_file_full = $opt_publish_full.$results_xml_file_name;
-    if (-e $_file_full ) { unlink $_file_full or die "Could not unlink $_file_full\n"; }
+    _whack($opt_publish_full.$results_xml_file_name);
     _write_xml(\$_results_xml);
 
     return;
@@ -3100,7 +3111,9 @@ sub _write_http_log {
     $_log_separator .= "  *************************************************************  \n";
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
-    print {$HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref };
+    open my $_HTTPLOGFILE, '>>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
+    print {$_HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref };
+    close $_HTTPLOGFILE or die "\nCould not close http log file\n\n";
 
     return;
 }
@@ -3454,7 +3467,6 @@ sub finaltasks {  #do ending tasks
 
     writefinalxml();  #write summary and closing tags for XML results file
 
-    close $HTTPLOGFILE or die "\nCould not close http log file\n\n";
     close $RESULTS or die "\nCould not close html results file\n\n";
 
     return;
