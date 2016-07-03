@@ -3109,17 +3109,16 @@ sub _write_http_log {
 sub _write_step_html {
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base) = @_;
 
-    #my $_response_content = ${ $_response_content_ref };
-
     _format_xml($_response_content_ref);
 
     _format_json($_response_content_ref);
 
+    my $_display_as_text = _should_display_as_text($_response_content_ref);
     # To Do: make this automatic - i.e. if no html and body tags found
-    my $_display_as_text;
-    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20}) { #Always log as text when a selenium command is present
-        $_display_as_text =  'true';
-    }
+#    my $_display_as_text;
+#    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20}) { #Always log as text when a selenium command is present
+#        $_display_as_text =  'true';
+#    }
 
     my ($_wif_batch, $_wif_run_number);
     if (defined $userconfig->{wif}->{batch} ) {
@@ -3208,6 +3207,19 @@ sub _format_json {
     }
 
     return;
+}
+
+#------------------------------------------------------------------
+sub _should_display_as_text {
+    my ($_response) = @_;
+
+    if ($case{logastext}) { return 'true'; }
+
+    # if html and body tags found, then display as html
+    if ( ${ $_response } =~ m/<html.*?<body/s ) { return; }
+
+    # if we didn't find html and body tags, then don't attempt to render as html
+    return 'true';
 }
 
 #------------------------------------------------------------------
