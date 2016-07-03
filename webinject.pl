@@ -3140,34 +3140,8 @@ sub _write_step_html {
     }
 
     my $_html = '<!DOCTYPE html>';
-    $_html .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; font:80% Verdana, sans-serif;">\n|;
+    _add_html_head(\$_html);
 
-    $_html .= qq|        <head>\n|;
-    $_html .= qq|            <style>\n|;
-    $_html .= qq|                wi_h1, wi_h2, wi_h3, wi_div { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
-    $_html .= qq|                wi_h2 a:link, .wi_headers:link { color:SlateGray; }\n|;
-    $_html .= qq|                wi_h2 a, .wi_headers { text-decoration:none; font-weight:bolder; }\n|;
-    $_html .= qq|                wi_h2 a:hover, .wi_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
-    $_html .= qq|                wi_h2 a:visited, .wi_headers:visited { color:SlateGray; }\n|;
-    $_html .= qq|                .wi_heading { padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em;}\n|;
-    $_html .= qq|                .wi_heading wi_h1 {  font-size:2.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
-    $_html .= qq|                .wi_heading wi_h2 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
-    $_html .= qq|                .wi_heading wi_h3 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em; line-height:1.5em;}\n|;
-    $_html .= qq|                .wi_alignleft {float: left;}\n|;
-    $_html .= qq|                .wi_alignright {float: right;}\n|;
-    $_html .= qq|            </style>\n|;
-    $_html .= qq|            <script language="javascript">\n|;
-    $_html .= qq|                function wi_toggle(wi_toggle_ele) {\n|;
-    $_html .= qq|                   var ele = document.getElementById(wi_toggle_ele);\n|;
-    $_html .= qq|                   if(ele.style.display == "block") {\n|;
-    $_html .= qq|                           ele.style.display = "none";\n|;
-    $_html .= qq|                   }\n|;
-    $_html .= qq|                   else {\n|;
-    $_html .= qq|                       ele.style.display = "block";\n|;
-    $_html .= qq|                   }\n|;
-    $_html .= qq|                } \n|;
-    $_html .= qq|            </script>\n|;
-    $_html .= qq|        </head>\n|;
     $_html .= qq|        <wi_div class="wi_heading">\n|;
     $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
     $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
@@ -3191,6 +3165,7 @@ sub _write_step_html {
     $_html .= qq|\n<xmp id="wi_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
+
 
     # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
@@ -3227,6 +3202,41 @@ sub _write_step_html {
 
     my $_file_full = $opt_publish_full."$testnumlog$jumpbacksprint$retriesprint".'.html';
     _delayed_write_step_html($_file_full, $_html);
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _add_html_head {
+    my ($_html) = @_;
+
+    ${$_html} .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; font:80% Verdana, sans-serif;">\n|;
+    ${$_html} .= qq|        <head>\n|;
+    ${$_html} .= qq|            <style>\n|;
+    ${$_html} .= qq|                wi_h1, wi_h2, wi_h3, wi_div { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
+    ${$_html} .= qq|                wi_h2 a:link, .wi_headers:link { color:SlateGray; }\n|;
+    ${$_html} .= qq|                wi_h2 a, .wi_headers { text-decoration:none; font-weight:bolder; }\n|;
+    ${$_html} .= qq|                wi_h2 a:hover, .wi_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
+    ${$_html} .= qq|                wi_h2 a:visited, .wi_headers:visited { color:SlateGray; }\n|;
+    ${$_html} .= qq|                .wi_heading { padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em;}\n|;
+    ${$_html} .= qq|                .wi_heading wi_h1 {  font-size:2.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
+    ${$_html} .= qq|                .wi_heading wi_h2 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
+    ${$_html} .= qq|                .wi_heading wi_h3 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em; line-height:1.5em;}\n|;
+    ${$_html} .= qq|                .wi_alignleft {float: left;}\n|;
+    ${$_html} .= qq|                .wi_alignright {float: right;}\n|;
+    ${$_html} .= qq|            </style>\n|;
+    ${$_html} .= qq|            <script language="javascript">\n|;
+    ${$_html} .= qq|                function wi_toggle(wi_toggle_ele) {\n|;
+    ${$_html} .= qq|                   var ele = document.getElementById(wi_toggle_ele);\n|;
+    ${$_html} .= qq|                   if(ele.style.display == "block") {\n|;
+    ${$_html} .= qq|                           ele.style.display = "none";\n|;
+    ${$_html} .= qq|                   }\n|;
+    ${$_html} .= qq|                   else {\n|;
+    ${$_html} .= qq|                       ele.style.display = "block";\n|;
+    ${$_html} .= qq|                   }\n|;
+    ${$_html} .= qq|                } \n|;
+    ${$_html} .= qq|            </script>\n|;
+    ${$_html} .= qq|        </head>\n|;
 
     return;
 }
