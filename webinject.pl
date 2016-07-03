@@ -3111,10 +3111,7 @@ sub _write_step_html {
 
     #my $_response_content = ${ $_response_content_ref };
 
-    if ($case{formatxml}) {
-         ## makes an xml response easier to read by putting in a few carriage returns
-         ${ $_response_content_ref } =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
-    }
+    _format_xml($_response_content_ref);
 
     if ($case{formatjson}) {
          ## makes a JSON response easier to read by putting in a few carriage returns
@@ -3166,25 +3163,11 @@ sub _write_step_html {
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
 
+    _add_selenium_screenshot(\$_html);
 
-    # if we have a Selenium WebDriver screenshot, link to it
-    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
-        $_html .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
-    }
+    _add_search_images(\$_html);
 
-    # if we have search images, copy them to the results and link to them
-    for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
-        if ( $case{$_} && -e $case{$_} ) {
-            copy "$case{$_}", "$opt_publish_full";
-            my ($_image_name, $_image_path) = fileparse( $case{$_} );
-            $_html .= qq|<br />$_image_name<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="searchimage $case{$_}" src="$_image_name"><br />|;
-        }
-    }
-
-    # if we have grabbed an email file, link to it
-    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.eml" ) {
-        $_html .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
-    }
+    _add_email_link(\$_html);
 
     if (defined $_response_base) {
         _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
@@ -3202,6 +3185,18 @@ sub _write_step_html {
 
     my $_file_full = $opt_publish_full."$testnumlog$jumpbacksprint$retriesprint".'.html';
     _delayed_write_step_html($_file_full, $_html);
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _format_xml {
+    my ($_response) = @_;
+
+    if ($case{formatxml}) {
+         ## makes an xml response easier to read by putting in a few carriage returns
+         ${ $_response } =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
+    }
 
     return;
 }
@@ -3237,6 +3232,46 @@ sub _add_html_head {
     ${$_html} .= qq|                } \n|;
     ${$_html} .= qq|            </script>\n|;
     ${$_html} .= qq|        </head>\n|;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _add_selenium_screenshot {
+    my ($_html) = @_;
+
+    # if we have a Selenium WebDriver screenshot, link to it
+    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
+        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _add_search_images {
+    my ($_html) = @_;
+
+    # if we have search images, copy them to the results and link to them
+    for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
+        if ( $case{$_} && -e $case{$_} ) {
+            copy "$case{$_}", "$opt_publish_full";
+            my ($_image_name, $_image_path) = fileparse( $case{$_} );
+            ${$_html} .= qq|<br />$_image_name<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="searchimage $case{$_}" src="$_image_name"><br />|;
+        }
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _add_email_link {
+    my ($_html) = @_;
+
+    # if we have grabbed an email file, link to it
+    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.eml" ) {
+        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
+    }
 
     return;
 }
