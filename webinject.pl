@@ -195,10 +195,10 @@ foreach ($start .. $repeat) {
 
         ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
         $testnumlog = $testnum + ($counter*10_000) - 10_000;
-        $testnumlog = sprintf("%.2f", $testnumlog); ## maximul of 2 decimal places
-        $testnumlog =~ s/0+\z// if $testnumlog =~ /\./; ## remove trailing non significant zeros
-        if (not ($testnumlog =~ s/\.\z//) ) { ## remove decimal point if nothing after
-            $testnumlog = sprintf("%.2f", $testnumlog); ## put back the non significant zero if we have a decimal point
+        $testnumlog = sprintf '%.2f', $testnumlog; ## maximul of 2 decimal places
+        $testnumlog =~ s/0+\z// if $testnumlog =~ /[.]/; ## remove trailing non significant zeros
+        if (not ($testnumlog =~ s/[.]\z//) ) { ## remove decimal point if nothing after
+            $testnumlog = sprintf '%.2f', $testnumlog; ## put back the non significant zero if we have a decimal point
         }
 
         if ($xnode) {  #if an XPath Node is defined, only process the single Node
@@ -439,7 +439,7 @@ foreach ($start .. $repeat) {
                 $results_xml .= qq|            <success>false</success>\n|;
                 if ($case{errormessage}) { #Add defined error message to the output
                     print {$RESULTS} qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
-                    $results_xml .= qq|            <result-message>|._sub_xml_special($case{errormessage}).qq|</result-message>\n|;
+                    $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
                     print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
                 }
                 else { #print regular error output
@@ -664,7 +664,7 @@ sub write_initial_xml {  #write opening tags for results file
         $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
-    if (-e "$opt_publish_full".$results_xml_file_name ) { unlink "$opt_publish_full".$results_xml_file_name or die "Could not unlink $results_xml_file_name\n"; }
+    if (-e $opt_publish_full.$results_xml_file_name ) { unlink $opt_publish_full.$results_xml_file_name or die "Could not unlink $results_xml_file_name\n"; }
     _write_xml(\$_results_xml);
 
     return;
@@ -775,7 +775,6 @@ sub _run_this_step {
     my ($_runon_parm) = @_;
 
     my @_run_on = split /[|]/, $_runon_parm; ## get the list of environments that this test step can be run on
-    my $_run_this;
     foreach (@_run_on) {
         if (defined $userconfig->{wif}->{environment}) {
             if ( $_ eq $userconfig->{wif}->{environment} ) {
@@ -2019,7 +2018,6 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
 sub searchimage {  ## search for images in the actual result
 
     my $_unmarked = 'true';
-    my $_imagecopy;
 
     for (qw/searchimage searchimage1 searchimage2 searchimage3 searchimage4 searchimage5/) {
         if ($case{$_}) {
@@ -2294,8 +2292,8 @@ sub _verify_smartassertion {
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
             #print {*STDOUT} "$verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
-                $results_xml .= qq|            <$config_attribute>\n|;
-                $results_xml .= qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
+                $results_xml .= "            <$config_attribute>\n";
+                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
                     #print {$RESULTS} qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $results_xml .= qq|                <success>true</success>\n|;
@@ -2308,7 +2306,7 @@ sub _verify_smartassertion {
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($verifyparms[2]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                       $results_xml .= qq|                <message>|._sub_xml_special($verifyparms[2]).qq|</message>\n|;
+                       $results_xml .= '                <message>'._sub_xml_special($verifyparms[2])."</message>\n";
                     }
                     print {*STDOUT} 'Failed Smart Assertion';
                     if ($verifyparms[2]) {
@@ -2342,8 +2340,8 @@ sub _verify_verifypositive {
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }
             else {
-                $results_xml .= qq|            <$case_attribute>\n|;
-                $results_xml .= qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
+                $results_xml .= "            <$case_attribute>\n";
+                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
                     print {$RESULTS} qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
@@ -2357,7 +2355,7 @@ sub _verify_verifypositive {
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) { ## is there a custom assertion failure message?
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       $results_xml .= qq|                <message>|._sub_xml_special($verifyparms[1]).qq|</message>\n|;
+                       $results_xml .= '                <message>'._sub_xml_special($verifyparms[1])."</message>\n";
                     }
                     print {*STDOUT} "Failed Positive Verification \n";
                     if ($verifyparms[1]) {
@@ -2391,14 +2389,14 @@ sub _verify_verifynegative {
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
             }
             else {
-                $results_xml .= qq|            <$case_attribute>\n|;
-                $results_xml .= qq|                <assert>|._sub_xml_special($verifyparms[0]).qq|</assert>\n|;
+                $results_xml .= "            <$case_attribute>\n";
+                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
                     print {$RESULTS} qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($verifyparms[1]) {
                        print {$RESULTS} qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                         $results_xml .= qq|            <message>|._sub_xml_special($verifyparms[1]).qq|</message>\n|;
+                         $results_xml .= '            <message>'._sub_xml_special($verifyparms[1])."</message>\n";
                     }
                     print {*STDOUT} "Failed Negative Verification \n";
                     if ($verifyparms[1]) {
@@ -2710,12 +2708,12 @@ sub read_test_case_file {
     my $_xml = read_file($currentcasefile);
 
     # substitute in the included test step files
-    $_xml =~ s/<include[^>]*?
-               id[ ]*=[ ]*["'](\d*)["']                 # id = "10"
+    $_xml =~ s{<include[^>]*?
+               id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
                [^>]*?
                file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
                [^>]*>
-               /_include_file($2,$1,$&)/gsex; # '       # the actual file content
+               }{_include_file($2,$1,$&)}gsex;          # the actual file content
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
     $_xml =~ s/&/{AMPERSAND}/g;
@@ -2762,8 +2760,8 @@ sub _write_failed_xml {
 
     File::Path::make_path ( $_path );
 
-    my $_file_name = 'test_file_'.int(rand(999)).'.xml';
-    my $_file_name_full = slash_me ( $_path.'/'.$_file_name);
+    my $_file_name = 'test_file_' . int rand 999 . '.xml';
+    my $_file_name_full = slash_me ( $_path.q{/}.$_file_name);
 
     my $_abs_file_full = File::Spec->rel2abs( $_file_name_full );
 
@@ -2899,7 +2897,7 @@ sub _get_random_string {
 
     require Math::Random::ISAAC;
 
-    my $_rng = Math::Random::ISAAC->new(time*100000); ## only integer portion is used in seed
+    my $_rng = Math::Random::ISAAC->new(time*100_000); ## only integer portion is used in seed
 
     my $_random;
     my $_last;
