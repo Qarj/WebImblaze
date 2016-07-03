@@ -3113,13 +3113,7 @@ sub _write_step_html {
 
     _format_xml($_response_content_ref);
 
-    if ($case{formatjson}) {
-         ## makes a JSON response easier to read by putting in a few carriage returns
-         ${ $_response_content_ref }  =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
-         ${ $_response_content_ref }  =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
-         ${ $_response_content_ref }  =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
-         ${ $_response_content_ref }  =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
-    }
+    _format_json($_response_content_ref);
 
     # To Do: make this automatic - i.e. if no html and body tags found
     my $_display_as_text;
@@ -3196,6 +3190,21 @@ sub _format_xml {
     if ($case{formatxml}) {
          ## makes an xml response easier to read by putting in a few carriage returns
          ${ $_response } =~ s{\>\<}{\>\x0D\n\<}g; ## insert a CR between every ><
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _format_json {
+    my ($_response) = @_;
+
+    if ($case{formatjson}) {
+         ## makes a JSON response easier to read by putting in a few carriage returns
+         ${ $_response }  =~ s{",}{",\x0D\n}g;   ## insert a CR after  every ",
+         ${ $_response }  =~ s/[}],/\},\x0D\n/g;  ## insert a CR after  every },
+         ${ $_response }  =~ s/\["/\x0D\n\["/g;  ## insert a CR before every ["
+         ${ $_response }  =~ s/\\n\\tat/\x0D\n\\tat/g;        ## make java exceptions inside JSON readable - when \n\tat is seen, eat the \n and put \ CR before the \tat
     }
 
     return;
