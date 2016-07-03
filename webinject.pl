@@ -963,9 +963,9 @@ sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Sear
 sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
                               ##        custom_switch_to_window(0);
                               ##        custom_switch_to_window(1);
-    require Data::Dumper;
-
     my ($_window_number) = @_;
+
+    require Data::Dumper;
 
     my $handles = $driver->get_window_handles;
     print Data::Dumper::Dumper($handles);
