@@ -8,6 +8,16 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.97 - Jul 3, 2016
+* made core WebInject compatible with Linux (Selenium support still be to addressed)
+* renamed http.log to http.txt - http.txt can be served by web servers without adding a mime type
+* added environments donotrunon feature
+* set exit code of 1 if one or more test steps failed
+* fixed seeding of random numbers
+* made log separator much larger
+* made it easier to debug test files that fail parsing + better messaging
+* file handles are now opened and closed for every test step
+
 ### Version 1.96 - Jun 12, 2016
 * replaced liveonly and testonly parameters with all-purpose runon
 * bug fix - searchimage filename should show in results xsl if not found
