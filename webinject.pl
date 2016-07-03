@@ -116,7 +116,7 @@ my $counter = 0; ## keeping track of the loop we are up to
 my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
-my ( $HTTPLOGFILE, $RESULTS ); ## output file handles
+my ( $RESULTS ); ## output file handles
 my ( $results_xml, $results_xml_file_name );
 my ($startruntimer, $endruntimer, $repeat, $start);
 my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from here, made global
