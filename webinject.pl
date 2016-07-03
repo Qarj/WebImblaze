@@ -43,7 +43,6 @@ use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need i
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
-use IO::Handle;
 use File::Copy qw(copy), qw(move);
 
 local $| = 1; #don't buffer output to STDOUT
@@ -116,10 +115,9 @@ my $counter = 0; ## keeping track of the loop we are up to
 my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
-#my ( $RESULTS ); ## output file handles
 my ( $results_html, $results_xml, $results_xml_file_name );
 my ($startruntimer, $endruntimer, $repeat, $start);
-my ($is_testcases_tag_already_written); ## removed $testnum, $xmltestcases from here, made global
+my ($is_testcases_tag_already_written);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -137,11 +135,8 @@ if (!$xnode) { #skip regular STDOUT output if using an XPath
     writeinitialstdout();  #write opening tags for STDOUT.
 }
 
-#open file handles
-#open $HTTPLOGFILE, '>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
 _whack($opt_publish_full.'http.txt');
 _whack($opt_publish_full.'results.html');
-#open $RESULTS, '>', "$opt_publish_full".'results.html' or die "\nERROR: Failed to open results.html file\n\n";
 
 write_initial_xml();
 writeinitialhtml();  #write opening tags for results file
@@ -407,7 +402,6 @@ foreach ($start .. $repeat) {
                 $results_xml .= qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
             }
 
-#            $RESULTS->autoflush();
 
             if ($case{method}) {
                 if ($case{method} eq 'delete') { httpdelete(); }
@@ -2683,11 +2677,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
         $config{globaljumpbacks} = 0;
     }
 
-    # find the name of the output folder only i.e. not full path
-#    if ($output =~ m{\\([^\\]*)\\$}s) { ## match between the penultimate \ and the final \ ($ means character after end of string)
-#        $concurrency = $1;
-#    }
-    ## this should be OS safe method of the above
+    # find the name of the output folder only i.e. not full path - OS safe
     my $_abs_output_full = File::Spec->rel2abs( $output );
     $concurrency =  basename ( dirname($_abs_output_full) );
 
@@ -3145,11 +3135,6 @@ sub _write_step_html {
     _format_json($_response_content_ref);
 
     my $_display_as_text = _should_display_as_text($_response_content_ref);
-    # To Do: make this automatic - i.e. if no html and body tags found
-#    my $_display_as_text;
-#    if ($case{logastext} || $case{command} || $case{command1} || $case{command2} || $case{command3} || $case{command4} || $case{command5} || $case{command6} || $case{command7} || $case{command8} || $case{command9} || $case{command10} || $case{command11} || $case{command12} || $case{command13} || $case{command14} || $case{command15} || $case{command16} || $case{command17} || $case{command18} || $case{command19} || $case{command20}) { #Always log as text when a selenium command is present
-#        $_display_as_text =  'true';
-#    }
 
     my ($_wif_batch, $_wif_run_number);
     if (defined $userconfig->{wif}->{batch} ) {
@@ -3484,8 +3469,6 @@ sub finaltasks {  #do ending tasks
     }
 
     writefinalxml();  #write summary and closing tags for XML results file
-
-#    close $RESULTS or die "\nCould not close html results file\n\n";
 
     return;
 }
