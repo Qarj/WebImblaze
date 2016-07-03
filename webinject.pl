@@ -664,7 +664,8 @@ sub write_initial_xml {  #write opening tags for results file
         $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
-    if (-e $opt_publish_full.$results_xml_file_name ) { unlink $opt_publish_full.$results_xml_file_name or die "Could not unlink $results_xml_file_name\n"; }
+    my $_file_full = $opt_publish_full.$results_xml_file_name;
+    if (-e $_file_full ) { unlink $_file_full or die "Could not unlink $_file_full\n"; }
     _write_xml(\$_results_xml);
 
     return;
@@ -2760,7 +2761,8 @@ sub _write_failed_xml {
 
     File::Path::make_path ( $_path );
 
-    my $_file_name = 'test_file_' . int rand 999 . '.xml';
+    my $_rand = int rand 999;
+    my $_file_name = 'test_file_'.$_rand.'.xml';
     my $_file_name_full = slash_me ( $_path.q{/}.$_file_name);
 
     my $_abs_file_full = File::Spec->rel2abs( $_file_name_full );
