@@ -351,7 +351,7 @@ foreach ($start .. $repeat) {
                 next;
             }
 
-            $results_html .= qq|<b>Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint </b><br />\n|;
+            $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnumlog$jumpbacksprint$retriesprint.html"> $testnumlog$jumpbacksprint$retriesprint </a> </b><br />\n|;
 
             print {*STDOUT} qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
 
