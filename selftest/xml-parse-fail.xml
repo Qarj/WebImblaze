@@ -10,7 +10,7 @@ Self test master file. All test steps in this file should pass.
     description1="${feature}"
     method="cmd"
     command=".{SLASH}webinject.pl -o selftest/output/${feature}sub selftest/substeps/${feature}.xml"
-    verifypositive="duplicate attribute at line"
+    verifypositive="duplicate attribute at line|Attribute verifypositive1 redefined"
     verifypositive1="Refer to built test file"
 />
 
