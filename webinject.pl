@@ -3230,6 +3230,7 @@ sub _should_display_as_text {
     my ($_response) = @_;
 
     if ($case{logastext}) { return 'true'; }
+    if ($case{method} eq 'selenium') { return 'true'; }
 
     # if html and body tags found, then display as html
     if ( ${ $_response } =~ m/<html.*?<body/s ) { return; }
