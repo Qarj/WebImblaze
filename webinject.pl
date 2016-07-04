@@ -56,14 +56,13 @@ my ($useragent, $request, $response);
 my ($latency, $verificationlatency, $screenshotlatency);
 my (%teststeptime); ## record in a hash the latency for every step for later use
 my ($cookie_jar, @httpauth);
-my ($xnode, $stop);
 my ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
 my ($totalresponse, $avgresponse, $maxresponse, $minresponse);
 my ($currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
 my (%case);
 my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
-my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy, $opt_basefolder);
+my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my ($testnum, $xmltestcases); ## $testnum made global
@@ -126,14 +125,9 @@ my $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
 ## Startup
 getoptions();  #get command line options
-
 startsession(); #starts, or restarts the webinject session
-
 processcasefile();
-
-if (!$xnode) { #skip regular STDOUT output if using an XPath
-    writeinitialstdout();  #write opening tags for STDOUT.
-}
+writeinitialstdout();  #write opening tags for STDOUT.
 
 _whack($opt_publish_full.'http.txt');
 _whack($opt_publish_full.'results.html');
@@ -150,7 +144,6 @@ $totalresponse = 0;
 $avgresponse = 0;
 $maxresponse = 0;
 $minresponse = 10_000_000; #set to large value so first minresponse will be less
-$stop = 'no';
 
 $globalretries=0; ## total number of retries for this run across all test cases
 
@@ -196,10 +189,6 @@ foreach ($start .. $repeat) {
         $testnumlog =~ s/0+\z// if $testnumlog =~ /[.]/; ## remove trailing non significant zeros
         if (not ($testnumlog =~ s/[.]\z//) ) { ## remove decimal point if nothing after
             $testnumlog = sprintf '%.2f', $testnumlog; ## put back the non significant zero if we have a decimal point
-        }
-
-        if ($xnode) {  #if an XPath Node is defined, only process the single Node
-            $testnum = $xnode;
         }
 
         $isfailure = 0;
@@ -523,9 +512,7 @@ foreach ($start .. $repeat) {
             _write_html (\$results_html);
             undef $results_html;
 
-            if (!$xnode) { #skip regular STDOUT output if using an XPath
-                print {*STDOUT} qq|------------------------------------------------------- \n|;
-            }
+            print {*STDOUT} qq|------------------------------------------------------- \n|;
 
             $endruntimer = time;
             $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
@@ -583,9 +570,6 @@ foreach ($start .. $repeat) {
                 }
             }
 
-            if ($xnode) {  #if an XPath Node is defined, only process the single Node
-                last;
-            }
             $retry = $retry - 1;
         } ## end of retry loop
         until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
@@ -2620,26 +2604,6 @@ sub processcasefile {  #get test case files to run (from command line or config 
         $currentcasefile = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
-    elsif (($#ARGV + 1) == 2) {  #two command line args were passed
-
-        undef $xnode; #reset xnode
-        undef $xpath; #reset xpath
-
-        $xpath = $ARGV[1];
-
-        if ($xpath =~ /\/(.*)\[/) {  #if the argument contains a "/" and "[", it is really an XPath
-            $xpath =~ /(.*)\/(.*)\[(.*?)\]/;  #if it contains XPath info, just grab the file name
-            if ($3) {$xnode = $3;}  #grab the XPath Node value.. (from inside the "[]")
-            #print "\nXPath Node is: $xnode \n";
-        }
-        else {
-            print {*STDERR} "\nSorry, $xpath is not in the XPath format I was expecting, I'm ignoring it...\n";
-        }
-
-        #use testcase filename passed on command line (config.xml is only used for other options)
-        $currentcasefile = slash_me($ARGV[0]);  #first commandline argument is the test case file
-    }
-
     #grab values for constants in config file:
     for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
         if ($userconfig->{$config_const}) {
@@ -3465,9 +3429,7 @@ sub finaltasks {  #do ending tasks
 
     writefinalhtml();  #write summary and closing tags for results file
 
-    if (!$xnode) { #skip regular STDOUT output if using an XPath
-        writefinalstdout();  #write summary and closing tags for STDOUT
-    }
+    writefinalstdout();  #write summary and closing tags for STDOUT
 
     writefinalxml();  #write summary and closing tags for XML results file
 
@@ -3720,7 +3682,6 @@ sub getoptions {  #shell options
         'a|autocontroller'    => \$opt_autocontroller,
         'p|port=s'    => \$opt_port,
         'x|proxy=s'   => \$opt_proxy,
-        'b|basefolder=s'   => \$opt_basefolder,
         'd|driver=s'   => \$opt_driver,
         'y|binary=s'   => \$opt_chromedriver_binary,
         'r|proxyrules=s'   => \$opt_proxyrules,
@@ -3781,9 +3742,9 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-Usage: webinject.pl testcase_file [XPath] <<options>>
+Usage: webinject.pl testcase_file <<options>>
 
-                                                    examples/simple.xml testcases/case[20]
+                                                    examples/simple.xml
 -c|--config config_file                             -c config.xml
 -o|--output output_location                         -o output/
 -A|--autocontroller                                 -a

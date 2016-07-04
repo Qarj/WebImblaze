@@ -50,8 +50,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Passing a Test Case Filename](#passingfile)
 
-[XPath/XNode](#xpathxnode)
-
 [More Examples of Command Line Usage](#cmdlinexampls)
 
 ## [3 - Test Case Setup](#setup)
@@ -561,11 +559,37 @@ WebInject is called from the command line and has several command line options.
 
 Usage:
 
-`webinject.pl [-c|--config config_file] [-o|--output output_location] [-A|--autocontroller] [testcase_file [XPath]]`
+```
+webinject.pl testcase_file <<options>>
+```
 
-&nbsp;&nbsp;&nbsp;or
+Example:
 
-`webinject.pl --version|-v`
+```
+webinject.pl examples/simple.xml
+```
+
+The command line options are:
+
+```
+-c|--config config_file                             -c config.xml
+-o|--output output_location                         -o output/
+-A|--autocontroller                                 -a
+-p|--port selenium_port                             -p 8325
+-x|--proxy proxy_server                             -x localhost:9222
+-d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
+-y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
+-r|--proxyrules                                     -r true
+-i|--ignoreretry                                    -i
+-u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
+```
+
+or
+
+```
+webinject.pl --version|-v
+webinject.pl --help|-h
+```
 
 <br />
 
@@ -573,14 +597,13 @@ Usage:
 <a name="availopts"></a>
 #### Available Command Line Options
 
-**-c** or **--config**
+`-c` or `--config`
 
 This option is followed by a config file name.  This is used to specify an
 alternate configuration file besides the default (config.xml).  To specify a config file in a different
-directory, you must use the relative path to it.
+directory, you must use the relative path to it (from WebInject directory).
 
-Note: relative path from the webinject directory.
-**-o** or **--output** : This option is followed by a directory name or a prefix to prepended to the output
+`-o` or `--output` : This option is followed by a directory name or a prefix to prepended to the output
 files.  This is used to specify the location for writing output files (http.txt, results.html, and
 results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to
 add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted,
@@ -609,13 +632,47 @@ Note: MS Windows style directory naming also works.
 Note: You must still have write access to the directory where WebInject resides, even when writing output
 elsewhere.
 
-**-a** or **--autocontroller**
+`-a` or `--autocontroller`
 
 Specifies to run autocontrolleronly testcases.
 
-**-v** or **--version**
+`-p` or `--port`
+
+Specifies the port to run Selenium Server under, e.g. `--port 8325`
+
+`x` or `--proxy`
+
+Specifies proxy to use, e.g. `--proxy localhost:9222`
+
+`-d` or `--driver`
+
+Specifies which driver to use for Selenium i.e, chromedriver, phantomjs or firefox, e.g. `--driver chromedriver`
+
+`-y` or `--binary`
+
+Location of chromedriver, e.g. `--binary C:\selenium-server\chromedriver.exe`
+
+`-r` or `--proxyrules`
+
+Specifies to apply Browsermob Proxy rules e.g. `--proxyrules --true`
+
+`-i` or `--ignoreretry`
+
+Specifies to ignore any retry or retryfromstep parameters.
+
+`-u` or `--publish-to`
+
+Specifies where to output the individual html test step results for display by a web server.
+
+E.g, `--publish-to C:\inetpub\wwwroot\this_run_home`
+
+`-v` or `--version`
 
 Displays the version number and other information.
+
+`-h` or `--help`
+
+Displays the command line switches.
 
 <br />
 
@@ -637,19 +694,6 @@ found, the engine will stop and give you an error.
 
 Note: If you pass a test case filename from the command line and also have testcasefile declarations in your
 config file, the files specified in the config file will not be processed (but all other config options are still used).
-
-<br />
-
-
-<a name="xpathxnode"></a>
-#### XPath/XNode
-
-When you pass a test case filename to the WebInject Engine from the command line, you may also specify an extra argument that defines a
-single XPath/XNode.  This will only execute the test case residing in the XPath/XNode you supply.
-
-For example, to run only testcase 2 from your file named mytests.xml, you would call it like this:
-
-`perl webinject.pl mytests.xml testcases/case[2]`
 
 <br />
 
