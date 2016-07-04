@@ -2566,7 +2566,6 @@ sub slash_me {
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
-    my $xpath;
     my $setuseragent;
     my $configfilepath;
 
