@@ -191,10 +191,11 @@ foreach ($start .. $repeat) {
 
         $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
-        $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
-        if ($case{useragent}) {
-            $useragent->agent($case{useragent});
-        }
+        set_useragent($xmltestcases->{case}->{$testnum}->{useragent});
+#        $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
+#        if ($case{useragent}) {
+#            $useragent->agent($case{useragent});
+#        }
 
         $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
         if ($case{runon}) { ## is this test step conditional on the target environment?
@@ -603,6 +604,18 @@ sub get_testnum_display {
 
     return $_testnum_display;
 }
+
+#------------------------------------------------------------------
+sub set_useragent {
+    my ($_useragent) = @_;
+
+    if (not $_useragent) { return; }
+
+    $useragent->agent($_useragent);
+
+    return;
+}
+
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
