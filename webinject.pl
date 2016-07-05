@@ -183,13 +183,7 @@ foreach ($start .. $repeat) {
 
         $testnum = $teststeps[$stepindex];
 
-        ## use $testnum_display for all testnum output, add 10000 in case of repeat loop
-        $testnum_display = $testnum + ($counter*10_000) - 10_000;
-        $testnum_display = sprintf '%.2f', $testnum_display; ## maximul of 2 decimal places
-        $testnum_display =~ s/0+\z// if $testnum_display =~ /[.]/; ## remove trailing non significant zeros
-        if (not ($testnum_display =~ s/[.]\z//) ) { ## remove decimal point if nothing after
-            $testnum_display = sprintf '%.2f', $testnum_display; ## put back the non significant zero if we have a decimal point
-        }
+        $testnum_display = get_testnum_display($testnum, $counter);
 
         $isfailure = 0;
         $retries = 1; ## we increment retries after writing to the log
@@ -594,6 +588,22 @@ exit $status;
 
 #------------------------------------------------------------------
 #  SUBROUTINES
+#------------------------------------------------------------------
+
+sub get_testnum_display {
+    my ($_testnum, $_counter) = @_;
+
+        ## use $testnum_display for all testnum output, add 10,000 in case of repeat loop
+        my $_testnum_display = $_testnum + ($_counter*10_000) - 10_000;
+        $_testnum_display = sprintf '%.2f', $_testnum_display; ## maximul of 2 decimal places
+        $_testnum_display =~ s/0+\z// if $_testnum_display =~ /[.]/; ## remove trailing non significant zeros
+        if (not ($_testnum_display =~ s/[.]\z//) ) { ## remove decimal point if nothing after
+            $_testnum_display = sprintf '%.2f', $_testnum_display; ## put back the non significant zero if we have a decimal point
+        }
+
+    return $_testnum_display;
+}
+
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
 
