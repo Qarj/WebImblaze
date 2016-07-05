@@ -66,7 +66,7 @@ my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, 
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my ($testnum, $xmltestcases); ## $testnum made global
-my ($testnumlog, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
+my ($testnum_display, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
 my ($forcedretry); ## force retry when specific http error code received
 my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
@@ -163,7 +163,7 @@ if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case f
 
 $counter = $start - 1; #so starting position and counter are aligned
 
-if ($opt_driver) { startseleniumbrowser(); }  #start selenium browser if applicable. If it is already started, close browser then start it again.
+if ($opt_driver) { startseleniumbrowser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
 print {*STDOUT} "-------------------------------------------------------\n";
 
@@ -183,12 +183,12 @@ foreach ($start .. $repeat) {
 
         $testnum = $teststeps[$stepindex];
 
-        ## use $testnumlog for all testnum output, add 10000 in case of repeat loop
-        $testnumlog = $testnum + ($counter*10_000) - 10_000;
-        $testnumlog = sprintf '%.2f', $testnumlog; ## maximul of 2 decimal places
-        $testnumlog =~ s/0+\z// if $testnumlog =~ /[.]/; ## remove trailing non significant zeros
-        if (not ($testnumlog =~ s/[.]\z//) ) { ## remove decimal point if nothing after
-            $testnumlog = sprintf '%.2f', $testnumlog; ## put back the non significant zero if we have a decimal point
+        ## use $testnum_display for all testnum output, add 10000 in case of repeat loop
+        $testnum_display = $testnum + ($counter*10_000) - 10_000;
+        $testnum_display = sprintf '%.2f', $testnum_display; ## maximul of 2 decimal places
+        $testnum_display =~ s/0+\z// if $testnum_display =~ /[.]/; ## remove trailing non significant zeros
+        if (not ($testnum_display =~ s/[.]\z//) ) { ## remove decimal point if nothing after
+            $testnum_display = sprintf '%.2f', $testnum_display; ## put back the non significant zero if we have a decimal point
         }
 
         $isfailure = 0;
@@ -340,16 +340,16 @@ foreach ($start .. $repeat) {
                 next;
             }
 
-            $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnumlog$jumpbacksprint$retriesprint.html"> $testnumlog$jumpbacksprint$retriesprint </a> </b><br />\n|;
+            $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
 
-            print {*STDOUT} qq|Test:  $currentcasefile - $testnumlog$jumpbacksprint$retriesprint \n|;
+            print {*STDOUT} qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
 
             if (!$is_testcases_tag_already_written) { # Only write the testcases opening tag once in the results.xml
                 $results_xml .= qq|    <testcases file="$currentcasefile">\n\n|;
                 $is_testcases_tag_already_written = 'true';
             }
 
-            $results_xml .= qq|        <testcase id="$testnumlog$jumpbacksprint$retriesprint">\n|;
+            $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
 
             for (qw/section description1 description2/) { ## support section breaks
                 next unless defined $case{$_};
@@ -417,7 +417,7 @@ foreach ($start .. $repeat) {
             parseresponse();  #grab string from response to send later
 
             httplog();  #write to http.txt file
-            $previous_test_step = $testnumlog.$jumpbacksprint.$retriesprint;
+            $previous_test_step = $testnum_display.$jumpbacksprint.$retriesprint;
 
             ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
             if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
@@ -533,7 +533,7 @@ foreach ($start .. $repeat) {
                 $avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
             }
 
-            $teststeptime{$testnumlog}=$latency; ## store latency for step
+            $teststeptime{$testnum_display}=$latency; ## store latency for step
 
             if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
                 print {*STDOUT} qq|RESTARTING SESSION DUE TO FAIL ... \n|;
@@ -894,7 +894,7 @@ sub _get_verifytext {
 sub _screenshot {
     $starttimer = time; ## measure latency for the screenshot
 
-    my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" );
+    my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" );
 
     if ($case{screenshot} && (lc($case{screenshot}) eq 'false' || lc($case{screenshot}) eq 'no')) #lc = lowercase
     {
@@ -2032,11 +2032,11 @@ sub searchimage {  ## search for images in the actual result
         if ($case{$_}) {
             if (-e "$case{$_}") { ## imageinimage.py bigimage smallimage markimage
                 if ($_unmarked eq 'true') {
-                   copy "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png";
+                   copy "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png";
                    $_unmarked = 'false';
                 }
 
-                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png`);
+                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png`);
 
                 $_image_in_image_result =~ m/primary confidence (\d+)/s;
                 my $_primary_confidence;
@@ -2082,8 +2082,8 @@ sub searchimage {  ## search for images in the actual result
 
     if ($_unmarked eq 'false') {
        #keep an unmarked image, make the marked the actual result
-       move "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-unmarked.png";
-       move "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint-marked.png", "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png";
+       move "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-unmarked.png";
+       move "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png";
     }
 
     return;
@@ -2800,7 +2800,7 @@ sub convertbackxml {  #converts replaced xml with substitutions
 
 ## hostname, testnum, concurrency, teststeptime
     $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running webinject
-    $_[0] =~ s/{TESTNUM}/$testnumlog/g;
+    $_[0] =~ s/{TESTNUM}/$testnum_display/g;
     $_[0] =~ s/{TESTFILENAME}/$testfilename/g;
     $_[0] =~ s/{LENGTH}/$mylength/g; #length of the previous test step response
     $_[0] =~ s/{AMPERSAND}/&/g;
@@ -3021,7 +3021,7 @@ sub httplog {  # write requests and responses to http.txt file
         close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
     }
 
-    my $_step_info = "Test Step: $testnumlog$jumpbacksprint$retriesprint - ";
+    my $_step_info = "Test Step: $testnum_display$jumpbacksprint$retriesprint - ";
 
     ## log descrption1 and description2
     $_step_info .=  $case{description1};
@@ -3112,7 +3112,7 @@ sub _write_step_html {
     _add_html_head(\$_html);
 
     $_html .= qq|        <wi_div class="wi_heading">\n|;
-    $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnumlog$jumpbacksprint$retriesprint</wi_h1>\n|;
+    $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnum_display$jumpbacksprint$retriesprint</wi_h1>\n|;
     $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
     $_html .= qq|              $case{description1}\n|;
     $_html .= qq|            </wi_h3>\n|;
@@ -3155,7 +3155,7 @@ sub _write_step_html {
 
     $_html .= "\n    </body>\n</html>\n";
 
-    my $_file_full = $opt_publish_full."$testnumlog$jumpbacksprint$retriesprint".'.html';
+    my $_file_full = $opt_publish_full."$testnum_display$jumpbacksprint$retriesprint".'.html';
     _delayed_write_step_html($_file_full, $_html);
 
     return;
@@ -3242,8 +3242,8 @@ sub _add_selenium_screenshot {
     my ($_html) = @_;
 
     # if we have a Selenium WebDriver screenshot, link to it
-    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.png" ) {
-        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnumlog$jumpbacksprint$retriesprint" src="$testnumlog$jumpbacksprint$retriesprint.png"><br />|;
+    if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" ) {
+        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacksprint$retriesprint" src="$testnum_display$jumpbacksprint$retriesprint.png"><br />|;
     }
 
     return;
@@ -3270,8 +3270,8 @@ sub _add_email_link {
     my ($_html) = @_;
 
     # if we have grabbed an email file, link to it
-    if (-e "$opt_publish_full$testnumlog$jumpbacksprint$retriesprint.eml" ) {
-        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnumlog$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
+    if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.eml" ) {
+        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnum_display$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
     return;
@@ -3407,7 +3407,7 @@ sub _delayed_write_step_html {
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
-            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$testnumlog$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
+            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
         }
         open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
         print {$_FILE} $delayed_html;
