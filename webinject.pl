@@ -192,10 +192,6 @@ foreach ($start .. $repeat) {
         $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
         set_useragent($xmltestcases->{case}->{$testnum}->{useragent});
-#        $case{useragent} = $xmltestcases->{case}->{$testnum}->{useragent}; ## change the user agent
-#        if ($case{useragent}) {
-#            $useragent->agent($case{useragent});
-#        }
 
         $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
         if ($case{runon}) { ## is this test step conditional on the target environment?
@@ -3105,9 +3101,9 @@ sub _write_http_log {
     $_log_separator .= "  *************************************************************  \n";
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
-    open my $_HTTPLOGFILE, '>>' ,"$opt_publish_full".'http.txt' or die "\nERROR: Failed to open http.txt file\n\n";
-    print {$_HTTPLOGFILE} $_log_separator, $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref };
-    close $_HTTPLOGFILE or die "\nCould not close http log file\n\n";
+    open my $_HTTPLOGFILE, '>>' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
+    print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref }, $_log_separator;
+    close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
 
     return;
 }
