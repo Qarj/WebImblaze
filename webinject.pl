@@ -203,25 +203,7 @@ foreach ($start .. $repeat) {
         # populate variables with values from testcase file, do substitutions, and revert converted values back
         substitute_variables();
 
-        $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
-        if ($case{retry}) { ## retry parameter found
-              $retry = $case{retry}; ## assume we can retry as many times as specified
-              if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
-                  if ($retry > ($config{globalretry} - $globalretries)) { ## we can't retry that many times
-                     $retry =  $config{globalretry} - $globalretries; ## this is the most we can retry
-                     if ($retry < 0) {$retry = 0;} ## if less than 0 then make 0
-                  }
-              }
-              print {*STDOUT} qq|Retry $retry times\n|;
-        }
-        else {
-              $retry = 0; #no retry parameter found, don't retry this case
-        }
-
-        $case{retryfromstep} = $xmltestcases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
-        if ($case{retryfromstep}) { ## retryfromstep parameter found
-              $retry = 0; ## we will not do a regular retry
-        }
+        $retry = get_number_of_times_to_retry_this_test_step(); # 0 means do not retry this step
 
         do ## retry loop
         {
@@ -616,6 +598,37 @@ sub substitute_variables {
 
     return;
 }
+
+#------------------------------------------------------------------
+sub get_number_of_times_to_retry_this_test_step {
+
+    $case{retryfromstep} = $xmltestcases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
+    if ($case{retryfromstep}) { ## retryfromstep parameter found
+        return 0; ## we will not do a regular retry
+    }
+
+    my $_retry;
+    $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
+    if ($case{retry}) { ## retry parameter found
+        $_retry = $case{retry}; ## assume we can retry as many times as specified
+        if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
+            if ($_retry > ($config{globalretry} - $globalretries)) { ## we can't retry that many times
+                $_retry =  $config{globalretry} - $globalretries; ## this is the most we can retry
+                if ($_retry < 0) {
+                    return 0; ## if less than 0 then make 0
+                }
+            }
+        }
+        print {*STDOUT} qq|Retry $_retry times\n|;
+        return $_retry;
+    }
+    else {
+        return 0; #no retry parameter found, don't retry this case
+    }
+
+    return; ## impossible to execute this statement
+}
+
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
