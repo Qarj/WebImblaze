@@ -193,70 +193,13 @@ foreach ($start .. $repeat) {
 
         set_useragent($xmltestcases->{case}->{$testnum}->{useragent});
 
-        $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
-        if ($case{runon}) { ## is this test step conditional on the target environment?
-            if ( _run_this_step($case{runon}) ) {
-                ## run this test case as normal since it is allowed
-            }
-            else {
-                print {*STDOUT} "Skipping Test Case $testnum... (run on $case{runon})\n";
-                print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                next TESTCASE; ## skip this test case if the current environment doesn't match one of the allowed
-            }
+        my $skip_message = get_test_step_skip_message();
+        if ( $skip_message ) {
+            print {*STDOUT} "Skipping Test Case $testnum... ($skip_message)\n";
+            print {*STDOUT} qq|------------------------------------------------------- \n|;
+            next TESTCASE; ## skip running this test step
         }
 
-        $case{donotrunon} = $xmltestcases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
-        if ($case{donotrunon}) { ## is this test step conditional on the target environment?
-            if ( not _run_this_step($case{donotrunon}) ) {
-                ## run this test case as normal since it is allowed
-            }
-            else {
-                print {*STDOUT} "Skipping Test Case $testnum... (do not run on $case{donotrunon})\n";
-                print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                next TESTCASE; ## skip this test case if explicitly blocked for this environment
-            }
-        }
-
-        $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
-        if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
-            if ($opt_autocontroller) { ## if so, was the auto controller option specified?
-                ## run this test case as normal since it is allowed
-            }
-            else {
-                  print {*STDOUT} "Skipping Test Case $testnum...\n (This is not the automation controller)\n";
-                  print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                  next TESTCASE; ## skip this test case if this isn't the test controller
-            }
-        }
-
-        $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
-        if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
-            if ($counter == 1) { ## counter keeps track of what loop number we are on
-                ## run this test case as normal since it is the first pass
-            }
-            else {
-                  print {*STDOUT} "Skipping Test Case $testnum... (firstlooponly)\n";
-                  print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                  next TESTCASE; ## skip this test case since it is firstlooponly and we have already run it
-            }
-        }
-
-        $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
-        if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
-            if ($counter == $repeat) { ## counter keeps track of what loop number we are on
-                ## run this test case as normal since it is the first pass
-            }
-            else {
-                  print {*STDOUT} "Skipping Test Case $testnum... (LASTLOOPONLY)\n";
-                  print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-                  next TESTCASE; ## skip this test case since it is not yet the lastloop
-            }
-        }
 
         # populate variables with values from testcase file, do substitutions, and revert converted values back
         ## old parmlist, kept for reference of what attributes are supported
@@ -612,6 +555,61 @@ sub set_useragent {
     return;
 }
 
+#------------------------------------------------------------------
+sub get_test_step_skip_message {
+
+    $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
+    if ($case{runon}) { ## is this test step conditional on the target environment?
+        if ( _run_this_step($case{runon}) ) {
+            ## run this test case as normal since it is allowed
+        }
+        else {
+            return "run on $case{runon}";
+        }
+    }
+
+    $case{donotrunon} = $xmltestcases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
+    if ($case{donotrunon}) { ## is this test step conditional on the target environment?
+        if ( not _run_this_step($case{donotrunon}) ) {
+            ## run this test case as normal since it is allowed
+        }
+        else {
+            return "do not run on $case{donotrunon}";
+        }
+    }
+
+    $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
+    if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
+        if ($opt_autocontroller) { ## if so, was the auto controller option specified?
+            ## run this test case as normal since it is allowed
+        }
+        else {
+              return 'This is not the automation controller';
+        }
+    }
+
+    $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
+    if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
+        if ($counter == 1) { ## counter keeps track of what loop number we are on
+            ## run this test case as normal since it is the first pass
+        }
+        else {
+              return 'firstlooponly';
+        }
+    }
+
+    $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
+    if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
+        if ($counter == $repeat) { ## counter keeps track of what loop number we are on
+            ## run this test case as normal since it is the first pass
+        }
+        else {
+              return 'lastlooponly';
+        }
+    }
+
+    return;
+}
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
