@@ -59,7 +59,7 @@ my ($cookie_jar, @httpauth);
 my ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
 my ($totalresponse, $avgresponse, $maxresponse, $minresponse);
 my ($currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
-my (%case);
+my (%case, %casesave);
 my (%config);
 my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
@@ -200,27 +200,8 @@ foreach ($start .. $repeat) {
             next TESTCASE; ## skip running this test step
         }
 
-
         # populate variables with values from testcase file, do substitutions, and revert converted values back
-        ## old parmlist, kept for reference of what attributes are supported
-        ##
-        ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", "command2", "command3", "command4", "command5", "command6", "command7", "command8", "command9", "command10", "", "command11", "command12", "command13", "command14", "command15", "command16", "command17", "command18", "command19", "command20", "parms", "verifytext",
-        ## "verifypositive", "verifypositive1", "verifypositive2", "verifypositive3", "verifypositive4", "verifypositive5", "verifypositive6", "verifypositive7", "verifypositive8", "verifypositive9", "verifypositive10", "verifypositive11", "verifypositive12", "verifypositive13", "verifypositive14", "verifypositive15", "verifypositive16", "verifypositive17", "verifypositive18", "verifypositive19", "verifypositive20",
-        ## "verifynegative", "verifynegative1", "verifynegative2", "verifynegative3", "verifynegative4", "verifynegative5", "verifynegative6", "verifynegative7", "verifynegative8", "verifynegative9", "verifynegative10", "verifynegative11", "verifynegative12", "verifynegative13", "verifynegative14", "verifynegative15", "verifynegative16", "verifynegative17", "verifynegative18", "verifynegative19", "verifynegative20",
-        ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999999", "parseresponseORANYTHING", "verifyresponsecode", "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
-        ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", "searchimage1", "searchimage2", "searchimage3", "searchimage4", "searchimage5", "screenshot", "formatxml", "formatjson", "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages", "firstlooponly", "lastlooponly", "decodequotedprintable");
-        ##
-        ## "verifypositivenext", "verifynegativenext" were features of WebInject 1.41 - removed since it is probably incompatible with the "retry" feature, and was never used by the author in writing more than 5000 test cases
-
-        my %casesave; ## we need a clean array for each test case
-        undef %case; ## do not allow values from previous test cases to bleed over
-        foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-            #print "DEBUG: $case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$case_attribute};
-            #print "\n";
-            $case{$case_attribute} = $xmltestcases->{case}->{$testnum}->{$case_attribute};
-            convertbackxml($case{$case_attribute});
-            $casesave{$case_attribute} = $case{$case_attribute}; ## in case we have to retry, some parms need to be resubbed
-        }
+        substitute_variables();
 
         $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
         if ($case{retry}) { ## retry parameter found
@@ -606,6 +587,31 @@ sub get_test_step_skip_message {
         else {
               return 'lastlooponly';
         }
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub substitute_variables {
+
+    ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", ... "command20", "parms", "verifytext",
+    ## "verifypositive", "verifypositive1", ... "verifypositive9999",
+    ## "verifynegative", "verifynegative1", ... "verifynegative9999",
+    ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
+    ## "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
+    ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "screenshot", "formatxml", "formatjson",
+    ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages",
+    ## "firstlooponly", "lastlooponly", "decodequotedprintable"
+
+    undef %casesave; ## we need a clean array for each test case
+    undef %case; ## do not allow values from previous test cases to bleed over
+    foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+        #print "DEBUG: $case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$case_attribute};
+        #print "\n";
+        $case{$case_attribute} = $xmltestcases->{case}->{$testnum}->{$case_attribute};
+        convertbackxml($case{$case_attribute});
+        $casesave{$case_attribute} = $case{$case_attribute}; ## in case we have to retry, some parms need to be resubbed
     }
 
     return;
