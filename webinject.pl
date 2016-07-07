@@ -222,14 +222,14 @@ foreach ($start .. $repeat) {
 
             $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
+            if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record (for single test steps), skip it
+                next;
+            }
+
             $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
 
             print {*STDOUT} qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
 
-            if (!$is_testcases_tag_already_written) { # Only write the testcases opening tag once in the results.xml
-                $results_xml .= qq|    <testcases file="$currentcasefile">\n\n|;
-                $is_testcases_tag_already_written = 'true';
-            }
 
             $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
 
@@ -283,7 +283,7 @@ foreach ($start .. $repeat) {
                 if ($case{method} eq 'selenium') { selenium(); }
             }
             else {
-               httpget();  #use "get" if no method is specified
+                httpget();  #use "get" if no method is specified
             }
 
             searchimage(); ## search for images within actual screen or page grab
@@ -705,6 +705,9 @@ sub write_initial_xml {  #write opening tags for results file
         $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
+
+    $_results_xml .= qq|\n    <testcases file="$currentcasefile">\n\n|;
+
     _whack($opt_publish_full.$results_xml_file_name);
     _write_xml(\$_results_xml);
 
