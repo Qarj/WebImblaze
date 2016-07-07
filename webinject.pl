@@ -189,8 +189,6 @@ foreach ($start .. $repeat) {
         $retries = 1; ## we increment retries after writing to the log
         $retriesprint = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
-        $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
-
         set_useragent($xmltestcases->{case}->{$testnum}->{useragent});
 
         my $skip_message = get_test_step_skip_message();
@@ -219,8 +217,6 @@ foreach ($start .. $repeat) {
             $verifynegativefailed = 'false';
             $retrypassedcount = 0;
             $retryfailedcount = 0;
-
-            $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
             if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record (for single test steps), skip it
                 next;
@@ -570,6 +566,8 @@ sub substitute_variables {
     ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "screenshot", "formatxml", "formatjson",
     ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
+
+    $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
     undef %casesave; ## we need a clean array for each test case
     undef %case; ## do not allow values from previous test cases to bleed over
@@ -3000,7 +2998,6 @@ sub _get_number_in_range {
 
     return ( ($_raw_rnd * $_max_desired_rnd) / $_max_possible_rnd ) + $_min_desired_rnd;
 }
-
 
 #------------------------------------------------------------------
 sub convertbackxmldynamic {## some values need to be updated after each retry
