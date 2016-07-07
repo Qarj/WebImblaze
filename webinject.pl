@@ -208,18 +208,13 @@ foreach ($start .. $repeat) {
         do ## retry loop
         {
             ## for each retry, there are a few substitutions that we need to redo - like the retry number
-           substitute_retry_variables();
+            substitute_retry_variables();
 
-            set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
-            foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
-                    convertback_variables($case{$case_attribute});
-            }
+            set_var_variables(); ## finally set any variables after doing all the static and dynamic substitutions
+            substitute_var_variables();
+            
+            set_retry_to_zero_if_global_limit_exceeded();
 
-            if ($config{globalretry}) {
-                if ($globalretries >= $config{globalretry}) {
-                    $retry = 0; ## globalretries value exceeded - not retrying any more this run
-                }
-            }
             $isfailure = 0;
             $verifynegativefailed = 'false';
             $retrypassedcount = 0;
@@ -636,6 +631,19 @@ sub substitute_retry_variables {
 
     return;
 }
+
+#------------------------------------------------------------------
+sub set_retry_to_zero_if_global_limit_exceeded {
+
+    if ($config{globalretry}) {
+        if ($globalretries >= $config{globalretry}) {
+            $retry = 0; ## globalretries value exceeded - not retrying any more this run
+        }
+    }
+
+    return;
+}
+
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
@@ -3023,7 +3031,7 @@ sub convertbackxmldynamic {## some values need to be updated after each retry
 }
 
 #------------------------------------------------------------------
-sub convertback_variables { ## e.g. postbody="time={RUNSTART}"
+sub convertback_var_variables { ## e.g. postbody="time={RUNSTART}"
     foreach my $case_attribute ( sort keys %{varvar} ) {
        my $sub_var = substr $case_attribute, 3;
        $_[0] =~ s/{$sub_var}/$varvar{$case_attribute}/g;
@@ -3034,7 +3042,7 @@ sub convertback_variables { ## e.g. postbody="time={RUNSTART}"
 
 ## use critic
 #------------------------------------------------------------------
-sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
+sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
     foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
        if ( (substr $case_attribute, 0, 3) eq 'var' ) {
             $varvar{$case_attribute} = $case{$case_attribute}; ## assign the variable
@@ -3043,6 +3051,17 @@ sub set_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 
     return;
 }
+
+#------------------------------------------------------------------
+sub substitute_var_variables {
+ 
+    foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
+        convertback_var_variables($case{$_case_attribute});
+    }
+
+    return;
+}
+
 #------------------------------------------------------------------
 sub uri_escape {
     my ($_string) = @_;
