@@ -222,10 +222,6 @@ foreach ($start .. $repeat) {
 
             $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
-            if ($case{description1} and $case{description1} =~ /dummy test case/) {  #if we hit a dummy record, skip it
-                next;
-            }
-
             $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
 
             print {*STDOUT} qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
