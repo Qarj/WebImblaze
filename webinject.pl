@@ -208,13 +208,7 @@ foreach ($start .. $repeat) {
         do ## retry loop
         {
             ## for each retry, there are a few substitutions that we need to redo - like the retry number
-            foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                if (defined $casesave{$case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
-                {
-                    $case{$case_attribute} = $casesave{$case_attribute}; ## need to restore to the original partially substituted parameter
-                    convertbackxmldynamic($case{$case_attribute}); ## now update the dynamic components
-                }
-            }
+           substitute_retry_variables();
 
             set_variables(); ## finally set any variables after doing all the static and dynamic substitutions
             foreach my $case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
@@ -629,6 +623,19 @@ sub get_number_of_times_to_retry_this_test_step {
     return; ## impossible to execute this statement
 }
 
+#------------------------------------------------------------------
+sub substitute_retry_variables {
+
+    foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
+        if (defined $casesave{$_case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
+        {
+            $case{$_case_attribute} = $casesave{$_case_attribute}; ## need to restore to the original partially substituted parameter
+            convertbackxmldynamic($case{$_case_attribute}); ## now update the dynamic components
+        }
+    }
+
+    return;
+}
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
