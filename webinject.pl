@@ -116,7 +116,6 @@ my $png_base64; ## Selenium full page grab screenshot
 
 my ( $results_html, $results_xml, $results_xml_file_name );
 my ($startruntimer, $endruntimer, $repeat, $start);
-my ($is_testcases_tag_already_written);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -210,7 +209,7 @@ foreach ($start .. $repeat) {
 
             set_var_variables(); ## finally set any variables after doing all the static and dynamic substitutions
             substitute_var_variables();
-            
+
             set_retry_to_zero_if_global_limit_exceeded();
 
             $isfailure = 0;
@@ -3050,7 +3049,7 @@ sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 
 #------------------------------------------------------------------
 sub substitute_var_variables {
- 
+
     foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
         convertback_var_variables($case{$_case_attribute});
     }
