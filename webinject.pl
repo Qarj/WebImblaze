@@ -3232,7 +3232,7 @@ sub _should_display_as_text {
     if ($case{method} eq 'selenium') { return 'true'; }
 
     # if html and body tags found, then display as html
-    if ( ${ $_response } =~ m/<html.*?<body/s ) { return; }
+    if ( ${ $_response } =~ m/<html.*?<body/is ) { return; }
 
     # if we didn't find html and body tags, then don't attempt to render as html
     return 'true';
