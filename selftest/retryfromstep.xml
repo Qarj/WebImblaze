@@ -4,7 +4,7 @@
 Self test master file. All test steps in this file should pass.
 -->
 
-<!-- verifyresponsetime="19" - this will fail if the sleep in step 30 is triggered - which we do not expect -->
+<!-- verifyresponsetime="19" - this will fail if the sleep in step 50 is triggered - which we do not expect -->
 <testvar varname="feature">retryfromstep</testvar>
 <case
     id="10"
@@ -23,7 +23,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive9="retryfromstep.xml - 110-10"
     verifynegative9="retryfromstep.xml - 110-11"
     assertcount="and also mynum variable  four  will be|||8"
-    verifyresponsetime="29"
+    verifyresponsetime="39"
 />
 
 <!-- Test both retryfromstep and retry in the same test case file -->

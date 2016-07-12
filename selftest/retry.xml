@@ -23,7 +23,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive9="retry.xml - 40.2"
     verifynegative9="retry.xml - 40.3"
     assertcount="but mynum variable  seven  will not|||6"
-    verifyresponsetime="19"
+    verifyresponsetime="39"
 />
 
 </testcases>
