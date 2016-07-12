@@ -2018,7 +2018,7 @@ sub cmd {  ## send terminal command and read response
             _shell_adjust(\$cmd);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
+            $combined_response =~ s{$}{<$_> $cmd </$_>\n$cmdresp\n\n\n}; ## include it in the response
         }
     }
     $combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
