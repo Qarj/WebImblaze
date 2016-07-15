@@ -29,17 +29,17 @@ $VERSION = '1.97';
 
 my $driver; ## support for Selenium WebDriver test cases
 
-use LWP;
-use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 use File::Basename; ## So gethrefs can determine the filename of the asset from the path
 use File::Spec;
 use File::Slurp;
+use LWP;
+#use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 use HTTP::Request::Common;
-use HTTP::Cookies;
+#use HTTP::Cookies;
+use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 use XML::Simple;
 use Time::HiRes 'time','sleep';
 use Getopt::Long;
-use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 #use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
@@ -3758,6 +3758,11 @@ sub startsession {     ## creates the webinject user agent
     require IO::Socket::SSL;
     #contsruct objects
     ## Authen::NTLM change allows ntlm authentication
+
+require LWP;
+require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
+require HTTP::Request::Common;
+require HTTP::Cookies;
 
     #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
