@@ -252,42 +252,9 @@ foreach ($start .. $repeat) {
 
             update_latency_statistics();
 
-            $teststeptime{$testnum_display}=$latency; ## store latency for step
+            restart_browser();
 
-            if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
-                print {*STDOUT} qq|RESTARTING SESSION DUE TO FAIL ... \n|;
-                if ($opt_driver) { startseleniumbrowser(); }
-                startsession();
-            }
-
-            if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
-                print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
-                if ($opt_driver) {
-                        print {*STDOUT} "RESTARTING SESSION ...\n";
-                        startseleniumbrowser();
-                    }
-                startsession();
-            }
-
-            if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
-            {
-                ## ignore the sleep if the test case worked and it is a retry test case
-            }
-            else
-            {
-                if ($case{sleep})
-                {
-                    if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
-                    {
-                        ## do not sleep if the test case failed and we have run out of retries or jumpbacks
-                    }
-                    else
-                    {
-                        ## if a sleep value is set in the test case, sleep that amount
-                        sleep $case{sleep};
-                    }
-                }
-            }
+            sleep_before_next_step();
 
             $retry = $retry - 1;
         } ## end of retry loop
@@ -693,6 +660,53 @@ sub update_latency_statistics {
     $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
 
     $teststeptime{$testnum_display}=$latency; ## store latency for step
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub restart_browser {
+
+    if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
+        print {*STDOUT} qq|RESTARTING SESSION DUE TO FAIL ... \n|;
+        if ($opt_driver) { startseleniumbrowser(); }
+        startsession();
+    }
+
+    if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
+        print {*STDOUT} qq|RESTARTING BROWSER ... \n|;
+        if ($opt_driver) {
+                print {*STDOUT} "RESTARTING SESSION ...\n";
+                startseleniumbrowser();
+            }
+        startsession();
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub sleep_before_next_step {
+
+    if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
+    {
+        ## ignore the sleep if the test case worked and it is a retry test case
+    }
+    else
+    {
+        if ($case{sleep})
+        {
+            if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
+            {
+                ## do not sleep if the test case failed and we have run out of retries or jumpbacks
+            }
+            else
+            {
+                ## if a sleep value is set in the test case, sleep that amount
+                sleep $case{sleep};
+            }
+        }
+    }
 
     return;
 }
