@@ -244,48 +244,13 @@ foreach ($start .. $repeat) {
 
             pass_fail_or_retry();
 
-            $results_html .= qq|Response Time = $latency sec <br />\n|;
+            output_test_step_latency();
 
-            print {*STDOUT} qq|Response Time = $latency sec \n|;
+            output_test_step_delimiter();
 
-            $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
+            increment_run_count();
 
-            if ($case{method} eq 'selenium') {
-                $results_html .= qq|Verification Time = $verificationlatency sec <br />\n|;
-                $results_html .= qq|Screenshot Time = $screenshotlatency sec <br />\n|;
-
-                print {*STDOUT} qq|Verification Time = $verificationlatency sec \n|;
-                print {*STDOUT} qq|Screenshot Time = $screenshotlatency sec \n|;
-
-                $results_xml .= qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
-                $results_xml .= qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
-            }
-
-            $results_xml .= qq|        </testcase>\n\n|;
-            _write_xml (\$results_xml);
-            undef $results_xml;
-
-            $results_html .= qq|<br />\n------------------------------------------------------- <br />\n\n|;
-            _write_html (\$results_html);
-            undef $results_html;
-
-            print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-            #if (($isfailure > 0) && ($retry > 0)) {  ## do not increase the run count if we will retry
-            if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq 'false') ) ) {
-                ## do not count this in run count if we are retrying, again maximum usage of retryfromstep has been hard coded
-            }
-            else {
-                $runcount++;
-                $totalruncount++;
-            }
-
-            if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
-            if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
-            $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
-            if ($totalruncount > 0) { #only update average response if at least one test case has completed, to avoid division by zero
-                $avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
-            }
+            update_latency_statistics();
 
             $teststeptime{$testnum_display}=$latency; ## store latency for step
 
@@ -339,6 +304,7 @@ foreach ($start .. $repeat) {
 
 $endruntimer = time;
 $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
+$avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
 
 finaltasks();  #do return/cleanup tasks
 
@@ -662,6 +628,71 @@ sub pass_fail_or_retry {
         $casepassedcount++;
         $retry = 0; # no need to retry when test case passes
     }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub output_test_step_latency {
+            
+    $results_html .= qq|Response Time = $latency sec <br />\n|;
+    print {*STDOUT} qq|Response Time = $latency sec \n|;
+    $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
+
+    if ($case{method} eq 'selenium') {
+        $results_html .= qq|Verification Time = $verificationlatency sec <br />\n|;
+        $results_html .= qq|Screenshot Time = $screenshotlatency sec <br />\n|;
+
+        print {*STDOUT} qq|Verification Time = $verificationlatency sec \n|;
+        print {*STDOUT} qq|Screenshot Time = $screenshotlatency sec \n|;
+
+        $results_xml .= qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
+        $results_xml .= qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub output_test_step_delimiter {
+            
+    $results_xml .= qq|        </testcase>\n\n|;
+    _write_xml (\$results_xml);
+    undef $results_xml;
+
+    $results_html .= qq|<br />\n------------------------------------------------------- <br />\n\n|;
+    _write_html (\$results_html);
+    undef $results_html;
+
+    print {*STDOUT} qq|------------------------------------------------------- \n|;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub increment_run_count {
+
+    if ( ( ($isfailure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
+         ( ($isfailure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($verifynegativefailed eq 'false') )
+       ) {
+        ## do not count this in run count if we are retrying
+    }
+    else {
+        $runcount++;
+        $totalruncount++;
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub update_latency_statistics {
+            
+    if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
+    if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
+    $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
+
+    $teststeptime{$testnum_display}=$latency; ## store latency for step
 
     return;
 }
