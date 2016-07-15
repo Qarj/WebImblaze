@@ -41,7 +41,7 @@ use Time::HiRes 'time','sleep';
 use Getopt::Long;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
-use IO::Socket::SSL qw( SSL_VERIFY_NONE );
+#use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use File::Copy qw(copy), qw(move);
 
@@ -87,6 +87,7 @@ my $chromehandle = 0; ## windows handle of chrome browser window - for screensho
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## substitute in grabbed assets to step results html
+my $session_started; ## only start up http sesion if http is being used
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -123,7 +124,6 @@ my $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
 ## Startup
 getoptions();  #get command line options
-startsession(); #starts, or restarts the webinject session
 processcasefile();
 writeinitialstdout();  #write opening tags for STDOUT.
 
@@ -152,6 +152,7 @@ $currentcasefilename = basename($currentcasefile); ## with extension
 $testfilename = fileparse($currentcasefile, '.xml'); ## without extension
 
 read_test_case_file();
+#startsession(); #starts, or restarts the webinject session
 
 $repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
@@ -501,12 +502,19 @@ sub output_assertions {
 sub execute_test_step {
 
     if ($case{method}) {
-        if ($case{method} eq 'delete') { httpdelete(); }
-        if ($case{method} eq 'get') { httpget(); }
-        if ($case{method} eq 'post') { httppost(); }
-        if ($case{method} eq 'put') { httpput(); }
-        if ($case{method} eq 'cmd') { cmd(); }
-        if ($case{method} eq 'selenium') { selenium(); }
+        if ($case{method} eq 'cmd') { cmd(); return; }
+        if ($case{method} eq 'selenium') { selenium(); return; }
+    }
+
+    if (not $session_started) {
+        startsession();
+    }
+
+    if ($case{method}) {
+        if ($case{method} eq 'get') { httpget(); return;}
+        if ($case{method} eq 'post') { httppost(); return;}
+        if ($case{method} eq 'delete') { httpdelete(); return;}
+        if ($case{method} eq 'put') { httpput(); return;}
     }
     else {
         httpget();  #use "get" if no method is specified
@@ -2679,7 +2687,6 @@ sub slash_me {
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
-    my $setuseragent;
     my $configfilepath;
 
     #process the config file
@@ -2721,14 +2728,6 @@ sub processcasefile {  #get test case files to run (from command line or config 
         if ($userconfig->{$config_const}) {
             $config{$config_const} = $userconfig->{$config_const};
             #print "\n$_ : $config{$_} \n\n";
-        }
-    }
-
-    if ($userconfig->{useragent}) {
-        $setuseragent = $userconfig->{useragent};
-        print "\nuseragent : $setuseragent \n\n";
-        if ($setuseragent) { #http useragent that will show up in webserver logs
-            $useragent->agent($setuseragent);
         }
     }
 
@@ -3756,8 +3755,10 @@ sub shutdown_selenium {
 }
 #------------------------------------------------------------------
 sub startsession {     ## creates the webinject user agent
+    require IO::Socket::SSL;
     #contsruct objects
     ## Authen::NTLM change allows ntlm authentication
+
     #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
     $cookie_jar = HTTP::Cookies->new;
@@ -3767,7 +3768,7 @@ sub startsession {     ## creates the webinject user agent
     eval
     {
        $useragent->ssl_opts(verify_hostname=>0); ## stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
-       $useragent->ssl_opts(SSL_verify_mode=>SSL_VERIFY_NONE); ## from Perl 5.16.3 need this to prevent ugly warnings
+       $useragent->ssl_opts(SSL_verify_mode=>'SSL_VERIFY_NONE'); ## from Perl 5.16.3 need this to prevent ugly warnings
     };
 
     #add proxy support if it is set in config.xml
@@ -3791,6 +3792,16 @@ sub startsession {     ## creates the webinject user agent
     if ($config{timeout}) {
         $useragent->timeout("$config{timeout}");  #default LWP timeout is 180 secs.
     }
+
+    my $setuseragent;
+    if ($userconfig->{useragent}) {
+        $setuseragent = $userconfig->{useragent};
+        if ($setuseragent) { #http useragent that will show up in webserver logs
+            $useragent->agent($setuseragent);
+        }
+    }
+
+    $session_started='true';
 
     return;
 }
