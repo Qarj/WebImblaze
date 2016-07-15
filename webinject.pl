@@ -47,7 +47,6 @@ use File::Copy qw(copy), qw(move);
 
 local $| = 1; #don't buffer output to STDOUT
 
-
 ## Variable declarations
 my ($timestamp, $testfilename);
 my (%parsedresult);
@@ -177,7 +176,7 @@ foreach ($start .. $repeat) {
     @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
     my $numsteps = scalar @teststeps;
 
-    ## Loop over each of the test cases (test steps)
+    ## Loop over each of the test cases (test steps) with C Style for loop (due to need to update $stepindex in a non standard fashion)
     TESTCASE:   for ($stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
 
         $testnum = $teststeps[$stepindex];
@@ -204,9 +203,7 @@ foreach ($start .. $repeat) {
 
         do ## retry loop
         {
-            ## for each retry, there are a few substitutions that we need to redo - like the retry number
-            substitute_retry_variables();
-
+            substitute_retry_variables(); ## for each retry, there are a few substitutions that we need to redo - like the retry number
             set_var_variables(); ## finally set any variables after doing all the static and dynamic substitutions
             substitute_var_variables();
 
@@ -217,17 +214,14 @@ foreach ($start .. $repeat) {
             $retrypassedcount = 0;
             $retryfailedcount = 0;
 
-            if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record (for single test steps), skip it
+            if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record, skip it (this is a hack for test case files with only one step)
                 next;
             }
 
             output_test_step_description();
-
             output_assertions();
 
             execute_test_step();
-
-            searchimage(); ## search for images within actual screen or page grab
 
             decode_quoted_printable();
 
@@ -240,16 +234,13 @@ foreach ($start .. $repeat) {
             parseresponse();  #grab string from response to send later
 
             httplog();  #write to http.txt file
-            $previous_test_step = $testnum_display.$jumpbacksprint.$retriesprint;
 
             pass_fail_or_retry();
 
             output_test_step_latency();
-
             output_test_step_delimiter();
 
             increment_run_count();
-
             update_latency_statistics();
 
             restart_browser();
@@ -2225,6 +2216,8 @@ sub decode_quoted_printable {
 #------------------------------------------------------------------
 sub verify {  #do verification of http response and print status to HTML/XML/STDOUT/UI
 
+    searchimage(); ## search for images within actual screen or page grab
+
     ## reset the global variables
     $assertionskips = 0;
     $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
@@ -3196,6 +3189,8 @@ sub httplog {  # write requests and responses to http.txt file
 
     _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
     _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base);
+
+    $previous_test_step = $testnum_display.$jumpbacksprint.$retriesprint;
 
     return;
 }
