@@ -221,65 +221,11 @@ foreach ($start .. $repeat) {
                 next;
             }
 
-            $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
+            output_test_step_description();
 
-            print {*STDOUT} qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
+            output_assertions();
 
-
-            $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
-
-            for (qw/section description1 description2/) { ## support section breaks
-                next unless defined $case{$_};
-                $results_html .= qq|$case{$_} <br />\n|;
-                print {*STDOUT} qq|$case{$_} \n|;
-                $results_xml .= qq|            <$_>|._sub_xml_special($case{$_}).qq|</$_>\n|;
-            }
-
-            $results_html .= qq|<br />\n|;
-
-            ## display and log the verifications to do to stdout and html - xml output is done with the verification itself
-            ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
-            ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
-            foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
-                if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
-                    my $verifytype = substr $case_attribute, 6, 8; ## so we get the word positive or negative
-                    $verifytype = ucfirst $verifytype; ## change to Positive or Negative
-                    @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
-                    $results_html .= qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
-                    print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
-                }
-            }
-
-            if ($case{verifyresponsecode}) {
-                $results_html .= qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
-                print {*STDOUT} qq|Verify Response Code: "$case{verifyresponsecode}" \n|;
-                $results_xml .= qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
-            }
-
-            if ($case{verifyresponsetime}) {
-                $results_html .= qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
-                print {*STDOUT} qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
-                $results_xml .= qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
-            }
-
-            if ($case{retryresponsecode}) {## retry if a particular response code was returned
-                $results_html .= qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
-                print {*STDOUT} qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
-                $results_xml .= qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
-            }
-
-
-            if ($case{method}) {
-                if ($case{method} eq 'delete') { httpdelete(); }
-                if ($case{method} eq 'get') { httpget(); }
-                if ($case{method} eq 'post') { httppost(); }
-                if ($case{method} eq 'put') { httpput(); }
-                if ($case{method} eq 'cmd') { cmd(); }
-                if ($case{method} eq 'selenium') { selenium(); }
-            }
-            else {
-                httpget();  #use "get" if no method is specified
-            }
+            execute_test_step();
 
             searchimage(); ## search for images within actual screen or page grab
 
@@ -637,6 +583,79 @@ sub set_retry_to_zero_if_global_limit_exceeded {
     return;
 }
 
+#------------------------------------------------------------------
+sub output_test_step_description {
+
+    $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
+    print {*STDOUT} qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
+    $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
+
+    for (qw/section description1 description2/) { ## support section breaks
+        next unless defined $case{$_};
+        $results_html .= qq|$case{$_} <br />\n|;
+        print {*STDOUT} qq|$case{$_} \n|;
+        $results_xml .= qq|            <$_>|._sub_xml_special($case{$_}).qq|</$_>\n|;
+    }
+
+    $results_html .= qq|<br />\n|;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub output_assertions {
+
+    ## display and log the verifications to do to stdout and html - xml output is done with the verification itself
+    ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
+    ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
+    foreach my $case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+        if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
+            my $verifytype = substr $case_attribute, 6, 8; ## so we get the word positive or negative
+            $verifytype = ucfirst $verifytype; ## change to Positive or Negative
+            @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
+            $results_html .= qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
+            print {*STDOUT} qq|Verify $verifytype: "$verifyparms[0]" \n|;
+        }
+    }
+
+    if ($case{verifyresponsecode}) {
+        $results_html .= qq|Verify Response Code: "$case{verifyresponsecode}" <br />\n|;
+        print {*STDOUT} qq|Verify Response Code: "$case{verifyresponsecode}" \n|;
+        $results_xml .= qq|            <verifyresponsecode>$case{verifyresponsecode}</verifyresponsecode>\n|;
+    }
+
+    if ($case{verifyresponsetime}) {
+        $results_html .= qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
+        print {*STDOUT} qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
+        $results_xml .= qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
+    }
+
+    if ($case{retryresponsecode}) {## retry if a particular response code was returned
+        $results_html .= qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
+        print {*STDOUT} qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
+        $results_xml .= qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub execute_test_step {
+
+    if ($case{method}) {
+        if ($case{method} eq 'delete') { httpdelete(); }
+        if ($case{method} eq 'get') { httpget(); }
+        if ($case{method} eq 'post') { httppost(); }
+        if ($case{method} eq 'put') { httpput(); }
+        if ($case{method} eq 'cmd') { cmd(); }
+        if ($case{method} eq 'selenium') { selenium(); }
+    }
+    else {
+        httpget();  #use "get" if no method is specified
+    }
+
+    return;
+}
 
 #------------------------------------------------------------------
 sub writeinitialhtml {  #write opening tags for results file
