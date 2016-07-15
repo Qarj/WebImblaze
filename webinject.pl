@@ -261,7 +261,6 @@ foreach ($start .. $repeat) {
                 $results_xml .= qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
             }
 
-
             $results_xml .= qq|        </testcase>\n\n|;
             _write_xml (\$results_xml);
             undef $results_xml;
@@ -271,9 +270,6 @@ foreach ($start .. $repeat) {
             undef $results_html;
 
             print {*STDOUT} qq|------------------------------------------------------- \n|;
-
-            $endruntimer = time;
-            $totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
 
             #if (($isfailure > 0) && ($retry > 0)) {  ## do not increase the run count if we will retry
             if ( (($isfailure > 0) && ($retry > 0) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks < $config{globaljumpbacks}  ) && ($verifynegativefailed eq 'false') ) ) {
@@ -340,6 +336,9 @@ foreach ($start .. $repeat) {
 
     $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
 } ## end of repeat loop
+
+$endruntimer = time;
+$totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
 
 finaltasks();  #do return/cleanup tasks
 
