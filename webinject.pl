@@ -65,7 +65,7 @@ my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
-my ($testnum, $xmltestcases); ## $testnum made global
+my ($testnum, $xmltestcases, $stepindex, @teststeps);
 my ($testnum_display, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
 my ($forcedretry); ## force retry when specific http error code received
@@ -174,11 +174,11 @@ foreach ($start .. $repeat) {
     $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
     $jumpbacks = 0;
 
-    my @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
+    @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
     my $numsteps = scalar @teststeps;
 
     ## Loop over each of the test cases (test steps)
-    TESTCASE:   for (my $stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
+    TESTCASE:   for ($stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
 
         $testnum = $teststeps[$stepindex];
 
@@ -242,72 +242,7 @@ foreach ($start .. $repeat) {
             httplog();  #write to http.txt file
             $previous_test_step = $testnum_display.$jumpbacksprint.$retriesprint;
 
-            ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-            if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {  #if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case. However if a verifynegative fails then the case is always a failure
-                $results_xml .= qq|            <success>false</success>\n|;
-                if ($case{errormessage}) { #Add defined error message to the output
-                    $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
-                    $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
-                    print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
-                }
-                else { #print regular error output
-                    $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
-                    $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
-                    print {*STDOUT} qq|TEST CASE FAILED\n|;
-                }
-                $casefailedcount++;
-            }
-            elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
-                $results_html .= qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
-                print {*STDOUT} qq|RETRYING... $retry to go \n|;
-                $results_xml .= qq|            <success>false</success>\n|;
-                $results_xml .= qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
-
-                ## all this is for ensuring correct behaviour when retries occur
-                $retriesprint = ".$retries";
-                $retries++;
-                $globalretries++;
-                $passedcount = $passedcount - $retrypassedcount;
-                $failedcount = $failedcount - $retryfailedcount;
-            }
-            elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
-                my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
-                $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
-                print {*STDOUT} qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
-                $results_xml .= qq|            <success>false</success>\n|;
-                $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
-                $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
-                $jumpbacksprint = "-$jumpbacks";
-                $globalretries++;
-                $passedcount = $passedcount - $retrypassedcount;
-                $failedcount = $failedcount - $retryfailedcount;
-
-                ## find the index for the test step we are retrying from
-                $stepindex = 0;
-                my $foundindex = 'false';
-                foreach (@teststeps) {
-                    if ($teststeps[$stepindex] eq $case{retryfromstep}) {
-                        $foundindex = 'true';
-                        last;
-                    }
-                    $stepindex++
-                }
-                if ($foundindex eq 'false') {
-                    print {*STDOUT} qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
-                }
-                else
-                {
-                    $stepindex--; ## since we increment it at the start of the next loop / end of this loop
-                }
-            }
-            else {
-                $results_html .= qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
-                print {*STDOUT} qq|TEST CASE PASSED \n|;
-                $results_xml .= qq|            <success>true</success>\n|;
-                $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
-                $casepassedcount++;
-                $retry = 0; # no need to retry when test case passes
-            }
+            pass_fail_or_retry();
 
             $results_html .= qq|Response Time = $latency sec <br />\n|;
 
@@ -652,6 +587,81 @@ sub execute_test_step {
     }
     else {
         httpget();  #use "get" if no method is specified
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub pass_fail_or_retry {
+
+    ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
+    if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {
+        ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
+        ## however if a verifynegative fails then the case is always a failure
+        $results_xml .= qq|            <success>false</success>\n|;
+        if ($case{errormessage}) { #Add defined error message to the output
+            $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
+            $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
+            print {*STDOUT} qq|TEST CASE FAILED : $case{errormessage}\n|;
+        }
+        else { #print regular error output
+            $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
+            $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
+            print {*STDOUT} qq|TEST CASE FAILED\n|;
+        }
+        $casefailedcount++;
+    }
+    elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
+        $results_html .= qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
+        print {*STDOUT} qq|RETRYING... $retry to go \n|;
+        $results_xml .= qq|            <success>false</success>\n|;
+        $results_xml .= qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
+
+        ## all this is for ensuring correct behaviour when retries occur
+        $retriesprint = ".$retries";
+        $retries++;
+        $globalretries++;
+        $passedcount = $passedcount - $retrypassedcount;
+        $failedcount = $failedcount - $retryfailedcount;
+    }
+    elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
+        my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
+        $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
+        print {*STDOUT} qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
+        $results_xml .= qq|            <success>false</success>\n|;
+        $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
+        $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
+        $jumpbacksprint = "-$jumpbacks";
+        $globalretries++;
+        $passedcount = $passedcount - $retrypassedcount;
+        $failedcount = $failedcount - $retryfailedcount;
+
+        ## find the index for the test step we are retrying from
+        $stepindex = 0;
+        my $foundindex = 'false';
+        foreach (@teststeps) {
+            if ($teststeps[$stepindex] eq $case{retryfromstep}) {
+                $foundindex = 'true';
+                last;
+            }
+            $stepindex++
+        }
+        if ($foundindex eq 'false') {
+            print {*STDOUT} qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
+        }
+        else
+        {
+            $stepindex--; ## since we increment it at the start of the next loop / end of this loop
+        }
+    }
+    else {
+        $results_html .= qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
+        print {*STDOUT} qq|TEST CASE PASSED \n|;
+        $results_xml .= qq|            <success>true</success>\n|;
+        $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
+        $casepassedcount++;
+        $retry = 0; # no need to retry when test case passes
     }
 
     return;
