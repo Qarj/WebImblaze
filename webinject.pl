@@ -27,14 +27,11 @@ $VERSION = '1.97';
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
-my $driver; ## support for Selenium WebDriver test cases
-
-use File::Basename; ## So gethrefs can determine the filename of the asset from the path
+use File::Basename;
 use File::Spec;
 use File::Slurp;
 use LWP;
 use HTTP::Request::Common;
-use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 use XML::Simple;
 use Time::HiRes 'time','sleep';
 use Getopt::Long;
@@ -85,6 +82,7 @@ my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## substitute in grabbed assets to step results html
 my $session_started; ## only start up http sesion if http is being used
+my $driver; ## support for Selenium WebDriver test cases
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -3758,6 +3756,7 @@ sub shutdown_selenium {
 sub startsession {     ## creates the webinject user agent
 
     require IO::Socket::SSL;
+    require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
     require HTTP::Cookies;
 
     #$useragent = LWP::UserAgent->new; ## 1.41 version
