@@ -600,7 +600,7 @@ sub pass_fail_or_retry {
 
 #------------------------------------------------------------------
 sub output_test_step_latency {
-            
+
     $results_html .= qq|Response Time = $latency sec <br />\n|;
     print {*STDOUT} qq|Response Time = $latency sec \n|;
     $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
@@ -621,7 +621,7 @@ sub output_test_step_latency {
 
 #------------------------------------------------------------------
 sub output_test_step_delimiter {
-            
+
     $results_xml .= qq|        </testcase>\n\n|;
     _write_xml (\$results_xml);
     undef $results_xml;
@@ -653,7 +653,7 @@ sub increment_run_count {
 
 #------------------------------------------------------------------
 sub update_latency_statistics {
-            
+
     if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
     if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
     $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
