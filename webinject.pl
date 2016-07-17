@@ -33,15 +33,12 @@ use File::Basename; ## So gethrefs can determine the filename of the asset from 
 use File::Spec;
 use File::Slurp;
 use LWP;
-#use URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 use HTTP::Request::Common;
-#use HTTP::Cookies;
 use Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
 use XML::Simple;
 use Time::HiRes 'time','sleep';
 use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
-#use IO::Socket::SSL qw( SSL_VERIFY_NONE );
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use File::Copy qw(copy), qw(move);
 
@@ -1474,6 +1471,8 @@ sub getbackgroundimages { ## style="background-image: url( )"
 #------------------------------------------------------------------
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ('href',q{"},q{"},'.less|.css')
+
+    require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
     my ($match, $leftdelim, $rightdelim, $assetlist, $_type) = @_;
 
@@ -3512,6 +3511,8 @@ sub _replace_relative_urls_with_absolute {
 sub _determine_absolute_url {
     my ($_ref, $_response_base) = @_;
 
+    require URI::URL;
+
     my $_ur_url = URI::URL->new($_ref, $_response_base);
     my $_abs_url = $_ur_url->abs;
 
@@ -3755,14 +3756,9 @@ sub shutdown_selenium {
 }
 #------------------------------------------------------------------
 sub startsession {     ## creates the webinject user agent
-    require IO::Socket::SSL;
-    #contsruct objects
-    ## Authen::NTLM change allows ntlm authentication
 
-require LWP;
-require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
-require HTTP::Request::Common;
-require HTTP::Cookies;
+    require IO::Socket::SSL;
+    require HTTP::Cookies;
 
     #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
