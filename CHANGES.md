@@ -8,6 +8,14 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.98 - Jul 18, 2016
+* removed xnode feature for running a single test step
+* fixed selftest compatibility for Perl 5.24.0
+* log separator now written after a test step, not before (as per original functionality)
+* WebInject now determines whether to try and render a test result based on whether it contains <html and <body tags
+* output of shell command tests were sometimes being treated as http headers, fixed
+* reduced startup time for tests that do not invoke a http session - makes the self tests much quicker
+
 ### Version 1.97 - Jul 3, 2016
 * made core WebInject compatible with Linux (Selenium support still be to addressed)
 * renamed http.log to http.txt - http.txt can be served by web servers without adding a mime type

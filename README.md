@@ -1,4 +1,4 @@
-# WebInject 1.97
+# WebInject 1.98
 WebInject is a free Perl based tool for automated testing of web applications and web services.
 
 You can see WebInject example output here: http://qarj.github.io/WebInject-Example/

@@ -1,4 +1,4 @@
-# Manual for WebInject version 1.97
+# Manual for WebInject version 1.98
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
