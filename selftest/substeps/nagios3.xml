@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Step 10 should fail"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="Will not be found"
+/>
+
+<case
+    id="20"
+    description1="Step 20 should fail also, however Step 10 should be reported to Nagios - first failed step"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="Will not be found"
+/>
+
+</testcases>

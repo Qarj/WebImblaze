@@ -203,6 +203,16 @@ Run all self tests
 />
 
 <case
+    varFEATURE="nagios"
+    id="230"
+    description1="{FEATURE}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
     id="260"
     description1="sanitycheck"
     method="cmd"

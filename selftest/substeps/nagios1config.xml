@@ -1,0 +1,17 @@
+<root>
+    <testcasefile>examples/simple.xml</testcasefile>
+    <globalretry>20</globalretry> <!-- Global limit for the number of retries for a test run --> 
+    <globaljumpbacks>5</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
+    <userdefined> 
+        <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
+        <ran>rimattest.azurewebsites.net</ran> <!-- RIMATTEST web site base url --> 
+    </userdefined> 
+    <autoassertions> 
+       <autoassertion1>^((?!HTTP Error 404.0 . Not Found).)*$|||Page not found error</autoassertion1> 
+    </autoassertions> 
+    <smartassertions> 
+       <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
+    </smartassertions> 
+    <reporttype>nagios</reporttype>
+    <globaltimeout>0.01</globaltimeout>
+</root>

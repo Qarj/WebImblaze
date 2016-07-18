@@ -1,0 +1,40 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">nagios</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}.xml"
+    verifypositive="WebInject CRITICAL - Nagios should see this error message \|time="
+/>
+
+<case
+    id="20"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}1sub -c selftest\substeps\${feature}1config.xml selftest\substeps\${feature}1.xml"
+    verifypositive="WebInject WARNING - All tests passed successfully but global timeout \(0\.01 seconds\) has been reached \|time="
+/>
+
+<case
+    id="30"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}2sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}2.xml"
+    verifypositive="WebInject OK - All tests passed successfully in"
+/>
+
+<case
+    id="40"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}3sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}3.xml"
+    verifypositive="WebInject CRITICAL - Test case number 10 failed |time="
+/>
+
+</testcases>
