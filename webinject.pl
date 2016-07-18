@@ -58,6 +58,8 @@ my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_no_output, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
+my ($report_type); ## 'standard' and 'nagios' supported
+my ($return_message); ## error message to return to nagios
 my ($testnum, $xmltestcases, $stepindex, @teststeps);
 my ($testnum_display, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
@@ -533,11 +535,17 @@ sub pass_fail_or_retry {
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
             $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
             $results_stdout .= qq|TEST CASE FAILED : $case{errormessage}\n|;
+            if (not $return_message) {
+                $return_message = $case{errormessage}; ## only return the first error message to nagios
+            }
         }
         else { #print regular error output
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
             $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
             $results_stdout .= qq|TEST CASE FAILED\n|;
+            if (not $return_message) {
+                $return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
+            }
         }
         $casefailedcount++;
     }
@@ -821,6 +829,7 @@ sub writefinalhtml {  #write summary and closing tags for results file
     $results_html .= qq|<b>\n|;
     $results_html .= qq|Start Time: $currentdatetime <br />\n|;
     $results_html .= qq|Total Run Time: $totalruntime seconds <br />\n|;
+    $results_html .= qq|Total Response Time: $totalresponse seconds <br />\n|;
     $results_html .= qq|<br />\n|;
     $results_html .= qq|Test Cases Run: $totalruncount <br />\n|;
     $results_html .= qq|Test Cases Passed: $casepassedcount <br />\n|;
@@ -861,6 +870,7 @@ sub writefinalxml {  #write summary and closing tags for XML results file
     $results_xml .= qq|        <start-date-time>$STARTDATE|;
     $results_xml .= qq|T$HOUR:$MINUTE:$SECOND</start-date-time>\n|;
     $results_xml .= qq|        <total-run-time>$totalruntime</total-run-time>\n|;
+    $results_xml .= qq|        <total-response-time>$totalresponse</total-response-time>\n|;
     $results_xml .= qq|        <test-cases-run>$totalruncount</test-cases-run>\n|;
     $results_xml .= qq|        <test-cases-passed>$casepassedcount</test-cases-passed>\n|;
     $results_xml .= qq|        <test-cases-failed>$casefailedcount</test-cases-failed>\n|;
@@ -887,6 +897,7 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
 
     $results_stdout .= qq|Start Time: $currentdatetime\n|;
     $results_stdout .= qq|Total Run Time: $totalruntime seconds\n\n|;
+    $results_stdout .= qq|Total Response Time: $totalresponse seconds\n\n|;
 
     $results_stdout .= qq|Test Cases Run: $totalruncount\n|;
     $results_stdout .= qq|Test Cases Passed: $casepassedcount\n|;
@@ -896,6 +907,40 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
 
     if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
+
+    #plugin modes
+    if ($report_type && $report_type ne 'standard') {  #return value is set which corresponds to a monitoring program
+
+        #Nagios plugin compatibility
+        my %exit_codes;
+        if ($report_type eq 'nagios') { #report results in Nagios format 
+            #predefined exit codes for Nagios
+            %exit_codes  = ('UNKNOWN' ,-1,
+                            'OK'      , 0,
+                            'WARNING' , 1,
+                            'CRITICAL', 2,);
+
+	    my $_end = defined $userconfig->{globaltimeout} ? "$userconfig->{globaltimeout};;0" : ";;0";
+
+            if ($casefailedcount > 0) {
+	        print "WebInject CRITICAL - $return_message |time=$totalresponse;$_end\n";
+                exit $exit_codes{'CRITICAL'};
+            }
+            elsif ( ($userconfig->{globaltimeout}) && ($totalresponse > $userconfig->{globaltimeout}) ) { 
+                print "WebInject WARNING - All tests passed successfully but global timeout ($userconfig->{globaltimeout} seconds) has been reached |time=$totalresponse;$_end\n";
+                exit $exit_codes{'WARNING'};
+            }
+            else {
+                print "WebInject OK - All tests passed successfully in $totalresponse seconds |time=$totalresponse;$_end\n";
+                exit $exit_codes{'OK'};
+            }
+        }
+
+        else {
+            print STDERR "\nError: only 'nagios' or 'standard' are supported reporttype values\n\n";
+        }
+
+    }
 
     return;
 }
@@ -2774,6 +2819,13 @@ sub processcasefile {  #get test case files to run (from command line or config 
         }
     }
 
+    if (defined $userconfig->{reporttype}) {
+        $report_type = lc $userconfig->{reporttype};
+        if ($report_type ne 'standard') {
+            $opt_no_output = 'true'; ## no standard output for plugins like nagios
+        }
+    }
+
     return;
 }
 
@@ -3559,9 +3611,9 @@ sub finaltasks {  #do ending tasks
 
     writefinalhtml();  #write summary and closing tags for results file
 
-    writefinalstdout();  #write summary and closing tags for STDOUT
-
     writefinalxml();  #write summary and closing tags for XML results file
+
+    writefinalstdout();  #write summary and closing tags for STDOUT
 
     return;
 }
