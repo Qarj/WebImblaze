@@ -9,7 +9,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Step 10 should pass"
     method="cmd"
-    command1='perl -e "sleep 0.01"'
+    command1='perl -MTime::HiRes=sleep -e "sleep 0.01"'
     errormessage="Nagios should NOT see this error message"
 />
 
@@ -17,7 +17,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="Step 20 should pass also, however we should report a WARNING to Nagios due to exceeding globaltimeout of 0.01"
     method="cmd"
-    command1='perl -e "sleep 0.01"'
+    command1='perl -MTime::HiRes=sleep -e "sleep 0.01"'
     errormessage="Nagios should NOT see this error message"
 />
 

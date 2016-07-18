@@ -83,7 +83,7 @@ Expected failures will be asserted by the master test file.
     description1="LENGTH is {SUB}"
     method="cmd"
     command1="echo {SUB}"
-    command2='perl -e "sleep 0.01"'
+    command2='perl -MTime::HiRes=sleep -e "sleep 0.01"'
     verifypositive="_\d*_"
 />
 
