@@ -496,7 +496,7 @@ sub output_assertions {
 #------------------------------------------------------------------
 sub execute_test_step {
 
-    print $results_stdout;
+    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
 
     if ($case{method}) {
@@ -629,7 +629,7 @@ sub output_test_step_results {
     undef $results_html;
 
     $results_stdout .= qq|------------------------------------------------------- \n|;
-    print $results_stdout;
+    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
 
     return;
@@ -894,7 +894,7 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
     $results_stdout .= qq|Verifications Passed: $passedcount\n|;
     $results_stdout .= qq|Verifications Failed: $failedcount\n\n|;
 
-    print $results_stdout;
+    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
 
     return;
