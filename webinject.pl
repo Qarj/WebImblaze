@@ -920,13 +920,13 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
                             'WARNING' , 1,
                             'CRITICAL', 2,);
 
-	    my $_end = defined $userconfig->{globaltimeout} ? "$userconfig->{globaltimeout};;0" : ";;0";
+	    my $_end = defined $userconfig->{globaltimeout} ? "$userconfig->{globaltimeout};;0" : ';;0';
 
             if ($casefailedcount > 0) {
 	        print "WebInject CRITICAL - $return_message |time=$totalresponse;$_end\n";
                 exit $exit_codes{'CRITICAL'};
             }
-            elsif ( ($userconfig->{globaltimeout}) && ($totalresponse > $userconfig->{globaltimeout}) ) { 
+            elsif ( ($userconfig->{globaltimeout}) && ($totalresponse > $userconfig->{globaltimeout}) ) {
                 print "WebInject WARNING - All tests passed successfully but global timeout ($userconfig->{globaltimeout} seconds) has been reached |time=$totalresponse;$_end\n";
                 exit $exit_codes{'WARNING'};
             }
@@ -937,7 +937,7 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
         }
 
         else {
-            print STDERR "\nError: only 'nagios' or 'standard' are supported reporttype values\n\n";
+            print {*STDERR} "\nError: only 'nagios' or 'standard' are supported reporttype values\n\n";
         }
 
     }
@@ -1523,9 +1523,9 @@ sub getbackgroundimages { ## style="background-image: url( )"
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ('href',q{"},q{"},'.less|.css')
 
-    require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
-
     my ($match, $leftdelim, $rightdelim, $assetlist, $_type) = @_;
+
+    require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
     my ($startassetrequest, $endassetrequest, $assetlatency);
     my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse);
