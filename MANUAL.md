@@ -20,8 +20,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Base URL (baseurl, baseurl1, baseurl2)](#baseurl)
 
-[Comments (comment)](#comment)
-
 [Response Delay Timeout (timeout)](#timeout)
 
 [Global Retry (globalretry)](#globalretry)
@@ -40,9 +38,9 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Smart Assertions (smartassertions)](#smartassertions)
 
-[Report Type (for Nagios Plugin mode) (reporttype)](#reporttype)
+[Report Type (Nagios Plugin mode) (reporttype)](#reporttype)
 
-[Global Timeout (for Nagios Plugin mode) (globaltimeout)](#globaltimeout)
+[Global Timeout (Nagios Plugin mode) (globaltimeout)](#globaltimeout)
 
 [WebInject Framework (webinjectframework)](#webinjectframework)
 
@@ -272,11 +270,15 @@ Available config settings are:
 #### proxy
 Specifies a proxy server to route all HTTP requests through.
 
-example: `<proxy>http://127.0.0.1:8080</proxy>`
+```xml
+<proxy>http://127.0.0.1:8080</proxy>
+```
 
 You can also do proxy authentication like this:
 
-example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
+```xml
+<proxy>http://username:password@127.0.0.1:8080</proxy>
+```
 
 <a name="useragent"></a>
 
@@ -287,7 +289,9 @@ example: `<proxy>http://username:password@127.0.0.1:8080</proxy>`
 Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default
 User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
 
-example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>`
+```xml
+<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</useragent>
+```
 
 <br />
 
@@ -298,13 +302,17 @@ example: `<useragent>Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)</userage
 Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response
 authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication
 information.  This configuration parameter takes a list of 5 colon delimited values that correspond to:
-<em>servername:portnumber:realm-name:username:password</em>
+`servername:portnumber:realm-name:username:password`
 
-example: `<httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>`
+```xml
+<httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>
+```
 
 You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
 
-example: `<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>`
+```xml
+<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>
+```
 
 Note: You can have as many httpauth entries as you need.
 
@@ -316,7 +324,9 @@ Note: You can have as many httpauth entries as you need.
 #### baseurl
 Creates the constant {BASEURL} which can be used in test cases (see 'Variables and Constants' section below).
 
-example: `<baseurl>http://myserver</baseurl>`
+```xml
+<baseurl>http://myserver</baseurl>
+```
 
 <br />
 
@@ -336,17 +346,6 @@ in the same way as the 'baseurl' example above.
 <br />
 
 
-<a name="comment"></a>
-#### comment
-
-Allows you to comment out parts of your config file.  Anything contained within comment tags will not be processed.
-(I know it is braindead that we don't allow regular XML-style comments here.. sorry)
-
-example: `<comment>this will be ignored</comment>`
-
-<br />
-
-
 <a name="timeout"></a>
 #### timeout
 Sets a response delay timeout (in seconds) for every test case.  If the response in any test case takes longer than
@@ -354,7 +353,9 @@ this threshold, the HTTP request times out and the case is marked as failed.  Th
 is 180 seconds.
 
 
-example: `<timeout>10</timeout>`
+```xml
+<timeout>10</timeout>
+```
 
 Note: This timeout setting may not always work when using SSL/HTTPS.
 
@@ -368,7 +369,9 @@ For example, consider 3 test cases each set to retry 40 times, along with a glob
 badly, then there will be no more than 50 retry attempts rather than 120.
 
 
-example: `<globalretry>50</globalretry>`
+```xml
+<globalretry>50</globalretry>
+```
 
 <br />
 
@@ -399,7 +402,7 @@ Used in conjunction with the runon and donotrunon test case parameters. Tests th
 be run if one of the environments specified match the environment configure here.
 
 Example - in the config file:
-```
+```xml
     <wif>
         <environment>DEV</environment>
     </wif>
@@ -433,7 +436,9 @@ Then the test step will be skipped.
 Allows you to designate certain servers as an automation controller.
 This enables you to specify that certain test steps should only be run from the automation controller.
 
-example: `<automationcontrolleronly>Allow</automationcontrolleronly>`
+```xml
+<automationcontrolleronly>Allow</automationcontrolleronly>
+```
 
 In the test step that you only want to run on automation controllers, specify the parameter `automationcontrolleronly="true"`
 
@@ -516,7 +521,7 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 
 
 <a name="reporttype"></a>
-#### reporttype
+#### reporttype (Nagios Plugin Mode)
 
 Two options:
 
@@ -576,7 +581,7 @@ WebInject OK - All tests passed successfully in 0.007 seconds |time=0.007;100;;0
 
 
 <a name="globaltimeout"></a>
-#### globaltimeout
+#### globaltimeout (Nagios Plugin Mode)
 
 The globaltimeout is only used when in Nagios plugin mode (see reporttype). If the globaltimeout parameter is
 present, then total test response time is checked against this parameter. If sum of the test step reponse times
@@ -599,7 +604,7 @@ WebInject Framework results summary. These links can be found in the individual 
 
 This section looks like:
 
-```
+```xml
 <wif>
     <batch>security</batch>
     <folder>examples</folder>
@@ -785,8 +790,6 @@ config file, the files specified in the config file will not be processed (but a
 #### More Examples of Command Line Usage
 
 Here are some examples to illustrate using webinject.pl from the command line:
-
-
 
 1) Launching webinject.pl using the default config file and test case file:
 
@@ -1186,7 +1189,7 @@ parseresponse1, parseresponse5000 and parseresponseUSERID.
 #### var
 Set a variable that can be used in the same test step.
 
-```
+```xml
 <case
     varTESTEMAIL="newuser_{JUMPBACKS}_{RETRY}_{COUNTER}@example.com"
     id="10"
@@ -1558,7 +1561,7 @@ from a not logged in state.
 
 <a name="restartbrowser"></a>
 #### restartbrowser
-Will restart the WebInject session after execution of the current step.
+Will restart the WebInject http session after execution of the current step.
 
 If a Selenium WebDriver browser session is also present, that will be restarted too.
 
@@ -1916,7 +1919,7 @@ If you examine the include selftest, you'll see a full example of the structure.
 
 The include step looks like this:
 
-```
+```xml
 <include
     id="10"
     file="selftest\helpers\setup\login.xml"
@@ -2194,7 +2197,7 @@ If you a have a test case that uses the parameter:
 ```
 
 You could create this line in your config.xml file:
-```
+```xml
     <baseurl>http://myserver</baseurl>
 ```
 
@@ -2509,7 +2512,7 @@ Will be sent to the server as:
 ## 7 - Additional Info
 
 <a name="parallel"></a>
-### 7.1 Parallel Execution
+### 7.1 Parallel Automated Test Execution
 
 WebInject can be run in parallel / concurrently with no problem. The only thing to keep in mind is to be sure to
 specify different output locations for each instance of WebInject.
