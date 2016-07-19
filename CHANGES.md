@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 1.99 - Jul 19, 2016
+* added back --no-output command line option
+* added back Nagios plugin mode support
+
 ### Version 1.98 - Jul 18, 2016
 * removed xnode feature for running a single test step
 * fixed selftest compatibility for Perl 5.24.0
