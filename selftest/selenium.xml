@@ -1,0 +1,36 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">selenium</testvar>
+
+<!--
+    command='start java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -Dwebdriver.chrome.logfile="selftest\substeps\${feature}chrome_logfile.xml" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates"'
+    command='wmic process call create "cmd /c java -Dwebdriver.chrome.driver=C:\selenium-server\chromedriver.exe -Dwebdriver.chrome.logfile={SINGLEQUOTE}selftest\substeps\${feature}chrome_logfile.xml{SINGLEQUOTE} -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates"'
+    command="wmic process call create 'cmd /c java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -Dwebdriver.chrome.logfile="selftest\substeps\${feature}chrome_logfile.xml" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates'"
+-->
+<case
+    id="10"
+    description1="Start Selenium Server"
+    method="cmd"
+    command='wmic process call create {SINGLEQUOTE}cmd /c java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates{SINGLEQUOTE}'
+/>
+
+<case
+    id="20"
+    description1="${feature}"
+    method="cmd"
+    command="perl webinject.pl -o selftest\output\${feature}sub --port 9988 --driver chrome selftest\substeps\${feature}.xml"
+/>
+
+<case
+    id="30"
+    description1="Shutdown Selenium Server"
+    method="get"
+    url="http://localhost:9988/selenium-server/driver/?cmd=shutDownSeleniumServer"
+/>
+
+
+</testcases>
