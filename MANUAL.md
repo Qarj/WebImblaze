@@ -40,6 +40,10 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [Smart Assertions (smartassertions)](#smartassertions)
 
+[Report Type (for Nagios Plugin mode) (reporttype)](#reporttype)
+
+[Global Timeout (for Nagios Plugin mode) (globaltimeout)](#globaltimeout)
+
 [WebInject Framework (webinjectframework)](#webinjectframework)
 
 ### [2.2 - Test Case Files (specifying in configuration file)](#filenames)
@@ -511,6 +515,80 @@ that exceptions are agreed, the ignoresmartassertions parameter can be used.
 <br />
 
 
+<a name="reporttype"></a>
+#### reporttype
+
+Two options:
+
+```xml
+<reporttype>nagios</reporttype>
+```
+
+or
+
+```xml
+<reporttype>standard</reporttype>
+```
+
+Setting the report type to `nagios` tells WebInject to behave as a Nagios plugin.
+
+When in Nagios mode, all the regular information written to STDOUT is suppressed. Instead at the
+end of testing, a single line is output according to Nagios standards.
+
+##### CRITICAL
+If one or more test failed, you'll get an output like the following:
+
+```
+WebInject CRITICAL - Nagios should see this error message |time=0.007;100;;0
+```
+
+or
+
+```
+WebInject CRITICAL - Test case number 10 failed |time=0.008;100;;0
+```
+
+In the first example, a test step failed that had an errormessage parameter.
+
+In the second example, no errormessage parameter was present, so the test step number that failed is
+reported.
+
+In both cases, if more than one test step fails, only the first test step that failed is reported to Nagios.
+
+##### WARNING
+Another type of message to Nagios is a warning that the globaltimeout was exceeded.
+
+```
+WebInject WARNING - All tests passed successfully but global timeout (0.01 seconds) has been reached |time=0.026;0.01;;0
+```
+
+This message is produced when all test steps passed, but the `globaltimeout` parameter in the config file was exceeded. See
+globaltimeout for more information.
+
+##### OK
+Finally, if WebInject ran the tests without any issues, then a message like this is produced:
+
+```
+WebInject OK - All tests passed successfully in 0.007 seconds |time=0.007;100;;0
+```
+
+<br />
+
+
+<a name="globaltimeout"></a>
+#### globaltimeout
+
+The globaltimeout is only used when in Nagios plugin mode (see reporttype). If the globaltimeout parameter is
+present, then total test response time is checked against this parameter. If sum of the test step reponse times
+is higher than this value (in seconds), then a warning is sent to Nagios.
+
+```xml
+<globaltimeout>5</globaltimeout>
+```
+
+<br />
+
+
 <a name="webinjectframework"></a>
 #### WebInject Framework
 
@@ -581,6 +659,7 @@ The command line options are:
 -y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
+-n|--no-output                                      -n
 -u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
 ```
 
@@ -659,6 +738,10 @@ Specifies to apply Browsermob Proxy rules e.g. `--proxyrules --true`
 `-i` or `--ignoreretry`
 
 Specifies to ignore any retry or retryfromstep parameters.
+
+`-n` or `--no-output`
+
+Specifies to not output anything to standard out (except any Nagios data)
 
 `-u` or `--publish-to`
 

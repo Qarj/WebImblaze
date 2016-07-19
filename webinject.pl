@@ -3951,6 +3951,7 @@ Usage: webinject.pl testcase_file <<options>>
 -y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
+-n|--no-output                                      -n
 -u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
 
 or
