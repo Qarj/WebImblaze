@@ -1097,8 +1097,8 @@ sub _screenshot {
     return;
 }
 
-sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Locator, Label);
-                            ##        custom_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
+sub helper_select_by_text { ## usage: helper_select_by_label(Search Target, Locator, Label);
+                            ##        helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
 
     my ($search_target, $locator, $labeltext) = @_;
 
@@ -1109,8 +1109,8 @@ sub custom_select_by_text { ## usage: custom_select_by_label(Search Target, Loca
     return $child;
 }
 
-sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Target, Locator, Keys);
-                                 ##        custom_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
+sub helper_clear_and_send_keys { ## usage: helper_clear_and_send_keys(Search Target, Locator, Keys);
+                                 ##        helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
 
     my ($search_target, $locator, $sendkeys) = @_;
 
@@ -1120,9 +1120,9 @@ sub custom_clear_and_send_keys { ## usage: custom_clear_and_send_keys(Search Tar
     return $resp1;
 }
 
-sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
-                                    ##        custom_mouse_move_to_location('closeBtn','id',3,4);
-                                    ##        custom_mouse_move_to_location('closeBtn','id'); # offsets are optional 
+sub helper_mouse_move_to_location { ## usage: helper_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
+                                    ##        helper_mouse_move_to_location('closeBtn','id',3,4);
+                                    ##        helper_mouse_move_to_location('closeBtn','id'); # offsets are optional 
 
     my ($_search_target, $_locator, $_xoffset, $_yoffset) = @_;
     $_xoffset = int $_xoffset;
@@ -1134,9 +1134,9 @@ sub custom_mouse_move_to_location { ## usage: custom_mouse_move_to_location(Sear
     return $_child;
 }
 
-sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
-                              ##        custom_switch_to_window(0);
-                              ##        custom_switch_to_window(1);
+sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
+                              ##        helper_switch_to_window(0);
+                              ##        helper_switch_to_window(1);
     my ($_window_number) = @_;
 
     require Data::Dumper;
@@ -1148,8 +1148,8 @@ sub custom_switch_to_window { ## usage: custom_switch_to_window(window number);
     return $_resp;
 }
 
-sub custom_js_click { ## usage: custom_js_click(id);
-                      ##        custom_js_click('btnSubmit');
+sub helper_js_click { ## usage: helper_js_click(id);
+                      ##        helper_js_click('btnSubmit');
 
     my ($id_to_click) = @_;
 
@@ -1163,8 +1163,8 @@ sub custom_js_click { ## usage: custom_js_click(id);
     return $resp1;
 }
 
-sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
-                           ##        custom_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');
+sub helper_js_set_value {  ## usage: helper_js_set_value(id,value);
+                           ##        helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');
                            ##
                            ##        Single quotes will not treat \ as escape codes
 
@@ -1181,8 +1181,8 @@ sub custom_js_set_value {  ## usage: custom_js_set_value(id,value);
     return $resp1;
 }
 
-sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_field_visible(id);
-                                                    ##        custom_js_make_field_visible('cvProvider_filCVUploadFile');
+sub helper_js_make_field_visible_to_webdriver {     ## usage: helper_js_make_field_visible(id);
+                                                    ##        helper_js_make_field_visible('cvProvider_filCVUploadFile');
 
     my ($id_to_set_css) = @_;
 
@@ -1197,8 +1197,8 @@ sub custom_js_make_field_visible_to_webdriver {     ## usage: custom_js_make_fie
     return $resp1;
 }
 
-sub custom_check_element_within_pixels {     ## usage: custom_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
-                                             ##        custom_check_element_within_pixels('txtEmail','id',193,325,30);
+sub helper_check_element_within_pixels {     ## usage: helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
+                                             ##        helper_check_element_within_pixels('txtEmail','id',193,325,30);
 
     my ($search_target, $locator, $x_base, $y_base, $pixel_threshold) = @_;
 
@@ -1226,8 +1226,8 @@ sub custom_check_element_within_pixels {     ## usage: custom_check_element_with
     return $message;
 }
 
-sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Search Text',Timeout);
-                                   ##        custom_wait_for_text_present('Job title',10);
+sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Search Text',Timeout);
+                                   ##        helper_wait_for_text_present('Job title',10);
                                    ##
                                    ## waits for text to appear in page source
 
@@ -1266,8 +1266,8 @@ sub custom_wait_for_text_present { ## usage: custom_wait_for_text_present('Searc
     return $returnmsg;
 }
 
-sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_present('Search Text',Timeout);
-                                       ##        custom_wait_for_text_not_present('Job title',10);
+sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_present('Search Text',Timeout);
+                                       ##        helper_wait_for_text_not_present('Job title',10);
                                        ##
                                        ## waits for text to disappear from page source
 
@@ -1303,8 +1303,8 @@ sub custom_wait_for_text_not_present { ## usage: custom_wait_for_text_not_presen
     return $returnmsg;
 }
 
-sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible('Search Text','target', 'locator', Timeout);
-                                   ##         custom_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
+sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
+                                   ##         helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
@@ -1344,8 +1344,8 @@ sub custom_wait_for_text_visible { ## usage: custom_wait_for_text_visible('Searc
     return $returnmsg;
 }
 
-sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visible('Search Text',Timeout);
-                                       ##        custom_wait_for_text_not_visible('This job has been emailed to',10);
+sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
+                                       ##        helper_wait_for_text_not_visible('This job has been emailed to',10);
                                        ##
                                        ## waits for text to be not visible in the body text - e.g. closing a JavaScript popup
 
@@ -1385,8 +1385,8 @@ sub custom_wait_for_text_not_visible { ## usage: custom_wait_for_text_not_visibl
     return $returnmsg;
 }
 
-sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present('element-name','element-type','Timeout');
-                                      ##        custom_wait_for_element_present('menu-search-icon','id','5');
+sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present('element-name','element-type','Timeout');
+                                      ##        helper_wait_for_element_present('menu-search-icon','id','5');
 
     my ($element_name, $element_type, $timeout) = @_;
 
@@ -1424,8 +1424,8 @@ sub custom_wait_for_element_present { ## usage: custom_wait_for_element_present(
     return $returnmsg;
 }
 
-sub custom_wait_for_element_visible { ## usage: custom_wait_for_element_visible('element-name','element-type','Timeout');
-                                      ##        custom_wait_for_element_visible('menu-search-icon','id','5');
+sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible('element-name','element-type','Timeout');
+                                      ##        helper_wait_for_element_visible('menu-search-icon','id','5');
 
     my ($element_name, $element_type, $timeout) = @_;
 
