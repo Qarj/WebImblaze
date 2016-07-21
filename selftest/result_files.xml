@@ -1,0 +1,43 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">result_files</testvar>
+<case
+    id="10"
+    description1="${feature} - filename prefix included as part of output path"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Passed: 3"
+    verifypositive1="Test Cases Failed: 0"
+/>
+
+<case
+    id="20"
+    description1="view result_filessubresults.html"
+    method="cmd"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}result_filessubresults.html'
+    verifypositive='href="result_filessub20.html"'
+/>
+
+<case
+    id="30"
+    description1="view result_filessub20.html"
+    method="cmd"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}result_filessub20.html'
+    verifypositive1='href="result_filessub10.html". prev'
+    verifypositive2='href="result_filessub30.html". next'
+/>
+
+<case
+    id="40"
+    description1="view result_filessubresults.xml"
+    method="cmd"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}result_filessubresults.xml'
+    verifypositive1='testcase id="20"'
+/>
+
+
+</testcases>

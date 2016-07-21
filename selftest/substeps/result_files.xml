@@ -1,0 +1,32 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Welcome to Step 10"
+    method="cmd"
+    command="echo one one one"
+    verifypositive="one"
+    verifynegative="two"
+/>
+
+<case
+    id="20"
+    description1="Step 20 welcomes you"
+    method="cmd"
+    command="echo twenty"
+/>
+
+<case
+    id="30"
+    description1="Step 30 says bye"
+    method="cmd"
+    command="echo This is step 30"
+/>
+
+
+</testcases>

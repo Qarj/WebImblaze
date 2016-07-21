@@ -71,7 +71,7 @@ my ($selresp); ## response from a Selenium command
 my ($element); ## for element selectors
 my (@verifyparms); ## friendly error message to show when an assertion fails
 my (@verifycountparms); ## regex match occurences must much a particular count for the assertion to pass
-my ($output, $outputfolder); ## output path including possible filename prefix, output path without filename prefix
+my ($output, $outputfolder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
@@ -442,7 +442,7 @@ sub set_retry_to_zero_if_global_limit_exceeded {
 #------------------------------------------------------------------
 sub output_test_step_description {
 
-    $results_html .= qq|<b>Test:  $currentcasefile - <a href="$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
+    $results_html .= qq|<b>Test:  $currentcasefile - <a href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
     $results_stdout .= qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
     $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
 
@@ -3302,7 +3302,7 @@ sub _write_step_html {
     $_html .= qq|            <wi_h2>\n|;
     $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
     if (defined $previous_test_step) {
-        $_html .= qq|                &nbsp; &nbsp; [<a href="$previous_test_step.html"> prev </a>]\n|;
+        $_html .= qq|                &nbsp; &nbsp; [<a href="$output_prefix$previous_test_step.html"> prev </a>]\n|;
     }
     $_html .= qq|            </wi_h2>\n|;
     $_html .= qq|        </wi_div>\n|;
@@ -3424,7 +3424,7 @@ sub _add_selenium_screenshot {
 
     # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" ) {
-        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacksprint$retriesprint" src="$testnum_display$jumpbacksprint$retriesprint.png"><br />|;
+        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacksprint$retriesprint" src="$output_prefix$testnum_display$jumpbacksprint$retriesprint.png"><br />|;
     }
 
     return;
@@ -3452,7 +3452,7 @@ sub _add_email_link {
 
     # if we have grabbed an email file, link to it
     if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.eml" ) {
-        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$testnum_display$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
+        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
     return;
@@ -3590,7 +3590,7 @@ sub _delayed_write_step_html {
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
-            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
+            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
         }
         open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
         print {$_FILE} $delayed_html;
@@ -3919,6 +3919,8 @@ sub getoptions {  #shell options
     }
     $output = slash_me($output);
     $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+    $output_prefix = $output;
+    $output_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
 
     # default the publish to location for the individual html step files
     if (not defined $opt_publish_full) {
