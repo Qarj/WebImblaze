@@ -1088,24 +1088,23 @@ sub _screenshot {
 sub helper_select_by_text { ## usage: helper_select_by_label(Search Target, Locator, Label);
                             ##        helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
 
-    my ($search_target, $locator, $labeltext) = @_;
+    my ($_search_target, $_locator, $_labeltext) = @_;
 
-    my $elem1 = $driver->find_element("$search_target", "$locator");
-    #my $child = $driver->find_child_element($elem1, "./option[\@value='4']")->click();
-    my $child = $driver->find_child_element($elem1, "./option[. = '$labeltext']")->click();
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+    my $_child = $driver->find_child_element($_element, "./option[. = '$_labeltext']")->click();
 
-    return $child;
+    return $_child;
 }
 
 sub helper_clear_and_send_keys { ## usage: helper_clear_and_send_keys(Search Target, Locator, Keys);
                                  ##        helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
 
-    my ($search_target, $locator, $sendkeys) = @_;
+    my ($_search_target, $_locator, $_keys) = @_;
 
-    my $elem1 = $driver->find_element("$search_target", "$locator")->clear();
-    my $resp1 = $driver->find_element("$search_target", "$locator")->send_keys("$sendkeys");
+    my $_element = $driver->find_element("$_search_target", "$_locator")->clear();
+    my $_response = $driver->find_element("$_search_target", "$_locator")->send_keys("$_keys");
 
-    return $resp1;
+    return $_response;
 }
 
 sub helper_mouse_move_to_location { ## usage: helper_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
@@ -1129,26 +1128,26 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
 
     require Data::Dumper;
 
-    my $handles = $driver->get_window_handles;
-    print Data::Dumper::Dumper($handles);
-    my $_resp =  $driver->switch_to_window($handles->[$_window_number]);
+    my $_handles = $driver->get_window_handles;
+    print Data::Dumper::Dumper($_handles);
+    my $_response =  $driver->switch_to_window($_handles->[$_window_number]);
 
-    return $_resp;
+    return $_response;
 }
 
 sub helper_js_click { ## usage: helper_js_click(id);
                       ##        helper_js_click('btnSubmit');
 
-    my ($id_to_click) = @_;
+    my ($_id_to_click) = @_;
 
-    my $script = q{
+    my $_script = q{
         var arg1 = arguments[0];
         var elem = window.document.getElementById(arg1).click();
         return elem;
     };
-    my $resp1 = $driver->execute_script($script,$id_to_click);
+    my $_response = $driver->execute_script($_script,$_id_to_click);
 
-    return $resp1;
+    return $_response;
 }
 
 sub helper_js_set_value {  ## usage: helper_js_set_value(id,value);
@@ -1156,62 +1155,62 @@ sub helper_js_set_value {  ## usage: helper_js_set_value(id,value);
                            ##
                            ##        Single quotes will not treat \ as escape codes
 
-    my ($id_to_set_value, $value_to_set) = @_;
+    my ($_id_to_set_value, $_value_to_set) = @_;
 
-    my $script = q{
+    my $_script = q{
         var arg1 = arguments[0];
         var arg2 = arguments[1];
         var elem = window.document.getElementById(arg1).value=arg2;
         return elem;
     };
-    my $resp1 = $driver->execute_script($script,$id_to_set_value,$value_to_set);
+    my $_response = $driver->execute_script($_script,$_id_to_set_value,$_value_to_set);
 
-    return $resp1;
+    return $_response;
 }
 
 sub helper_js_make_field_visible_to_webdriver {     ## usage: helper_js_make_field_visible(id);
                                                     ##        helper_js_make_field_visible('cvProvider_filCVUploadFile');
 
-    my ($id_to_set_css) = @_;
+    my ($_id_to_set_css) = @_;
 
-    my $script = q{
+    my $_script = q{
         var arg1 = arguments[0];
         window.document.getElementById(arg1).style.width = '5px';
         var elem = window.document.getElementById(arg1).style.height = '5px';
         return elem;
     };
-    my $resp1 = $driver->execute_script($script,$id_to_set_css);
+    my $_response = $driver->execute_script($_script,$_id_to_set_css);
 
-    return $resp1;
+    return $_response;
 }
 
 sub helper_check_element_within_pixels {     ## usage: helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
                                              ##        helper_check_element_within_pixels('txtEmail','id',193,325,30);
 
-    my ($search_target, $locator, $x_base, $y_base, $pixel_threshold) = @_;
+    my ($_search_target, $_locator, $_x_base, $_y_base, $_pixel_threshold) = @_;
 
     ## get_element_location will return a reference to a hash associative array
     ## http://www.troubleshooters.com/codecorn/littperl/perlscal.htm
     ## the array will look something like this
     # { 'y' => 325, 'hCode' => 25296896, 'x' => 193, 'class' => 'org.openqa.selenium.Point' };
-    my ($location) = $driver->find_element("$search_target", "$locator")->get_element_location();
+    my ($_location) = $driver->find_element("$_search_target", "$_locator")->get_element_location();
 
     ## if the element doesn't exist, we get an empty output, so presumably this subroutine just dies and the program carries on
 
     ## we use the -> operator to get to the underlying values in the hash array
-    my $x = $location->{x};
-    my $y = $location->{y};
+    my $_x = $_location->{x};
+    my $_y = $_location->{y};
 
-    my $x_diff = abs $x_base - $x;
-    my $y_diff = abs $y_base - $y;
+    my $_x_diff = abs $_x_base - $_x;
+    my $_y_diff = abs $_y_base - $_y;
 
-    my $message = "Pixel threshold check passed - $search_target is $x_diff,$y_diff (x,y) pixels removed from baseline of $x_base,$y_base; actual was $x,$y";
+    my $_message = "Pixel threshold check passed - $_search_target is $_x_diff,$_y_diff (x,y) pixels removed from baseline of $_x_base,$_y_base; actual was $_x,$_y";
 
-    if ($x_diff > $pixel_threshold || $y_diff > $pixel_threshold) {
-        $message = "Pixel threshold check failed - $search_target is $x_diff,$y_diff (x,y) pixels removed from baseline of $x_base,$y_base; actual was $x,$y";
+    if ($_x_diff > $_pixel_threshold || $_y_diff > $_pixel_threshold) {
+        $_message = "Pixel threshold check failed - $_search_target is $_x_diff,$_y_diff (x,y) pixels removed from baseline of $_x_base,$_y_base; actual was $_x,$_y";
     }
 
-    return $message;
+    return $_message;
 }
 
 sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Search Text',Timeout);
@@ -1219,39 +1218,84 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
                                    ##
                                    ## waits for text to appear in page source
 
-    my ($searchtext, $timeout) = @_;
+    my ($_search_text, $_timeout) = @_;
 
-    $results_stdout .= "SEARCHTEXT:$searchtext\n";
-    $results_stdout .= "TIMEOUT:$timeout\n";
+#    $results_stdout .= "SEARCHTEXT:$_search_text\n";
+    
+#    my $_search_expression = '@_response = $driver->get_page_source();';
+#    my $_found_expression = '$__response =~ m{$_search_text}si; return $__response;';
 
-    my $timestart = time;
-    my @resp1;
-    my $foundit = 'false';
+    #http://stackoverflow.com/questions/1915616/how-can-i-elegantly-call-a-perl-subroutine-whose-name-is-held-in-a-variable
+#    my $_cool_message = _wait_for_item_present($_search_expression, $_found_expression, $_timeout);
+#    return $_cool_message;
 
-    while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
-        eval { @resp1 = $driver->get_page_source(); };
-        foreach my $resp (@resp1) {
-            if ($resp =~ m{$searchtext}si) {
-                $foundit = 'true';
+    $results_stdout .= "SEARCHTEXT:$_search_text\n";
+    $results_stdout .= "TIMEOUT:$_timeout\n";
+
+    my $_timestart = time;
+    my @_response;
+    my $_found_it;
+
+    while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
+        eval { @_response = $driver->get_page_source(); };
+        foreach my $__response (@_response) {
+            if ($__response =~ m{$_search_text}si) {
+                $_found_it = 'true';
             }
         }
-        if ($foundit eq 'false')
+        if (not $_found_it)
         {
-            sleep 0.1; # Sleep for 0.1 seconds
+            sleep 0.2; # Sleep for 0.2 seconds
         }
     }
-    my $trytime = ( int( (time - $timestart) *10 ) / 10);
+    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
 
-    my $returnmsg;
-    if ($foundit eq 'true') {
-        $returnmsg = "Found sought text in page source after $trytime seconds";
+    my $_message;
+    if ($_found_it) {
+        $_message = "Found sought text in page source after $_try_time seconds";
     }
     else
     {
-        $returnmsg = "Did not find sought text in page source, timed out after $trytime seconds";
+        $_message = "Did not find sought text in page source, timed out after $_try_time seconds";
     }
 
-    return $returnmsg;
+    return $_message;
+}
+
+sub _wait_for_item_present {
+
+    my ($_search_expression, $_found_expression, $_timeout) = @_;
+
+    $results_stdout .= "TIMEOUT:$_timeout\n";
+
+    my $_timestart = time;
+    my @_response;
+    my $_found_it;
+
+    while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
+        eval { eval "$_search_expression"; };
+        foreach my $__response (@_response) {
+            if (eval { eval "$_found_expression";} ) {
+                $_found_it = 'true';
+            }
+        }
+        if (not $_found_it)
+        {
+            sleep 0.2; # Sleep for 0.2 seconds
+        }
+    }
+    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
+
+    my $_message;
+    if ($_found_it) {
+        $_message = "Found sought text in page source after $_try_time seconds";
+    }
+    else
+    {
+        $_message = "Did not find sought text in page source, timed out after $_try_time seconds";
+    }
+
+    return $_message;
 }
 
 sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_present('Search Text',Timeout);
@@ -1259,36 +1303,36 @@ sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_presen
                                        ##
                                        ## waits for text to disappear from page source
 
-    my ($searchtext, $timeout) = @_;
+    my ($_search_text, $_timeout) = @_;
 
-    $results_stdout .= "DO NOT WANT TEXT:$searchtext\n";
-    $results_stdout .= "TIMEOUT:$timeout\n";
+    $results_stdout .= "DO NOT WANT TEXT:$_search_text\n";
+    $results_stdout .= "TIMEOUT:$_timeout\n";
 
-    my $timestart = time;
-    my @resp1;
-    my $foundit = 'true';
+    my $_timestart = time;
+    my @_response;
+    my $_found_it = 'true';
 
-    while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
-        eval { @resp1 = $driver->get_page_source(); };
-        foreach my $resp (@resp1) {
-            if ($resp =~ m{$searchtext}si) {
-                sleep 0.1; ## sleep for 0.1 seconds
+    while ( (($_timestart + $_timeout) > time) && $_found_it) {
+        eval { @_response = $driver->get_page_source(); };
+        foreach my $__response (@_response) {
+            if ($__response =~ m{$_search_text}si) {
+                sleep 0.2; ## sleep for 0.2 seconds
             } else {
-                $foundit = 'false';
+                undef $_found_it;
             }
         }
     }
 
-    my $trytime = ( int( (time - $timestart) *10 ) / 10);
+    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
 
-    my $returnmsg;
-    if ($foundit eq 'true') {
-        $returnmsg = "TIMEOUT: Text was *still* in page source after $trytime seconds";
+    my $_message;
+    if ($_found_it) {
+        $_message = "TIMEOUT: Text was *still* in page source after $_try_time seconds";
     } else {
-        $returnmsg = "SUCCESS: Did not find sought text in page source after $trytime seconds";
+        $_message = "SUCCESS: Did not find sought text in page source after $_try_time seconds";
     }
 
-    return $returnmsg;
+    return $_message;
 }
 
 sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
@@ -1296,40 +1340,40 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
-    my ($searchtext, $target, $locator, $timeout) = @_;
+    my ($_search_text, $_target, $_locator, $_timeout) = @_;
 
-    $results_stdout .= "VISIBLE SEARCH TEXT:$searchtext\n";
-    $results_stdout .= "TIMEOUT:$timeout\n";
+    $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
+    $results_stdout .= "TIMEOUT:$_timeout\n";
 
-    my $timestart = time;
-    my @resp1;
-    my $foundit = 'false';
+    my $_timestart = time;
+    my @_response;
+    my $_found_it;
 
-    while ( (($timestart + $timeout) > time) && $foundit eq 'false' ) {
-        eval { @resp1 = $driver->find_element($target,$locator)->get_text(); };
-        foreach my $resp (@resp1) {
-            if ($resp =~ m{$searchtext}si) {
-                $foundit = 'true';
+    while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
+        eval { @_response = $driver->find_element($_target,$_locator)->get_text(); };
+        foreach my $__response (@_response) {
+            if ($__response =~ m{$_search_text}si) {
+                $_found_it = 'true';
             }
         }
-        if ($foundit eq 'false')
+        if (not $_found_it)
         {
             sleep 0.5; ## sleep for 0.5 seconds
         }
     }
 
-    my $trytime = ( int( (time() - $timestart) *10 ) / 10);
+    my $_try_time = ( int( (time() - $_timestart) *10 ) / 10);
 
-    my $returnmsg;
-    if ($foundit eq 'true') {
-        $returnmsg = "Found sought text visible after $trytime seconds";
+    my $_message;
+    if ($_found_it) {
+        $_message = "Found sought text visible after $_try_time seconds";
     }
     else
     {
-        $returnmsg = "Did not find sought text visible, timed out after $trytime seconds";
+        $_message = "Did not find sought text visible, timed out after $_try_time seconds";
     }
 
-    return $returnmsg;
+    return $_message;
 }
 
 sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
