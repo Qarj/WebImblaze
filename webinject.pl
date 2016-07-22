@@ -3647,24 +3647,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         eval
         {
 
-            ## Phantomjs
-            if ($opt_driver eq 'phantomjs') {
-                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                    'port' => $opt_port,
-                                                    'browser_name' => 'phantomjs',
-                                                    );
-            }
-
-            ## Firefox
-            if ($opt_driver eq 'firefox') {
-                $results_stdout .= qq|opt_proxy $opt_proxy\n|;
-                $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                    'port' => $opt_port,
-                                                    'browser_name' => 'firefox',
-                                                    'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
-                                                    );
-             }
-
             ## ChromeDriver without Selenium Server or JRE
             if ($opt_driver eq 'chromedriver') {
                 my $port = find_available_port(9585); ## find a free port to bind to, starting from this number
@@ -3949,8 +3931,8 @@ Usage: webinject.pl testcase_file <<options>>
 -p|--port selenium_port                             -p 8325
 -x|--proxy proxy_server                             -x localhost:9222
 -b|--basefolder baselined image folder              -b examples/basefoler/
--d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
--y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
+-d|--driver chrome/chromedriver                     -d chrome
+-y|--binary (if chromedriver option chosen)         -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 -n|--no-output                                      -n

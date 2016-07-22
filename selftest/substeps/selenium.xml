@@ -9,6 +9,7 @@
     command1='$selresp = $driver->get_all_cookies();'
     verifytext="get_page_source,get_current_url"
     verifypositive="Search Recipes"
+    verifypositive1="Max Preparation Time"
 />
 
 <case
@@ -19,6 +20,7 @@
     command2="$selresp = helper_clear_and_send_keys('TxtCuisine','id','British');" 
     command3="$selresp = helper_clear_and_send_keys('TxtMaxPrepTime','id','2');" 
     verifytext="get_page_source,get_current_url"
+    verifypositive="Cuisine"
 />
 
 <case
@@ -27,6 +29,7 @@
     method="selenium"
     command1='$selresp = $driver->find_element("input[name=BtnSubmit]","css")->click();'
     verifytext="get_page_source,get_current_url"
+    verifypositive="you just submitted a search"
 />
 
 </testcases>
