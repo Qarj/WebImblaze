@@ -4,3 +4,5 @@ http.txt
 results.html
 results.xml
 *.tmp
+output/
+temp/
