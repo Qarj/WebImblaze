@@ -38,6 +38,7 @@ use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use Socket qw( PF_INET SOCK_STREAM INADDR_ANY sockaddr_in );
 use File::Copy qw(copy), qw(move);
+use File::Path qw(make_path remove_tree);
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -2904,8 +2905,6 @@ sub read_test_case_file {
 sub _write_failed_xml {
     my ($_xml) = @_;
 
-    require File::Path;
-
     ## output location might include a prefix that we do not want
     my $_output_folder = dirname($output.'dummy');
 
@@ -3919,6 +3918,7 @@ sub getoptions {  #shell options
     }
     $output = slash_me($output);
     $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+    File::Path::make_path ( $outputfolder );
     $output_prefix = $output;
     $output_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
 
