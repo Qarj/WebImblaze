@@ -167,12 +167,9 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 #### [3.3.8 - Parameters to control Selenium WebDriver Test Execution](#webdriver)
 
-[screenshot](#screenshot)
-
 [searchimage searchimage1 ... searchimage5](#searchimage)
 
 [verifytext](#verifytext)
-
 
 
 #### [3.3.9 - Test step re-use](#reuse)
@@ -1849,21 +1846,6 @@ like getting the home page, fails, then there little point running the rest of t
 
 <a name="webdriver"></a>
 ### 3.3.8 - Parameters to control Selenium WebDriver Test Execution
-
-<br />
-
-<a name="screenshot"></a>
-#### screenshot
-```
-    screenshot="false"
-```
-
-Normally for the WebDriver test steps, we take a full page grab for evey single step. Unfortunately the
-pagegrab is rather slow and takes about 1 second to do, slowing down test execution.
-
-By specifying this parameter, a page grab will not be taken. Instead, a very fast screenshot of the visible
-portion of the web page will be taken. This fast screenshot will only be taken for interactive sessions. If the test
-is being run by a service account, there is no window handle with which to work with.
 
 <br />
 

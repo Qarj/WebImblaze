@@ -365,7 +365,7 @@ sub substitute_variables {
     ## "verifynegative", "verifynegative1", ... "verifynegative9999",
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
     ## "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
-    ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "screenshot", "formatxml", "formatjson",
+    ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "formatxml", "formatjson",
     ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
 
@@ -1064,32 +1064,19 @@ sub _screenshot {
 
     my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" );
 
-    if ($case{screenshot} && (lc($case{screenshot}) eq 'false' || lc($case{screenshot}) eq 'no')) #lc = lowercase
-    {
-        ## take a very fast screenshot - visible window only, only works for interactive sessions
-        if ($chromehandle > 0) {
-            $results_stdout .= "Taking Fast WindowCapture Screenshot\n";
-            my $minicap = (`WindowCapture "$_abs_screenshot_full" $chromehandle`);
-            #my $minicap = (`minicap -save "$_abs_screenshot_full" -capturehwnd $chromehandle -exit`);
-            #my $minicap = (`screenshot-cmd -o "$_abs_screenshot_full" -wh "$hexchromehandle"`);
-        }
+    ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
+    eval { $png_base64 = $driver->screenshot(); };
+
+    ## if there was an error in taking the screenshot, $@ will have content
+    if ($@) {
+        $results_stdout .= "Selenium full page grab failed.\n";
+        $results_stdout .= "ERROR:$@";
     } else {
-        ## take a full pagegrab - works for interactive and non interactive, but is slow i.e > 2 seconds
-
-        ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
-        eval { $png_base64 = $driver->screenshot(); };
-
-        ## if there was an error in taking the screenshot, $@ will have content
-        if ($@) {
-            $results_stdout .= "Selenium full page grab failed.\n";
-            $results_stdout .= "ERROR:$@";
-        } else {
-            require MIME::Base64;
-            open my $FH, '>', slash_me($_abs_screenshot_full) or die "\nCould not open $_abs_screenshot_full for writing\n";
-            binmode $FH; ## set binary mode
-            print {$FH} MIME::Base64::decode_base64($png_base64);
-            close $FH or die "\nCould not close page capture file handle\n";
-        }
+        require MIME::Base64;
+        open my $FH, '>', slash_me($_abs_screenshot_full) or die "\nCould not open $_abs_screenshot_full for writing\n";
+        binmode $FH; ## set binary mode
+        print {$FH} MIME::Base64::decode_base64($png_base64);
+        close $FH or die "\nCould not close page capture file handle\n";
     }
 
     $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
@@ -3618,7 +3605,7 @@ sub finaltasks {  #do ending tasks
 }
 
 #------------------------------------------------------------------
-sub startseleniumbrowser {     ## start Selenium Remote Control browser if applicable
+sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeDriver
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
 
@@ -3633,8 +3620,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         $results_stdout .= "\nConnecting to Selenium Remote Control server on port $opt_port \n";
     }
 
-    ## connecting to the Selenium server is done in a retry loop in case of slow startup
-    ## see http://www.perlmonks.org/?node_id=355817
     my $max = 30;
     my $try = 0;
 
@@ -3688,7 +3673,8 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
                                                         );
                 }
              }
-
+                                                   # For reference on how to specify options for Chrome
+                                                   #
                                                    #'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                    #'extra_capabilities' => {'chrome.switches' => ['--proxy-server="http://127.0.0.1:$opt_proxy" --incognito --window-size=1260,460'],},
                                                    #'extra_capabilities' => {'chrome.switches' => ['--incognito --window-size=1260,960']}
@@ -3717,25 +3703,6 @@ sub startseleniumbrowser {     ## start Selenium Remote Control browser if appli
         print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
         die "WebInject Aborted - could not connect to Selenium Server\n";
     }
-
-    ## this block finds out the Windows window handle of the chrome window so that we can do a very fast screenshot (as opposed to full page grab which is slow)
-    my $thetime = time;
-    eval { $driver->get("http://127.0.0.1:87/?windowidentify_$thetime-time"); }; ## we put the current time stamp in the window title, so this is multi-thread safe
-
-    my $allchromehandle = (`plugins/GetWindows.exe`); ## this is a separate simple .NET C# program that lists all open windows and what their title is
-    #$results_stdout .= qq|$allchromehandle\n|;
-    $allchromehandle =~ m{(\d+), http:..127.0.0.1:87..windowidentify_$thetime}s;
-    if ($1)
-    {
-        $chromehandle = $1;
-    }
-    else
-    {
-        $chromehandle = 0;
-    }
-    $results_stdout .= qq|CHROME HANDLE THIS SESSION\n$chromehandle\n|;
-
-    #eval { $driver->set_window_size(968, 1260); }; ## y,x
 
     eval { $driver->set_timeout('page load', 30_000); };
 
