@@ -1295,8 +1295,7 @@ sub _wait_for_item_present {
                 $_found_it = 'true';
             }
         }
-        if (not $_found_it)
-        {
+        if (not $_found_it) {
             sleep 0.5; # Sleep for 0.5 seconds
         }
     }
@@ -1306,15 +1305,14 @@ sub _wait_for_item_present {
     if ($_found_it) {
         $_message = 'Found sought '.$_message_fragment." after $_try_time seconds";
     }
-    else
-    {
+    else {
         $_message = 'Did not find sought '.$_message_fragment.", timed out after $_try_time seconds";
     }
 
     return $_message;
 }
 
-sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_present('Search Text',Timeout);
+sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_present('Search Text',timeout);
                                        ##        helper_wait_for_text_not_present('Job title',10);
                                        ##
                                        ## waits for text to disappear from page source
@@ -1322,33 +1320,40 @@ sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_presen
     my ($_search_text, $_timeout) = @_;
 
     $results_stdout .= "DO NOT WANT TEXT:$_search_text\n";
-    $results_stdout .= "TIMEOUT:$_timeout\n";
 
-    my $_timestart = time;
-    my @_response;
-    my $_found_it = 'true';
+    my $_search_expression = '@_response = $driver->get_page_source();';
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
 
-    while ( (($_timestart + $_timeout) > time) && $_found_it) {
-        eval { @_response = $driver->get_page_source(); };
-        foreach my $__response (@_response) {
-            if ($__response =~ m{$_search_text}si) {
-                sleep 0.2; ## sleep for 0.2 seconds
-            } else {
-                undef $_found_it;
-            }
-        }
-    }
+    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
-    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
 
-    my $_message;
-    if ($_found_it) {
-        $_message = "TIMEOUT: Text was *still* in page source after $_try_time seconds";
-    } else {
-        $_message = "SUCCESS: Did not find sought text in page source after $_try_time seconds";
-    }
+#    $results_stdout .= "TIMEOUT:$_timeout\n";
 
-    return $_message;
+#    my $_timestart = time;
+#    my @_response;
+#    my $_found_it = 'true';
+
+#    while ( (($_timestart + $_timeout) > time) && $_found_it) {
+#        eval { @_response = $driver->get_page_source(); };
+#        foreach my $__response (@_response) {
+#            if ($__response =~ m{$_search_text}si) {
+#                sleep 0.2; ## sleep for 0.2 seconds
+#            } else {
+#                undef $_found_it;
+#            }
+#        }
+#    }
+
+#    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
+
+#    my $_message;
+#    if ($_found_it) {
+#        $_message = "TIMEOUT: Text was *still* in page source after $_try_time seconds";
+#    } else {
+#        $_message = "SUCCESS: Did not find sought text in page source after $_try_time seconds";
+#    }
+
+#    return $_message;
 }
 
 sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
@@ -1382,14 +1387,48 @@ sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visibl
 
     my $returnmsg;
     if ($foundit eq 'false') {
-        $returnmsg = "Sought text is now not visible after $trytime seconds";
+        $returnmsg = "SUCCESS: Sought text is now not visible after $trytime seconds";
     }
     else
     {
-        $returnmsg = "Sought text still visible, timed out after $trytime seconds";
+        $returnmsg = "TIMEOUT: Sought text still visible, timed out after $trytime seconds";
     }
 
     return $returnmsg;
+}
+
+sub _wait_for_item_not_present {
+
+    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_target, $_locator) = @_;
+
+    $results_stdout .= "TIMEOUT:$_timeout\n";
+
+    my $_timestart = time;
+    my @_response;
+    my $_found_it = 'true';
+
+    while ( (($_timestart + $_timeout) > time) && ($_found_it) ) {
+        eval { eval "$_search_expression"; };
+        foreach my $__response (@_response) {
+            if (not eval { eval "$_found_expression";} ) {
+                undef $_found_it;
+            }
+        }
+        if ($_found_it) {
+            sleep 0.5; # Sleep for 0.5 seconds
+        }
+    }
+    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
+
+    my $_message;
+    if (not $_found_it) {
+        $_message = 'SUCCESS: Sought '.$_message_fragment." not found after $_try_time seconds";
+    }
+    else {
+        $_message = 'TIMEOUT: Still found '.$_message_fragment.", timed out after $_try_time seconds";
+    }
+
+    return $_message;
 }
 
 #------------------------------------------------------------------
