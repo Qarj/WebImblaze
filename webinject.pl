@@ -1234,6 +1234,22 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
 
 }
 
+sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
+                                   ##         helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
+                                   ##
+                                   ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
+
+    my ($_search_text, $_target, $_locator, $_timeout) = @_;
+
+    $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
+
+    my $_search_expression = '@_response = $driver->find_element($_target,$_locator)->get_text();';
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
+
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text, $_target, $_locator);
+
+}
+
 sub _wait_for_item_present {
 
     my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_target, $_locator) = @_;
@@ -1307,22 +1323,6 @@ sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_presen
     return $_message;
 }
 
-sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
-                                   ##         helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
-                                   ##
-                                   ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
-
-    my ($_search_text, $_target, $_locator, $_timeout) = @_;
-
-    $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
-
-    my $_search_expression = '@_response = $driver->find_element($_target,$_locator)->get_text();';
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
-
-    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text, $_target, $_locator);
-
-}
-
 sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
                                        ##        helper_wait_for_text_not_visible('This job has been emailed to',10);
                                        ##
@@ -1364,43 +1364,18 @@ sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visibl
     return $returnmsg;
 }
 
-sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present('element-name','element-type','Timeout');
-                                      ##        helper_wait_for_element_present('menu-search-icon','id','5');
+sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(target,locator,timeout);
+                                      ##        helper_wait_for_element_present('menu-search-icon','id',5);
 
-    my ($element_name, $element_type, $timeout) = @_;
+    my ($_target, $_locator, $_timeout) = @_;
 
-    $results_stdout .= "SEARCH ELEMENT[$element_name], ELEMENT TYPE[$element_type], TIMEOUT[$timeout]\n";
+    $results_stdout .= "SEARCH TARGET[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
 
-    my $timestart = time;
-    my $foundit = 'false';
-    undef $element;
+    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");';
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
 
-    while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
-    {
-        eval { $element = $driver->find_element("$element_name","$element_type"); };
-        if ($element)
-        {
-            $foundit = 'true';
-        }
-        if ($foundit eq 'false')
-        {
-            sleep 0.1; ## Sleep for 0.1 seconds
-        }
-    }
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element', 'NA', $_target, $_locator);
 
-    my $trytime = ( int( (time - $timestart) *10 ) / 10);
-
-    my $returnmsg;
-    if ($foundit eq 'true') {
-        $returnmsg = "Found sought element after $trytime seconds";
-    }
-    else
-    {
-        $returnmsg = "Did not find sought element, timed out after $trytime seconds";
-    }
-
-    #$results_stdout .= "$returnmsg\n";
-    return $returnmsg;
 }
 
 sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible('element-name','element-type','Timeout');
