@@ -1250,6 +1250,34 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
 
 }
 
+sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(target,locator,timeout);
+                                      ##        helper_wait_for_element_present('menu-search-icon','id',5);
+
+    my ($_target, $_locator, $_timeout) = @_;
+
+    $results_stdout .= "SEARCH TARGET[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
+
+    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");';
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
+
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element', 'NA', $_target, $_locator);
+
+}
+
+sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible(target,locator,timeout);
+                                      ##        helper_wait_for_element_visible('menu-search-icon','id',5);
+
+    my ($_target, $_locator, $_timeout) = @_;
+
+    $results_stdout .= "SEARCH TARGET VISIBLE[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
+
+    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator")->is_displayed();';
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
+
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_target, $_locator);
+
+}
+
 sub _wait_for_item_present {
 
     my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_target, $_locator) = @_;
@@ -1363,59 +1391,6 @@ sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visibl
 
     return $returnmsg;
 }
-
-sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(target,locator,timeout);
-                                      ##        helper_wait_for_element_present('menu-search-icon','id',5);
-
-    my ($_target, $_locator, $_timeout) = @_;
-
-    $results_stdout .= "SEARCH TARGET[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
-
-    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");';
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
-
-    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element', 'NA', $_target, $_locator);
-
-}
-
-sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible('element-name','element-type','Timeout');
-                                      ##        helper_wait_for_element_visible('menu-search-icon','id','5');
-
-    my ($element_name, $element_type, $timeout) = @_;
-
-    $results_stdout .= "SEARCH ELEMENT[$element_name], ELEMENT TYPE[$element_type], TIMEOUT[$timeout]\n";
-
-    my $timestart = time;
-    my $foundit = 'false';
-    my $find_element;
-
-    while ( (($timestart + $timeout) > time) && $foundit eq 'false' )
-    {
-        eval { $find_element = $driver->find_element("$element_name","$element_type")->is_displayed(); };
-        if ($find_element)
-        {
-            $foundit = 'true';
-        }
-        if ($foundit eq 'false')
-        {
-            sleep 0.1; ## Sleep for 0.1 seconds
-        }
-    }
-    my $trytime = ( int( (time - $timestart) *10 ) / 10);
-
-    my $returnmsg;
-    if ($foundit eq 'true') {
-        $returnmsg = "Found sought element visible after $trytime seconds";
-    }
-    else
-    {
-        $returnmsg = "Did not find sought element visible, timed out after $trytime seconds";
-    }
-
-    #$results_stdout .= "$returnmsg\n";
-    return $returnmsg;
-}
-
 
 #------------------------------------------------------------------
 sub addcookie { ## add a cookie like JBM_COOKIE=4830075
