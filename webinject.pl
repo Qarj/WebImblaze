@@ -1223,13 +1223,8 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
     $results_stdout .= "SEARCHTEXT:$_search_text\n";
     
     my $_search_expression = '@_response = $driver->get_page_source();';
-#     my %_match = ( 
-#                    search => sub { $driver->get_page_source() }
-#                    found => sub { $driver->get_page_source() }
-#                  )
     my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
 
-    #http://stackoverflow.com/questions/1915616/how-can-i-elegantly-call-a-perl-subroutine-whose-name-is-held-in-a-variable
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
 }
@@ -1326,75 +1321,22 @@ sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_presen
 
     return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
-
-#    $results_stdout .= "TIMEOUT:$_timeout\n";
-
-#    my $_timestart = time;
-#    my @_response;
-#    my $_found_it = 'true';
-
-#    while ( (($_timestart + $_timeout) > time) && $_found_it) {
-#        eval { @_response = $driver->get_page_source(); };
-#        foreach my $__response (@_response) {
-#            if ($__response =~ m{$_search_text}si) {
-#                sleep 0.2; ## sleep for 0.2 seconds
-#            } else {
-#                undef $_found_it;
-#            }
-#        }
-#    }
-
-#    my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
-
-#    my $_message;
-#    if ($_found_it) {
-#        $_message = "TIMEOUT: Text was *still* in page source after $_try_time seconds";
-#    } else {
-#        $_message = "SUCCESS: Did not find sought text in page source after $_try_time seconds";
-#    }
-
-#    return $_message;
 }
 
-sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
+sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',timeout);
                                        ##        helper_wait_for_text_not_visible('This job has been emailed to',10);
                                        ##
                                        ## waits for text to be not visible in the body text - e.g. closing a JavaScript popup
 
-    my ($searchtext, $timeout) = @_;
+    my ($_search_text, $_timeout) = @_;
 
-    $results_stdout .= "NOT VISIBLE SEARCH TEXT:$searchtext\n";
-    $results_stdout .= "TIMEOUT:$timeout\n";
+    $results_stdout .= "NOT VISIBLE SEARCH TEXT:$_search_text\n";
 
-    my $timestart = time;
-    my @resp1;
-    my $foundit = 'true'; ## we assume it is there already (from previous test step), otherwise it makes no sense to call this
+    my $_search_expression = '@_response = $driver->find_element(q|body|,q|tag_name|)->get_text();';
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
 
-    while ( (($timestart + $timeout) > time) && $foundit eq 'true' ) {
-        eval { @resp1 = $driver->find_element('body','tag_name')->get_text(); };
-        foreach my $resp (@resp1) {
-            if (not ($resp =~ m{$searchtext}si)) {
-                $foundit = 'false';
-            }
-        }
-        if ($foundit eq 'true')
-        {
-            sleep 0.1; ## sleep for 0.1 seconds
-        }
-    }
+    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text);
 
-    my $trytime = ( int( (time - $timestart) *10 ) / 10);
-
-    my $returnmsg;
-    if ($foundit eq 'false') {
-        $returnmsg = "SUCCESS: Sought text is now not visible after $trytime seconds";
-    }
-    else
-    {
-        $returnmsg = "TIMEOUT: Sought text still visible, timed out after $trytime seconds";
-    }
-
-    return $returnmsg;
 }
 
 sub _wait_for_item_not_present {
