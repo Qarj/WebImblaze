@@ -1230,14 +1230,13 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
     my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
 
     #http://stackoverflow.com/questions/1915616/how-can-i-elegantly-call-a-perl-subroutine-whose-name-is-held-in-a-variable
-    my $_cool_message = _wait_for_item_present($_search_expression, $_found_expression, $_timeout, $_search_text);
-    return $_cool_message;
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
 }
 
 sub _wait_for_item_present {
 
-    my ($_search_expression, $_found_expression, $_timeout, $_search_text) = @_;
+    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_target, $_locator) = @_;
 
     $results_stdout .= "TIMEOUT:$_timeout\n";
 
@@ -1254,18 +1253,18 @@ sub _wait_for_item_present {
         }
         if (not $_found_it)
         {
-            sleep 0.2; # Sleep for 0.2 seconds
+            sleep 0.5; # Sleep for 0.5 seconds
         }
     }
     my $_try_time = ( int( (time - $_timestart) *10 ) / 10);
 
     my $_message;
     if ($_found_it) {
-        $_message = "Found sought text in page source after $_try_time seconds";
+        $_message = 'Found sought '.$_message_fragment." after $_try_time seconds";
     }
     else
     {
-        $_message = "Did not find sought text in page source, timed out after $_try_time seconds";
+        $_message = 'Did not find sought '.$_message_fragment.", timed out after $_try_time seconds";
     }
 
     return $_message;
@@ -1316,37 +1315,12 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
     my ($_search_text, $_target, $_locator, $_timeout) = @_;
 
     $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
-    $results_stdout .= "TIMEOUT:$_timeout\n";
 
-    my $_timestart = time;
-    my @_response;
-    my $_found_it;
+    my $_search_expression = '@_response = $driver->find_element($_target,$_locator)->get_text();';
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
 
-    while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
-        eval { @_response = $driver->find_element($_target,$_locator)->get_text(); };
-        foreach my $__response (@_response) {
-            if ($__response =~ m{$_search_text}si) {
-                $_found_it = 'true';
-            }
-        }
-        if (not $_found_it)
-        {
-            sleep 0.5; ## sleep for 0.5 seconds
-        }
-    }
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text, $_target, $_locator);
 
-    my $_try_time = ( int( (time() - $_timestart) *10 ) / 10);
-
-    my $_message;
-    if ($_found_it) {
-        $_message = "Found sought text visible after $_try_time seconds";
-    }
-    else
-    {
-        $_message = "Did not find sought text visible, timed out after $_try_time seconds";
-    }
-
-    return $_message;
 }
 
 sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',Timeout);
