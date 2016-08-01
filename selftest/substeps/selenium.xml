@@ -18,6 +18,7 @@
     command4="$selresp = helper_wait_for_element_present('TxtCuisine','id',5);"
     command4="$selresp = helper_wait_for_element_visible('TxtCuisine','id',5);"
     command4="$selresp = helper_wait_for_text_not_present('Cuisine',5);"
+    command4="$selresp = helper_wait_for_text_not_visible('This text will not be found',5);"
 -->
 <case
     id="20"
