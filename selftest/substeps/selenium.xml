@@ -27,7 +27,7 @@
     command1="$selresp = helper_clear_and_send_keys('TxtRecipeName','id','Sheperds Pie');" 
     command2="$selresp = helper_clear_and_send_keys('TxtCuisine','id','British');" 
     command3="$selresp = helper_clear_and_send_keys('TxtMaxPrepTime','id','2');" 
-    command4="$selresp = helper_wait_for_text_not_visible('This text will not be found',5);"
+    command4="$selresp = helper_wait_for_text_visible('Cuisine', 'body', 'tag_name', 5);"
     verifytext="get_page_source,get_current_url"
     verifypositive="Cuisine"
 />

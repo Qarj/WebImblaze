@@ -69,7 +69,6 @@ my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as 
 my ($starttime); ## to store a copy of $startruntimer in a global variable
 my ($cmdresp); ## response from running a terminal command
 my ($selresp); ## response from a Selenium command
-my ($element); ## for element selectors
 my (@verifyparms); ## friendly error message to show when an assertion fails
 my (@verifycountparms); ## regex match occurences must much a particular count for the assertion to pass
 my ($output, $outputfolder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
@@ -1221,9 +1220,9 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
     my ($_search_text, $_timeout) = @_;
 
     $results_stdout .= "SEARCHTEXT:$_search_text\n";
-    
-    my $_search_expression = '@_response = $driver->get_page_source();';
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
+
+    my $_search_expression = '@_response = $driver->get_page_source();'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
@@ -1238,8 +1237,8 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
 
     $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
 
-    my $_search_expression = '@_response = $driver->find_element($_target,$_locator)->get_text();';
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
+    my $_search_expression = '@_response = $driver->find_element($_target,$_locator)->get_text();'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text, $_target, $_locator);
 
@@ -1252,8 +1251,8 @@ sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(
 
     $results_stdout .= "SEARCH TARGET[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
 
-    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");';
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
+    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element', 'NA', $_target, $_locator);
 
@@ -1266,8 +1265,8 @@ sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible(
 
     $results_stdout .= "SEARCH TARGET VISIBLE[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
 
-    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator")->is_displayed();';
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }';
+    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator")->is_displayed();'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_target, $_locator);
 
@@ -1284,9 +1283,9 @@ sub _wait_for_item_present {
     my $_found_it;
 
     while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
-        eval { eval "$_search_expression"; };
+        eval { eval "$_search_expression"; }; ## no critic(ProhibitStringyEval)
         foreach my $__response (@_response) {
-            if (eval { eval "$_found_expression";} ) {
+            if (eval { eval "$_found_expression";} ) { ## no critic(ProhibitStringyEval)
                 $_found_it = 'true';
             }
         }
@@ -1316,8 +1315,8 @@ sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_presen
 
     $results_stdout .= "DO NOT WANT TEXT:$_search_text\n";
 
-    my $_search_expression = '@_response = $driver->get_page_source();';
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
+    my $_search_expression = '@_response = $driver->get_page_source();'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
 
@@ -1332,8 +1331,8 @@ sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visibl
 
     $results_stdout .= "NOT VISIBLE SEARCH TEXT:$_search_text\n";
 
-    my $_search_expression = '@_response = $driver->find_element(q|body|,q|tag_name|)->get_text();';
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }';
+    my $_search_expression = '@_response = $driver->find_element(q|body|,q|tag_name|)->get_text();'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text);
 
@@ -1350,9 +1349,9 @@ sub _wait_for_item_not_present {
     my $_found_it = 'true';
 
     while ( (($_timestart + $_timeout) > time) && ($_found_it) ) {
-        eval { eval "$_search_expression"; };
+        eval { eval "$_search_expression"; }; ## no critic(ProhibitStringyEval)
         foreach my $__response (@_response) {
-            if (not eval { eval "$_found_expression";} ) {
+            if (not eval { eval "$_found_expression";} ) { ## no critic(ProhibitStringyEval)
                 undef $_found_it;
             }
         }
