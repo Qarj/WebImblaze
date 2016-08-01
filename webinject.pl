@@ -3507,6 +3507,8 @@ sub finaltasks {  #do ending tasks
     # write out the html for the final test step, there is no new content to put in the buffer
     _delayed_write_step_html(undef, undef);
 
+    $totalresponse = sprintf '%.3f', $totalresponse;
+
     writefinalhtml();  #write summary and closing tags for results file
 
     writefinalxml();  #write summary and closing tags for XML results file
