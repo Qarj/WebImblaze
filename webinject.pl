@@ -3200,26 +3200,25 @@ sub _write_step_html {
     my $_html = '<!DOCTYPE html>';
     _add_html_head(\$_html);
 
-    $_html .= qq|        <wi_div class="wi_heading">\n|;
-    $_html .= qq|            <wi_h1 class="wi_alignleft">Step $testnum_display$jumpbacksprint$retriesprint</wi_h1>\n|;
-    $_html .= qq|            <wi_h3 class="wi_alignright">\n|;
+    $_html .= qq|        <div style="padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em !important; font:Verdana, sans-serif !important;">\n|;
+    $_html .= qq|            <h1 style="font-weight: normal; font-size:1.6em !important; font-family: Verdana, sans-serif; float: left; margin: 0; padding: 0; border: 0; color:#D1E6E7;">Step $testnum_display$jumpbacksprint$retriesprint</wi>\n|;
+    $_html .= qq|            <h3 style="font-size: 1.0em !important; font-family: Verdana, sans-serif !important; margin-bottom: 0.3em; float: right; margin: 0; padding: 0; border: 0; line-height: 1.0em !important; color:#D1E6E7;">\n|;
     $_html .= qq|              $case{description1}\n|;
-    $_html .= qq|            </wi_h3>\n|;
-    $_html .= qq|            <wi_div style="clear: both;"></wi_div>\n|;
-    $_html .= qq|            <br />\n|;
-    $_html .= qq|            <wi_h2>\n|;
-    $_html .= qq|                <a href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
+    $_html .= qq|            </h3>\n|;
+    $_html .= qq|            <div style="clear: both;"></div>\n|;
+    $_html .= qq|            <h2 style="font-size:1.2em !important; font-family: Verdana, sans-serif !important; margin-bottom:0.3em !important; text-align: left;">\n|;
+    $_html .= qq|                <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder !important;" href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
     if (defined $previous_test_step) {
-        $_html .= qq|                &nbsp; &nbsp; [<a href="$output_prefix$previous_test_step.html"> prev </a>]\n|;
+        $_html .= qq|                &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$previous_test_step.html"> prev </a>]\n|;
     }
-    $_html .= qq|            </wi_h2>\n|;
-    $_html .= qq|        </wi_div>\n|;
+    $_html .= qq|            </h2>\n|;
+    $_html .= qq|        </div>\n|;
 
     #$_html .= $_step_info;
 
-    $_html .= qq|        <a class="wi_headers" href="javascript:wi_toggle('wi_toggle_request');">Request Headers</a>\n|;
+    $_html .= qq|        <a class="wi_hover_item" style="font-family: Verdana, sans-serif; color:SlateGray; font-weight:bolder;" href="javascript:wi_toggle('wi_toggle_request');">Request Headers</a> : \n|;
     $_html .= qq|\n<xmp id="wi_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_request_headers.qq|\n</xmp>\n|;
-    $_html .= qq|        <a class="wi_headers" href="javascript:wi_toggle('wi_toggle_response');">Response Headers</a>\n|;
+    $_html .= qq|        <a class="wi_hover_item" style="font-family: Verdana, sans-serif; color:SlateGray; font-weight:bolder;" href="javascript:wi_toggle('wi_toggle_response');">Response Headers</a>\n|;
     $_html .= qq|\n<xmp id="wi_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$_response_headers.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
     $_html .= qq|    <body style="display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline;">\n|;
@@ -3295,20 +3294,11 @@ sub _should_display_as_text {
 sub _add_html_head {
     my ($_html) = @_;
 
-    ${$_html} .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; font:80% Verdana, sans-serif;">\n|;
+    ${$_html} .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; text-align: left;">\n|;
     ${$_html} .= qq|        <head>\n|;
     ${$_html} .= qq|            <style>\n|;
-    ${$_html} .= qq|                wi_h1, wi_h2, wi_h3, wi_div { display:block; margin:0; padding:0; border:0; font-size: 100%; font: inherit; vertical-align: baseline; }\n|;
-    ${$_html} .= qq|                wi_h2 a:link, .wi_headers:link { color:SlateGray; }\n|;
-    ${$_html} .= qq|                wi_h2 a, .wi_headers { text-decoration:none; font-weight:bolder; }\n|;
-    ${$_html} .= qq|                wi_h2 a:hover, .wi_headers:hover { color:SlateGray; text-decoration: underline; }\n|;
-    ${$_html} .= qq|                wi_h2 a:visited, .wi_headers:visited { color:SlateGray; }\n|;
-    ${$_html} .= qq|                .wi_heading { padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em;}\n|;
-    ${$_html} .= qq|                .wi_heading wi_h1 {  font-size:2.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
-    ${$_html} .= qq|                .wi_heading wi_h2 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em;  }\n|;
-    ${$_html} .= qq|                .wi_heading wi_h3 {  font-size:1.5em; font-family: Verdana, sans-serif; margin-bottom:0.3em; line-height:1.5em;}\n|;
-    ${$_html} .= qq|                .wi_alignleft {float: left;}\n|;
-    ${$_html} .= qq|                .wi_alignright {float: right;}\n|;
+    ${$_html} .= qq|                .wi_hover_item { text-decoration: none; }\n|;
+    ${$_html} .= qq|                .wi_hover_item:hover { text-decoration: underline; }\n|;
     ${$_html} .= qq|            </style>\n|;
     ${$_html} .= qq|            <script language="javascript">\n|;
     ${$_html} .= qq|                function wi_toggle(wi_toggle_ele) {\n|;
@@ -3498,7 +3488,7 @@ sub _delayed_write_step_html {
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
-            $delayed_html =~ s{</wi_h2>}{ &nbsp; &nbsp; [<a href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</wi_h2>};
+            $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</h2>};
         }
         open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
         print {$_FILE} $delayed_html;
