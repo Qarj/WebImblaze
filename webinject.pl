@@ -74,7 +74,7 @@ my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 o
 my $totalassertionskips = 0;
 my (@visited_pages); ## page source of previously visited pages
 my (@visited_page_names); ## page name of previously visited pages
-my (@page_update_times); ## last time the page was updated in the cache
+my (@_page_update_times); ## last time the page was updated in the cache
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
@@ -101,7 +101,7 @@ $currentdatetime = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$
 my $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
 
-my $counter = 0; ## keeping track of the loop we are up to
+my $_counter = 0; ## keeping track of the loop we are up to
 
 my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
@@ -152,7 +152,7 @@ if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case
 $start = $xmltestcases->{start};  #grab the start for repeating (for restart)
 if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
-$counter = $start - 1; #so starting position and counter are aligned
+$_counter = $start - 1; #so starting position and counter are aligned
 
 if ($opt_driver) { startseleniumbrowser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
@@ -161,7 +161,7 @@ $results_stdout .= "-------------------------------------------------------\n";
 ## Repeat Loop
 foreach ($start .. $repeat) {
 
-    $counter = $counter + 1;
+    $_counter = $_counter + 1;
     $runcount = 0;
     $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
     $jumpbacks = 0;
@@ -174,7 +174,7 @@ foreach ($start .. $repeat) {
 
         $testnum = $teststeps[$stepindex];
 
-        $testnum_display = get_testnum_display($testnum, $counter);
+        $testnum_display = get_testnum_display($testnum, $_counter);
 
         $isfailure = 0;
         $retries = 1; ## we increment retries after writing to the log
@@ -330,7 +330,7 @@ sub get_test_step_skip_message {
 
     $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
     if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
-        if ($counter == 1) { ## counter keeps track of what loop number we are on
+        if ($_counter == 1) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
         }
         else {
@@ -340,7 +340,7 @@ sub get_test_step_skip_message {
 
     $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
     if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
-        if ($counter == $repeat) { ## counter keeps track of what loop number we are on
+        if ($_counter == $repeat) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
         }
         else {
@@ -1436,18 +1436,18 @@ sub getassets { ## get page assets matching a list for a reference type
 
     my $_page = $response->as_string;
 
-    my @extensions = split /[|]/, $assetlist ;
+    my @_extensions = split /[|]/, $assetlist ;
 
-    foreach my $extension (@extensions) {
+    foreach my $_extension (@_extensions) {
 
-        #while ($_page =~ m{$assettype="([^"]*$extension)["\?]}g) ##" Iterate over all the matches to this extension
-        print "\n $_match$_left_delim([^$_right_delim]*$extension)[$_right_delim\?] \n";
-        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$extension)[$_right_delim?]}g) ##" Iterate over all the matches to this extension
+        #while ($_page =~ m{$assettype="([^"]*$_extension)["\?]}g) ##" Iterate over all the matches to this extension
+        print "\n $_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim\?] \n";
+        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) ##" Iterate over all the matches to this extension
         {
             $_start_asset_request = time;
 
             $_asset_ref = $1;
-            #print "$extension: $_asset_ref\n";
+            #print "$_extension: $_asset_ref\n";
 
             $_ur_url = URI::URL->new($_asset_ref, $case{url}); ## join the current page url together with the href of the asset
             $_asset_url = $_ur_url->abs; ## determine the absolute address of the asset
@@ -1461,10 +1461,10 @@ sub getassets { ## get page assets matching a list for a reference type
 
             $_asset_response = $useragent->request($_asset_request);
 
-            open my $RESPONSEASFILE, '>', "$outputfolder/$_filename" or die "\nCould not open asset file $outputfolder/$_filename for writing\n"; #open in clobber mode
-            binmode $RESPONSEASFILE; ## set binary mode
-            print {$RESPONSEASFILE} $_asset_response->content, q{}; ## content just outputs the content, whereas as_string includes the response header
-            close $RESPONSEASFILE or die "\nCould not close asset file\n";
+            open my $_RESPONSE_AS_FILE, '>', "$outputfolder/$_filename" or die "\nCould not open asset file $outputfolder/$_filename for writing\n"; #open in clobber mode
+            binmode $_RESPONSE_AS_FILE; ## set binary mode
+            print {$_RESPONSE_AS_FILE} $_asset_response->content, q{}; ## content just outputs the content, whereas as_string includes the response header
+            close $_RESPONSE_AS_FILE or die "\nCould not close asset file\n";
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
@@ -1522,15 +1522,15 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         }
 
         ## update the global variables
-        $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
+        $_page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
         $visited_page_names[$_page_index] = $_page_action; ## save page name
         $visited_pages[$_page_index] = $response->as_string; ## save page source
 
-        #$results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
+        #$results_stdout .= " Saved $_page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
 
         ## debug - write out the contents of the cache
         #for my $i (0 .. $#visited_page_names) {
-        #    $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
+        #    $results_stdout .= " $i:$_page_update_times[$i]:$visited_page_names[$i] \n"; #debug
         #}
         #$results_stdout .= "\n";
 
@@ -1542,15 +1542,15 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
 sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
-    my $oldest_index = 0;
-    my $oldest_page_time = $page_update_times[0];
+    my $_oldest_index = 0;
+    my $_oldest_page_time = $_page_update_times[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#page_update_times) {
-        if ($page_update_times[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $page_update_times[$i]; }
+    for my $i (0 .. $#_page_update_times) {
+        if ($_page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $_page_update_times[$i]; }
     }
 
-    return $oldest_index;
+    return $_oldest_index;
 }
 
 #------------------------------------------------------------------
@@ -1564,214 +1564,214 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 ##          In this example, the actual user name field may have been txtUsername_xpos5_ypos8_33926509
 ##
 
-    my ($postbody, $posttype, $posturl) = @_;
+    my ($_post_body, $_post_type, $_post_url) = @_;
 
-    my @postfields;
+    my @_post_fields;
 
     ## separate the fields
-    if ($posttype eq 'normalpost') {
-        @postfields = split /\&/, $postbody ; ## & is separator
+    if ($_post_type eq 'normalpost') {
+        @_post_fields = split /\&/, $_post_body ; ## & is separator
     } else {
         ## assumes that double quotes on the outside, internally single qoutes
         ## enhancements needed
         ##   1. subsitute out blank space first between the field separators
-        @postfields = split /\'\,/, $postbody ; #separate the fields
+        @_post_fields = split /\'\,/, $_post_body ; #separate the fields
     }
 
     ## debug - print the array
     #$results_stdout .= " \n There are ".($#postfields+1)." fields in the postbody: \n"; #debug
-    #for my $i (0 .. $#postfields) {
-    #    $results_stdout .= ' Field '.($i+1).": $postfields[$i] \n";
+    #for my $_i (0 .. $#_post_fields) {
+    #    $results_stdout .= ' Field '.($_i+1).": $_post_fields[$_i] \n";
     #}
 
     ## work out pagename to use for matching purposes
-    $posturl =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-    $posturl =~ s{http.?://}{}si; ## remove http:// and https://
-    $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    $results_stdout .= qq| POSTURL $posturl \n|; #debug
+    $_post_url =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+    $_post_url =~ s{http.?://}{}si; ## remove http:// and https://
+    $_post_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+    $results_stdout .= qq| POSTURL $_post_url \n|; #debug
 
-    my $_pageid = _find_page_in_cache($posturl.q{$});
-    if (not defined $_pageid) {
-        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #$results_stdout .= " TRY WITH PAGE NAME ONLY    : $posturl".'$'."\n";
-        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+    my $_page_id = _find_page_in_cache($_post_url.q{$});
+    if (not defined $_page_id) {
+        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
+        #$results_stdout .= " TRY WITH PAGE NAME ONLY    : $_post_url".'$'."\n";
+        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
-    if (not defined $_pageid) {
-        $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
-        #$results_stdout .= " REMOVE PATH                : $posturl".'$'."\n";
-        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+    if (not defined $_page_id) {
+        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
+        #$results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n";
+        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
-    if (not defined $_pageid) {
-        $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        #$results_stdout .= " REMOVE LEADING /           : $posturl".'$'."\n";
-        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+    if (not defined $_page_id) {
+        $_post_url =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
+        #$results_stdout .= " REMOVE LEADING /           : $_post_url".'$'."\n";
+        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
-    if (not defined $_pageid) {
-        #$results_stdout .= " DESPERATE MODE - NO ANCHOR : $posturl\n";
-        _find_page_in_cache($posturl);
+    if (not defined $_page_id) {
+        #$results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n";
+        _find_page_in_cache($_post_url);
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
-    #my $startlooptimer = time;
+    #my $_start_loop_timer = time;
 
     ## time for substitutions
-    if (defined $_pageid) { ## did we find match?
-        #$results_stdout .= " ID MATCH $_pageid \n";
-        for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
+    if (defined $_page_id) { ## did we find match?
+        #$results_stdout .= " ID MATCH $_page_id \n";
+        for my $_i (0 .. $#_post_fields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
-            $postfields[$i] = _substitute_name($postfields[$i], $_pageid, $posttype);
+            $_post_fields[$_i] = _substitute_name($_post_fields[$_i], $_page_id, $_post_type);
 
             ## substitute {DATA} for actual
-            $postfields[$i] = _substitute_data($postfields[$i], $_pageid, $posttype);
+            $_post_fields[$_i] = _substitute_data($_post_fields[$_i], $_page_id, $_post_type);
         }
     }
 
     ## done all the substitutions, now put it all together again
-    if ($posttype eq 'normalpost') {
-        $postbody = join q{&}, @postfields;
+    if ($_post_type eq 'normalpost') {
+        $_post_body = join q{&}, @_post_fields;
     } else {
         ## assumes that double quotes on the outside, internally single qoutes
         ## enhancements needed
         ##   1. subsitute out blank space first between the field separators
-        $postbody = join q{',}, @postfields; #'
+        $_post_body = join q{',}, @_post_fields; #'
     }
-    #out $results_stdout .= qq|\n\n POSTBODY is $postbody \n|;
+    #out $results_stdout .= qq|\n\n POSTBODY is $_post_body \n|;
 
-    #my $looplatency = (int(1000 * (time - $startlooptimer)) / 1000);  ## elapsed time rounded to thousandths
+    #my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000);  ## elapsed time rounded to thousandths
     ## debug - make sure all the regular expressions are efficient
-    #$results_stdout .= qq| Looping took $looplatency \n|; #debug
+    #$results_stdout .= qq| Looping took $_loop_latency \n|; #debug
 
-    return $postbody;
+    return $_post_body;
 }
 
 sub _substitute_name {
-    my ($post_field, $_page_id, $post_type) = @_;
+    my ($_post_field, $_page_id, $_post_type) = @_;
 
-    my $dotx;
-    my $doty;
+    my $_dot_x;
+    my $_dot_y;
 
     ## does the field name end in .x e.g. btnSubmit.x? The .x bit won't be in the saved page
-    if ( $post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
-        #out $results_stdout .= qq| DOTX found in $post_field \n|;
-        $dotx = 'true';
-        $post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
+    if ( $_post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
+        #out $results_stdout .= qq| DOTX found in $_post_field \n|;
+        $_dot_x = 'true';
+        $_post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
     }
 
     ## does the field name end in .y e.g. btnSubmit.y? The .y bit won't be in the saved page
-    if ( $post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-        #out $results_stdout .= qq| DOTY found in $post_field \n|;
-        $doty = 'true';
-        $post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
+    if ( $_post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
+        #out $results_stdout .= qq| DOTY found in $_post_field \n|;
+        $_dot_y = 'true';
+        $_post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
     }
 
     ## look for characters to the left and right of {NAME} and save them
-    if ( $post_field =~ m/([^']{0,70}?)[{]NAME[}]([^=']{0,70})/s ) { ## ' was *?, {0,70}? much quicker
-        my $lhsname = $1;
-        my $rhsname = $2;
+    if ( $_post_field =~ m/([^']{0,70}?)[{]NAME[}]([^=']{0,70})/s ) { ## ' was *?, {0,70}? much quicker
+        my $_lhs_name = $1;
+        my $_rhs_name = $2;
 
-        $lhsname =~ s{\$}{\\\$}g; ## protect $ with \$
-        $lhsname =~ s{[.]}{\\\.}g; ## protect . with \.
-        #$results_stdout .= qq| LHS of {NAME}: [$lhsname] \n|;
+        $_lhs_name =~ s{\$}{\\\$}g; ## protect $ with \$
+        $_lhs_name =~ s{[.]}{\\\.}g; ## protect . with \.
+        #$results_stdout .= qq| LHS of {NAME}: [$_lhs_name] \n|;
 
-        $rhsname =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
-        $rhsname =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
-        $rhsname =~ s{[.]}{\\\.}g; ## same for the .
-        #$results_stdout .= qq| RHS of {NAME}: [$rhsname] \n|;
+        $_rhs_name =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
+        $_rhs_name =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
+        $_rhs_name =~ s{[.]}{\\\.}g; ## same for the .
+        #$results_stdout .= qq| RHS of {NAME}: [$_rhs_name] \n|;
 
         ## find out what to substitute it with, then do the substitution
         ##
         ## saved page source will contain something like
         ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-        if ($visited_pages[$_page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
-            my $name = $1;
-            #out $results_stdout .= qq| NAME is $name \n|;
+        if ($visited_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
+            my $_name = $1;
+            #out $results_stdout .= qq| NAME is $_name \n|;
 
             ## substitute {NAME} for the actual (dynamic) value
-            $post_field =~ s/{NAME}/$name/;
-            #$results_stdout .= qq| SUBBED_NAME is $post_field \n|;
+            $_post_field =~ s/{NAME}/$_name/;
+            #$results_stdout .= qq| SUBBED_NAME is $_post_field \n|;
         }
     }
 
     ## did we take out the .x? we need to put it back
-    if (defined $dotx) {
-        if ($post_type eq 'normalpost') {
-            $post_field =~ s{[=]}{\.x\=};
+    if (defined $_dot_x) {
+        if ($_post_type eq 'normalpost') {
+            $_post_field =~ s{[=]}{\.x\=};
         } else {
-            $post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
+            $_post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
         }
-        #$results_stdout .= qq| DOTX restored to $post_field \n|;
+        #$results_stdout .= qq| DOTX restored to $_post_field \n|;
     }
 
     ## did we take out the .y? we need to put it back
-    if (defined $doty) {
-     if ($post_type eq 'normalpost') {
-        $post_field =~ s{[=]}{\.y\=};
+    if (defined $_dot_y) {
+     if ($_post_type eq 'normalpost') {
+        $_post_field =~ s{[=]}{\.y\=};
      } else {
-        $post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
+        $_post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
      }
-        #$results_stdout .= qq| DOTY restored to $post_field \n|;
+        #$results_stdout .= qq| DOTY restored to $_post_field \n|;
     }
 
-    return $post_field;
+    return $_post_field;
 }
 
 sub _substitute_data {
-    my ($post_field, $_page_id, $post_type) = @_;
+    my ($_post_field, $_page_id, $_post_type) = @_;
 
-    my $target_field;
+    my $_target_field;
 
-    if ($post_type eq 'normalpost') {
-        if ($post_field =~ m/(.{0,70}?)=[{]DATA}/s) {
-            $target_field = $1;
-            #$results_stdout .= qq| Normal Field $fieldname has {DATA} \n|; #debug
+    if ($_post_type eq 'normalpost') {
+        if ($_post_field =~ m/(.{0,70}?)=[{]DATA}/s) {
+            $_target_field = $1;
+            #$results_stdout .= qq| Normal Field $_field_name has {DATA} \n|; #debug
         }
     }
 
-    if ($post_type eq 'multipost') {
-        if ($post_field =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
-            $target_field = $1;
-            #$results_stdout .= qq| Multi Field $fieldname has {DATA} \n|; #debug
+    if ($_post_type eq 'multipost') {
+        if ($_post_field =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
+            $_target_field = $1;
+            #$results_stdout .= qq| Multi Field $_field_name has {DATA} \n|; #debug
         }
     }
 
     ## find out what to substitute it with, then do the substitution
-    if (defined $target_field) {
-        $target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
-        $target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
-        if ($visited_pages[$_page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
-            my $data = $1;
-            #$results_stdout .= qq| DATA is $data \n|; #debug
+    if (defined $_target_field) {
+        $_target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
+        $_target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
+        if ($visited_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
+            my $_data = $1;
+            #$results_stdout .= qq| DATA is $_data \n|; #debug
 
             ## normal post must be escaped
-            if ($post_type eq 'normalpost') {
-                $data = uri_escape($data);
+            if ($_post_type eq 'normalpost') {
+                $_data = uri_escape($_data);
                 #$results_stdout .= qq| URLESCAPE!! \n|; #debug
             }
 
             ## substitute in the data
-            if ($post_field =~ s/{DATA}/$data/) {
-                #$results_stdout .= qq| SUBBED_FIELD is $postfields[$i] \n|; #debug
+            if ($_post_field =~ s/{DATA}/$_data/) {
+                #$results_stdout .= qq| SUBBED_FIELD is $_post_fields[$i] \n|; #debug
             }
 
         }
     }
 
-    return $post_field;
+    return $_post_field;
 }
 
 sub _find_page_in_cache {
 
-    my ($post_url) = @_;
+    my ($_post_url) = @_;
 
     ## see if we have stored this page
     if ($visited_page_names[0]) { ## does the array contain at least one entry?
-        for my $i (0 .. $#visited_page_names) {
-            if ($visited_page_names[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
-            #$results_stdout .= qq| MATCH at position $i\n|; #debug
-            return $i;
+        for my $_i (0 .. $#visited_page_names) {
+            if ($visited_page_names[$_i] =~ m/$_post_url/si) { ## can we find the post url within the current saved action url?
+            #$results_stdout .= qq| MATCH at position $_i\n|; #debug
+            return $_i;
             } else {
-                #$results_stdout .= qq| NO MATCH on $i:$visited_page_names[$i]\n|; #debug
+                #$results_stdout .= qq| NO MATCH on $_i:$visited_page_names[$_i]\n|; #debug
             }
         }
     } else {
@@ -1792,8 +1792,8 @@ sub httpget {  #send http request and read response
     addcookie (); ## append additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
-        foreach (@addheaders) {
+        my @_add_headers = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
             $_ =~ m/(.*): (.*)/;
             if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
@@ -1862,13 +1862,13 @@ sub httpsend {  # send request based on specified encoding and method (verb)
 sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or application/json HTTP request and read response
     my ($_verb) = @_;
 
-    my $substituted_postbody; ## auto substitution
-    $substituted_postbody = autosub("$case{postbody}", 'normalpost', "$case{url}");
+    my $_substituted_postbody; ## auto substitution
+    $_substituted_postbody = autosub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}");
     #$request->content("$case{postbody}");
-    $request->content("$substituted_postbody");
+    $request->content("$_substituted_postbody");
 
     ## moved cookie management up above addheader as per httppost_form_data
     $cookie_jar->add_cookie_header($request);
@@ -1876,8 +1876,8 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     addcookie (); ## append to additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  # add an additional HTTP Header if specified
-        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
-        foreach (@addheaders) {
+        my @_add_headers = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
             $_ =~ m{(.*): (.*)};
             if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
@@ -1901,57 +1901,57 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
 sub httpsend_xml{  #send text/xml HTTP request and read response
     my ($_verb) = @_;
 
-    my @parms;
-    my $len;
+    my @_parms;
+    my $_len;
     #my $_idx;
-    my $fieldname;
-    my $fieldvalue;
-    my $subname;
+    my $_field_name;
+    my $_field_value;
+    my $_sub_name;
 
     #read the xml file specified in the testcase
-    my @xmlbody;
+    my @_xml_body;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
-        open my $XMLBODY, '<', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
-        @xmlbody = <$XMLBODY>;  #read the file into an array
-        close $XMLBODY or die "\nCould not close xml file to be posted\n\n";
+        open my $_XML_BODY, '<', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";  #open file handle
+        @_xml_body = <$_XML_BODY>;  #read the file into an array
+        close $_XML_BODY or die "\nCould not close xml file to be posted\n\n";
     }
 
     if ($case{parms}) { #is there a postbody for this testcase - if so need to subtitute in fields
-       @parms = split /\&/, $case{parms} ; #& is separator
-       $len = @parms; #number of items in the array
+       @_parms = split /\&/, $case{parms} ; #& is separator
+       $_len = @_parms; #number of items in the array
        #out $results_stdout .= qq| \n There are $len fields in the parms \n|;
 
        #loop through each of the fields and substitute
-       foreach my $_idx (1..$len) {
-            $fieldname = q{};
+       foreach my $_idx (1..$_len) {
+            $_field_name = q{};
             #out $results_stdout .= qq| \n parms $_idx: $parms[$_idx-1] \n |;
-            if ($parms[$_idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
-                $fieldname = $1;
-                #out $results_stdout .= qq| fieldname: $fieldname \n|;
+            if ($_parms[$_idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
+                $_field_name = $1;
+                #out $results_stdout .= qq| fieldname: $_field_name \n|;
             }
-            $fieldvalue = q{};
-            if ($parms[$_idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
-                $fieldvalue = $1;
-                #out $results_stdout .= qq| fieldvalue: $fieldvalue \n\n|;
+            $_field_value = q{};
+            if ($_parms[$_idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
+                $_field_value = $1;
+                #out $results_stdout .= qq| fieldvalue: $_field_value \n\n|;
             }
 
             #make the substitution
-            foreach (@xmlbody) {
+            foreach (@_xml_body) {
                 #non escaped fields
-                $_ =~ s{\<$fieldname\>.*?\<\/$fieldname\>}{\<$fieldname\>$fieldvalue\<\/$fieldname\>};
+                $_ =~ s{\<$_field_name\>.*?\<\/$_field_name\>}{\<$_field_name\>$_field_value\<\/$_field_name\>};
 
                 #escaped fields
-                $_ =~ s{\&lt;$fieldname\&gt;.*?\&lt;\/$fieldname\&gt;}{\&lt;$fieldname\&gt;$fieldvalue\&lt;\/$fieldname\&gt;};
+                $_ =~ s{\&lt;$_field_name\&gt;.*?\&lt;\/$_field_name\&gt;}{\&lt;$_field_name\&gt;$_field_value\&lt;\/$_field_name\&gt;};
 
                 #attributes
                 # ([^a-zA-Z]) says there must be a non alpha so that bigid and id and treated separately
                 # $1 will put it back - otherwise it'll be eaten
-                $_ =~ s{([^a-zA-Z])$fieldname\=\".*?\"}{$1$fieldname\=\"$fieldvalue\"}; ## no critic(ProhibitEnumeratedClasses)
+                $_ =~ s{([^a-zA-Z])$_field_name\=\".*?\"}{$1$_field_name\=\"$_field_value\"}; ## no critic(ProhibitEnumeratedClasses)
 
                 #variable substitution
-                $subname = $fieldname;
-                if ( $subname =~ s{__}{} ) {#if there are double underscores, like __salarymax__ then replace it
-                    $_ =~ s{__$subname}{$fieldvalue}g;
+                $_sub_name = $_field_name;
+                if ( $_sub_name =~ s{__}{} ) {#if there are double underscores, like __salarymax__ then replace it
+                    $_ =~ s{__$_sub_name}{$_field_value}g;
                 }
 
             }
@@ -1962,14 +1962,14 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
 
     $request = HTTP::Request->new($_verb, "$case{url}");
     $request->content_type("$case{posttype}");
-    $request->content(join q{ }, @xmlbody);  #load the contents of the file into the request body
+    $request->content(join q{ }, @_xml_body);  #load the contents of the file into the request body
 
 ## moved cookie management up above addheader as per httpsend_form_data
     $cookie_jar->add_cookie_header($request);
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
-        foreach (@addheaders) {
+        my @_add_headers = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
             $_ =~ m/(.*): (.*)/;
             if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
@@ -1993,15 +1993,15 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
 sub httpsend_form_data {  #send multipart/form-data HTTP request and read response
     my ($_verb) = @_;
 
-    my $substituted_postbody; ## auto substitution
-    $substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
+    my $_substituted_postbody; ## auto substitution
+    $_substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
 
-    my %my_content_;
-    eval "\%my_content_ = $substituted_postbody"; ## no critic(ProhibitStringyEval)
+    my %_my_content_;
+    eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval)
     if ($_verb eq 'POST') {
-        $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%my_content_;
+        $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
-        $request = PUT "$case{url}", Content_Type => "$case{posttype}", Content => \%my_content_;
+        $request = PUT "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } else {
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
@@ -2011,8 +2011,8 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
     addcookie (); ## append additional cookies rather than overwriting with add header
 
     if ($case{addheader}) {  #add an additional HTTP Header if specified
-        my @addheaders = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
-        foreach (@addheaders) {
+        my @_add_headers = split /[|]/, $case{addheader} ;  #can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
             $_ =~ m/(.*): (.*)/;
             if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
@@ -2120,8 +2120,8 @@ sub searchimage {  ## search for images in the actual result
                 if ($1) {$_alternate_confidence = $1;}
 
                 $_image_in_image_result =~ m/min_loc (.*?)X/s;
-                my $location;
-                if ($1) {$location = $1;}
+                my $_location;
+                if ($1) {$_location = $1;}
 
                 $results_xml .= qq|            <$_>\n|;
                 $results_xml .= qq|                <assert>$case{$_}</assert>\n|;
@@ -2129,14 +2129,14 @@ sub searchimage {  ## search for images in the actual result
                 if ($_image_in_image_result =~ m/was found/s) { ## was the image found?
                     $results_html .= qq|<span class="found">Found image: $case{$_}</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
-                    $results_stdout .= "Found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $location location\n";
+                    $results_stdout .= "Found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $_location location\n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else { #the image was not found within the bigger image
                     $results_html .= qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    $results_stdout .= "Not found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $location location\n";
+                    $results_stdout .= "Not found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $_location location\n";
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
@@ -2168,8 +2168,8 @@ sub decode_quoted_printable {
     require MIME::QuotedPrint;
 
 	if ($case{decodequotedprintable}) {
-		 my $decoded = MIME::QuotedPrint::decode_qp($response->as_string); ## decode the response output
-		 $response = HTTP::Response->parse($decoded); ## inject it back into the response
+		 my $_decoded = MIME::QuotedPrint::decode_qp($response->as_string); ## decode the response output
+		 $response = HTTP::Response->parse($_decoded); ## inject it back into the response
 	}
 
     return;
@@ -2305,27 +2305,27 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 
 sub _verify_autoassertion {
 
-    foreach my $config_attribute ( sort keys %{ $userconfig->{autoassertions} } ) {
-        if ( (substr $config_attribute, 0, 13) eq 'autoassertion' ) {
-            my $verifynum = $config_attribute; ## determine index verifypositive index
-            $verifynum =~ s/^autoassertion//g; ## remove autoassertion from string
-            if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+    foreach my $_config_attribute ( sort keys %{ $userconfig->{autoassertions} } ) {
+        if ( (substr $_config_attribute, 0, 13) eq 'autoassertion' ) {
+            my $_verify_number = $_config_attribute; ## determine index verifypositive index
+            $_verify_number =~ s/^autoassertion//g; ## remove autoassertion from string
+            if (!$_verify_number) {$_verify_number = '0';} #In case of autoassertion, need to treat as 0
+            my @_verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$_config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Auto Assertion $verifynum - $_verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Auto Assertion $verifynum - $_verifyparms[2] \n";
+                $results_html .= qq|<span class="skip">Skipped Auto Assertion $_verify_number - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Auto Assertion $_verify_number - $_verifyparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
             else {
-                my $_results_xml = qq|            <$config_attribute>\n|;
+                my $_results_xml = qq|            <$_config_attribute>\n|;
                 $_results_xml .= qq|                <assert>$_verifyparms[0]</assert>\n|;
                 #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
                 if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## verify existence of string in response
                     #$results_html .= qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $_results_xml .= qq|                <success>true</success>\n|;
                     #$results_stdout .= "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
-                    #$results_stdout .= $verifynum." Passed Auto Assertion \n"; ##DEBUG
+                    #$results_stdout .= $_verify_number." Passed Auto Assertion \n"; ##DEBUG
                     $passedcount++;
                     $retrypassedcount++;
                 }
@@ -2344,7 +2344,7 @@ sub _verify_autoassertion {
                     $retryfailedcount++;
                     $isfailure++;
                 }
-                $_results_xml .= qq|            </$config_attribute>\n|;
+                $_results_xml .= qq|            </$_config_attribute>\n|;
 
                 # only log the auto assertion if it failed
                 if ($_results_xml =~ m/success.false/) {
@@ -2359,15 +2359,15 @@ sub _verify_autoassertion {
 
 sub _verify_smartassertion {
 
-    foreach my $config_attribute ( sort keys %{ $userconfig->{smartassertions} } ) {
-        if ( (substr $config_attribute, 0, 14) eq 'smartassertion' ) {
-            my $verifynum = $config_attribute; ## determine index verifypositive index
-            $verifynum =~ s/^smartassertion//g; ## remove smartassertion from string
-            if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+    foreach my $_config_attribute ( sort keys %{ $userconfig->{smartassertions} } ) {
+        if ( (substr $_config_attribute, 0, 14) eq 'smartassertion' ) {
+            my $_verify_number = $_config_attribute; ## determine index verifypositive index
+            $_verify_number =~ s/^smartassertion//g; ## remove smartassertion from string
+            if (!$_verify_number) {$_verify_number = '0';} #In case of smartassertion, need to treat as 0
+            my @_verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$_config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
             if ($_verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Smart Assertion $verifynum - $_verifyparms[3]</span><br />\n|;
-                $results_stdout .= "Skipped Smart Assertion $verifynum - $_verifyparms[2] \n";
+                $results_html .= qq|<span class="skip">Skipped Smart Assertion $_verify_number - $_verifyparms[3]</span><br />\n|;
+                $results_stdout .= "Skipped Smart Assertion $_verify_number - $_verifyparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
                 return;
@@ -2376,7 +2376,7 @@ sub _verify_smartassertion {
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
             #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
-                $results_xml .= "            <$config_attribute>\n";
+                $results_xml .= "            <$_config_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$_verifyparms[1]/si) {  ## verify existence of string in response
                     #$results_html .= qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
@@ -2401,7 +2401,7 @@ sub _verify_smartassertion {
                     $retryfailedcount++;
                     $isfailure++;
                 }
-                $results_xml .= qq|            </$config_attribute>\n|;
+                $results_xml .= qq|            </$_config_attribute>\n|;
             } ## end if - is pre-condition for smart assertion met?
         }
     }
@@ -2413,13 +2413,13 @@ sub _verify_verifypositive {
 
     foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' ) {
-            my $verifynum = $_case_attribute; ## determine index verifypositive index
-            $verifynum =~ s/^verifypositive//g; ## remove verifypositive from string
-            if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
+            my $_verify_number = $_case_attribute; ## determine index verifypositive index
+            $_verify_number =~ s/^verifypositive//g; ## remove verifypositive from string
+            if (!$_verify_number) {$_verify_number = '0';} #In case of verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Positive Verification $verifynum - $_verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Positive Verification $verifynum - $_verifyparms[2] \n";
+                $results_html .= qq|<span class="skip">Skipped Positive Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Positive Verification $_verify_number - $_verifyparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
@@ -2430,7 +2430,7 @@ sub _verify_verifypositive {
                     $results_html .= qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Positive Verification \n";
-                    #$results_stdout .= $verifynum." Passed Positive Verification \n"; ##DEBUG
+                    #$results_stdout .= $_verify_number." Passed Positive Verification \n"; ##DEBUG
                     $passedcount++;
                     $retrypassedcount++;
                 }
@@ -2461,14 +2461,14 @@ sub _verify_verifynegative {
 
     foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifynegative' ) {
-            my $verifynum = $_case_attribute; ## determine index verifypositive index
+            my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
-            $verifynum =~ s/^verifynegative//g; ## remove verifynegative from string
-            if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
+            $_verify_number =~ s/^verifynegative//g; ## remove verifynegative from string
+            if (!$_verify_number) {$_verify_number = '0';} ## in case of verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; #index 0 contains the actual string to verify
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Negative Verification $verifynum - $_verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Negative Verification $verifynum - $_verifyparms[2] \n";
+                $results_html .= qq|<span class="skip">Skipped Negative Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Negative Verification $_verify_number - $_verifyparms[2] \n";
                 $assertionskips++;
                 $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
@@ -2512,44 +2512,44 @@ sub _verify_assertcount {
 
     foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 11) eq 'assertcount' ) {
-            my $verifynum = $_case_attribute; ## determine index verifypositive index
+            my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
-            $verifynum =~ s/^assertcount//g; ## remove assertcount from string
-            if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-            my @_verifycountparms = split /[|][|][|]/, $case{$_case_attribute} ;
-            my $count = 0;
-            my $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
+            $_verify_number =~ s/^assertcount//g; ## remove assertcount from string
+            if (!$_verify_number) {$_verify_number = '0';} ## in case of verifypositive, need to treat as 0
+            my @_verify_count_parms = split /[|][|][|]/, $case{$_case_attribute} ;
+            my $_count = 0;
+            my $_temp_string=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
 
-            while ($tempstring =~ m/$_verifycountparms[0]/ig) { $count++;} ## count how many times string is found
+            while ($_temp_string =~ m/$_verify_count_parms[0]/ig) { $_count++;} ## count how many times string is found
 
-            if ($_verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Assertion Count $verifynum - $_verifycountparms[3]</span><br />\n|;
-                $results_stdout .= "Skipped Assertion Count $verifynum - $_verifycountparms[2] \n";
+            if ($_verify_count_parms[3]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Assertion Count $_verify_number - $_verify_count_parms[3]</span><br />\n|;
+                $results_stdout .= "Skipped Assertion Count $_verify_number - $_verify_count_parms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifycountparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verify_count_parms[2] . ']';
             }
             else {
-                if ($count == $_verifycountparms[1]) {
-                    $results_html .= qq|<span class="pass">Passed Count Assertion of $_verifycountparms[1]</span><br />\n|;
+                if ($_count == $_verify_count_parms[1]) {
+                    $results_html .= qq|<span class="pass">Passed Count Assertion of $_verify_count_parms[1]</span><br />\n|;
                     $results_xml .= qq|            <$_case_attribute-success>true</$_case_attribute-success>\n|;
-                    $results_stdout .= "Passed Count Assertion of $_verifycountparms[1] \n";
+                    $results_stdout .= "Passed Count Assertion of $_verify_count_parms[1] \n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else {
                     $results_xml .= qq|            <$_case_attribute-success>false</$_case_attribute-success>\n|;
-                    if ($_verifycountparms[2]) {## if there is a custom message, write it out
-                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verifycountparms[1], got $count</span><br />\n|;
-                        $results_html .= qq|<span class="fail">$_verifycountparms[2]</span><br />\n|;
-                        $results_xml .= qq|            <$_case_attribute-message>|._sub_xml_special($_verifycountparms[2]).qq| [got $count]</$_case_attribute-message>\n|;
+                    if ($_verify_count_parms[2]) {## if there is a custom message, write it out
+                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verify_count_parms[1], got $_count</span><br />\n|;
+                        $results_html .= qq|<span class="fail">$_verify_count_parms[2]</span><br />\n|;
+                        $results_xml .= qq|            <$_case_attribute-message>|._sub_xml_special($_verify_count_parms[2]).qq| [got $_count]</$_case_attribute-message>\n|;
                     }
                     else {# we make up a standard message
-                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verifycountparms[1], got $count</span><br />\n|;
-                        $results_xml .= qq|            <$_case_attribute-message>Failed Count Assertion of $_verifycountparms[1], got $count</$_case_attribute-message>\n|;
+                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verify_count_parms[1], got $_count</span><br />\n|;
+                        $results_xml .= qq|            <$_case_attribute-message>Failed Count Assertion of $_verify_count_parms[1], got $_count</$_case_attribute-message>\n|;
                     }
-                    $results_stdout .= "Failed Count Assertion of $_verifycountparms[1], got $count \n";
-                    if ($_verifycountparms[2]) {
-                        $results_stdout .= "$_verifycountparms[2] \n";
+                    $results_stdout .= "Failed Count Assertion of $_verify_count_parms[1], got $_count \n";
+                    if ($_verify_count_parms[2]) {
+                        $results_stdout .= "$_verify_count_parms[2] \n";
                     }
                     $failedcount++;
                     $retryfailedcount++;
@@ -2564,44 +2564,44 @@ sub _verify_assertcount {
 #------------------------------------------------------------------
 sub parseresponse {  #parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
 
-    my ($_response_to_parse, @parseargs);
-    my ($leftboundary, $rightboundary, $escape);
+    my ($_response_to_parse, @_parse_args);
+    my ($_left_boundary, $_right_boundary, $_escape);
 
     foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
 
         if ( (substr $_case_attribute, 0, 13) eq 'parseresponse' ) {
 
-            @parseargs = split /[|]/, $case{$_case_attribute} ;
+            @_parse_args = split /[|]/, $case{$_case_attribute} ;
 
-            $leftboundary = $parseargs[0]; $rightboundary = $parseargs[1]; $escape = $parseargs[2];
+            $_left_boundary = $_parse_args[0]; $_right_boundary = $_parse_args[1]; $_escape = $_parse_args[2];
 
             $parsedresult{$_case_attribute} = undef; ## clear out any old value first
 
             $_response_to_parse = $response->as_string;
 
-            if ($rightboundary eq 'regex') {## custom regex feature
-                if ($_response_to_parse =~ m/$leftboundary/s) {
+            if ($_right_boundary eq 'regex') {## custom regex feature
+                if ($_response_to_parse =~ m/$_left_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             } else {
-                if ($_response_to_parse =~ m/$leftboundary(.*?)$rightboundary/s) {
+                if ($_response_to_parse =~ m/$_left_boundary(.*?)$_right_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             }
 
-            if ($escape) {
+            if ($_escape) {
                 ## convert special characters into %20 and so on
-                if ($escape eq 'escape') {
+                if ($_escape eq 'escape') {
                     $parsedresult{$_case_attribute} = uri_escape($parsedresult{$_case_attribute});
                 }
 
                 ## decode html entities - e.g. convert &amp; to & and &lt; to <
-                if ($escape eq 'decode') {
+                if ($_escape eq 'decode') {
                     _decode_html_entities($_case_attribute);
                 }
 
                 ## quote meta characters so they will be treated as literal in regex
-                if ($escape eq 'quotemeta') {
+                if ($_escape eq 'quotemeta') {
                     $parsedresult{$_case_attribute} = quotemeta $parsedresult{$_case_attribute};
                 }
             }
@@ -2641,18 +2641,18 @@ sub slash_me {
 sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
-    my $configfilepath;
+    my $_config_file_path;
 
     #process the config file
     if ($opt_configfile) {  #if -c option was set on command line, use specified config file
-        $configfilepath = slash_me($opt_configfile);
+        $_config_file_path = slash_me($opt_configfile);
     } else {
-        $configfilepath = 'config.xml';
+        $_config_file_path = 'config.xml';
         $opt_configfile = 'config.xml'; ## we have defaulted to config.xml in the current folder
     }
 
-    if (-e "$configfilepath") {  #if we have a config file, use it
-        $userconfig = XMLin("$configfilepath"); ## Parse as XML for the user defined config
+    if (-e "$_config_file_path") {  #if we have a config file, use it
+        $userconfig = XMLin("$_config_file_path"); ## Parse as XML for the user defined config
     } else {
         die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
@@ -2678,9 +2678,9 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     #grab values for constants in config file:
-    for my $config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
-        if ($userconfig->{$config_const}) {
-            $config{$config_const} = $userconfig->{$config_const};
+    for my $_config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
+        if ($userconfig->{$_config_const}) {
+            $config{$_config_const} = $userconfig->{$_config_const};
             #print "\n$_ : $config{$_} \n\n";
         }
     }
@@ -2688,8 +2688,8 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if ($userconfig->{httpauth}) {
         if ( ref($userconfig->{httpauth}) eq 'ARRAY') {
             #print "We have an array of httpauths\n";
-            for my $auth ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
-                _push_httpauth ($auth);
+            for my $_auth ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
+                _push_httpauth ($_auth);
             }
         } else {
             #print "Not an array - we just have one httpauth\n";
@@ -2734,15 +2734,15 @@ sub processcasefile {  #get test case files to run (from command line or config 
 }
 
 sub _push_httpauth {
-    my ($auth) = @_;
+    my ($_auth) = @_;
 
     #print "\nhttpauth:$auth\n";
-    my @authentry = split /:/, $auth;
-    if ($#authentry != 4) {
+    my @_auth_entry = split /:/, $_auth;
+    if ($#_auth_entry != 4) {
         print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
     }
     else {
-        push @httpauth, [@authentry];
+        push @httpauth, [@_auth_entry];
     }
 
     return;
@@ -2849,9 +2849,9 @@ sub _include_file {
     my $_include = read_file(slash_me($_file));
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
 
-    #open my $INCLUDE, '>', "$output".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
-    #print {$INCLUDE} $_include;
-    #close $INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
+    #open my $_INCLUDE, '>', "$output".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
+    #print {$_INCLUDE} $_include;
+    #close $_INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
 
     return $_include;
 }
@@ -2862,9 +2862,9 @@ sub convertbackxml {  #converts replaced xml with substitutions
 
 
 ## length feature for returning the size of the response
-    my $mylength;
+    my $_my_length;
     if (defined $response) {#It will not be defined for the first test
-        $mylength = length($response->as_string);
+        $_my_length = length($response->as_string);
     }
 
     $_[0] =~ s/{JUMPBACKS}/$jumpbacks/g; #Number of times we have jumped back due to failure
@@ -2873,7 +2873,7 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running webinject
     $_[0] =~ s/{TESTNUM}/$testnum_display/g;
     $_[0] =~ s/{TESTFILENAME}/$testfilename/g;
-    $_[0] =~ s/{LENGTH}/$mylength/g; #length of the previous test step response
+    $_[0] =~ s/{LENGTH}/$_my_length/g; #length of the previous test step response
     $_[0] =~ s/{AMPERSAND}/&/g;
     $_[0] =~ s/{LESSTHAN}/</g;
     $_[0] =~ s/{SINGLEQUOTE}/'/g; #'
@@ -2906,9 +2906,9 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{SS}/$SECOND/g;
     $_[0] =~ s/{WEEKOFMONTH}/$WEEKOFMONTH/g;
     $_[0] =~ s/{DATETIME}/$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND/g;
-    my $underscore = '_';
-    $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$underscore$HOUR:$MINUTE:$SECOND}g;
-    $_[0] =~ s/{COUNTER}/$counter/g;
+    my $_underscore = '_';
+    $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$_underscore$HOUR:$MINUTE:$SECOND}g;
+    $_[0] =~ s/{COUNTER}/$_counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$output/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
@@ -2921,8 +2921,8 @@ sub convertbackxml {  #converts replaced xml with substitutions
     ##substitute all the parsed results back
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $_case_attribute ( sort keys %{parsedresult} ) {
-       my $parse_var = substr $_case_attribute, 13;
-       $_[0] =~ s/{$parse_var}/$parsedresult{$_case_attribute}/g;
+       my $_parse_var = substr $_case_attribute, 13;
+       $_[0] =~ s/{$_parse_var}/$parsedresult{$_case_attribute}/g;
     }
 
     $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
@@ -2930,14 +2930,14 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{BASEURL2}/$config{baseurl2}/g;
 
 ## perform arbirtary user defined config substituions
-    my ($value, $KEY);
-    foreach my $key (keys %{ $userconfig->{userdefined} } ) {
-        $value = $userconfig->{userdefined}{$key};
-        if (ref($value) eq 'HASH') { ## if we found a HASH, we treat it as blank
-            $value = q{};
+    my ($_value, $_KEY);
+    foreach my $_key (keys %{ $userconfig->{userdefined} } ) {
+        $_value = $userconfig->{userdefined}{$_key};
+        if (ref($_value) eq 'HASH') { ## if we found a HASH, we treat it as blank
+            $_value = q{};
         }
-        $KEY = uc $key; ## convert to uppercase
-        $_[0] =~ s/{$KEY}/$value/g;
+        $_KEY = uc $_key; ## convert to uppercase
+        $_[0] =~ s/{$_KEY}/$_value/g;
     }
 
     return;
@@ -3025,26 +3025,26 @@ sub _get_number_in_range {
 #------------------------------------------------------------------
 sub convertbackxmldynamic {## some values need to be updated after each retry
 
-    my $retriessub = $retries-1;
+    my $_retries_sub = $retries-1;
 
-    my $elapsed_seconds_so_far = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
-    my $elapsed_minutes_so_far = int($elapsed_seconds_so_far / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
+    my $_elapsed_seconds_so_far = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
+    my $_elapsed_minutes_so_far = int($_elapsed_seconds_so_far / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
 
-    $_[0] =~ s/{RETRY}/$retriessub/g;
-    $_[0] =~ s/{ELAPSED_SECONDS}/$elapsed_seconds_so_far/g; ## always rounded up
-    $_[0] =~ s/{ELAPSED_MINUTES}/$elapsed_minutes_so_far/g; ## always rounded up
+    $_[0] =~ s/{RETRY}/$_retries_sub/g;
+    $_[0] =~ s/{ELAPSED_SECONDS}/$_elapsed_seconds_so_far/g; ## always rounded up
+    $_[0] =~ s/{ELAPSED_MINUTES}/$_elapsed_minutes_so_far/g; ## always rounded up
 
     ## put the current date and time into variables
-    my ($dynamic_second, $dynamic_minute, $dynamic_hour, $dynamic_day_of_month, $dynamic_month, $dynamic_year_offset, $dynamic_day_of_week, $dynamic_day_of_year, $dynamic_daylight_savings) = localtime;
-    my $dynamic_year = 1900 + $dynamic_year_offset;
-    $dynamic_month = $MONTHS[$dynamic_month];
-    my $dynamic_day = sprintf '%02d', $dynamic_day_of_month;
-    $dynamic_hour = sprintf '%02d', $dynamic_hour; #put in up to 2 leading zeros
-    $dynamic_minute = sprintf '%02d', $dynamic_minute;
-    $dynamic_second = sprintf '%02d', $dynamic_second;
+    my ($_dynamic_second, $_dynamic_minute, $_dynamic_hour, $_dynamic_day_of_month, $_dynamic_month, $_dynamic_year_offset, $_dynamic_day_of_week, $_dynamic_day_of_year, $_dynamic_daylight_savings) = localtime;
+    my $_dynamic_year = 1900 + $_dynamic_year_offset;
+    $_dynamic_month = $MONTHS[$_dynamic_month];
+    my $_dynamic_day = sprintf '%02d', $_dynamic_day_of_month;
+    $_dynamic_hour = sprintf '%02d', $_dynamic_hour; #put in up to 2 leading zeros
+    $_dynamic_minute = sprintf '%02d', $_dynamic_minute;
+    $_dynamic_second = sprintf '%02d', $_dynamic_second;
 
-    my $underscore = '_';
-    $_[0] =~ s{{NOW}}{$dynamic_day\/$dynamic_month\/$dynamic_year$underscore$dynamic_hour:$dynamic_minute:$dynamic_second}g;
+    my $_underscore = '_';
+    $_[0] =~ s{{NOW}}{$_dynamic_day\/$_dynamic_month\/$_dynamic_year$_underscore$_dynamic_hour:$_dynamic_minute:$_dynamic_second}g;
 
     return;
 }
@@ -3052,8 +3052,8 @@ sub convertbackxmldynamic {## some values need to be updated after each retry
 #------------------------------------------------------------------
 sub convertback_var_variables { ## e.g. postbody="time={RUNSTART}"
     foreach my $_case_attribute ( sort keys %{varvar} ) {
-       my $sub_var = substr $_case_attribute, 3;
-       $_[0] =~ s/{$sub_var}/$varvar{$_case_attribute}/g;
+       my $_sub_var = substr $_case_attribute, 3;
+       $_[0] =~ s/{$_sub_var}/$varvar{$_case_attribute}/g;
     }
 
     return;
@@ -3095,11 +3095,11 @@ sub httplog {  # write requests and responses to http.txt file
 
     ## save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
-        my $responsefoldername = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        open my $RESPONSEASFILE, '>', "$responsefoldername/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
-        binmode $RESPONSEASFILE; ## set binary mode
-        print {$RESPONSEASFILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
-        close $RESPONSEASFILE or die "\nCould not close file for response as file\n\n";
+        my $_response_folder_name = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+        open my $_RESPONSE_AS_FILE, '>', "$_response_folder_name/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
+        binmode $_RESPONSE_AS_FILE; ## set binary mode
+        print {$_RESPONSE_AS_FILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
+        close $_RESPONSE_AS_FILE or die "\nCould not close file for response as file\n\n";
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacksprint$retriesprint - ";
@@ -3528,8 +3528,8 @@ sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeD
         $results_stdout .= "\nConnecting to Selenium Remote Control server on port $opt_port \n";
     }
 
-    my $max = 30;
-    my $try = 0;
+    my $_max = 30;
+    my $_try = 0;
 
     ## --load-extension Loads an extension from the specified directory
     ## --whitelisted-extension-id
@@ -3542,12 +3542,12 @@ sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeD
 
             ## ChromeDriver without Selenium Server or JRE
             if ($opt_driver eq 'chromedriver') {
-                my $port = find_available_port(9585); ## find a free port to bind to, starting from this number
+                my $_port = find_available_port(9585); ## find a free port to bind to, starting from this number
                 if ($opt_proxy) {
                     $results_stdout .= "Starting ChromeDriver using proxy at $opt_proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
-                                                 binary_port => $port,
-                                                 _binary_args => " --port=$port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
+                                                 binary_port => $_port,
+                                                 _binary_args => " --port=$_port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome',
                                                  'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy }
                                                  );
@@ -3555,8 +3555,8 @@ sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeD
                 } else {
                     $results_stdout .= "Starting ChromeDriver without a proxy\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
-                                                 binary_port => $port,
-                                                 _binary_args => " --port=$port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
+                                                 binary_port => $_port,
+                                                 _binary_args => " --port=$_port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
                                                  'browser_name' => 'chrome'
                                                  );
                 }
@@ -3599,16 +3599,16 @@ sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeD
 
         }; ## end eval
 
-        if ( $@ and $try++ < $max )
+        if ( $@ and $_try++ < $_max )
         {
-            print "\nError: $@ Failed try $try to connect to Selenium Server, retrying...\n";
+            print "\nError: $@ Failed try $_try to connect to Selenium Server, retrying...\n";
             sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
             redo ATTEMPT;
         }
     } ## end ATTEMPT
 
     if ($@) {
-        print "\nError: $@ Failed to connect on port $opt_port after $max tries\n\n";
+        print "\nError: $@ Failed to connect on port $opt_port after $_max tries\n\n";
         die "WebInject Aborted - could not connect to Selenium Server\n";
     }
 
@@ -3618,17 +3618,17 @@ sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeD
 }
 
 sub port_available {
-    my ($port) = @_;
+    my ($_port) = @_;
 
-    my $family = PF_INET;
-    my $type   = SOCK_STREAM;
-    my $proto  = getprotobyname 'tcp' or die "getprotobyname: $!\n";
-    my $host   = INADDR_ANY;  # Use inet_aton for a specific interface
+    my $_family = PF_INET;
+    my $_type   = SOCK_STREAM;
+    my $_proto  = getprotobyname 'tcp' or die "getprotobyname: $!\n";
+    my $_host   = INADDR_ANY;  # Use inet_aton for a specific interface
 
-    socket my $sock, $family, $type, $proto or die "socket: $!\n";
-    my $name = sockaddr_in($port, $host)     or die "sockaddr_in: $!\n";
+    socket my $_sock, $_family, $_type, $_proto or die "socket: $!\n";
+    my $_name = sockaddr_in($_port, $_host)     or die "sockaddr_in: $!\n";
 
-    if (bind $sock, $name) {
+    if (bind $_sock, $_name) {
         return 'available';
     }
 
@@ -3636,12 +3636,12 @@ sub port_available {
 }
 
 sub find_available_port {
-    my ($start_port) = @_;
+    my ($_start_port) = @_;
 
-    my $max_attempts = 20;
-    foreach my $i (0..$max_attempts) {
-        if (port_available($start_port + $i) eq 'available') {
-            return $start_port + $i;
+    my $_max_attempts = 20;
+    foreach my $_i (0..$_max_attempts) {
+        if (port_available($_start_port + $_i) eq 'available') {
+            return $_start_port + $_i;
         }
     }
 
@@ -3653,9 +3653,9 @@ sub shutdown_selenium {
         #$results_stdout .= " Shutting down Selenium Browser Session\n";
 
         #my $close_handles = $driver->get_window_handles;
-        #for my $close_handle (reverse 0..@{$close_handles}) {
-        #   $results_stdout .= "Shutting down window $close_handle\n";
-        #   $driver->switch_to_window($close_handles->[$close_handle]);
+        #for my $_close_handle (reverse 0..@{$_close_handles}) {
+        #   $results_stdout .= "Shutting down window $_close_handle\n";
+        #   $driver->switch_to_window($_close_handles->[$_close_handle]);
         #   $driver->close();
         #}
 
@@ -3698,9 +3698,9 @@ sub startsession {     ## creates the webinject user agent
     if (@httpauth) {
         #add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         #deref $elem to get the array elements.
-        foreach my $elem(@httpauth) {
-            #$results_stdout .= "adding credential: $elem->[0]:$elem->[1], $elem->[2], $elem->[3] => $elem->[4]\n";
-            $useragent->credentials("$elem->[0]:$elem->[1]", "$elem->[2]", "$elem->[3]" => "$elem->[4]");
+        foreach my $_elem(@httpauth) {
+            #$results_stdout .= "adding credential: $_elem->[0]:$_elem->[1], $_elem->[2], $_elem->[3] => $_elem->[4]\n";
+            $useragent->credentials("$_elem->[0]:$_elem->[1]", "$_elem->[2]", "$_elem->[3]" => "$_elem->[4]");
         }
     }
 
@@ -3709,11 +3709,11 @@ sub startsession {     ## creates the webinject user agent
         $useragent->timeout("$config{timeout}");  #default LWP timeout is 180 secs.
     }
 
-    my $setuseragent;
+    my $_set_user_agent;
     if ($userconfig->{useragent}) {
-        $setuseragent = $userconfig->{useragent};
-        if ($setuseragent) { #http useragent that will show up in webserver logs
-            $useragent->agent($setuseragent);
+        $_set_user_agent = $userconfig->{useragent};
+        if ($_set_user_agent) { #http useragent that will show up in webserver logs
+            $useragent->agent($_set_user_agent);
         }
     }
 
