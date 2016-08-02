@@ -19,7 +19,7 @@ WebInject is very easy to setup and run. An example is test included.
 
 That's it! You are now ready to run WebInject for the first time.
 
-### Linux - works for non Selenium tests
+### Linux
 
 1. Clone WebInject with git
     ```
@@ -94,6 +94,10 @@ Test Cases Passed: 2
 Test Cases Failed: 0
 Verifications Passed: 6
 Verifications Failed: 0
+
+Total Response Time: 4.467 seconds
+
+Results at: output\results.html
 ```
 
 So what happened?
@@ -149,7 +153,7 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
 it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
 we'll put it here: `C:\ChromeDriver\chromedriver.exe`
 
-### Linux - work in progress, does not yet work for Selenium tests
+### Linux - instructions coming soon
 
 
 ### Run the Example Selenium WebDriver test
