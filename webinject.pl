@@ -971,15 +971,15 @@ sub selenium {  ## send Selenium command and read response
     ## commands must be run in this order
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10  command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
         if ($case{$_}) {#perform command
-            my $command = $case{$_};
+            my $_command = $case{$_};
             undef $selresp;
-            my $eval_response = eval { eval "$command"; }; ## no critic(ProhibitStringyEval)
-            #$results_stdout .= "EVALRESP:$eval_response\n";
+            my $_eval_response = eval { eval "$_command"; }; ## no critic(ProhibitStringyEval)
+            #$results_stdout .= "EVALRESP:$_eval_response\n";
             if (defined $selresp) { ## phantomjs does not return a defined response sometimes
                 if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                    my $dumper_response = Data::Dumper::Dumper($selresp);
-                    $results_stdout .= "SELRESP: DUMPED:\n$dumper_response";
-                    $selresp = "selresp:DUMPED:$dumper_response";
+                    my $_dumper_response = Data::Dumper::Dumper($selresp);
+                    $results_stdout .= "SELRESP: DUMPED:\n$_dumper_response";
+                    $selresp = "selresp:DUMPED:$_dumper_response";
                 } else {
                     $results_stdout .= "SELRESP:$selresp\n";
                     $selresp = "selresp:$selresp";
@@ -988,7 +988,7 @@ sub selenium {  ## send Selenium command and read response
                 $results_stdout .= "SELRESP:<undefined>\n";
                 $selresp = 'selresp:<undefined>';
             }
-            $_combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
+            $_combined_response =~ s{$}{<$_>$_command</$_>\n$selresp\n\n\n}; ## include it in the response
         }
     }
     $selresp = $_combined_response;
@@ -1018,29 +1018,29 @@ sub _get_verifytext {
 
     ## multiple verifytexts are separated by commas
     if ($case{verifytext}) {
-        my @parseverify = split /,/, $case{verifytext} ;
-        foreach (@parseverify) {
-            my $verifytext = $_;
-            $results_stdout .= "$verifytext\n";
-            my @verfresp;
+        my @_parse_verify = split /,/, $case{verifytext} ;
+        foreach (@_parse_verify) {
+            my $_verify_text = $_;
+            $results_stdout .= "$_verify_text\n";
+            my @_verify_response;
 
-            if ($verifytext eq 'get_body_text') {
-                print "GET_BODY_TEXT:$verifytext\n";
-                eval { @verfresp =  $driver->find_element('body','tag_name')->get_text(); };
+            if ($_verify_text eq 'get_body_text') {
+                print "GET_BODY_TEXT:$_verify_text\n";
+                eval { @_verify_response =  $driver->find_element('body','tag_name')->get_text(); };
             } else {
-                eval { @verfresp = $driver->$verifytext(); }; ## sometimes Selenium will return an array
+                eval { @_verify_response = $driver->$_verify_text(); }; ## sometimes Selenium will return an array
             }
 
             $selresp =~ s{$}{\n\n\n\n}; ## put in a few carriage returns after any Selenium server message first
-            my $idx = 0;
-            foreach my $vresp (@verfresp) {
-                $vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
-                $idx++; ## we number the verifytexts from 1 onwards to tell them apart in the tags
-                $selresp =~ s{$}{<$verifytext$idx>$vresp</$verifytext$idx>\n}; ## include it in the response
-                if (($vresp =~ m/(^|=)HASH\b/) || ($vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
-                    my $dumper_response = Data::Dumper::Dumper($vresp);
-                    my $dumped = 'dumped';
-                    $selresp =~ s{$}{<$verifytext$dumped$idx>$dumper_response</$verifytext$dumped$idx>\n}; ## include it in the response
+            my $_idx = 0;
+            foreach my $_vresp (@_verify_response) {
+                $_vresp =~ s/[^[:ascii:]]+//g; ## get rid of non-ASCII characters in the string element
+                $_idx++; ## we number the verifytexts from 1 onwards to tell them apart in the tags
+                $selresp =~ s{$}{<$_verify_text$_idx>$_vresp</$_verify_text$_idx>\n}; ## include it in the response
+                if (($_vresp =~ m/(^|=)HASH\b/) || ($_vresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
+                    my $_dumper_response = Data::Dumper::Dumper($_vresp);
+                    my $_dumped = 'dumped';
+                    $selresp =~ s{$}{<$_verify_text$_dumped$_idx>$_dumper_response</$_verify_text$_dumped$_idx>\n}; ## include it in the response
                     ## ^ means match start of string, $ end of string
                 }
             }
@@ -1903,7 +1903,7 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
 
     my @parms;
     my $len;
-    #my $idx;
+    #my $_idx;
     my $fieldname;
     my $fieldvalue;
     my $subname;
@@ -1922,15 +1922,15 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
        #out $results_stdout .= qq| \n There are $len fields in the parms \n|;
 
        #loop through each of the fields and substitute
-       foreach my $idx (1..$len) {
+       foreach my $_idx (1..$len) {
             $fieldname = q{};
-            #out $results_stdout .= qq| \n parms $idx: $parms[$idx-1] \n |;
-            if ($parms[$idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
+            #out $results_stdout .= qq| \n parms $_idx: $parms[$_idx-1] \n |;
+            if ($parms[$_idx-1] =~ m/(.*?)\=/s) { #we only want everything to the left of the = sign
                 $fieldname = $1;
                 #out $results_stdout .= qq| fieldname: $fieldname \n|;
             }
             $fieldvalue = q{};
-            if ($parms[$idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
+            if ($parms[$_idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
                 $fieldvalue = $1;
                 #out $results_stdout .= qq| fieldvalue: $fieldvalue \n\n|;
             }
