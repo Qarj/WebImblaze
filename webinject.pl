@@ -3677,7 +3677,7 @@ sub shutdown_selenium {
 sub start_session {     ## creates the webinject user agent
 
     require IO::Socket::SSL;
-    require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
+    #require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
     require HTTP::Cookies;
 
     #$useragent = LWP::UserAgent->new; ## 1.41 version

@@ -33,12 +33,9 @@ That's it! You are now ready to run WebInject for the first time.
     ```
     cd WebInject
     chmod +x webinject.pl
-    su -
-    cpan File::Slurp
-    cpan XML::Simple
-    cpan Crypt::SSLeay
-    cpan Math::Random::ISAAC
-    exit
+    sudo cpan File::Slurp
+    sudo cpan XML::Simple
+    sudo cpan Math::Random::ISAAC
     ```
 
 3. Check that you can see the WebInject help info
