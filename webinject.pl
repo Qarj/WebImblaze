@@ -900,6 +900,10 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
     $results_stdout .= qq|Verifications Passed: $passed_count\n|;
     $results_stdout .= qq|Verifications Failed: $failed_count\n\n|;
 
+    if ($opt_publish_full eq $output) {
+        $results_stdout .= qq|Results at: $opt_publish_full|.'results.html'.qq|\n|;
+    }
+
     if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
 
