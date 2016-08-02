@@ -67,10 +67,6 @@ my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $ret
 my ($forcedretry); ## force retry when specific http error code received
 my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($starttime); ## to store a copy of $startruntimer in a global variable
-my ($cmdresp); ## response from running a terminal command
-my ($selresp); ## response from a Selenium command
-my (@verifyparms); ## friendly error message to show when an assertion fails
-my (@verifycountparms); ## regex match occurences must much a particular count for the assertion to pass
 my ($output, $outputfolder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my ($userconfig); ## support arbirtary user defined config
@@ -79,12 +75,11 @@ my $totalassertionskips = 0;
 my (@pages); ## page source of previously visited pages
 my (@pagenames); ## page name of previously visited pages
 my (@pageupdatetimes); ## last time the page was updated in the cache
-my $chromehandle = 0; ## windows handle of chrome browser window - for screenshots
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
-my (@hrefs, @srcs, @bg_images); ## substitute in grabbed assets to step results html
+my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my $session_started; ## only start up http sesion if http is being used
-my $driver; ## support for Selenium WebDriver test cases
+my ($selresp, $driver); ## support for Selenium WebDriver test cases
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -468,9 +463,9 @@ sub output_assertions {
         if ( (substr $case_attribute, 0, 14) eq 'verifypositive' || (substr $case_attribute, 0, 14) eq 'verifynegative') {
             my $verifytype = substr $case_attribute, 6, 8; ## so we get the word positive or negative
             $verifytype = ucfirst $verifytype; ## change to Positive or Negative
-            @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
-            $results_html .= qq|Verify $verifytype: "$verifyparms[0]" <br />\n|;
-            $results_stdout .= qq|Verify $verifytype: "$verifyparms[0]" \n|;
+            my @_verifyparms = split /[|][|][|]/, $case{$case_attribute} ; ## index 0 contains the actual string to verify
+            $results_html .= qq|Verify $verifytype: "$_verifyparms[0]" <br />\n|;
+            $results_stdout .= qq|Verify $verifytype: "$_verifyparms[0]" \n|;
         }
     }
 
@@ -2044,12 +2039,12 @@ sub cmd {  ## send terminal command and read response
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
         if ($case{$_}) {#perform command
-            my $cmd = $case{$_};
-            $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust(\$cmd);
+            my $_cmd = $case{$_};
+            $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+            _shell_adjust(\$_cmd);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
-            $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combined_response =~ s{$}{<$_> $cmd </$_>\n$cmdresp\n\n\n}; ## include it in the response
+            my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+            $combined_response =~ s{$}{<$_> $_cmd </$_>\n$_cmdresp\n\n\n}; ## include it in the response
         }
     }
     $combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
@@ -2088,11 +2083,11 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
     for (qw/commandonerror/) {
         if ($case{$_}) {## perform command
 
-            my $cmd = $case{$_};
-            $cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust(\$cmd);
-            $cmdresp = (`$cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combined_response =~ s{$}{<$_>$cmd</$_>\n$cmdresp\n\n\n}; ## include it in the response
+            my $_cmd = $case{$_};
+            $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+            _shell_adjust(\$_cmd);
+            my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+            $combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; ## include it in the response
         }
     }
     $response = HTTP::Response->parse($combined_response); ## put the test response along with the command on error response back in the response
@@ -2315,18 +2310,18 @@ sub _verify_autoassertion {
             my $verifynum = $config_attribute; ## determine index verifypositive index
             $verifynum =~ s/^autoassertion//g; ## remove autoassertion from string
             if (!$verifynum) {$verifynum = '0';} #In case of autoassertion, need to treat as 0
-            @verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
-            if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Auto Assertion $verifynum - $verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Auto Assertion $verifynum - $verifyparms[2] \n";
+            my @_verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+            if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Auto Assertion $verifynum - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Auto Assertion $verifynum - $_verifyparms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
             else {
                 my $_results_xml = qq|            <$config_attribute>\n|;
-                $_results_xml .= qq|                <assert>$verifyparms[0]</assert>\n|;
-                #$results_stdout .= "$verifyparms[0]\n"; ##DEBUG
-                if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
+                $_results_xml .= qq|                <assert>$_verifyparms[0]</assert>\n|;
+                #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
+                if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## verify existence of string in response
                     #$results_html .= qq|<span class="pass">Passed Auto Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $_results_xml .= qq|                <success>true</success>\n|;
                     #$results_stdout .= "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
@@ -2335,15 +2330,15 @@ sub _verify_autoassertion {
                     $retrypassedcount++;
                 }
                 else {
-                    $results_html .= qq|<span class="fail">Failed Auto Assertion:</span>$verifyparms[0]<br />\n|;
+                    $results_html .= qq|<span class="fail">Failed Auto Assertion:</span>$_verifyparms[0]<br />\n|;
                     $_results_xml .= qq|                <success>false</success>\n|;
-                    if ($verifyparms[1]) { ## is there a custom assertion failure message?
-                       $results_html .= qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       $_results_xml .= qq|                <message>$verifyparms[1]</message>\n|;
+                    if ($_verifyparms[1]) { ## is there a custom assertion failure message?
+                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                       $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
                     }
                     $results_stdout .= "Failed Auto Assertion \n";
-                    if ($verifyparms[1]) {
-                       $results_stdout .= "$verifyparms[1] \n";
+                    if ($_verifyparms[1]) {
+                       $results_stdout .= "$_verifyparms[1] \n";
                     }
                     $failedcount++;
                     $retryfailedcount++;
@@ -2369,21 +2364,21 @@ sub _verify_smartassertion {
             my $verifynum = $config_attribute; ## determine index verifypositive index
             $verifynum =~ s/^smartassertion//g; ## remove smartassertion from string
             if (!$verifynum) {$verifynum = '0';} #In case of smartassertion, need to treat as 0
-            @verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
-            if ($verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Smart Assertion $verifynum - $verifyparms[3]</span><br />\n|;
-                $results_stdout .= "Skipped Smart Assertion $verifynum - $verifyparms[2] \n";
+            my @_verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+            if ($_verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Smart Assertion $verifynum - $_verifyparms[3]</span><br />\n|;
+                $results_stdout .= "Skipped Smart Assertion $verifynum - $_verifyparms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
                 return;
             }
 
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
-            #$results_stdout .= "$verifyparms[0]\n"; ##DEBUG
-            if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
+            #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
+            if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
                 $results_xml .= "            <$config_attribute>\n";
-                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
-                if ($response->as_string() =~ m/$verifyparms[1]/si) {  ## verify existence of string in response
+                $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
+                if ($response->as_string() =~ m/$_verifyparms[1]/si) {  ## verify existence of string in response
                     #$results_html .= qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $results_xml .= qq|                <success>true</success>\n|;
                     #$results_stdout .= "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
@@ -2391,15 +2386,15 @@ sub _verify_smartassertion {
                     $retrypassedcount++;
                 }
                 else {
-                    $results_html .= qq|<span class="fail">Failed Smart Assertion:</span>$verifyparms[0]<br />\n|;
+                    $results_html .= qq|<span class="fail">Failed Smart Assertion:</span>$_verifyparms[0]<br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    if ($verifyparms[2]) { ## is there a custom assertion failure message?
-                       $results_html .= qq|<span class="fail">$verifyparms[2]</span><br />\n|;
-                       $results_xml .= '                <message>'._sub_xml_special($verifyparms[2])."</message>\n";
+                    if ($_verifyparms[2]) { ## is there a custom assertion failure message?
+                       $results_html .= qq|<span class="fail">$_verifyparms[2]</span><br />\n|;
+                       $results_xml .= '                <message>'._sub_xml_special($_verifyparms[2])."</message>\n";
                     }
                     $results_stdout .= 'Failed Smart Assertion';
-                    if ($verifyparms[2]) {
-                       $results_stdout .= ": $verifyparms[2]";
+                    if ($_verifyparms[2]) {
+                       $results_stdout .= ": $_verifyparms[2]";
                     }
                     $results_stdout .= "\n";
                     $failedcount++;
@@ -2421,17 +2416,17 @@ sub _verify_verifypositive {
             my $verifynum = $case_attribute; ## determine index verifypositive index
             $verifynum =~ s/^verifypositive//g; ## remove verifypositive from string
             if (!$verifynum) {$verifynum = '0';} #In case of verifypositive, need to treat as 0
-            @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
-            if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Positive Verification $verifynum - $verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Positive Verification $verifynum - $verifyparms[2] \n";
+            my @_verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+            if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Positive Verification $verifynum - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Positive Verification $verifynum - $_verifyparms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
             else {
                 $results_xml .= "            <$case_attribute>\n";
-                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
-                if ($response->as_string() =~ m/$verifyparms[0]/si) {  ## verify existence of string in response
+                $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
+                if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## verify existence of string in response
                     $results_html .= qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Positive Verification \n";
@@ -2440,15 +2435,15 @@ sub _verify_verifypositive {
                     $retrypassedcount++;
                 }
                 else {
-                    $results_html .= qq|<span class="fail">Failed Positive Verification:</span>$verifyparms[0]<br />\n|;
+                    $results_html .= qq|<span class="fail">Failed Positive Verification:</span>$_verifyparms[0]<br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    if ($verifyparms[1]) { ## is there a custom assertion failure message?
-                       $results_html .= qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                       $results_xml .= '                <message>'._sub_xml_special($verifyparms[1])."</message>\n";
+                    if ($_verifyparms[1]) { ## is there a custom assertion failure message?
+                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                       $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
                     $results_stdout .= "Failed Positive Verification \n";
-                    if ($verifyparms[1]) {
-                       $results_stdout .= "$verifyparms[1] \n";
+                    if ($_verifyparms[1]) {
+                       $results_stdout .= "$_verifyparms[1] \n";
                     }
                     $failedcount++;
                     $retryfailedcount++;
@@ -2470,26 +2465,26 @@ sub _verify_verifynegative {
             #$results_stdout .= "$case_attribute\n"; ##DEBUG
             $verifynum =~ s/^verifynegative//g; ## remove verifynegative from string
             if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-            @verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify
-            if ($verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Negative Verification $verifynum - $verifyparms[2]</span><br />\n|;
-                $results_stdout .= "Skipped Negative Verification $verifynum - $verifyparms[2] \n";
+            my @_verifyparms = split /[|][|][|]/, $case{$case_attribute} ; #index 0 contains the actual string to verify
+            if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Negative Verification $verifynum - $_verifyparms[2]</span><br />\n|;
+                $results_stdout .= "Skipped Negative Verification $verifynum - $_verifyparms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
             }
             else {
                 $results_xml .= "            <$case_attribute>\n";
-                $results_xml .= '                <assert>'._sub_xml_special($verifyparms[0])."</assert>\n";
-                if ($response->as_string() =~ m/$verifyparms[0]/si) {  #verify existence of string in response
+                $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
+                if ($response->as_string() =~ m/$_verifyparms[0]/si) {  #verify existence of string in response
                     $results_html .= qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    if ($verifyparms[1]) {
-                       $results_html .= qq|<span class="fail">$verifyparms[1]</span><br />\n|;
-                         $results_xml .= '            <message>'._sub_xml_special($verifyparms[1])."</message>\n";
+                    if ($_verifyparms[1]) {
+                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                         $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
                     $results_stdout .= "Failed Negative Verification \n";
-                    if ($verifyparms[1]) {
-                       $results_stdout .= "$verifyparms[1] \n";
+                    if ($_verifyparms[1]) {
+                       $results_stdout .= "$_verifyparms[1] \n";
                     }
                     $failedcount++;
                     $retryfailedcount++;
@@ -2521,46 +2516,46 @@ sub _verify_assertcount {
             #$results_stdout .= "$case_attribute\n"; ##DEBUG
             $verifynum =~ s/^assertcount//g; ## remove assertcount from string
             if (!$verifynum) {$verifynum = '0';} ## in case of verifypositive, need to treat as 0
-            @verifycountparms = split /[|][|][|]/, $case{$case_attribute} ;
+            my @_verifycountparms = split /[|][|][|]/, $case{$case_attribute} ;
             my $count = 0;
             my $tempstring=$response->as_string(); #need to put in a temporary variable otherwise it gets stuck in infinite loop
 
-            while ($tempstring =~ m/$verifycountparms[0]/ig) { $count++;} ## count how many times string is found
+            while ($tempstring =~ m/$_verifycountparms[0]/ig) { $count++;} ## count how many times string is found
 
-            if ($verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
-                $results_html .= qq|<span class="skip">Skipped Assertion Count $verifynum - $verifycountparms[3]</span><br />\n|;
-                $results_stdout .= "Skipped Assertion Count $verifynum - $verifycountparms[2] \n";
+            if ($_verifycountparms[3]) { ## assertion is being ignored due to known production bug or whatever
+                $results_html .= qq|<span class="skip">Skipped Assertion Count $verifynum - $_verifycountparms[3]</span><br />\n|;
+                $results_stdout .= "Skipped Assertion Count $verifynum - $_verifycountparms[2] \n";
                 $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $verifyparms[2] . ']';
+                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifycountparms[2] . ']';
             }
             else {
-                if ($count == $verifycountparms[1]) {
-                    $results_html .= qq|<span class="pass">Passed Count Assertion of $verifycountparms[1]</span><br />\n|;
+                if ($count == $_verifycountparms[1]) {
+                    $results_html .= qq|<span class="pass">Passed Count Assertion of $_verifycountparms[1]</span><br />\n|;
                     $results_xml .= qq|            <$case_attribute-success>true</$case_attribute-success>\n|;
-                    $results_stdout .= "Passed Count Assertion of $verifycountparms[1] \n";
+                    $results_stdout .= "Passed Count Assertion of $_verifycountparms[1] \n";
                     $passedcount++;
                     $retrypassedcount++;
                 }
                 else {
                     $results_xml .= qq|            <$case_attribute-success>false</$case_attribute-success>\n|;
-                    if ($verifycountparms[2]) {## if there is a custom message, write it out
-                        $results_html .= qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                        $results_html .= qq|<span class="fail">$verifycountparms[2]</span><br />\n|;
-                        $results_xml .= qq|            <$case_attribute-message>|._sub_xml_special($verifycountparms[2]).qq| [got $count]</$case_attribute-message>\n|;
+                    if ($_verifycountparms[2]) {## if there is a custom message, write it out
+                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verifycountparms[1], got $count</span><br />\n|;
+                        $results_html .= qq|<span class="fail">$_verifycountparms[2]</span><br />\n|;
+                        $results_xml .= qq|            <$case_attribute-message>|._sub_xml_special($_verifycountparms[2]).qq| [got $count]</$case_attribute-message>\n|;
                     }
                     else {# we make up a standard message
-                        $results_html .= qq|<span class="fail">Failed Count Assertion of $verifycountparms[1], got $count</span><br />\n|;
-                        $results_xml .= qq|            <$case_attribute-message>Failed Count Assertion of $verifycountparms[1], got $count</$case_attribute-message>\n|;
+                        $results_html .= qq|<span class="fail">Failed Count Assertion of $_verifycountparms[1], got $count</span><br />\n|;
+                        $results_xml .= qq|            <$case_attribute-message>Failed Count Assertion of $_verifycountparms[1], got $count</$case_attribute-message>\n|;
                     }
-                    $results_stdout .= "Failed Count Assertion of $verifycountparms[1], got $count \n";
-                    if ($verifycountparms[2]) {
-                        $results_stdout .= "$verifycountparms[2] \n";
+                    $results_stdout .= "Failed Count Assertion of $_verifycountparms[1], got $count \n";
+                    if ($_verifycountparms[2]) {
+                        $results_stdout .= "$_verifycountparms[2] \n";
                     }
                     $failedcount++;
                     $retryfailedcount++;
                     $isfailure++;
-                } ## end else verifycountparms[2]
-            } ## end else verifycountparms[3]
+                } ## end else _verifycountparms[2]
+            } ## end else _verifycountparms[3]
         } ## end if assertcount
     } ## end foreach
 
