@@ -461,11 +461,11 @@ sub output_assertions {
     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
     foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' || (substr $_case_attribute, 0, 14) eq 'verifynegative') {
-            my $verifytype = substr $_case_attribute, 6, 8; ## so we get the word positive or negative
-            $verifytype = ucfirst $verifytype; ## change to Positive or Negative
+            my $_verifytype = substr $_case_attribute, 6, 8; ## so we get the word positive or negative
+            $_verifytype = ucfirst $_verifytype; ## change to Positive or Negative
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; ## index 0 contains the actual string to verify
-            $results_html .= qq|Verify $verifytype: "$_verifyparms[0]" <br />\n|;
-            $results_stdout .= qq|Verify $verifytype: "$_verifyparms[0]" \n|;
+            $results_html .= qq|Verify $_verifytype: "$_verifyparms[0]" <br />\n|;
+            $results_stdout .= qq|Verify $_verifytype: "$_verifyparms[0]" \n|;
         }
     }
 
@@ -558,11 +558,11 @@ sub pass_fail_or_retry {
         $failedcount = $failedcount - $retryfailedcount;
     }
     elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
-        my $jumpbacksleft = $config{globaljumpbacks} - $jumpbacks;
-        $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $jumpbacksleft tries left</span></b><br />\n|;
-        $results_stdout .= qq|RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left\n|;
+        my $_jump_backs_left = $config{globaljumpbacks} - $jumpbacks;
+        $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $_jump_backs_left tries left</span></b><br />\n|;
+        $results_stdout .= qq|RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left\n|;
         $results_xml .= qq|            <success>false</success>\n|;
-        $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $jumpbacksleft tries left</result-message>\n|;
+        $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left</result-message>\n|;
         $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
         $jumpbacksprint = "-$jumpbacks";
         $globalretries++;
@@ -571,15 +571,15 @@ sub pass_fail_or_retry {
 
         ## find the index for the test step we are retrying from
         $stepindex = 0;
-        my $foundindex = 'false';
+        my $_found_index = 'false';
         foreach (@teststeps) {
             if ($teststeps[$stepindex] eq $case{retryfromstep}) {
-                $foundindex = 'true';
+                $_found_index = 'true';
                 last;
             }
             $stepindex++
         }
-        if ($foundindex eq 'false') {
+        if ($_found_index eq 'false') {
             $results_stdout .= qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
         }
         else
@@ -907,10 +907,10 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
     if ($report_type && $report_type ne 'standard') {  #return value is set which corresponds to a monitoring program
 
         #Nagios plugin compatibility
-        my %exit_codes;
+        my %_exit_codes;
         if ($report_type eq 'nagios') { #report results in Nagios format 
             #predefined exit codes for Nagios
-            %exit_codes  = ('UNKNOWN' ,-1,
+            %_exit_codes  = ('UNKNOWN' ,-1,
                             'OK'      , 0,
                             'WARNING' , 1,
                             'CRITICAL', 2,);
@@ -919,15 +919,15 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
 
             if ($casefailedcount > 0) {
 	        print "WebInject CRITICAL - $return_message |time=$totalresponse;$_end\n";
-                exit $exit_codes{'CRITICAL'};
+                exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($userconfig->{globaltimeout}) && ($totalresponse > $userconfig->{globaltimeout}) ) {
                 print "WebInject WARNING - All tests passed successfully but global timeout ($userconfig->{globaltimeout} seconds) has been reached |time=$totalresponse;$_end\n";
-                exit $exit_codes{'WARNING'};
+                exit $_exit_codes{'WARNING'};
             }
             else {
                 print "WebInject OK - All tests passed successfully in $totalresponse seconds |time=$totalresponse;$_end\n";
-                exit $exit_codes{'OK'};
+                exit $_exit_codes{'OK'};
             }
         }
 
@@ -965,7 +965,7 @@ sub selenium {  ## send Selenium command and read response
 
     $starttimer = time;
 
-    my $combined_response = q{};
+    my $_combined_response = q{};
     $request = HTTP::Request->new('GET','WebDriver');
 
     ## commands must be run in this order
@@ -988,10 +988,10 @@ sub selenium {  ## send Selenium command and read response
                 $results_stdout .= "SELRESP:<undefined>\n";
                 $selresp = 'selresp:<undefined>';
             }
-            $combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
+            $_combined_response =~ s{$}{<$_>$command</$_>\n$selresp\n\n\n}; ## include it in the response
         }
     }
-    $selresp = $combined_response;
+    $selresp = $_combined_response;
 
     if ($selresp =~ /^ERROR/) { ## Selenium returned an error
        $selresp =~ s{^}{HTTP/1.1 500 Selenium returned an error\n\n}; ## pretend this is an HTTP response - 100 means continue
@@ -2033,7 +2033,7 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
 #------------------------------------------------------------------
 sub cmd {  ## send terminal command and read response
 
-    my $combined_response=q{};
+    my $_combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
     $starttimer = time;
 
@@ -2044,11 +2044,11 @@ sub cmd {  ## send terminal command and read response
             _shell_adjust(\$_cmd);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
             my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combined_response =~ s{$}{<$_> $_cmd </$_>\n$_cmdresp\n\n\n}; ## include it in the response
+            $_combined_response =~ s{$}{<$_> $_cmd </$_>\n$_cmdresp\n\n\n}; ## include it in the response
         }
     }
-    $combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
-    $response = HTTP::Response->parse($combined_response); ## pretend the response is a http response - inject it into the object
+    $_combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
+    $response = HTTP::Response->parse($_combined_response); ## pretend the response is a http response - inject it into the object
     $endtimer = time;
     $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
 
@@ -2078,7 +2078,7 @@ sub _shell_adjust {
 sub commandonerror {  ## command only gets run on error - it does not count as part of the test
                       ## intended for scenarios when you want to give something a kick - e.g. recycle app pool
 
-    my $combined_response = $response->as_string; ## take the existing test response
+    my $_combined_response = $response->as_string; ## take the existing test response
 
     for (qw/commandonerror/) {
         if ($case{$_}) {## perform command
@@ -2087,10 +2087,10 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
             $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
             _shell_adjust(\$_cmd);
             my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; ## include it in the response
+            $_combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; ## include it in the response
         }
     }
-    $response = HTTP::Response->parse($combined_response); ## put the test response along with the command on error response back in the response
+    $response = HTTP::Response->parse($_combined_response); ## put the test response along with the command on error response back in the response
 
     return;
 }
