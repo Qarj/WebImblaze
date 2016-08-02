@@ -115,15 +115,15 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 my $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
 ## Startup
-getoptions();  #get command line options
-processcasefile();
-writeinitialstdout();  #write opening tags for STDOUT.
+get_options();  #get command line options
+process_case_file();
+write_initial_stdout();  #write opening tags for STDOUT.
 
 _whack($opt_publish_full.'http.txt');
 _whack($opt_publish_full.'results.html');
 
 write_initial_xml();
-writeinitialhtml();  #write opening tags for results file
+write_initial_html();  #write opening tags for results file
 
 $total_run_count = 0;
 $case_passed_count = 0;
@@ -144,7 +144,7 @@ $current_case_filename = basename($current_case_file); ## with extension
 $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
-#startsession(); #starts, or restarts the webinject session
+#start_session(); #starts, or restarts the webinject session
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
@@ -154,7 +154,7 @@ if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case f
 
 $_counter = $start - 1; #so starting position and counter are aligned
 
-if ($opt_driver) { startseleniumbrowser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
+if ($opt_driver) { start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
 $results_stdout .= "-------------------------------------------------------\n";
 
@@ -257,7 +257,7 @@ $end_run_timer = time;
 $total_run_time = (int(1000 * ($end_run_timer - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
 $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
 
-finaltasks();  #do return/cleanup tasks
+final_tasks();  #do return/cleanup tasks
 
 ## shut down the Selenium server last - it is less important than closing the files
 shutdown_selenium();
@@ -371,7 +371,7 @@ sub substitute_variables {
         #print "DEBUG: $_case_attribute", ": ", $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         #print "\n";
         $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
-        convertbackxml($case{$_case_attribute});
+        convert_back_xml($case{$_case_attribute});
         $case_save{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
     }
 
@@ -415,7 +415,7 @@ sub substitute_retry_variables {
         if (defined $case_save{$_case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
         {
             $case{$_case_attribute} = $case_save{$_case_attribute}; ## need to restore to the original partially substituted parameter
-            convertbackxmldynamic($case{$_case_attribute}); ## now update the dynamic components
+            convert_back_xml_dynamic($case{$_case_attribute}); ## now update the dynamic components
         }
     }
 
@@ -502,7 +502,7 @@ sub execute_test_step {
     }
 
     if (not $session_started) {
-        startsession();
+        start_session();
     }
 
     if ($case{method}) {
@@ -671,17 +671,17 @@ sub restart_browser {
 
     if ($case{restartbrowseronfail} && ($is_failure > 0)) { ## restart the Selenium browser session and also the WebInject session
         $results_stdout .= qq|RESTARTING SESSION DUE TO FAIL ... \n|;
-        if ($opt_driver) { startseleniumbrowser(); }
-        startsession();
+        if ($opt_driver) { start_selenium_browser(); }
+        start_session();
     }
 
     if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
         $results_stdout .= qq|RESTARTING BROWSER ... \n|;
         if ($opt_driver) {
                 $results_stdout .= "RESTARTING SESSION ...\n";
-                startseleniumbrowser();
+                start_selenium_browser();
             }
-        startsession();
+        start_session();
     }
 
     return;
@@ -714,7 +714,7 @@ sub sleep_before_next_step {
 }
 
 #------------------------------------------------------------------
-sub writeinitialhtml {  #write opening tags for results file
+sub write_initial_html {  #write opening tags for results file
 
     $results_html .= qq|<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"\n|;
     $results_html .= qq|    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">\n\n|;
@@ -809,7 +809,7 @@ sub _write_html {
 }
 
 #------------------------------------------------------------------
-sub writeinitialstdout {  #write initial text for STDOUT
+sub write_initial_stdout {  #write initial text for STDOUT
 
     $results_stdout .= "\n";
     $results_stdout .= "Starting WebInject Engine...\n\n";
@@ -818,7 +818,7 @@ sub writeinitialstdout {  #write initial text for STDOUT
 }
 
 #------------------------------------------------------------------
-sub writefinalhtml {  #write summary and closing tags for results file
+sub write_final_html {  #write summary and closing tags for results file
 
     $results_html .= qq|<br /><hr /><br />\n|;
     $results_html .= qq|<b>\n|;
@@ -848,7 +848,7 @@ sub writefinalhtml {  #write summary and closing tags for results file
 }
 
 #------------------------------------------------------------------
-sub writefinalxml {  #write summary and closing tags for XML results file
+sub write_final_xml {  #write summary and closing tags for XML results file
 
     if ($case{sanitycheck} && ($case_failed_count > 0)) { ## sanitycheck
         $sanity_result = 'false';
@@ -888,7 +888,7 @@ sub writefinalxml {  #write summary and closing tags for XML results file
 }
 
 #------------------------------------------------------------------
-sub writefinalstdout {  #write summary and closing text for STDOUT
+sub write_final_stdout {  #write summary and closing text for STDOUT
 
     $results_stdout .= qq|Start Time: $current_date_time\n|;
     $results_stdout .= qq|Total Run Time: $total_run_time seconds\n\n|;
@@ -1392,7 +1392,7 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
     if ($case{gethrefs}) {
         my $_match = 'href=';
         my $_delim = q{"}; #"
-        getassets ($_match,$_delim,$_delim,$case{gethrefs}, 'hrefs');
+        get_assets ($_match,$_delim,$_delim,$case{gethrefs}, 'hrefs');
     }
 
     return;
@@ -1404,7 +1404,7 @@ sub getsrcs { ## get page src assets matching a list of ending patterns, separat
     if ($case{getsrcs}) {
         my $_match = 'src=';
         my $_delim = q{"}; #"
-        getassets ($_match, $_delim, $_delim, $case{getsrcs}, 'srcs');
+        get_assets ($_match, $_delim, $_delim, $case{getsrcs}, 'srcs');
     }
 
     return;
@@ -1417,15 +1417,15 @@ sub getbackgroundimages { ## style="background-image: url( )"
         my $_match = 'style="background-image: url';
         my $_left_delim = '\(';
         my $_right_delim = '\)';
-        getassets ($_match,$_left_delim,$_right_delim,$case{getbackgroundimages}, 'bg-images');
+        get_assets ($_match,$_left_delim,$_right_delim,$case{getbackgroundimages}, 'bg-images');
     }
 
     return;
 }
 
 #------------------------------------------------------------------
-sub getassets { ## get page assets matching a list for a reference type
-                ## getassets ('href',q{"},q{"},'.less|.css')
+sub get_assets { ## get page assets matching a list for a reference type
+                ## get_assets ('href',q{"},q{"},'.less|.css')
 
     my ($_match, $_left_delim, $_right_delim, $assetlist, $_type) = @_;
 
@@ -1482,7 +1482,7 @@ sub getassets { ## get page assets matching a list for a reference type
 }
 
 #------------------------------------------------------------------
-sub savepage {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
+sub save_page {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
     my $_page_action;
     my $_page_index; ## where to save the page in the cache (array of pages)
@@ -1554,7 +1554,7 @@ sub _find_oldest_page_in_cache {
 }
 
 #------------------------------------------------------------------
-sub autosub {## auto substitution - {DATA} and {NAME}
+sub auto_sub {## auto substitution - {DATA} and {NAME}
 ## {DATA} finds .NET field value from a previous test case and puts it in the postbody - no need for manual parseresponse
 ## Example: postbody="txtUsername=testuser&txtPassword=123&__VIEWSTATE={DATA}"
 ##
@@ -1809,7 +1809,7 @@ sub httpget {  #send http request and read response
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
 
-    savepage (); ## save page in the cache for the auto substitutions
+    save_page (); ## save page in the cache for the auto substitutions
 
     return;
 }
@@ -1853,7 +1853,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
         httpsend_form_urlencoded($_verb);  #use "x-www-form-urlencoded" if no encoding is specified
     }
 
-    savepage (); ## for auto substitutions
+    save_page (); ## for auto substitutions
 
     return;
 }
@@ -1863,7 +1863,7 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     my ($_verb) = @_;
 
     my $_substituted_postbody; ## auto substitution
-    $_substituted_postbody = autosub("$case{postbody}", 'normalpost', "$case{url}");
+    $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}");
@@ -1994,7 +1994,7 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
     my ($_verb) = @_;
 
     my $_substituted_postbody; ## auto substitution
-    $_substituted_postbody = autosub("$case{postbody}", 'multipost', "$case{url}");
+    $_substituted_postbody = auto_sub("$case{postbody}", 'multipost', "$case{url}");
 
     my %_my_content_;
     eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval)
@@ -2638,7 +2638,7 @@ sub slash_me {
 }
 
 #------------------------------------------------------------------
-sub processcasefile {  #get test case files to run (from command line or config file) and evaluate constants
+sub process_case_file {  #get test case files to run (from command line or config file) and evaluate constants
                        #parse config file and grab values it sets
 
     my $_config_file_path;
@@ -2858,7 +2858,7 @@ sub _include_file {
 
 #------------------------------------------------------------------
 ## no critic (RequireArgUnpacking)
-sub convertbackxml {  #converts replaced xml with substitutions
+sub convert_back_xml {  #converts replaced xml with substitutions
 
 
 ## length feature for returning the size of the response
@@ -3023,7 +3023,7 @@ sub _get_number_in_range {
 }
 
 #------------------------------------------------------------------
-sub convertbackxmldynamic {## some values need to be updated after each retry
+sub convert_back_xml_dynamic {## some values need to be updated after each retry
 
     my $_retries_sub = $retries-1;
 
@@ -3050,7 +3050,7 @@ sub convertbackxmldynamic {## some values need to be updated after each retry
 }
 
 #------------------------------------------------------------------
-sub convertback_var_variables { ## e.g. postbody="time={RUNSTART}"
+sub convert_back_var_variables { ## e.g. postbody="time={RUNSTART}"
     foreach my $_case_attribute ( sort keys %{varvar} ) {
        my $_sub_var = substr $_case_attribute, 3;
        $_[0] =~ s/{$_sub_var}/$varvar{$_case_attribute}/g;
@@ -3075,7 +3075,7 @@ sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 sub substitute_var_variables {
 
     foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) { ## then substitute them in
-        convertback_var_variables($case{$_case_attribute});
+        convert_back_var_variables($case{$_case_attribute});
     }
 
     return;
@@ -3496,24 +3496,24 @@ sub _delayed_write_step_html {
 }
 
 #------------------------------------------------------------------
-sub finaltasks {  #do ending tasks
+sub final_tasks {  #do ending tasks
 
     # write out the html for the final test step, there is no new content to put in the buffer
     _delayed_write_step_html(undef, undef);
 
     $total_response = sprintf '%.3f', $total_response;
 
-    writefinalhtml();  #write summary and closing tags for results file
+    write_final_html();  #write summary and closing tags for results file
 
-    writefinalxml();  #write summary and closing tags for XML results file
+    write_final_xml();  #write summary and closing tags for XML results file
 
-    writefinalstdout();  #write summary and closing tags for STDOUT
+    write_final_stdout();  #write summary and closing tags for STDOUT
 
     return;
 }
 
 #------------------------------------------------------------------
-sub startseleniumbrowser {     ## start Browser using Selenium Server or ChromeDriver
+sub start_selenium_browser {     ## start Browser using Selenium Server or ChromeDriver
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
 
@@ -3669,7 +3669,7 @@ sub shutdown_selenium {
     return;
 }
 #------------------------------------------------------------------
-sub startsession {     ## creates the webinject user agent
+sub start_session {     ## creates the webinject user agent
 
     require IO::Socket::SSL;
     require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
@@ -3723,7 +3723,7 @@ sub startsession {     ## creates the webinject user agent
 }
 
 #------------------------------------------------------------------
-sub getoptions {  #shell options
+sub get_options {  #shell options
 
     Getopt::Long::Configure('bundling');
     GetOptions(
