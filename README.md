@@ -23,9 +23,8 @@ That's it! You are now ready to run WebInject for the first time.
 
 1. Clone WebInject with git
     ```
-    cd ~
-    mkdir git
-    cd git
+    mkdir ~/git
+    cd ~/git
     git clone https://github.com/Qarj/WebInject.git
     ```
 
@@ -40,19 +39,19 @@ That's it! You are now ready to run WebInject for the first time.
 
 3. Check that you can see the WebInject help info
     ```
-    ./webinject.pl --help
+    perl webinject.pl --help
     ```
 
 4. Optional - run the self test
     ```
-    ./webinject.pl selftest/all.xml
+    perl webinject.pl selftest/all.xml
     ```
 
 Tested with Fedora 23, 24 and Ubuntu 16.04
 
 ### Run the example WebInject test
 
-Note that these instructions are for Windows. If you are using Linux, then you already know what to do.
+Note that these instructions are written with Windows in mind. 
 
 1. Open the Command Prompt up as an Administrator
     * Press the Windows Key
