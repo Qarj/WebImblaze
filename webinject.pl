@@ -72,9 +72,9 @@ my ($outsum); ## outsum is a checksum calculated on the output directory name. U
 my ($userconfig); ## support arbirtary user defined config
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $totalassertionskips = 0;
-my (@pages); ## page source of previously visited pages
-my (@pagenames); ## page name of previously visited pages
-my (@pageupdatetimes); ## last time the page was updated in the cache
+my (@_pages); ## page source of previously visited pages
+my (@_pagenames); ## page name of previously visited pages
+my (@_pageupdatetimes); ## last time the page was updated in the cache
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
@@ -1067,10 +1067,10 @@ sub _screenshot {
         $results_stdout .= "ERROR:$@";
     } else {
         require MIME::Base64;
-        open my $FH, '>', slash_me($_abs_screenshot_full) or die "\nCould not open $_abs_screenshot_full for writing\n";
-        binmode $FH; ## set binary mode
-        print {$FH} MIME::Base64::decode_base64($png_base64);
-        close $FH or die "\nCould not close page capture file handle\n";
+        open my $_FH, '>', slash_me($_abs_screenshot_full) or die "\nCould not open $_abs_screenshot_full for writing\n";
+        binmode $_FH; ## set binary mode
+        print {$_FH} MIME::Base64::decode_base64($png_base64);
+        close $_FH or die "\nCould not close page capture file handle\n";
     }
 
     $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
@@ -1370,17 +1370,17 @@ sub _wait_for_item_not_present {
 #------------------------------------------------------------------
 sub addcookie { ## add a cookie like JBM_COOKIE=4830075
     if ($case{addcookie}) { ## inject in an additional cookie for this test step only if specified
-        my $cookies = $request->header('Cookie');
-        if (defined $cookies) {
-            #print "[COOKIE] $cookies\n";
-            $request->header('Cookie' => "$cookies; " . $case{addcookie});
+        my $_cookies = $request->header('Cookie');
+        if (defined $_cookies) {
+            #print "[COOKIE] $_cookies\n";
+            $request->header('Cookie' => "$_cookies; " . $case{addcookie});
             #print '[COOKIE UPDATED] ' . $request->header('Cookie') . "\n";
         } else {
             #print "[COOKIE] <UNDEFINED>\n";
             $request->header('Cookie' => $case{addcookie});
             #print "[COOKIE UPDATED] " . $request->header('Cookie') . "\n";
         }
-        undef $cookies;
+        undef $_cookies;
     }
 
     return;
@@ -1390,9 +1390,9 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
 sub gethrefs { ## get page href assets matching a list of ending patterns, separate multiple with |
                ## gethrefs=".less|.css"
     if ($case{gethrefs}) {
-        my $match = 'href=';
-        my $delim = q{"}; #"
-        getassets ($match,$delim,$delim,$case{gethrefs}, 'hrefs');
+        my $_match = 'href=';
+        my $_delim = q{"}; #"
+        getassets ($_match,$_delim,$_delim,$case{gethrefs}, 'hrefs');
     }
 
     return;
@@ -1402,9 +1402,9 @@ sub gethrefs { ## get page href assets matching a list of ending patterns, separ
 sub getsrcs { ## get page src assets matching a list of ending patterns, separate multiple with |
               ## getsrcs=".js|.png|.jpg|.gif"
     if ($case{getsrcs}) {
-        my $match = 'src=';
-        my $delim = q{"}; #"
-        getassets ($match, $delim, $delim, $case{getsrcs}, 'srcs');
+        my $_match = 'src=';
+        my $_delim = q{"}; #"
+        getassets ($_match, $_delim, $_delim, $case{getsrcs}, 'srcs');
     }
 
     return;
@@ -1414,10 +1414,10 @@ sub getsrcs { ## get page src assets matching a list of ending patterns, separat
 sub getbackgroundimages { ## style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
-        my $match = 'style="background-image: url';
-        my $leftdelim = '\(';
-        my $rightdelim = '\)';
-        getassets ($match,$leftdelim,$rightdelim,$case{getbackgroundimages}, 'bg-images');
+        my $_match = 'style="background-image: url';
+        my $_left_delim = '\(';
+        my $_right_delim = '\)';
+        getassets ($_match,$_left_delim,$_right_delim,$case{getbackgroundimages}, 'bg-images');
     }
 
     return;
@@ -1427,52 +1427,52 @@ sub getbackgroundimages { ## style="background-image: url( )"
 sub getassets { ## get page assets matching a list for a reference type
                 ## getassets ('href',q{"},q{"},'.less|.css')
 
-    my ($match, $leftdelim, $rightdelim, $assetlist, $_type) = @_;
+    my ($_match, $_left_delim, $_right_delim, $assetlist, $_type) = @_;
 
     require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
-    my ($startassetrequest, $endassetrequest, $assetlatency);
-    my ($assetref, $ururl, $asseturl, $path, $filename, $assetrequest, $assetresponse);
+    my ($_start_asset_request, $_end_asset_request, $_asset_latency);
+    my ($_asset_ref, $_ur_url, $_asset_url, $_path, $_filename, $_asset_request, $_asset_response);
 
-    my $page = $response->as_string;
+    my $_page = $response->as_string;
 
     my @extensions = split /[|]/, $assetlist ;
 
     foreach my $extension (@extensions) {
 
-        #while ($page =~ m{$assettype="([^"]*$extension)["\?]}g) ##" Iterate over all the matches to this extension
-        print "\n $match$leftdelim([^$rightdelim]*$extension)[$rightdelim\?] \n";
-        while ($page =~ m{$match$leftdelim([^$rightdelim]*$extension)[$rightdelim?]}g) ##" Iterate over all the matches to this extension
+        #while ($_page =~ m{$assettype="([^"]*$extension)["\?]}g) ##" Iterate over all the matches to this extension
+        print "\n $_match$_left_delim([^$_right_delim]*$extension)[$_right_delim\?] \n";
+        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$extension)[$_right_delim?]}g) ##" Iterate over all the matches to this extension
         {
-            $startassetrequest = time;
+            $_start_asset_request = time;
 
-            $assetref = $1;
-            #print "$extension: $assetref\n";
+            $_asset_ref = $1;
+            #print "$extension: $_asset_ref\n";
 
-            $ururl = URI::URL->new($assetref, $case{url}); ## join the current page url together with the href of the asset
-            $asseturl = $ururl->abs; ## determine the absolute address of the asset
-            #print "$asseturl\n\n";
-            $path = $asseturl->path; ## get the path portion of the asset location
-            $filename = basename($path); ## get the filename from the path
-            $results_stdout .= "  GET Asset [$filename] ...";
+            $_ur_url = URI::URL->new($_asset_ref, $case{url}); ## join the current page url together with the href of the asset
+            $_asset_url = $_ur_url->abs; ## determine the absolute address of the asset
+            #print "$_asset_url\n\n";
+            $_path = $_asset_url->path; ## get the path portion of the asset location
+            $_filename = basename($_path); ## get the filename from the path
+            $results_stdout .= "  GET Asset [$_filename] ...";
 
-            $assetrequest = HTTP::Request->new('GET',"$asseturl");
-            $cookie_jar->add_cookie_header($assetrequest); ## session cookies will be needed
+            $_asset_request = HTTP::Request->new('GET',"$_asset_url");
+            $cookie_jar->add_cookie_header($_asset_request); ## session cookies will be needed
 
-            $assetresponse = $useragent->request($assetrequest);
+            $_asset_response = $useragent->request($_asset_request);
 
-            open my $RESPONSEASFILE, '>', "$outputfolder/$filename" or die "\nCould not open asset file $outputfolder/$filename for writing\n"; #open in clobber mode
+            open my $RESPONSEASFILE, '>', "$outputfolder/$_filename" or die "\nCould not open asset file $outputfolder/$_filename for writing\n"; #open in clobber mode
             binmode $RESPONSEASFILE; ## set binary mode
-            print {$RESPONSEASFILE} $assetresponse->content, q{}; ## content just outputs the content, whereas as_string includes the response header
+            print {$RESPONSEASFILE} $_asset_response->content, q{}; ## content just outputs the content, whereas as_string includes the response header
             close $RESPONSEASFILE or die "\nCould not close asset file\n";
 
-            if ($_type eq 'hrefs') { push @hrefs, $filename; }
-            if ($_type eq 'srcs') { push @srcs, $filename; }
-            if ($_type eq 'bg-images') { push @bg_images, $filename; }
+            if ($_type eq 'hrefs') { push @hrefs, $_filename; }
+            if ($_type eq 'srcs') { push @srcs, $_filename; }
+            if ($_type eq 'bg-images') { push @bg_images, $_filename; }
 
-            $endassetrequest = time;
-            $assetlatency = (int(1000 * ($endassetrequest - $startassetrequest)) / 1000);  ## elapsed time rounded to thousandths
-            $results_stdout .= " $assetlatency s\n";
+            $_end_asset_request = time;
+            $_asset_latency = (int(1000 * ($_end_asset_request - $_start_asset_request)) / 1000);  ## elapsed time rounded to thousandths
+            $results_stdout .= " $_asset_latency s\n";
 
         } ## end while
 
@@ -1484,53 +1484,53 @@ sub getassets { ## get page assets matching a list for a reference type
 #------------------------------------------------------------------
 sub savepage {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
-    my $page_action;
-    my $page_index; ## where to save the page in the cache (array of pages)
+    my $_page_action;
+    my $_page_index; ## where to save the page in the cache (array of pages)
 
     ## decide if we want to save this page - needs a method post action
     if ( ($response->as_string =~ m{method="post" action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)" method="post"}s) ) { ## look for the method post action
-        $page_action = $1;
-        #$results_stdout .= qq|\n ACTION $page_action\n|;
+        $_page_action = $1;
+        #$results_stdout .= qq|\n ACTION $_page_action\n|;
     } else {
         #$results_stdout .= qq|\n ACTION none\n\n|;
     }
 
-    if (defined $page_action) { ## ok, so we save this page
+    if (defined $_page_action) { ## ok, so we save this page
 
-        #$results_stdout .= qq| SAVING $page_action (BEFORE)\n|;
-        $page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-        $page_action =~ s{http.?://}{}si; ## remove http:// and https://
-        #$results_stdout .= qq| SAVING $page_action (AFTER)\n\n|;
+        #$results_stdout .= qq| SAVING $_page_action (BEFORE)\n|;
+        $_page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+        $_page_action =~ s{http.?://}{}si; ## remove http:// and https://
+        #$results_stdout .= qq| SAVING $_page_action (AFTER)\n\n|;
 
         ## we want to overwrite any page with the same name in the cache to prevent weird errors
-        my $match_url = $page_action;
-        $match_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+        my $_match_url = $_page_action;
+        $_match_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
 
         ## check to see if we already have this page in the cache, if so, just overwrite it
-        $page_index = _find_page_in_cache($match_url);
+        $_page_index = _find_page_in_cache($_match_url);
 
         my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
         ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
-        if (not defined $page_index) { ## the page is not in the cache
-            if ($#pagenames == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
-                $page_index = _find_oldest_page_in_cache();
-                #$results_stdout .= qq|\n Overwriting - Oldest Page Index: $page_index\n\n|; #debug
+        if (not defined $_page_index) { ## the page is not in the cache
+            if ($#_pagenames == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
+                $_page_index = _find_oldest_page_in_cache();
+                #$results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index\n\n|; #debug
             } else {
-                $page_index = $#pagenames + 1;
-                #out $results_stdout .= qq| Index $page_index available \n\n|;
+                $_page_index = $#_pagenames + 1;
+                #out $results_stdout .= qq| Index $_page_index available \n\n|;
             }
         }
 
         ## update the global variables
-        $pageupdatetimes[$page_index] = time; ## save time so we overwrite oldest when cache is full
-        $pagenames[$page_index] = $page_action; ## save page name
-        $pages[$page_index] = $response->as_string; ## save page source
+        $_pageupdatetimes[$_page_index] = time; ## save time so we overwrite oldest when cache is full
+        $_pagenames[$_page_index] = $_page_action; ## save page name
+        $_pages[$_page_index] = $response->as_string; ## save page source
 
-        #$results_stdout .= " Saved $pageupdatetimes[$page_index]:$pagenames[$page_index] \n\n";
+        #$results_stdout .= " Saved $_pageupdatetimes[$_page_index]:$_pagenames[$_page_index] \n\n";
 
         ## debug - write out the contents of the cache
-        #for my $i (0 .. $#pagenames) {
-        #    $results_stdout .= " $i:$pageupdatetimes[$i]:$pagenames[$i] \n"; #debug
+        #for my $i (0 .. $#_pagenames) {
+        #    $results_stdout .= " $i:$_pageupdatetimes[$i]:$_pagenames[$i] \n"; #debug
         #}
         #$results_stdout .= "\n";
 
@@ -1543,11 +1543,11 @@ sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
     my $oldest_index = 0;
-    my $oldest_page_time = $pageupdatetimes[0];
+    my $oldest_page_time = $_pageupdatetimes[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#pageupdatetimes) {
-        if ($pageupdatetimes[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $pageupdatetimes[$i]; }
+    for my $i (0 .. $#_pageupdatetimes) {
+        if ($_pageupdatetimes[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $_pageupdatetimes[$i]; }
     }
 
     return $oldest_index;
@@ -1590,23 +1590,23 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     $posturl =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
     $results_stdout .= qq| POSTURL $posturl \n|; #debug
 
-    my $pageid = _find_page_in_cache($posturl.q{$});
-    if (not defined $pageid) {
+    my $_pageid = _find_page_in_cache($posturl.q{$});
+    if (not defined $_pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
         #$results_stdout .= " TRY WITH PAGE NAME ONLY    : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
-    if (not defined $pageid) {
+    if (not defined $_pageid) {
         $posturl =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
         #$results_stdout .= " REMOVE PATH                : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
-    if (not defined $pageid) {
+    if (not defined $_pageid) {
         $posturl =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
         #$results_stdout .= " REMOVE LEADING /           : $posturl".'$'."\n";
-        $pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
+        $_pageid = _find_page_in_cache($posturl.q{$}); ## try again without the full path
     }
-    if (not defined $pageid) {
+    if (not defined $_pageid) {
         #$results_stdout .= " DESPERATE MODE - NO ANCHOR : $posturl\n";
         _find_page_in_cache($posturl);
     }
@@ -1615,14 +1615,14 @@ sub autosub {## auto substitution - {DATA} and {NAME}
     #my $startlooptimer = time;
 
     ## time for substitutions
-    if (defined $pageid) { ## did we find match?
-        #$results_stdout .= " ID MATCH $pageid \n";
+    if (defined $_pageid) { ## did we find match?
+        #$results_stdout .= " ID MATCH $_pageid \n";
         for my $i (0 .. $#postfields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
-            $postfields[$i] = _substitute_name($postfields[$i], $pageid, $posttype);
+            $postfields[$i] = _substitute_name($postfields[$i], $_pageid, $posttype);
 
             ## substitute {DATA} for actual
-            $postfields[$i] = _substitute_data($postfields[$i], $pageid, $posttype);
+            $postfields[$i] = _substitute_data($postfields[$i], $_pageid, $posttype);
         }
     }
 
@@ -1645,7 +1645,7 @@ sub autosub {## auto substitution - {DATA} and {NAME}
 }
 
 sub _substitute_name {
-    my ($post_field, $page_id, $post_type) = @_;
+    my ($post_field, $_page_id, $post_type) = @_;
 
     my $dotx;
     my $doty;
@@ -1683,7 +1683,7 @@ sub _substitute_name {
         ## saved page source will contain something like
         ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-        if ($pages[$page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
+        if ($_pages[$_page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
             my $name = $1;
             #out $results_stdout .= qq| NAME is $name \n|;
 
@@ -1717,7 +1717,7 @@ sub _substitute_name {
 }
 
 sub _substitute_data {
-    my ($post_field, $page_id, $post_type) = @_;
+    my ($post_field, $_page_id, $post_type) = @_;
 
     my $target_field;
 
@@ -1739,7 +1739,7 @@ sub _substitute_data {
     if (defined $target_field) {
         $target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
         $target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
-        if ($pages[$page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
+        if ($_pages[$_page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
             my $data = $1;
             #$results_stdout .= qq| DATA is $data \n|; #debug
 
@@ -1765,13 +1765,13 @@ sub _find_page_in_cache {
     my ($post_url) = @_;
 
     ## see if we have stored this page
-    if ($pagenames[0]) { ## does the array contain at least one entry?
-        for my $i (0 .. $#pagenames) {
-            if ($pagenames[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
+    if ($_pagenames[0]) { ## does the array contain at least one entry?
+        for my $i (0 .. $#_pagenames) {
+            if ($_pagenames[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
             #$results_stdout .= qq| MATCH at position $i\n|; #debug
             return $i;
             } else {
-                #$results_stdout .= qq| NO MATCH on $i:$pagenames[$i]\n|; #debug
+                #$results_stdout .= qq| NO MATCH on $i:$_pagenames[$i]\n|; #debug
             }
         }
     } else {
