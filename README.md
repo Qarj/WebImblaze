@@ -43,7 +43,12 @@ That's it! You are now ready to run WebInject for the first time.
     ./webinject.pl --help
     ```
 
-Tested with Fedora 23.
+4. Optional - run the self test
+    ```
+    ./webinject.pl selftest/all.xml
+    ```
+
+Tested with Fedora 23, 24 and Ubuntu 16.04
 
 ### Run the example WebInject test
 
