@@ -47,36 +47,36 @@ my ($timestamp, $testfilename);
 my (%parsedresult);
 my (%varvar);
 my ($useragent, $request, $response);
-my ($latency, $verificationlatency, $screenshotlatency);
-my (%teststeptime); ## record in a hash the latency for every step for later use
-my ($cookie_jar, @httpauth);
-my ($runcount, $totalruncount, $casepassedcount, $casefailedcount, $passedcount, $failedcount);
-my ($totalresponse, $avgresponse, $maxresponse, $minresponse);
-my ($currentcasefile, $currentcasefilename, $casecount, $isfailure, $verifynegativefailed);
-my (%case, %casesave);
+my ($latency, $verification_latency, $screenshot_latency);
+my (%test_step_time); ## record in a hash the latency for every step for later use
+my ($cookie_jar, @http_auth);
+my ($run_count, $total_run_count, $case_passed_count, $case_failed_count, $passed_count, $failed_count);
+my ($total_response, $avg_response, $max_response, $min_response);
+my ($current_case_file, $current_case_filename, $case_count, $is_failure, $verifynegative_failed);
+my (%case, %case_save);
 my (%config);
-my ($currentdatetime, $totalruntime, $starttimer, $endtimer);
+my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
 my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_no_output, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my ($report_type); ## 'standard' and 'nagios' supported
 my ($return_message); ## error message to return to nagios
-my ($testnum, $xmltestcases, $stepindex, @teststeps);
+my ($testnum, $xml_test_cases, $step_index, @test_steps);
 my ($testnum_display, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
-my ($retry, $retries, $globalretries, $retrypassedcount, $retryfailedcount, $retriesprint, $jumpbacks, $jumpbacksprint); ## retry failed tests
-my ($forcedretry); ## force retry when specific http error code received
-my ($sanityresult); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
-my ($starttime); ## to store a copy of $startruntimer in a global variable
-my ($output, $outputfolder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
+my ($retry, $retries, $globalretries, $retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks, $jumpbacks_print); ## retry failed tests
+my ($forced_retry); ## force retry when specific http error code received
+my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
+my ($start_time); ## to store a copy of $start_run_timer in a global variable
+my ($output, $output_folder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
-my ($userconfig); ## support arbirtary user defined config
+my ($user_config); ## support arbirtary user defined config
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
-my $totalassertionskips = 0;
+my $total_assertion_skips = 0;
 my (@visited_pages); ## page source of previously visited pages
 my (@visited_page_names); ## page name of previously visited pages
 my (@_page_update_times); ## last time the page was updated in the cache
-my $assertionskips = 0;
-my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
+my $assertion_skips = 0;
+my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my $session_started; ## only start up http sesion if http is being used
 my ($selresp, $driver); ## support for Selenium WebDriver test cases
@@ -96,7 +96,7 @@ $MINUTE = sprintf '%02d', $MINUTE; #put in up to 2 leading zeros
 $SECOND = sprintf '%02d', $SECOND;
 $HOUR = sprintf '%02d', $HOUR;
 my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
-$currentdatetime = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
+$current_date_time = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
 my $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
@@ -107,7 +107,7 @@ my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
 
 my ( $results_stdout, $results_html, $results_xml, $results_xml_file_name );
-my ($startruntimer, $endruntimer, $repeat, $start);
+my ($start_run_timer, $end_run_timer, $repeat, $start);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -125,31 +125,31 @@ _whack($opt_publish_full.'results.html');
 write_initial_xml();
 writeinitialhtml();  #write opening tags for results file
 
-$totalruncount = 0;
-$casepassedcount = 0;
-$casefailedcount = 0;
-$passedcount = 0;
-$failedcount = 0;
-$totalresponse = 0;
-$avgresponse = 0;
-$maxresponse = 0;
-$minresponse = 10_000_000; #set to large value so first minresponse will be less
+$total_run_count = 0;
+$case_passed_count = 0;
+$case_failed_count = 0;
+$passed_count = 0;
+$failed_count = 0;
+$total_response = 0;
+$avg_response = 0;
+$max_response = 0;
+$min_response = 10_000_000; #set to large value so first minresponse will be less
 
 $globalretries=0; ## total number of retries for this run across all test cases
 
-$startruntimer = time;  #timer for entire test run
-$starttime = $startruntimer; ## need a global variable to make a copy of the start run timer
+$start_run_timer = time;  #timer for entire test run
+$start_time = $start_run_timer; ## need a global variable to make a copy of the start run timer
 
-$currentcasefilename = basename($currentcasefile); ## with extension
-$testfilename = fileparse($currentcasefile, '.xml'); ## without extension
+$current_case_filename = basename($current_case_file); ## with extension
+$testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
 #startsession(); #starts, or restarts the webinject session
 
-$repeat = $xmltestcases->{repeat};  #grab the number of times to iterate test case file
+$repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
 
-$start = $xmltestcases->{start};  #grab the start for repeating (for restart)
+$start = $xml_test_cases->{start};  #grab the start for repeating (for restart)
 if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
 $_counter = $start - 1; #so starting position and counter are aligned
@@ -162,25 +162,25 @@ $results_stdout .= "-------------------------------------------------------\n";
 foreach ($start .. $repeat) {
 
     $_counter = $_counter + 1;
-    $runcount = 0;
-    $jumpbacksprint = q{}; ## we do not indicate a jump back until we actually jump back
+    $run_count = 0;
+    $jumpbacks_print = q{}; ## we do not indicate a jump back until we actually jump back
     $jumpbacks = 0;
 
-    @teststeps = sort {$a<=>$b} keys %{$xmltestcases->{case}};
-    my $numsteps = scalar @teststeps;
+    @test_steps = sort {$a<=>$b} keys %{$xml_test_cases->{case}};
+    my $numsteps = scalar @test_steps;
 
-    ## Loop over each of the test cases (test steps) with C Style for loop (due to need to update $stepindex in a non standard fashion)
-    TESTCASE:   for ($stepindex = 0; $stepindex < $numsteps; $stepindex++) {  ## no critic(ProhibitCStyleForLoops)
+    ## Loop over each of the test cases (test steps) with C Style for loop (due to need to update $step_index in a non standard fashion)
+    TESTCASE:   for ($step_index = 0; $step_index < $numsteps; $step_index++) {  ## no critic(ProhibitCStyleForLoops)
 
-        $testnum = $teststeps[$stepindex];
+        $testnum = $test_steps[$step_index];
 
         $testnum_display = get_testnum_display($testnum, $_counter);
 
-        $isfailure = 0;
+        $is_failure = 0;
         $retries = 1; ## we increment retries after writing to the log
-        $retriesprint = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+        $retries_print = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
-        set_useragent($xmltestcases->{case}->{$testnum}->{useragent});
+        set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
 
         my $skip_message = get_test_step_skip_message();
         if ( $skip_message ) {
@@ -202,10 +202,10 @@ foreach ($start .. $repeat) {
 
             set_retry_to_zero_if_global_limit_exceeded();
 
-            $isfailure = 0;
-            $verifynegativefailed = 'false';
-            $retrypassedcount = 0;
-            $retryfailedcount = 0;
+            $is_failure = 0;
+            $verifynegative_failed = 'false';
+            $retry_passed_count = 0;
+            $retry_failed_count = 0;
 
             if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record, skip it (this is a hack for test case files with only one step)
                 next;
@@ -244,7 +244,7 @@ foreach ($start .. $repeat) {
         } ## end of retry loop
         until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
 
-        if ($case{sanitycheck} && ($casefailedcount > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
+        if ($case{sanitycheck} && ($case_failed_count > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
             $results_stdout .= qq|SANITY CHECK FAILED ... Aborting \n|;
             last;
         }
@@ -253,16 +253,16 @@ foreach ($start .. $repeat) {
     $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
 } ## end of repeat loop
 
-$endruntimer = time;
-$totalruntime = (int(1000 * ($endruntimer - $startruntimer)) / 1000);  #elapsed time rounded to thousandths
-$avgresponse = (int(1000 * ($totalresponse / $totalruncount)) / 1000);  #avg response rounded to thousandths
+$end_run_timer = time;
+$total_run_time = (int(1000 * ($end_run_timer - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
+$avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
 
 finaltasks();  #do return/cleanup tasks
 
 ## shut down the Selenium server last - it is less important than closing the files
 shutdown_selenium();
 
-my $status = $casefailedcount cmp 0;
+my $status = $case_failed_count cmp 0;
 exit $status;
 ## End main code
 
@@ -298,7 +298,7 @@ sub set_useragent {
 #------------------------------------------------------------------
 sub get_test_step_skip_message {
 
-    $case{runon} = $xmltestcases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
+    $case{runon} = $xml_test_cases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
     if ($case{runon}) { ## is this test step conditional on the target environment?
         if ( _run_this_step($case{runon}) ) {
             ## run this test case as normal since it is allowed
@@ -308,7 +308,7 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{donotrunon} = $xmltestcases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
+    $case{donotrunon} = $xml_test_cases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
     if ($case{donotrunon}) { ## is this test step conditional on the target environment?
         if ( not _run_this_step($case{donotrunon}) ) {
             ## run this test case as normal since it is allowed
@@ -318,7 +318,7 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{autocontrolleronly} = $xmltestcases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
+    $case{autocontrolleronly} = $xml_test_cases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
     if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
         if ($opt_autocontroller) { ## if so, was the auto controller option specified?
             ## run this test case as normal since it is allowed
@@ -328,7 +328,7 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{firstlooponly} = $xmltestcases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
+    $case{firstlooponly} = $xml_test_cases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
     if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
         if ($_counter == 1) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
@@ -338,7 +338,7 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{lastlooponly} = $xmltestcases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
+    $case{lastlooponly} = $xml_test_cases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
     if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
         if ($_counter == $repeat) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
@@ -365,14 +365,14 @@ sub substitute_variables {
 
     $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
 
-    undef %casesave; ## we need a clean array for each test case
+    undef %case_save; ## we need a clean array for each test case
     undef %case; ## do not allow values from previous test cases to bleed over
-    foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-        #print "DEBUG: $_case_attribute", ": ", $xmltestcases->{case}->{$testnum}->{$_case_attribute};
+    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+        #print "DEBUG: $_case_attribute", ": ", $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         #print "\n";
-        $case{$_case_attribute} = $xmltestcases->{case}->{$testnum}->{$_case_attribute};
+        $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         convertbackxml($case{$_case_attribute});
-        $casesave{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
+        $case_save{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
     }
 
     return;
@@ -381,13 +381,13 @@ sub substitute_variables {
 #------------------------------------------------------------------
 sub get_number_of_times_to_retry_this_test_step {
 
-    $case{retryfromstep} = $xmltestcases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
+    $case{retryfromstep} = $xml_test_cases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
     if ($case{retryfromstep}) { ## retryfromstep parameter found
         return 0; ## we will not do a regular retry
     }
 
     my $_retry;
-    $case{retry} = $xmltestcases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
+    $case{retry} = $xml_test_cases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
     if ($case{retry}) { ## retry parameter found
         $_retry = $case{retry}; ## assume we can retry as many times as specified
         if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
@@ -411,10 +411,10 @@ sub get_number_of_times_to_retry_this_test_step {
 #------------------------------------------------------------------
 sub substitute_retry_variables {
 
-    foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) {
-        if (defined $casesave{$_case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
+    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+        if (defined $case_save{$_case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
         {
-            $case{$_case_attribute} = $casesave{$_case_attribute}; ## need to restore to the original partially substituted parameter
+            $case{$_case_attribute} = $case_save{$_case_attribute}; ## need to restore to the original partially substituted parameter
             convertbackxmldynamic($case{$_case_attribute}); ## now update the dynamic components
         }
     }
@@ -437,9 +437,9 @@ sub set_retry_to_zero_if_global_limit_exceeded {
 #------------------------------------------------------------------
 sub output_test_step_description {
 
-    $results_html .= qq|<b>Test:  $currentcasefile - <a href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> $testnum_display$jumpbacksprint$retriesprint </a> </b><br />\n|;
-    $results_stdout .= qq|Test:  $currentcasefile - $testnum_display$jumpbacksprint$retriesprint \n|;
-    $results_xml .= qq|        <testcase id="$testnum_display$jumpbacksprint$retriesprint">\n|;
+    $results_html .= qq|<b>Test:  $current_case_file - <a href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
+    $results_stdout .= qq|Test:  $current_case_file - $testnum_display$jumpbacks_print$retries_print \n|;
+    $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
     for (qw/section description1 description2/) { ## support section breaks
         next unless defined $case{$_};
@@ -459,7 +459,7 @@ sub output_assertions {
     ## display and log the verifications to do to stdout and html - xml output is done with the verification itself
     ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' || (substr $_case_attribute, 0, 14) eq 'verifynegative') {
             my $_verifytype = substr $_case_attribute, 6, 8; ## so we get the word positive or negative
             $_verifytype = ucfirst $_verifytype; ## change to Positive or Negative
@@ -522,7 +522,7 @@ sub execute_test_step {
 sub pass_fail_or_retry {
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    if ( (($isfailure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($isfailure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegativefailed eq 'true')) {
+    if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegative_failed eq 'true')) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         ## however if a verifynegative fails then the case is always a failure
         $results_xml .= qq|            <success>false</success>\n|;
@@ -542,49 +542,49 @@ sub pass_fail_or_retry {
                 $return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
             }
         }
-        $casefailedcount++;
+        $case_failed_count++;
     }
-    elsif (($isfailure > 0) && ($retry > 0)) {#Output message if we will retry the test case
+    elsif (($is_failure > 0) && ($retry > 0)) {#Output message if we will retry the test case
         $results_html .= qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
         $results_stdout .= qq|RETRYING... $retry to go \n|;
         $results_xml .= qq|            <success>false</success>\n|;
         $results_xml .= qq|            <result-message>RETRYING... $retry to go</result-message>\n|;
 
         ## all this is for ensuring correct behaviour when retries occur
-        $retriesprint = ".$retries";
+        $retries_print = ".$retries";
         $retries++;
         $globalretries++;
-        $passedcount = $passedcount - $retrypassedcount;
-        $failedcount = $failedcount - $retryfailedcount;
+        $passed_count = $passed_count - $retry_passed_count;
+        $failed_count = $failed_count - $retry_failed_count;
     }
-    elsif (($isfailure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
+    elsif (($is_failure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
         my $_jump_backs_left = $config{globaljumpbacks} - $jumpbacks;
         $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $_jump_backs_left tries left</span></b><br />\n|;
         $results_stdout .= qq|RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left\n|;
         $results_xml .= qq|            <success>false</success>\n|;
         $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left</result-message>\n|;
         $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
-        $jumpbacksprint = "-$jumpbacks";
+        $jumpbacks_print = "-$jumpbacks";
         $globalretries++;
-        $passedcount = $passedcount - $retrypassedcount;
-        $failedcount = $failedcount - $retryfailedcount;
+        $passed_count = $passed_count - $retry_passed_count;
+        $failed_count = $failed_count - $retry_failed_count;
 
         ## find the index for the test step we are retrying from
-        $stepindex = 0;
+        $step_index = 0;
         my $_found_index = 'false';
-        foreach (@teststeps) {
-            if ($teststeps[$stepindex] eq $case{retryfromstep}) {
+        foreach (@test_steps) {
+            if ($test_steps[$step_index] eq $case{retryfromstep}) {
                 $_found_index = 'true';
                 last;
             }
-            $stepindex++
+            $step_index++
         }
         if ($_found_index eq 'false') {
             $results_stdout .= qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
         }
         else
         {
-            $stepindex--; ## since we increment it at the start of the next loop / end of this loop
+            $step_index--; ## since we increment it at the start of the next loop / end of this loop
         }
     }
     else {
@@ -592,7 +592,7 @@ sub pass_fail_or_retry {
         $results_stdout .= qq|TEST CASE PASSED \n|;
         $results_xml .= qq|            <success>true</success>\n|;
         $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
-        $casepassedcount++;
+        $case_passed_count++;
         $retry = 0; # no need to retry when test case passes
     }
 
@@ -607,14 +607,14 @@ sub output_test_step_latency {
     $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
 
     if ($case{method} eq 'selenium') {
-        $results_html .= qq|Verification Time = $verificationlatency sec <br />\n|;
-        $results_html .= qq|Screenshot Time = $screenshotlatency sec <br />\n|;
+        $results_html .= qq|Verification Time = $verification_latency sec <br />\n|;
+        $results_html .= qq|Screenshot Time = $screenshot_latency sec <br />\n|;
 
-        $results_stdout .= qq|Verification Time = $verificationlatency sec \n|;
-        $results_stdout .= qq|Screenshot Time = $screenshotlatency sec \n|;
+        $results_stdout .= qq|Verification Time = $verification_latency sec \n|;
+        $results_stdout .= qq|Screenshot Time = $screenshot_latency sec \n|;
 
-        $results_xml .= qq|            <verificationtime>$verificationlatency</verificationtime>\n|;
-        $results_xml .= qq|            <screenshottime>$screenshotlatency</screenshottime>\n|;
+        $results_xml .= qq|            <verificationtime>$verification_latency</verificationtime>\n|;
+        $results_xml .= qq|            <screenshottime>$screenshot_latency</screenshottime>\n|;
     }
 
     return;
@@ -641,14 +641,14 @@ sub output_test_step_results {
 #------------------------------------------------------------------
 sub increment_run_count {
 
-    if ( ( ($isfailure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
-         ( ($isfailure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($verifynegativefailed eq 'false') )
+    if ( ( ($is_failure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
+         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($verifynegative_failed eq 'false') )
        ) {
         ## do not count this in run count if we are retrying
     }
     else {
-        $runcount++;
-        $totalruncount++;
+        $run_count++;
+        $total_run_count++;
     }
 
     return;
@@ -657,11 +657,11 @@ sub increment_run_count {
 #------------------------------------------------------------------
 sub update_latency_statistics {
 
-    if ($latency > $maxresponse) { $maxresponse = $latency; }  #set max response time
-    if ($latency < $minresponse) { $minresponse = $latency; }  #set min response time
-    $totalresponse = ($totalresponse + $latency);  #keep total of response times for calculating avg
+    if ($latency > $max_response) { $max_response = $latency; }  #set max response time
+    if ($latency < $min_response) { $min_response = $latency; }  #set min response time
+    $total_response = ($total_response + $latency);  #keep total of response times for calculating avg
 
-    $teststeptime{$testnum_display}=$latency; ## store latency for step
+    $test_step_time{$testnum_display}=$latency; ## store latency for step
 
     return;
 }
@@ -669,7 +669,7 @@ sub update_latency_statistics {
 #------------------------------------------------------------------
 sub restart_browser {
 
-    if ($case{restartbrowseronfail} && ($isfailure > 0)) { ## restart the Selenium browser session and also the WebInject session
+    if ($case{restartbrowseronfail} && ($is_failure > 0)) { ## restart the Selenium browser session and also the WebInject session
         $results_stdout .= qq|RESTARTING SESSION DUE TO FAIL ... \n|;
         if ($opt_driver) { startseleniumbrowser(); }
         startsession();
@@ -690,7 +690,7 @@ sub restart_browser {
 #------------------------------------------------------------------
 sub sleep_before_next_step {
 
-    if ( (($isfailure < 1) && ($case{retry})) || (($isfailure < 1) && ($case{retryfromstep})) )
+    if ( (($is_failure < 1) && ($case{retry})) || (($is_failure < 1) && ($case{retryfromstep})) )
     {
         ## ignore the sleep if the test case worked and it is a retry test case
     }
@@ -698,7 +698,7 @@ sub sleep_before_next_step {
     {
         if ($case{sleep})
         {
-            if ( (($isfailure > 0) && ($retry < 1)) || (($isfailure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
+            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
             {
                 ## do not sleep if the test case failed and we have run out of retries or jumpbacks
             }
@@ -767,18 +767,18 @@ sub write_initial_xml {  #write opening tags for results file
     $_results_xml .= '<?xml-stylesheet type="text/xsl" href="../../../../../../../content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
-    if ( defined $userconfig->{wif}->{dd} && defined $userconfig->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
-        $results_xml_file_name = 'results_'.$userconfig->{wif}->{run_number}.'.xml';
+    if ( defined $user_config->{wif}->{dd} && defined $user_config->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
+        $results_xml_file_name = 'results_'.$user_config->{wif}->{run_number}.'.xml';
         $_results_xml .= "    <wif>\n";
-        $_results_xml .= "        <environment>$userconfig->{wif}->{environment}</environment>\n";
-        $_results_xml .= "        <yyyy>$userconfig->{wif}->{yyyy}</yyyy>\n";
-        $_results_xml .= "        <mm>$userconfig->{wif}->{mm}</mm>\n";
-        $_results_xml .= "        <dd>$userconfig->{wif}->{dd}</dd>\n";
-        $_results_xml .= "        <batch>$userconfig->{wif}->{batch}</batch>\n";
+        $_results_xml .= "        <environment>$user_config->{wif}->{environment}</environment>\n";
+        $_results_xml .= "        <yyyy>$user_config->{wif}->{yyyy}</yyyy>\n";
+        $_results_xml .= "        <mm>$user_config->{wif}->{mm}</mm>\n";
+        $_results_xml .= "        <dd>$user_config->{wif}->{dd}</dd>\n";
+        $_results_xml .= "        <batch>$user_config->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
 
-    $_results_xml .= qq|\n    <testcases file="$currentcasefile">\n\n|;
+    $_results_xml .= qq|\n    <testcases file="$current_case_file">\n\n|;
 
     _whack($opt_publish_full.$results_xml_file_name);
     _write_xml(\$_results_xml);
@@ -822,19 +822,19 @@ sub writefinalhtml {  #write summary and closing tags for results file
 
     $results_html .= qq|<br /><hr /><br />\n|;
     $results_html .= qq|<b>\n|;
-    $results_html .= qq|Start Time: $currentdatetime <br />\n|;
-    $results_html .= qq|Total Run Time: $totalruntime seconds <br />\n|;
-    $results_html .= qq|Total Response Time: $totalresponse seconds <br />\n|;
+    $results_html .= qq|Start Time: $current_date_time <br />\n|;
+    $results_html .= qq|Total Run Time: $total_run_time seconds <br />\n|;
+    $results_html .= qq|Total Response Time: $total_response seconds <br />\n|;
     $results_html .= qq|<br />\n|;
-    $results_html .= qq|Test Cases Run: $totalruncount <br />\n|;
-    $results_html .= qq|Test Cases Passed: $casepassedcount <br />\n|;
-    $results_html .= qq|Test Cases Failed: $casefailedcount <br />\n|;
-    $results_html .= qq|Verifications Passed: $passedcount <br />\n|;
-    $results_html .= qq|Verifications Failed: $failedcount <br />\n|;
+    $results_html .= qq|Test Cases Run: $total_run_count <br />\n|;
+    $results_html .= qq|Test Cases Passed: $case_passed_count <br />\n|;
+    $results_html .= qq|Test Cases Failed: $case_failed_count <br />\n|;
+    $results_html .= qq|Verifications Passed: $passed_count <br />\n|;
+    $results_html .= qq|Verifications Failed: $failed_count <br />\n|;
     $results_html .= qq|<br />\n|;
-    $results_html .= qq|Average Response Time: $avgresponse seconds <br />\n|;
-    $results_html .= qq|Max Response Time: $maxresponse seconds <br />\n|;
-    $results_html .= qq|Min Response Time: $minresponse seconds <br />\n|;
+    $results_html .= qq|Average Response Time: $avg_response seconds <br />\n|;
+    $results_html .= qq|Max Response Time: $max_response seconds <br />\n|;
+    $results_html .= qq|Min Response Time: $min_response seconds <br />\n|;
     $results_html .= qq|</b>\n|;
     $results_html .= qq|<br />\n\n|;
 
@@ -850,32 +850,32 @@ sub writefinalhtml {  #write summary and closing tags for results file
 #------------------------------------------------------------------
 sub writefinalxml {  #write summary and closing tags for XML results file
 
-    if ($case{sanitycheck} && ($casefailedcount > 0)) { ## sanitycheck
-        $sanityresult = 'false';
+    if ($case{sanitycheck} && ($case_failed_count > 0)) { ## sanitycheck
+        $sanity_result = 'false';
     }
     else {
-        $sanityresult = 'true';
+        $sanity_result = 'true';
     }
 
     $results_xml .= qq|    </testcases>\n\n|;
 
     $results_xml .= qq|    <test-summary>\n|;
-    $results_xml .= qq|        <start-time>$currentdatetime</start-time>\n|;
+    $results_xml .= qq|        <start-time>$current_date_time</start-time>\n|;
     $results_xml .= qq|        <start-seconds>$TIMESECONDS</start-seconds>\n|;
     $results_xml .= qq|        <start-date-time>$STARTDATE|;
     $results_xml .= qq|T$HOUR:$MINUTE:$SECOND</start-date-time>\n|;
-    $results_xml .= qq|        <total-run-time>$totalruntime</total-run-time>\n|;
-    $results_xml .= qq|        <total-response-time>$totalresponse</total-response-time>\n|;
-    $results_xml .= qq|        <test-cases-run>$totalruncount</test-cases-run>\n|;
-    $results_xml .= qq|        <test-cases-passed>$casepassedcount</test-cases-passed>\n|;
-    $results_xml .= qq|        <test-cases-failed>$casefailedcount</test-cases-failed>\n|;
-    $results_xml .= qq|        <verifications-passed>$passedcount</verifications-passed>\n|;
-    $results_xml .= qq|        <verifications-failed>$failedcount</verifications-failed>\n|;
-    $results_xml .= qq|        <assertion-skips>$totalassertionskips</assertion-skips>\n|;
-    $results_xml .= qq|        <average-response-time>$avgresponse</average-response-time>\n|;
-    $results_xml .= qq|        <max-response-time>$maxresponse</max-response-time>\n|;
-    $results_xml .= qq|        <min-response-time>$minresponse</min-response-time>\n|;
-    $results_xml .= qq|        <sanity-check-passed>$sanityresult</sanity-check-passed>\n|;
+    $results_xml .= qq|        <total-run-time>$total_run_time</total-run-time>\n|;
+    $results_xml .= qq|        <total-response-time>$total_response</total-response-time>\n|;
+    $results_xml .= qq|        <test-cases-run>$total_run_count</test-cases-run>\n|;
+    $results_xml .= qq|        <test-cases-passed>$case_passed_count</test-cases-passed>\n|;
+    $results_xml .= qq|        <test-cases-failed>$case_failed_count</test-cases-failed>\n|;
+    $results_xml .= qq|        <verifications-passed>$passed_count</verifications-passed>\n|;
+    $results_xml .= qq|        <verifications-failed>$failed_count</verifications-failed>\n|;
+    $results_xml .= qq|        <assertion-skips>$total_assertion_skips</assertion-skips>\n|;
+    $results_xml .= qq|        <average-response-time>$avg_response</average-response-time>\n|;
+    $results_xml .= qq|        <max-response-time>$max_response</max-response-time>\n|;
+    $results_xml .= qq|        <min-response-time>$min_response</min-response-time>\n|;
+    $results_xml .= qq|        <sanity-check-passed>$sanity_result</sanity-check-passed>\n|;
     $results_xml .= qq|        <test-file-name>$testfilename</test-file-name>\n|;
     $results_xml .= qq|    </test-summary>\n\n|;
 
@@ -890,15 +890,15 @@ sub writefinalxml {  #write summary and closing tags for XML results file
 #------------------------------------------------------------------
 sub writefinalstdout {  #write summary and closing text for STDOUT
 
-    $results_stdout .= qq|Start Time: $currentdatetime\n|;
-    $results_stdout .= qq|Total Run Time: $totalruntime seconds\n\n|;
-    $results_stdout .= qq|Total Response Time: $totalresponse seconds\n\n|;
+    $results_stdout .= qq|Start Time: $current_date_time\n|;
+    $results_stdout .= qq|Total Run Time: $total_run_time seconds\n\n|;
+    $results_stdout .= qq|Total Response Time: $total_response seconds\n\n|;
 
-    $results_stdout .= qq|Test Cases Run: $totalruncount\n|;
-    $results_stdout .= qq|Test Cases Passed: $casepassedcount\n|;
-    $results_stdout .= qq|Test Cases Failed: $casefailedcount\n|;
-    $results_stdout .= qq|Verifications Passed: $passedcount\n|;
-    $results_stdout .= qq|Verifications Failed: $failedcount\n\n|;
+    $results_stdout .= qq|Test Cases Run: $total_run_count\n|;
+    $results_stdout .= qq|Test Cases Passed: $case_passed_count\n|;
+    $results_stdout .= qq|Test Cases Failed: $case_failed_count\n|;
+    $results_stdout .= qq|Verifications Passed: $passed_count\n|;
+    $results_stdout .= qq|Verifications Failed: $failed_count\n\n|;
 
     if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
@@ -915,18 +915,18 @@ sub writefinalstdout {  #write summary and closing text for STDOUT
                             'WARNING' , 1,
                             'CRITICAL', 2,);
 
-	    my $_end = defined $userconfig->{globaltimeout} ? "$userconfig->{globaltimeout};;0" : ';;0';
+	    my $_end = defined $user_config->{globaltimeout} ? "$user_config->{globaltimeout};;0" : ';;0';
 
-            if ($casefailedcount > 0) {
-	        print "WebInject CRITICAL - $return_message |time=$totalresponse;$_end\n";
+            if ($case_failed_count > 0) {
+	        print "WebInject CRITICAL - $return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
-            elsif ( ($userconfig->{globaltimeout}) && ($totalresponse > $userconfig->{globaltimeout}) ) {
-                print "WebInject WARNING - All tests passed successfully but global timeout ($userconfig->{globaltimeout} seconds) has been reached |time=$totalresponse;$_end\n";
+            elsif ( ($user_config->{globaltimeout}) && ($total_response > $user_config->{globaltimeout}) ) {
+                print "WebInject WARNING - All tests passed successfully but global timeout ($user_config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
                 exit $_exit_codes{'WARNING'};
             }
             else {
-                print "WebInject OK - All tests passed successfully in $totalresponse seconds |time=$totalresponse;$_end\n";
+                print "WebInject OK - All tests passed successfully in $total_response seconds |time=$total_response;$_end\n";
                 exit $_exit_codes{'OK'};
             }
         }
@@ -946,8 +946,8 @@ sub _run_this_step {
 
     my @_run_on = split /[|]/, $_runon_parm; ## get the list of environments that this test step can be run on
     foreach (@_run_on) {
-        if (defined $userconfig->{wif}->{environment}) {
-            if ( $_ eq $userconfig->{wif}->{environment} ) {
+        if (defined $user_config->{wif}->{environment}) {
+            if ( $_ eq $user_config->{wif}->{environment} ) {
                 return 'true';
             }
         }
@@ -963,7 +963,7 @@ sub selenium {  ## send Selenium command and read response
     require Selenium::Chrome;
     require Data::Dumper;
 
-    $starttimer = time;
+    $start_timer = time;
 
     my $_combined_response = q{};
     $request = HTTP::Request->new('GET','WebDriver');
@@ -1001,8 +1001,8 @@ sub selenium {  ## send Selenium command and read response
     }
     #print $response->as_string; print "\n\n";
 
-    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+    $end_timer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
 
     _get_verifytext(); ## will be injected into $selresp
     $response = HTTP::Response->parse($selresp); ## pretend the response is an http response - inject it into the object
@@ -1013,7 +1013,7 @@ sub selenium {  ## send Selenium command and read response
 } ## end sub
 
 sub _get_verifytext {
-    $starttimer = time; ## measure latency for the verification
+    $start_timer = time; ## measure latency for the verification
     sleep 0.020; ## Sleep for 20 milliseconds
 
     ## multiple verifytexts are separated by commas
@@ -1047,16 +1047,16 @@ sub _get_verifytext {
         }
     }
 
-    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-    $verificationlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+    $end_timer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $verification_latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
 
     return;
 }
 
 sub _screenshot {
-    $starttimer = time; ## measure latency for the screenshot
+    $start_timer = time; ## measure latency for the screenshot
 
-    my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" );
+    my $_abs_screenshot_full = File::Spec->rel2abs( "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png" );
 
     ## do the screenshot, needs to be in eval in case modal popup is showing (screenshot not possible)
     eval { $png_base64 = $driver->screenshot(); };
@@ -1073,8 +1073,8 @@ sub _screenshot {
         close $_FH or die "\nCould not close page capture file handle\n";
     }
 
-    $endtimer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
-    $screenshotlatency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+    $end_timer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
+    $screenshot_latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
 
     return;
 }
@@ -1461,7 +1461,7 @@ sub getassets { ## get page assets matching a list for a reference type
 
             $_asset_response = $useragent->request($_asset_request);
 
-            open my $_RESPONSE_AS_FILE, '>', "$outputfolder/$_filename" or die "\nCould not open asset file $outputfolder/$_filename for writing\n"; #open in clobber mode
+            open my $_RESPONSE_AS_FILE, '>', "$output_folder/$_filename" or die "\nCould not open asset file $output_folder/$_filename for writing\n"; #open in clobber mode
             binmode $_RESPONSE_AS_FILE; ## set binary mode
             print {$_RESPONSE_AS_FILE} $_asset_response->content, q{}; ## content just outputs the content, whereas as_string includes the response header
             close $_RESPONSE_AS_FILE or die "\nCould not close asset file\n";
@@ -1800,10 +1800,10 @@ sub httpget {  #send http request and read response
     }
 
 
-    $starttimer = time;
+    $start_timer = time;
     $response = $useragent->request($request);
-    $endtimer = time;
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  #elapsed time rounded to thousandths
+    $end_timer = time;
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
     #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
@@ -1885,10 +1885,10 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     }
 
     #print $request->as_string; print "\n\n";
-    $starttimer = time;
+    $start_timer = time;
     $response = $useragent->request($request);
-    $endtimer = time;
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  #elapsed time rounded to thousandths
+    $end_timer = time;
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
     #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
@@ -1977,10 +1977,10 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
     }
 
     #print $request->as_string; print "\n\n";
-    $starttimer = time;
+    $start_timer = time;
     $response = $useragent->request($request);
-    $endtimer = time;
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  #elapsed time rounded to thousandths
+    $end_timer = time;
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
     #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
@@ -2018,10 +2018,10 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
         }
     }
 
-    $starttimer = time;
+    $start_timer = time;
     $response = $useragent->request($request);
-    $endtimer = time;
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  #elapsed time rounded to thousandths
+    $end_timer = time;
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
     #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
@@ -2035,7 +2035,7 @@ sub cmd {  ## send terminal command and read response
 
     my $_combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
-    $starttimer = time;
+    $start_timer = time;
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
         if ($case{$_}) {#perform command
@@ -2049,8 +2049,8 @@ sub cmd {  ## send terminal command and read response
     }
     $_combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse($_combined_response); ## pretend the response is a http response - inject it into the object
-    $endtimer = time;
-    $latency = (int(1000 * ($endtimer - $starttimer)) / 1000);  ## elapsed time rounded to thousandths
+    $end_timer = time;
+    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
 
     return;
 }
@@ -2105,11 +2105,11 @@ sub searchimage {  ## search for images in the actual result
         if ($case{$_}) {
             if (-e "$case{$_}") { ## imageinimage.py bigimage smallimage markimage
                 if ($_unmarked eq 'true') {
-                   copy "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png";
+                   copy "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png", "$opt_publish_full$testnum_display$jumpbacks_print$retries_print-marked.png";
                    $_unmarked = 'false';
                 }
 
-                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png "$case{$_}" $opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png`);
+                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnum_display$jumpbacks_print$retries_print.png "$case{$_}" $opt_publish_full$testnum_display$jumpbacks_print$retries_print-marked.png`);
 
                 $_image_in_image_result =~ m/primary confidence (\d+)/s;
                 my $_primary_confidence;
@@ -2130,33 +2130,33 @@ sub searchimage {  ## search for images in the actual result
                     $results_html .= qq|<span class="found">Found image: $case{$_}</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $_location location\n";
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 else { #the image was not found within the bigger image
                     $results_html .= qq|<span class="notfound">Image not found: $case{$_}</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
                     $results_stdout .= "Not found: $case{$_}\n   $_primary_confidence primary confidence\n   $_alternate_confidence alternate confidence\n   $_location location\n";
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                 }
                 $results_xml .= qq|            </$_>\n|;
             } else {#We were not able to find the image to search for
                 $results_html .= qq|<span class="notfound">SearchImage error - was the file path correct? $case{$_}</span><br />\n|;
                 $results_xml .= qq|                <success>false</success>\n|;
                 $results_stdout .= "SearchImage error - was the file path correct? $case{$_}\n";
-                $failedcount++;
-                $retryfailedcount++;
-                $isfailure++;
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
             }
         } ## end first if
     } ## end for
 
     if ($_unmarked eq 'false') {
        #keep an unmarked image, make the marked the actual result
-       move "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-unmarked.png";
-       move "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint-marked.png", "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png";
+       move "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png", "$opt_publish_full$testnum_display$jumpbacks_print$retries_print-unmarked.png";
+       move "$opt_publish_full$testnum_display$jumpbacks_print$retries_print-marked.png", "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png";
     }
 
     return;
@@ -2181,8 +2181,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
     searchimage(); ## search for images within actual screen or page grab
 
     ## reset the global variables
-    $assertionskips = 0;
-    $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
+    $assertion_skips = 0;
+    $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
 
     ## auto assertions
     if (!$case{ignoreautoassertions}) {
@@ -2211,28 +2211,28 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $results_html .= qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
                 $results_stdout .= "Passed Response Time Verification \n";
-                $passedcount++;
-                $retrypassedcount++;
+                $passed_count++;
+                $retry_passed_count++;
          }
          else {
                 $results_html .= qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
                 $results_xml .= qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
                 $results_stdout .= "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n";
-                $failedcount++;
-                $retryfailedcount++;
-                $isfailure++;
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
         }
      }
 
-    $forcedretry='false';
+    $forced_retry='false';
     if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
         if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
             $results_html .= qq|<span class="pass">Will retry on response code </span><br />\n|;
             $results_xml .= qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
             $results_xml .= qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
             $results_stdout .= qq|Found Retry HTTP Response Code \n|;
-            $forcedretry='true'; ## force a retry even though we received a potential error code
+            $forced_retry='true'; ## force a retry even though we received a potential error code
         }
     }
 
@@ -2242,8 +2242,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
             $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
             $results_stdout .= qq|Passed HTTP Response Code Verification \n|;
-            $passedcount++;
-            $retrypassedcount++;
+            $passed_count++;
+            $retry_passed_count++;
             $retry=0; ## we won't retry if the response code is invalid since it will probably never work
             }
         else {
@@ -2251,9 +2251,9 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
             $results_xml .=   '            <verifyresponsecode-message>Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
             $results_stdout .= 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|;
-            $failedcount++;
-            $retryfailedcount++;
-            $isfailure++;
+            $failed_count++;
+            $retry_failed_count++;
+            $is_failure++;
         }
     }
     else { #verify http response code is in the 100-399 range
@@ -2263,8 +2263,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
             $results_stdout .= qq|Passed HTTP Response Code Verification \n|;
             #succesful response codes: 100-399
-            $passedcount++;
-            $retrypassedcount++;
+            $passed_count++;
+            $retry_passed_count++;
         }
         else {
             $response->as_string() =~ /(HTTP\/1.)(.*)/i;
@@ -2280,23 +2280,23 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
                 $results_stdout .= "Failed - No Response \n"; #($1$2) is HTTP response code
             }
-            if ($forcedretry eq 'false') {
-                $failedcount++;
-                $retryfailedcount++;
-                $isfailure++;
+            if ($forced_retry eq 'false') {
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
                 if ($retry > 0) { $results_stdout .= "==> Won't retry - received HTTP error code\n"; }
                 $retry=0; # we won't try again if we can't connect
             }
         }
     }
 
-    if ($assertionskips > 0) {
-        $totalassertionskips = $totalassertionskips + $assertionskips;
+    if ($assertion_skips > 0) {
+        $total_assertion_skips = $total_assertion_skips + $assertion_skips;
         $results_xml .= qq|            <assertionskips>true</assertionskips>\n|;
-        $results_xml .= qq|            <assertionskips-message>$assertionskipsmessage</assertionskips-message>\n|;
+        $results_xml .= qq|            <assertionskips-message>$assertion_skips_message</assertionskips-message>\n|;
     }
 
-    if (($case{commandonerror}) && ($isfailure > 0)) { ## if the test case failed, check if we want to run a command to help sort out any problems
+    if (($case{commandonerror}) && ($is_failure > 0)) { ## if the test case failed, check if we want to run a command to help sort out any problems
         commandonerror();
     }
 
@@ -2305,17 +2305,17 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 
 sub _verify_autoassertion {
 
-    foreach my $_config_attribute ( sort keys %{ $userconfig->{autoassertions} } ) {
+    foreach my $_config_attribute ( sort keys %{ $user_config->{autoassertions} } ) {
         if ( (substr $_config_attribute, 0, 13) eq 'autoassertion' ) {
             my $_verify_number = $_config_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^autoassertion//g; ## remove autoassertion from string
             if (!$_verify_number) {$_verify_number = '0';} #In case of autoassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $userconfig->{autoassertions}{$_config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+            my @_verifyparms = split /[|][|][|]/, $user_config->{autoassertions}{$_config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Auto Assertion $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Auto Assertion $_verify_number - $_verifyparms[2] \n";
-                $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
+                $assertion_skips++;
+                $assertion_skips_message = $assertion_skips_message . '[' . $_verifyparms[2] . ']';
             }
             else {
                 my $_results_xml = qq|            <$_config_attribute>\n|;
@@ -2326,8 +2326,8 @@ sub _verify_autoassertion {
                     $_results_xml .= qq|                <success>true</success>\n|;
                     #$results_stdout .= "Passed Auto Assertion \n"; ## Do not print out all the auto assertion passes
                     #$results_stdout .= $_verify_number." Passed Auto Assertion \n"; ##DEBUG
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 else {
                     $results_html .= qq|<span class="fail">Failed Auto Assertion:</span>$_verifyparms[0]<br />\n|;
@@ -2340,9 +2340,9 @@ sub _verify_autoassertion {
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                 }
                 $_results_xml .= qq|            </$_config_attribute>\n|;
 
@@ -2359,17 +2359,17 @@ sub _verify_autoassertion {
 
 sub _verify_smartassertion {
 
-    foreach my $_config_attribute ( sort keys %{ $userconfig->{smartassertions} } ) {
+    foreach my $_config_attribute ( sort keys %{ $user_config->{smartassertions} } ) {
         if ( (substr $_config_attribute, 0, 14) eq 'smartassertion' ) {
             my $_verify_number = $_config_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^smartassertion//g; ## remove smartassertion from string
             if (!$_verify_number) {$_verify_number = '0';} #In case of smartassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $userconfig->{smartassertions}{$_config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+            my @_verifyparms = split /[|][|][|]/, $user_config->{smartassertions}{$_config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
             if ($_verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Smart Assertion $_verify_number - $_verifyparms[3]</span><br />\n|;
                 $results_stdout .= "Skipped Smart Assertion $_verify_number - $_verifyparms[2] \n";
-                $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
+                $assertion_skips++;
+                $assertion_skips_message = $assertion_skips_message . '[' . $_verifyparms[2] . ']';
                 return;
             }
 
@@ -2382,8 +2382,8 @@ sub _verify_smartassertion {
                     #$results_html .= qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $results_xml .= qq|                <success>true</success>\n|;
                     #$results_stdout .= "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 else {
                     $results_html .= qq|<span class="fail">Failed Smart Assertion:</span>$_verifyparms[0]<br />\n|;
@@ -2397,9 +2397,9 @@ sub _verify_smartassertion {
                        $results_stdout .= ": $_verifyparms[2]";
                     }
                     $results_stdout .= "\n";
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                 }
                 $results_xml .= qq|            </$_config_attribute>\n|;
             } ## end if - is pre-condition for smart assertion met?
@@ -2411,7 +2411,7 @@ sub _verify_smartassertion {
 
 sub _verify_verifypositive {
 
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^verifypositive//g; ## remove verifypositive from string
@@ -2420,8 +2420,8 @@ sub _verify_verifypositive {
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Positive Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Positive Verification $_verify_number - $_verifyparms[2] \n";
-                $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
+                $assertion_skips++;
+                $assertion_skips_message = $assertion_skips_message . '[' . $_verifyparms[2] . ']';
             }
             else {
                 $results_xml .= "            <$_case_attribute>\n";
@@ -2431,8 +2431,8 @@ sub _verify_verifypositive {
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Positive Verification \n";
                     #$results_stdout .= $_verify_number." Passed Positive Verification \n"; ##DEBUG
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 else {
                     $results_html .= qq|<span class="fail">Failed Positive Verification:</span>$_verifyparms[0]<br />\n|;
@@ -2445,9 +2445,9 @@ sub _verify_verifypositive {
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                 }
                 $results_xml .= qq|            </$_case_attribute>\n|;
             }
@@ -2459,7 +2459,7 @@ sub _verify_verifypositive {
 
 sub _verify_verifynegative {
 
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifynegative' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
@@ -2469,8 +2469,8 @@ sub _verify_verifynegative {
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Negative Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Negative Verification $_verify_number - $_verifyparms[2] \n";
-                $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verifyparms[2] . ']';
+                $assertion_skips++;
+                $assertion_skips_message = $assertion_skips_message . '[' . $_verifyparms[2] . ']';
             }
             else {
                 $results_xml .= "            <$_case_attribute>\n";
@@ -2486,19 +2486,19 @@ sub _verify_verifynegative {
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                     if ($retry > 0) { $results_stdout .= "==> Won't retry - a verifynegative failed \n"; }
                     $retry=0; ## we won't retry if any of the verifynegatives fail
-                    $verifynegativefailed = 'true';
+                    $verifynegative_failed = 'true';
                 }
                 else {
                     $results_html .= qq|<span class="pass">Passed Negative Verification</span><br />\n|;
                     $results_xml .= qq|            <success>true</success>\n|;
                     $results_stdout .= "Passed Negative Verification \n";
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 $results_xml .= qq|            </$_case_attribute>\n|;
             }
@@ -2510,7 +2510,7 @@ sub _verify_verifynegative {
 
 sub _verify_assertcount {
 
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
         if ( (substr $_case_attribute, 0, 11) eq 'assertcount' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
@@ -2525,16 +2525,16 @@ sub _verify_assertcount {
             if ($_verify_count_parms[3]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Assertion Count $_verify_number - $_verify_count_parms[3]</span><br />\n|;
                 $results_stdout .= "Skipped Assertion Count $_verify_number - $_verify_count_parms[2] \n";
-                $assertionskips++;
-                $assertionskipsmessage = $assertionskipsmessage . '[' . $_verify_count_parms[2] . ']';
+                $assertion_skips++;
+                $assertion_skips_message = $assertion_skips_message . '[' . $_verify_count_parms[2] . ']';
             }
             else {
                 if ($_count == $_verify_count_parms[1]) {
                     $results_html .= qq|<span class="pass">Passed Count Assertion of $_verify_count_parms[1]</span><br />\n|;
                     $results_xml .= qq|            <$_case_attribute-success>true</$_case_attribute-success>\n|;
                     $results_stdout .= "Passed Count Assertion of $_verify_count_parms[1] \n";
-                    $passedcount++;
-                    $retrypassedcount++;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 else {
                     $results_xml .= qq|            <$_case_attribute-success>false</$_case_attribute-success>\n|;
@@ -2551,9 +2551,9 @@ sub _verify_assertcount {
                     if ($_verify_count_parms[2]) {
                         $results_stdout .= "$_verify_count_parms[2] \n";
                     }
-                    $failedcount++;
-                    $retryfailedcount++;
-                    $isfailure++;
+                    $failed_count++;
+                    $retry_failed_count++;
+                    $is_failure++;
                 } ## end else _verifycountparms[2]
             } ## end else _verifycountparms[3]
         } ## end if assertcount
@@ -2567,7 +2567,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
     my ($_response_to_parse, @_parse_args);
     my ($_left_boundary, $_right_boundary, $_escape);
 
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
 
         if ( (substr $_case_attribute, 0, 13) eq 'parseresponse' ) {
 
@@ -2652,7 +2652,7 @@ sub processcasefile {  #get test case files to run (from command line or config 
     }
 
     if (-e "$_config_file_path") {  #if we have a config file, use it
-        $userconfig = XMLin("$_config_file_path"); ## Parse as XML for the user defined config
+        $user_config = XMLin("$_config_file_path"); ## Parse as XML for the user defined config
     } else {
         die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
@@ -2664,8 +2664,8 @@ sub processcasefile {  #get test case files to run (from command line or config 
     if (($#ARGV + 1) < 1) {  #no command line args were passed
         #if testcase filename is not passed on the command line, use files in config.xml
 
-        if ($userconfig->{testcasefile}) {
-            $currentcasefile = slash_me($userconfig->{testcasefile});
+        if ($user_config->{testcasefile}) {
+            $current_case_file = slash_me($user_config->{testcasefile});
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
         }
@@ -2674,26 +2674,26 @@ sub processcasefile {  #get test case files to run (from command line or config 
 
     elsif (($#ARGV + 1) == 1) {  #one command line arg was passed
         #use testcase filename passed on command line (config.xml is only used for other options)
-        $currentcasefile = slash_me($ARGV[0]);  #first commandline argument is the test case file
+        $current_case_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
     #grab values for constants in config file:
     for my $_config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
-        if ($userconfig->{$_config_const}) {
-            $config{$_config_const} = $userconfig->{$_config_const};
+        if ($user_config->{$_config_const}) {
+            $config{$_config_const} = $user_config->{$_config_const};
             #print "\n$_ : $config{$_} \n\n";
         }
     }
 
-    if ($userconfig->{httpauth}) {
-        if ( ref($userconfig->{httpauth}) eq 'ARRAY') {
+    if ($user_config->{httpauth}) {
+        if ( ref($user_config->{httpauth}) eq 'ARRAY') {
             #print "We have an array of httpauths\n";
-            for my $_auth ( @{ $userconfig->{httpauth} } ) { ## $userconfig->{httpauth} is an array
+            for my $_auth ( @{ $user_config->{httpauth} } ) { ## $user_config->{httpauth} is an array
                 _push_httpauth ($_auth);
             }
         } else {
             #print "Not an array - we just have one httpauth\n";
-            _push_httpauth ($userconfig->{httpauth});
+            _push_httpauth ($user_config->{httpauth});
         }
     }
 
@@ -2713,18 +2713,18 @@ sub processcasefile {  #get test case files to run (from command line or config 
     $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
 
-    if (defined $userconfig->{ports_variable}) {
-        if ($userconfig->{ports_variable} eq 'convert_back') {
+    if (defined $user_config->{ports_variable}) {
+        if ($user_config->{ports_variable} eq 'convert_back') {
             $convert_back_ports = 'true';
         }
 
-        if ($userconfig->{ports_variable} eq 'null') {
+        if ($user_config->{ports_variable} eq 'null') {
             $convert_back_ports_null = 'true';
         }
     }
 
-    if (defined $userconfig->{reporttype}) {
-        $report_type = lc $userconfig->{reporttype};
+    if (defined $user_config->{reporttype}) {
+        $report_type = lc $user_config->{reporttype};
         if ($report_type ne 'standard') {
             $opt_no_output = 'true'; ## no standard output for plugins like nagios
         }
@@ -2742,7 +2742,7 @@ sub _push_httpauth {
         print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
     }
     else {
-        push @httpauth, [@_auth_entry];
+        push @http_auth, [@_auth_entry];
     }
 
     return;
@@ -2762,7 +2762,7 @@ sub _sub_xml_special {
 #------------------------------------------------------------------
 sub read_test_case_file {
 
-    my $_xml = read_file($currentcasefile);
+    my $_xml = read_file($current_case_file);
 
     # substitute in the included test step files
     $_xml =~ s{<include[^>]*?
@@ -2778,12 +2778,12 @@ sub read_test_case_file {
     while ( $_xml =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
     #$_xml =~ s/\\</{LESSTHAN}/g;
 
-    $casecount = 0;
+    $case_count = 0;
     while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag
-        $casecount++;
+        $case_count++;
     }
 
-    if ($casecount == 1) {
+    if ($case_count == 1) {
         $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
 
@@ -2792,7 +2792,7 @@ sub read_test_case_file {
 
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
-    $xmltestcases = eval { XMLin($_xml, VarAttr => 'varname') };
+    $xml_test_cases = eval { XMLin($_xml, VarAttr => 'varname') };
 
     if ($@) {
         $_message = $@;
@@ -2878,14 +2878,14 @@ sub convertbackxml {  #converts replaced xml with substitutions
     $_[0] =~ s/{LESSTHAN}/</g;
     $_[0] =~ s/{SINGLEQUOTE}/'/g; #'
     $_[0] =~ s/{TIMESTAMP}/$timestamp/g;
-    $_[0] =~ s/{STARTTIME}/$starttime/g;
+    $_[0] =~ s/{STARTTIME}/$start_time/g;
     $_[0] =~ s/{OPT_PROXYRULES}/$opt_proxyrules/g;
     $_[0] =~ s/{OPT_PROXY}/$opt_proxy/g;
 
     $_[0] =~ m/{TESTSTEPTIME:(\d+)}/s;
     if ($1)
     {
-     $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$teststeptime{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
+     $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$test_step_time{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     }
 
     $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
@@ -2931,8 +2931,8 @@ sub convertbackxml {  #converts replaced xml with substitutions
 
 ## perform arbirtary user defined config substituions
     my ($_value, $_KEY);
-    foreach my $_key (keys %{ $userconfig->{userdefined} } ) {
-        $_value = $userconfig->{userdefined}{$_key};
+    foreach my $_key (keys %{ $user_config->{userdefined} } ) {
+        $_value = $user_config->{userdefined}{$_key};
         if (ref($_value) eq 'HASH') { ## if we found a HASH, we treat it as blank
             $_value = q{};
         }
@@ -3027,7 +3027,7 @@ sub convertbackxmldynamic {## some values need to be updated after each retry
 
     my $_retries_sub = $retries-1;
 
-    my $_elapsed_seconds_so_far = int(time() - $starttime) + 1; ## elapsed time rounded to seconds - increased to the next whole number
+    my $_elapsed_seconds_so_far = int(time() - $start_time) + 1; ## elapsed time rounded to seconds - increased to the next whole number
     my $_elapsed_minutes_so_far = int($_elapsed_seconds_so_far / 60) + 1; ## elapsed time rounded to seconds - increased to the next whole number
 
     $_[0] =~ s/{RETRY}/$_retries_sub/g;
@@ -3062,7 +3062,7 @@ sub convertback_var_variables { ## e.g. postbody="time={RUNSTART}"
 ## use critic
 #------------------------------------------------------------------
 sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
-    foreach my $_case_attribute ( sort keys %{ $xmltestcases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
        if ( (substr $_case_attribute, 0, 3) eq 'var' ) {
             $varvar{$_case_attribute} = $case{$_case_attribute}; ## assign the variable
         }
@@ -3074,7 +3074,7 @@ sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 #------------------------------------------------------------------
 sub substitute_var_variables {
 
-    foreach my $_case_attribute ( keys %{ $xmltestcases->{case}->{$testnum} } ) { ## then substitute them in
+    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) { ## then substitute them in
         convertback_var_variables($case{$_case_attribute});
     }
 
@@ -3102,7 +3102,7 @@ sub httplog {  # write requests and responses to http.txt file
         close $_RESPONSE_AS_FILE or die "\nCould not close file for response as file\n\n";
     }
 
-    my $_step_info = "Test Step: $testnum_display$jumpbacksprint$retriesprint - ";
+    my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
 
     ## log descrption1 and description2
     $_step_info .=  $case{description1};
@@ -3148,7 +3148,7 @@ sub httplog {  # write requests and responses to http.txt file
     _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
     _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base);
 
-    $previous_test_step = $testnum_display.$jumpbacksprint.$retriesprint;
+    $previous_test_step = $testnum_display.$jumpbacks_print.$retries_print;
 
     return;
 }
@@ -3183,9 +3183,9 @@ sub _write_step_html {
     my $_display_as_text = _should_display_as_text($_response_content_ref);
 
     my ($_wif_batch, $_wif_run_number);
-    if (defined $userconfig->{wif}->{batch} ) {
-        $_wif_batch = $userconfig->{wif}->{batch};
-        $_wif_run_number = $userconfig->{wif}->{run_number};
+    if (defined $user_config->{wif}->{batch} ) {
+        $_wif_batch = $user_config->{wif}->{batch};
+        $_wif_run_number = $user_config->{wif}->{run_number};
     } else {
         $_wif_batch = 'needs_webinject_framework';
         $_wif_run_number = 'needs_webinject_framework';
@@ -3195,7 +3195,7 @@ sub _write_step_html {
     _add_html_head(\$_html);
 
     $_html .= qq|        <div style="padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em !important; font:Verdana, sans-serif !important;">\n|;
-    $_html .= qq|            <h1 style="font-weight: normal; font-size:1.6em !important; font-family: Verdana, sans-serif; float: left; margin: 0; padding: 0; border: 0; color:#D1E6E7;">Step $testnum_display$jumpbacksprint$retriesprint</wi>\n|;
+    $_html .= qq|            <h1 style="font-weight: normal; font-size:1.6em !important; font-family: Verdana, sans-serif; float: left; margin: 0; padding: 0; border: 0; color:#D1E6E7;">Step $testnum_display$jumpbacks_print$retries_print</wi>\n|;
     $_html .= qq|            <h3 style="font-size: 1.0em !important; font-family: Verdana, sans-serif !important; margin-bottom: 0.3em; float: right; margin: 0; padding: 0; border: 0; line-height: 1.0em !important; color:#D1E6E7;">\n|;
     $_html .= qq|              $case{description1}\n|;
     $_html .= qq|            </h3>\n|;
@@ -3237,7 +3237,7 @@ sub _write_step_html {
 
     $_html .= "\n    </body>\n</html>\n";
 
-    my $_file_full = $opt_publish_full."$testnum_display$jumpbacksprint$retriesprint".'.html';
+    my $_file_full = $opt_publish_full."$testnum_display$jumpbacks_print$retries_print".'.html';
     _delayed_write_step_html($_file_full, $_html);
 
     return;
@@ -3315,8 +3315,8 @@ sub _add_selenium_screenshot {
     my ($_html) = @_;
 
     # if we have a Selenium WebDriver screenshot, link to it
-    if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.png" ) {
-        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacksprint$retriesprint" src="$output_prefix$testnum_display$jumpbacksprint$retriesprint.png"><br />|;
+    if (-e "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png" ) {
+        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacks_print$retries_print" src="$output_prefix$testnum_display$jumpbacks_print$retries_print.png"><br />|;
     }
 
     return;
@@ -3343,8 +3343,8 @@ sub _add_email_link {
     my ($_html) = @_;
 
     # if we have grabbed an email file, link to it
-    if (-e "$opt_publish_full$testnum_display$jumpbacksprint$retriesprint.eml" ) {
-        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
+    if (-e "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.eml" ) {
+        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
     return;
@@ -3354,9 +3354,9 @@ sub _add_email_link {
 sub _response_content_substitutions {
     my ($_response_content_ref) = @_;
 
-    foreach my $_sub ( keys %{ $userconfig->{content_subs} } ) {
-        #print "_sub:$_sub:$userconfig->{content_subs}{$_sub}\n";
-        my @_regex = split /[|][|][|]/, $userconfig->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+    foreach my $_sub ( keys %{ $user_config->{content_subs} } ) {
+        #print "_sub:$_sub:$user_config->{content_subs}{$_sub}\n";
+        my @_regex = split /[|][|][|]/, $user_config->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
     }
 
@@ -3422,10 +3422,10 @@ sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
 
     # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
-    foreach my $_sub ( keys %{ $userconfig->{baseurl_subs} } ) {
-        #print "_sub:$_sub:$userconfig->{baseurl_subs}{$_sub}\n";
+    foreach my $_sub ( keys %{ $user_config->{baseurl_subs} } ) {
+        #print "_sub:$_sub:$user_config->{baseurl_subs}{$_sub}\n";
         #print "orig _response_base:$_response_base\n";
-        my @_regex = split /[|][|][|]/, $userconfig->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+        my @_regex = split /[|][|][|]/, $user_config->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         $_response_base =~ s{$_regex[0]}{$_regex[1]}ee;
         #print "new _response_base:$_response_base\n";
     }
@@ -3482,7 +3482,7 @@ sub _delayed_write_step_html {
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
-            $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacksprint$retriesprint.html"> next </a>]</h2>};
+            $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
         print {$_FILE} $delayed_html;
@@ -3501,7 +3501,7 @@ sub finaltasks {  #do ending tasks
     # write out the html for the final test step, there is no new content to put in the buffer
     _delayed_write_step_html(undef, undef);
 
-    $totalresponse = sprintf '%.3f', $totalresponse;
+    $total_response = sprintf '%.3f', $total_response;
 
     writefinalhtml();  #write summary and closing tags for results file
 
@@ -3695,10 +3695,10 @@ sub startsession {     ## creates the webinject user agent
     #add http basic authentication support
     #corresponds to:
     #$useragent->credentials('servername:portnumber', 'realm-name', 'username' => 'password');
-    if (@httpauth) {
+    if (@http_auth) {
         #add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         #deref $elem to get the array elements.
-        foreach my $_elem(@httpauth) {
+        foreach my $_elem(@http_auth) {
             #$results_stdout .= "adding credential: $_elem->[0]:$_elem->[1], $_elem->[2], $_elem->[3] => $_elem->[4]\n";
             $useragent->credentials("$_elem->[0]:$_elem->[1]", "$_elem->[2]", "$_elem->[3]" => "$_elem->[4]");
         }
@@ -3710,8 +3710,8 @@ sub startsession {     ## creates the webinject user agent
     }
 
     my $_set_user_agent;
-    if ($userconfig->{useragent}) {
-        $_set_user_agent = $userconfig->{useragent};
+    if ($user_config->{useragent}) {
+        $_set_user_agent = $user_config->{useragent};
         if ($_set_user_agent) { #http useragent that will show up in webserver logs
             $useragent->agent($_set_user_agent);
         }
@@ -3774,8 +3774,8 @@ sub getoptions {  #shell options
         $output = 'output/'; ## default to the output folder under the current folder
     }
     $output = slash_me($output);
-    $outputfolder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-    File::Path::make_path ( $outputfolder );
+    $output_folder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
+    File::Path::make_path ( $output_folder );
     $output_prefix = $output;
     $output_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
 
