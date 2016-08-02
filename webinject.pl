@@ -72,9 +72,9 @@ my ($outsum); ## outsum is a checksum calculated on the output directory name. U
 my ($userconfig); ## support arbirtary user defined config
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $totalassertionskips = 0;
-my (@_pages); ## page source of previously visited pages
-my (@_pagenames); ## page name of previously visited pages
-my (@_pageupdatetimes); ## last time the page was updated in the cache
+my (@visited_pages); ## page source of previously visited pages
+my (@visited_page_names); ## page name of previously visited pages
+my (@page_update_times); ## last time the page was updated in the cache
 my $assertionskips = 0;
 my $assertionskipsmessage = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
@@ -1512,25 +1512,25 @@ sub savepage {## save the page in a cache to enable auto substitution of hidden 
         my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
         ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
         if (not defined $_page_index) { ## the page is not in the cache
-            if ($#_pagenames == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
+            if ($#visited_page_names == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
                 $_page_index = _find_oldest_page_in_cache();
                 #$results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index\n\n|; #debug
             } else {
-                $_page_index = $#_pagenames + 1;
+                $_page_index = $#visited_page_names + 1;
                 #out $results_stdout .= qq| Index $_page_index available \n\n|;
             }
         }
 
         ## update the global variables
-        $_pageupdatetimes[$_page_index] = time; ## save time so we overwrite oldest when cache is full
-        $_pagenames[$_page_index] = $_page_action; ## save page name
-        $_pages[$_page_index] = $response->as_string; ## save page source
+        $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
+        $visited_page_names[$_page_index] = $_page_action; ## save page name
+        $visited_pages[$_page_index] = $response->as_string; ## save page source
 
-        #$results_stdout .= " Saved $_pageupdatetimes[$_page_index]:$_pagenames[$_page_index] \n\n";
+        #$results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
 
         ## debug - write out the contents of the cache
-        #for my $i (0 .. $#_pagenames) {
-        #    $results_stdout .= " $i:$_pageupdatetimes[$i]:$_pagenames[$i] \n"; #debug
+        #for my $i (0 .. $#visited_page_names) {
+        #    $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
         #}
         #$results_stdout .= "\n";
 
@@ -1543,11 +1543,11 @@ sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
     my $oldest_index = 0;
-    my $oldest_page_time = $_pageupdatetimes[0];
+    my $oldest_page_time = $page_update_times[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#_pageupdatetimes) {
-        if ($_pageupdatetimes[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $_pageupdatetimes[$i]; }
+    for my $i (0 .. $#page_update_times) {
+        if ($page_update_times[$i] < $oldest_page_time) { $oldest_index = $i; $oldest_page_time = $page_update_times[$i]; }
     }
 
     return $oldest_index;
@@ -1683,7 +1683,7 @@ sub _substitute_name {
         ## saved page source will contain something like
         ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-        if ($_pages[$_page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
+        if ($visited_pages[$_page_id] =~ m/name=['"]$lhsname([^'"]{0,70}?)$rhsname['"]/s) { ## "
             my $name = $1;
             #out $results_stdout .= qq| NAME is $name \n|;
 
@@ -1739,7 +1739,7 @@ sub _substitute_data {
     if (defined $target_field) {
         $target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
         $target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
-        if ($_pages[$_page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
+        if ($visited_pages[$_page_id] =~ m/="$target_field" [^\>]*value="(.*?)"/s) {
             my $data = $1;
             #$results_stdout .= qq| DATA is $data \n|; #debug
 
@@ -1765,13 +1765,13 @@ sub _find_page_in_cache {
     my ($post_url) = @_;
 
     ## see if we have stored this page
-    if ($_pagenames[0]) { ## does the array contain at least one entry?
-        for my $i (0 .. $#_pagenames) {
-            if ($_pagenames[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
+    if ($visited_page_names[0]) { ## does the array contain at least one entry?
+        for my $i (0 .. $#visited_page_names) {
+            if ($visited_page_names[$i] =~ m/$post_url/si) { ## can we find the post url within the current saved action url?
             #$results_stdout .= qq| MATCH at position $i\n|; #debug
             return $i;
             } else {
-                #$results_stdout .= qq| NO MATCH on $i:$_pagenames[$i]\n|; #debug
+                #$results_stdout .= qq| NO MATCH on $i:$visited_page_names[$i]\n|; #debug
             }
         }
     } else {
