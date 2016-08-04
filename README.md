@@ -153,6 +153,18 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
 it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
 we'll put it here: `C:\ChromeDriver\chromedriver.exe`
 
+#### Run the Selenium WebDriver example
+1. Open a command prompt as an administrator and issue the following command:
+
+    ```
+    perl webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+    ```
+
+You should see Chrome open along with a process chromedriver.exe in the taskbar.
+
+After the tests run, you will see in the `output` folder that screenshots for each step
+are automatically taken.
+
 ### Linux
 
 1. First obtain ChromeDriver and put it in a folder called ~/selenium by running these commands
@@ -191,17 +203,31 @@ we'll put it here: `C:\ChromeDriver\chromedriver.exe`
     perl webinject.pl selftest/selenium.xml
     ```    
 
-### Run the Example Selenium WebDriver test
-1. Open a command prompt as an administrator and issue the following command:
+#### Run the Selenium WebDriver example
+
+1. You can run the example through ChromeDriver directly as follows:
 
     ```
-    perl webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+    perl webinject.pl -d chromedriver --binary ~/selenium/chromedriver examples/selenium.xml
     ```
 
-You should see Chrome open along with a process chromedriver.exe in the taskbar.
+2. In my experience, the Selenium Standalone Server is more reliable. You can run the same example test through Selenium Server.
+   
+    First start the Selenium Standalone Server in a background terminal
+    ```
+    (gnome-terminal -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &)
+    ```
 
-After the tests run, you will see in the `output` folder that screenshots for each step
-are automatically taken.
+    Now run the example, selecting to use the Selenium Standalone Server running on port 9988
+    ```
+    perl webinject.pl --port 9988 --driver chrome examples/selenium.xml
+    ```
+
+    Once you are finished running all the Selenium tests, you can shut down the Selenium Standalone Server as follows
+    ```
+    curl http://localhost:9988/selenium-server/driver/?cmd=shutDownSeleniumServer
+    ```
+
 
 WebInject Self Test
 -------------------
