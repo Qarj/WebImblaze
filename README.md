@@ -153,14 +153,48 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
 it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
 we'll put it here: `C:\ChromeDriver\chromedriver.exe`
 
-### Linux - instructions coming soon
+### Linux
 
+1. First obtain ChromeDriver and put it in a folder called ~/selenium by running these commands
+    ```
+    mkdir ~/selenium
+    wget -N http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -P ~/selenium
+    sudo apt install unzip
+    unzip ~/selenium/chromedriver_linux64.zip -d ~/selenium
+    chmod +x ~/selenium/chromedriver
+    ```
+
+2. Now obtain the Selenium Standalone Server and put it in ~/selenium with this command
+    ```
+    wget -N http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar -P ~/selenium
+    ```
+
+3. A few extra commands are needed to ensure the dependencies are covered
+    ```
+    sudo apt install gnome-terminal
+    sudo cpan Selenium::Remote::Driver
+    ```
+
+4. Now you should install Chrome, on Ubuntu / Debian / Linux Mint you can do it with these commands
+    ```
+    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+    sudo sh -c 'echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
+    sudo apt-get update
+    sudo apt-get install google-chrome-stable
+    ```
+
+5. Important - Run Chrome at least once and choose whether you want it to be the default browser or not. You can then close it or leave it open. If you don't do this, then it will hang when you try to run a test with ChromeDriver.
+
+6. You can check that it all works by running the Selenium self test. You should see Chrome open twice and run a quick test. The first time will be using Selenium Server Standalone. The second time will be using ChromeDriver directly without Selenium Server Standalone.
+    ```
+    perl webinject.pl selftest/selenium.xml
+    ```    
 
 ### Run the Example Selenium WebDriver test
 1. Open a command prompt as an administrator and issue the following command:
 
     ```
-    webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+    perl webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
     ```
 
 You should see Chrome open along with a process chromedriver.exe in the taskbar.
