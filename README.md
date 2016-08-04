@@ -172,6 +172,7 @@ we'll put it here: `C:\ChromeDriver\chromedriver.exe`
 3. A few extra commands are needed to ensure the dependencies are covered
     ```
     sudo apt install gnome-terminal
+    sudo apt install default-jre
     sudo cpan Selenium::Remote::Driver
     ```
 
