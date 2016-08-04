@@ -239,13 +239,13 @@ how that feature works.
 You can run all the self tests with the following command:
 
 ```
-webinject.pl selftest\all.xml
+perl webinject.pl selftest/all.xml
 ```
 
 Or you can run just one self test like this:
 
 ```
-webinject.pl selftest\verifypositive.xml
+perl webinject.pl selftest/verifypositive.xml
 ```
 
 Plugins
