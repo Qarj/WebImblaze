@@ -26,7 +26,7 @@ command will run on both Windows and Linux
     description1="Start Selenium Server with ChromeDriver"
     method="cmd"
     command1='wmic process call create {SINGLEQUOTE}cmd /c java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates{SINGLEQUOTE}'
-    command2='xterm -hold -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &'
+    command2='xterm -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &'
 />
 
 <case
