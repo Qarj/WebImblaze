@@ -25,7 +25,7 @@ command will run on both Windows and Linux
     id="10"
     description1="Start Selenium Server with ChromeDriver"
     method="cmd"
-    command1='wmic process call create {SINGLEQUOTE}cmd /c java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates{SINGLEQUOTE}'
+    command1='wmic process call create {SINGLEQUOTE}cmd /c java -Dwebdriver.chrome.driver="C:\selenium\chromedriver.exe" -jar C:\selenium\selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates{SINGLEQUOTE}'
     command2='(gnome-terminal -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &)'
 />
 
@@ -50,7 +50,7 @@ command will run on both Windows and Linux
     id="100"
     description1="Run WebInject pointing to the ChromeDriver binary - does not require Selenium Server or java"
     method="cmd"
-    command1="webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --binary C:\selenium-server\chromedriver.exe selftest\substeps\${feature}.xml"
+    command1="webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --binary C:\selenium\chromedriver.exe selftest\substeps\${feature}.xml"
     command2=" ./webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --binary $HOME/selenium/chromedriver selftest\substeps\${feature}.xml"
     verifypositive1="__RequestVerificationToken"
     verifypositive2="Test Cases Failed: 0"

@@ -59,9 +59,9 @@ Note that these instructions are written with Windows in mind.
     * Right click on `cmd.exe` then select `Run as Administrator`
 
 2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called WebInject, then
-    * `CD C:\WebInject\webinject.pl` then press 'Enter'
+    * `CD C:\WebInject` then press 'Enter'
 
-3. Now just type 'webinject.pl' and hit 'Enter'
+3. Now just type `webinject.pl` and hit 'Enter'
 
 If everything worked ok, then you'll see something like the following:
 
@@ -150,20 +150,36 @@ WebInject can also drive Chrome using using ChromeDriver. A bit of extra setup i
     ```
 
 2. Obtain ChromeDriver.exe from https://sites.google.com/a/chromium.org/chromedriver/ and save
-it somewhere. For simplicity, ensure that there are no spaces in the path. For this example,
-we'll put it here: `C:\ChromeDriver\chromedriver.exe`
+it somewhere. For simplicity, ensure that there are no spaces in the path.
+
+    For this example, we'll put it here: `C:\selenium\chromedriver.exe`
+
+3. Optional - download selenium-server-standalone-2.53.1.jar from http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.1.jar
+and place it in `C:\selenium`
 
 #### Run the Selenium WebDriver example
 1. Open a command prompt as an administrator and issue the following command:
 
     ```
-    perl webinject.pl -d chromedriver --binary C:\ChromeDriver\chromedriver.exe examples\selenium.xml
+    perl webinject.pl examples\selenium.xml --driver chromedriver --binary C:\selenium\chromedriver.exe
     ```
 
 You should see Chrome open along with a process chromedriver.exe in the taskbar.
 
 After the tests run, you will see in the `output` folder that screenshots for each step
 are automatically taken.
+
+2. Optional - Run the same example through Selenium Server (in my experience this is more robust)
+
+    First you need to start the server in a separate process, in this example we'll start it on port 9988
+    ```    
+    wmic process call create 'cmd /c java -Dwebdriver.chrome.driver="C:\selenium\chromedriver.exe" -jar C:\selenium\selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates'
+    ```
+
+    Then you call WebInject telling it what port to find Selenium Server on
+    ```
+    perl webinject.pl examples\selenium.xml --port 9988 --driver chrome
+    ```
 
 ### Linux
 
