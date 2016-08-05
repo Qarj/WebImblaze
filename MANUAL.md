@@ -177,6 +177,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 [include](#include)
 
 
+#### [3.3.10 - Selenium WebDriver](#selenium)
+
 
 ### [3.4 - Full Examples](#fullexamp)
 
@@ -1927,6 +1929,181 @@ supported for the include step.**
 file is substituted for the include step.
 
 <br />
+
+<a name="selenium"></a>
+### 3.3.10 - Selenium WebDriver
+
+A minimal Selenium example looks like the following:
+
+```
+<case
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="selenium"
+    command='$selresp = $driver->get("http://www.totaljobs.com");'
+/>
+```
+
+The method is specified as `selenium` and this is used in conjunction with `command` to drive Selenium.
+
+The example gets a web page, and automatically takes a screenshot which will be saved in the output folder.
+
+Many different commands are supported, to see them all refer to Selenium::Remote::Driver on cpan which
+can be found here: http://search.cpan.org/~gempesaw/Selenium-Remote-Driver/lib/Selenium/Remote/Driver.pm
+
+The first example given does not include an assertion. Here is a more complete example:
+
+```
+<case
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="selenium"
+    command='$selresp = $driver->get("http://www.totaljobs.com");'
+    verifytext="get_current_url,get_page_source"
+    verifypositive="Find your perfect job"
+/>
+```
+
+Here you can see that we also get the page source. WebInject then can use this to perform a standard
+assertion within its existing framework.
+
+#### Helper functions for Selenium WebDriver based tests
+
+There are a number of helper functions built into WebInject to make it easier to create
+Selenium test suites.
+
+The following example shows how you can get WebInject to wait up to a maximum of 25 seconds
+for the text `Sign in` to appear.
+
+```
+<case
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="selenium"
+    command1='$selresp = $driver->get("http://www.totaljobs.com");'
+	command2="$selresp = helper_wait_for_text_visible('Sign in','body','tag_name',25);"
+    verifytext="get_current_url,get_page_source"
+    verifypositive="Find your perfect job"
+    verifypositive1="Found sought text"
+/>
+```
+
+Here is a full list of the helper functions.
+
+##### helper_select_by_text
+
+helper_select_by_label(`Search Target`, `Locator`, `Label`);
+
+```
+command="$selresp = helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');"
+```
+
+##### helper_clear_and_send_keys
+
+helper_clear_and_send_keys(Search Target, Locator, Keys);
+
+```
+command="$selresp = helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');"
+```
+
+##### helper_mouse_move_to_location
+
+helper_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
+
+```
+command="$selresp = helper_mouse_move_to_location('closeBtn','id',3,4);"
+```
+
+```
+command="$selresp = helper_mouse_move_to_location('closeBtn','id'); # offsets are optional"
+```
+
+##### helper_switch_to_window
+
+helper_switch_to_window(window number);
+
+```
+command="$selresp = helper_switch_to_window(0);"
+```
+
+##### helper_js_click
+
+helper_js_click(id);
+
+```
+command="$selresp = helper_js_click('btnSubmit');"
+```
+
+##### helper_js_set_value
+
+helper_js_set_value(id,value);
+
+```
+command="$selresp = helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');"
+```
+
+##### helper_js_make_field_visible_to_webdriver
+
+usage: helper_js_make_field_visible(id);
+```
+command="$selresp = helper_js_make_field_visible('cvProvider_filCVUploadFile');"
+```
+
+##### helper_check_element_within_pixels
+
+helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
+
+```
+command="$selresp = helper_check_element_within_pixels('txtEmail','id',193,325,30);"
+```
+
+##### helper_wait_for_text_present
+
+helper_wait_for_text_present('Search Text',Timeout);
+
+```
+command="$selresp = helper_wait_for_text_present('Job title',10);"
+```
+
+##### helper_wait_for_text_visible
+
+helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
+
+```
+command="$selresp = helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);"
+```
+
+##### helper_wait_for_element_present
+
+helper_wait_for_element_present(target,locator,timeout);
+
+```
+command="$selresp = helper_wait_for_element_present('menu-search-icon','id',5);"
+```
+
+##### helper_wait_for_element_visible
+
+helper_wait_for_element_visible(target,locator,timeout);
+
+```
+command="$selresp = helper_wait_for_element_visible('menu-search-icon','id',5);"
+```
+
+##### helper_wait_for_text_not_present
+
+helper_wait_for_text_not_present('Search Text',timeout);
+
+```
+command="$selresp = helper_wait_for_text_not_present('Job title',10);
+```
+
+##### helper_wait_for_text_not_visible
+
+helper_wait_for_text_not_visible('Search Text',timeout);
+
+```
+command="$selresp = helper_wait_for_text_not_visible('This job has been emailed to',10);"
+```
 
 
 <a name="fullexamp"></a>
