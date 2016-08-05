@@ -164,10 +164,10 @@ and place it in `C:\selenium`
     perl webinject.pl examples\selenium.xml --driver chromedriver --binary C:\selenium\chromedriver.exe
     ```
 
-You should see Chrome open along with a process chromedriver.exe in the taskbar.
+    You should see Chrome open along with a process chromedriver.exe in the taskbar.
 
-After the tests run, you will see in the `output` folder that screenshots for each step
-are automatically taken.
+    After the tests run, you will see in the `output` folder that screenshots for each step
+    are automatically taken.
 
 2. Optional - Run the same example through Selenium Server (in my experience this is more robust)
 
