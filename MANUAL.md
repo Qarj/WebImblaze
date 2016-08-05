@@ -179,6 +179,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 #### [3.3.10 - Selenium WebDriver](#selenium)
 
+[helper functions](#helper)
+
 
 ### [3.4 - Full Examples](#fullexamp)
 
@@ -1967,6 +1969,7 @@ The first example given does not include an assertion. Here is a more complete e
 Here you can see that we also get the page source. WebInject then can use this to perform a standard
 assertion within its existing framework.
 
+<a name="helper"></a>
 #### Helper functions for Selenium WebDriver based tests
 
 There are a number of helper functions built into WebInject to make it easier to create
@@ -1992,7 +1995,7 @@ Here is a full list of the helper functions.
 
 ##### helper_select_by_text
 
-helper_select_by_label(`Search Target`, `Locator`, `Label`);
+helper_select_by_label(`target`, `locator`, `label`);
 
 ```
 command="$selresp = helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');"
@@ -2000,7 +2003,7 @@ command="$selresp = helper_select_by_label('candidateProfileDetails_ddlCurrentSa
 
 ##### helper_clear_and_send_keys
 
-helper_clear_and_send_keys(Search Target, Locator, Keys);
+helper_clear_and_send_keys(`target`, `locator`, `keys`);
 
 ```
 command="$selresp = helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');"
@@ -2008,7 +2011,7 @@ command="$selresp = helper_clear_and_send_keys('candidateProfileDetails_txtPostC
 
 ##### helper_mouse_move_to_location
 
-helper_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
+helper_mouse_move_to_location(`target`, `locator`, `xoffset`, `yoffset`);
 
 ```
 command="$selresp = helper_mouse_move_to_location('closeBtn','id',3,4);"
@@ -2020,7 +2023,7 @@ command="$selresp = helper_mouse_move_to_location('closeBtn','id'); # offsets ar
 
 ##### helper_switch_to_window
 
-helper_switch_to_window(window number);
+helper_switch_to_window(`window number`);
 
 ```
 command="$selresp = helper_switch_to_window(0);"
@@ -2028,7 +2031,7 @@ command="$selresp = helper_switch_to_window(0);"
 
 ##### helper_js_click
 
-helper_js_click(id);
+helper_js_click(`id`);
 
 ```
 command="$selresp = helper_js_click('btnSubmit');"
@@ -2036,7 +2039,7 @@ command="$selresp = helper_js_click('btnSubmit');"
 
 ##### helper_js_set_value
 
-helper_js_set_value(id,value);
+helper_js_set_value(`id`, `value`);
 
 ```
 command="$selresp = helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');"
@@ -2044,14 +2047,15 @@ command="$selresp = helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\test
 
 ##### helper_js_make_field_visible_to_webdriver
 
-usage: helper_js_make_field_visible(id);
+usage: helper_js_make_field_visible(`id`);
+
 ```
 command="$selresp = helper_js_make_field_visible('cvProvider_filCVUploadFile');"
 ```
 
 ##### helper_check_element_within_pixels
 
-helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
+helper_check_element_within_pixels(`target`, `id`, `x baseline`, `y baseline`, `pixel threshold`);
 
 ```
 command="$selresp = helper_check_element_within_pixels('txtEmail','id',193,325,30);"
@@ -2059,7 +2063,7 @@ command="$selresp = helper_check_element_within_pixels('txtEmail','id',193,325,3
 
 ##### helper_wait_for_text_present
 
-helper_wait_for_text_present('Search Text',Timeout);
+helper_wait_for_text_present(`search text`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_text_present('Job title',10);"
@@ -2067,7 +2071,7 @@ command="$selresp = helper_wait_for_text_present('Job title',10);"
 
 ##### helper_wait_for_text_visible
 
-helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
+helper_wait_for_text_visible(`search text`,`target`, `locator`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);"
@@ -2075,7 +2079,7 @@ command="$selresp = helper_wait_for_text_visible('Job title', 'body', 'tag_name'
 
 ##### helper_wait_for_element_present
 
-helper_wait_for_element_present(target,locator,timeout);
+helper_wait_for_element_present(`target`, `locator`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_element_present('menu-search-icon','id',5);"
@@ -2083,7 +2087,7 @@ command="$selresp = helper_wait_for_element_present('menu-search-icon','id',5);"
 
 ##### helper_wait_for_element_visible
 
-helper_wait_for_element_visible(target,locator,timeout);
+helper_wait_for_element_visible(`target`, `locator`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_element_visible('menu-search-icon','id',5);"
@@ -2091,7 +2095,7 @@ command="$selresp = helper_wait_for_element_visible('menu-search-icon','id',5);"
 
 ##### helper_wait_for_text_not_present
 
-helper_wait_for_text_not_present('Search Text',timeout);
+helper_wait_for_text_not_present(`search text`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_text_not_present('Job title',10);
@@ -2099,7 +2103,7 @@ command="$selresp = helper_wait_for_text_not_present('Job title',10);
 
 ##### helper_wait_for_text_not_visible
 
-helper_wait_for_text_not_visible('Search Text',timeout);
+helper_wait_for_text_not_visible(`search text`, `timeout`);
 
 ```
 command="$selresp = helper_wait_for_text_not_visible('This job has been emailed to',10);"
