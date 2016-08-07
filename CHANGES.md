@@ -8,6 +8,16 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.0.0 - Aug 7, 2016
+* created a self test for Selenium functionality - works on both Windows and Linux
+* removed Firefox and PhantomJS support
+* removed support for fast screenshot (ChromeDriver inbuilt screenshot is fast)
+* optimised Selenium helper functions
+* renamed local and global variables + subroutine names according to a different naming standard
+* removed reference to Crypt::SSLeay library - no longer needed for SSL
+* ensured call to search-image.py can work on Linux as well as Windows
+* change to semantic version numbering
+
 ### Version 1.99 - Jul 19, 2016
 * added back --no-output command line option
 * added back Nagios plugin mode support
