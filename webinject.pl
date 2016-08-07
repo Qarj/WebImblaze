@@ -74,7 +74,7 @@ my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 o
 my $total_assertion_skips = 0;
 my (@visited_pages); ## page source of previously visited pages
 my (@visited_page_names); ## page name of previously visited pages
-my (@_page_update_times); ## last time the page was updated in the cache
+my (@page_update_times); ## last time the page was updated in the cache
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
@@ -101,7 +101,7 @@ $current_date_time = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR
 my $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
 
-my $_counter = 0; ## keeping track of the loop we are up to
+my $counter = 0; ## keeping track of the loop we are up to
 
 my $concurrency = 'null'; ## current working directory - not full path
 my $png_base64; ## Selenium full page grab screenshot
@@ -152,7 +152,7 @@ if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case
 $start = $xml_test_cases->{start};  #grab the start for repeating (for restart)
 if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
-$_counter = $start - 1; #so starting position and counter are aligned
+$counter = $start - 1; #so starting position and counter are aligned
 
 if ($opt_driver) { start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
@@ -161,7 +161,7 @@ $results_stdout .= "-------------------------------------------------------\n";
 ## Repeat Loop
 foreach ($start .. $repeat) {
 
-    $_counter = $_counter + 1;
+    $counter = $counter + 1;
     $run_count = 0;
     $jumpbacks_print = q{}; ## we do not indicate a jump back until we actually jump back
     $jumpbacks = 0;
@@ -174,7 +174,7 @@ foreach ($start .. $repeat) {
 
         $testnum = $test_steps[$step_index];
 
-        $testnum_display = get_testnum_display($testnum, $_counter);
+        $testnum_display = get_testnum_display($testnum, $counter);
 
         $is_failure = 0;
         $retries = 1; ## we increment retries after writing to the log
@@ -273,13 +273,13 @@ exit $status;
 sub get_testnum_display {
     my ($_testnum, $_counter) = @_;
 
-        ## use $testnum_display for all testnum output, add 10,000 in case of repeat loop
-        my $_testnum_display = $_testnum + ($_counter*10_000) - 10_000;
-        $_testnum_display = sprintf '%.2f', $_testnum_display; ## maximul of 2 decimal places
-        $_testnum_display =~ s/0+\z// if $_testnum_display =~ /[.]/; ## remove trailing non significant zeros
-        if (not ($_testnum_display =~ s/[.]\z//) ) { ## remove decimal point if nothing after
-            $_testnum_display = sprintf '%.2f', $_testnum_display; ## put back the non significant zero if we have a decimal point
-        }
+    ## use $testnum_display for all testnum output, add 10,000 in case of repeat loop
+    my $_testnum_display = $_testnum + ($_counter*10_000) - 10_000;
+    $_testnum_display = sprintf '%.2f', $_testnum_display; ## maximul of 2 decimal places
+    $_testnum_display =~ s/0+\z// if $_testnum_display =~ /[.]/; ## remove trailing non significant zeros
+    if (not ($_testnum_display =~ s/[.]\z//) ) { ## remove decimal point if nothing after
+        $_testnum_display = sprintf '%.2f', $_testnum_display; ## put back the non significant zero if we have a decimal point
+    }
 
     return $_testnum_display;
 }
@@ -330,7 +330,7 @@ sub get_test_step_skip_message {
 
     $case{firstlooponly} = $xml_test_cases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
     if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
-        if ($_counter == 1) { ## counter keeps track of what loop number we are on
+        if ($counter == 1) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
         }
         else {
@@ -340,7 +340,7 @@ sub get_test_step_skip_message {
 
     $case{lastlooponly} = $xml_test_cases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
     if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
-        if ($_counter == $repeat) { ## counter keeps track of what loop number we are on
+        if ($counter == $repeat) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
         }
         else {
@@ -1526,15 +1526,15 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
         }
 
         ## update the global variables
-        $_page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
+        $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
         $visited_page_names[$_page_index] = $_page_action; ## save page name
         $visited_pages[$_page_index] = $response->as_string; ## save page source
 
-        #$results_stdout .= " Saved $_page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
+        #$results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
 
         ## debug - write out the contents of the cache
         #for my $i (0 .. $#visited_page_names) {
-        #    $results_stdout .= " $i:$_page_update_times[$i]:$visited_page_names[$i] \n"; #debug
+        #    $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
         #}
         #$results_stdout .= "\n";
 
@@ -1547,11 +1547,11 @@ sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
     my $_oldest_index = 0;
-    my $_oldest_page_time = $_page_update_times[0];
+    my $_oldest_page_time = $page_update_times[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#_page_update_times) {
-        if ($_page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $_page_update_times[$i]; }
+    for my $i (0 .. $#page_update_times) {
+        if ($page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $page_update_times[$i]; }
     }
 
     return $_oldest_index;
@@ -2913,7 +2913,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{DATETIME}/$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND/g;
     my $_underscore = '_';
     $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$_underscore$HOUR:$MINUTE:$SECOND}g;
-    $_[0] =~ s/{COUNTER}/$_counter/g;
+    $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$output/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
