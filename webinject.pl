@@ -2113,7 +2113,8 @@ sub searchimage {  ## search for images in the actual result
                    $_unmarked = 'false';
                 }
 
-                my $_image_in_image_result = (`plugins\\search-image.py $opt_publish_full$testnum_display$jumpbacks_print$retries_print.png "$case{$_}" $opt_publish_full$testnum_display$jumpbacks_print$retries_print-marked.png`);
+                my $_search_image_script = slash_me('plugins/search-image.py');
+                my $_image_in_image_result = (`$_search_image_script $opt_publish_full$testnum_display$jumpbacks_print$retries_print.png "$case{$_}" $opt_publish_full$testnum_display$jumpbacks_print$retries_print-marked.png`);
 
                 $_image_in_image_result =~ m/primary confidence (\d+)/s;
                 my $_primary_confidence;
@@ -3766,7 +3767,7 @@ sub get_options {  #shell options
         if ($opt_driver eq 'chromedriver') {
             if (not defined $opt_chromedriver_binary) {
                 print "\nLocation of chromedriver binary must be specified when chromedriver selected.\n\n";
-                print "--binary C:\\selenium-server\\chromedriver.exe\n";
+                print "--binary C:\\selenium\\chromedriver.exe\n";
                 exit;
             }
         }
