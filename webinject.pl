@@ -57,7 +57,7 @@ my (%case, %case_save);
 my (%config);
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
-my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_no_output, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
+my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my ($report_type); ## 'standard' and 'nagios' supported
 my ($return_message); ## error message to return to nagios
@@ -214,6 +214,7 @@ foreach ($start .. $repeat) {
             output_assertions();
 
             execute_test_step();
+            display_request_response();
 
             decode_quoted_printable();
 
@@ -268,6 +269,16 @@ exit $status;
 #------------------------------------------------------------------
 #  SUBROUTINES
 #------------------------------------------------------------------
+
+sub display_request_response {
+
+    if (not $opt_verbose) { return; }
+
+    $results_stdout .= "\n\nREQUEST ===>\n".$request->as_string."\n<=== END REQUEST\n\n";
+    $results_stdout .= "\n\nRESPONSE ===>\n".$response->as_string."\n<=== END RESPONSE\n\n";
+
+    return;
+}
 
 sub get_testnum_display {
     my ($_testnum, $_counter) = @_;
@@ -996,7 +1007,6 @@ sub selenium {  ## send Selenium command and read response
     else {
        $selresp =~ s{^}{HTTP/1.1 100 OK\n\n}; ## pretend this is an HTTP response - 100 means continue
     }
-    #print $response->as_string; print "\n\n";
 
     $end_timer = time; ## we only want to measure the time it took for the commands, not to do the screenshots and verification
     $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
@@ -1784,7 +1794,6 @@ sub httpget {  #send http request and read response
 
     #1.42 Moved cookie management up above addheader as per httppost_form_data
     $cookie_jar->add_cookie_header($request);
-    #print $request->as_string; print "\n\n";
 
     addcookie (); ## append additional cookies rather than overwriting with add header
 
@@ -1801,7 +1810,6 @@ sub httpget {  #send http request and read response
     $response = $useragent->request($request);
     $end_timer = time;
     $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
-    #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -1881,12 +1889,10 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
         #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
-    #print $request->as_string; print "\n\n";
     $start_timer = time;
     $response = $useragent->request($request);
     $end_timer = time;
     $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
-    #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -1973,12 +1979,10 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
         #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
-    #print $request->as_string; print "\n\n";
     $start_timer = time;
     $response = $useragent->request($request);
     $end_timer = time;
     $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
-    #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -2003,7 +2007,6 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
     $cookie_jar->add_cookie_header($request);
-    #print $request->as_string; print "\n\n";
 
     addcookie (); ## append additional cookies rather than overwriting with add header
 
@@ -2019,10 +2022,8 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
     $response = $useragent->request($request);
     $end_timer = time;
     $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
-    #print $response->as_string; print "\n\n";
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     return;
 }
@@ -3743,6 +3744,7 @@ sub get_options {  #shell options
         'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'n|no-output'   => \$opt_no_output,
+        'e|verbose'   => \$opt_verbose,
         'h|help'   => \$opt_help,
         'u|publish-to=s' => \$opt_publish_full,
         )
@@ -3816,6 +3818,7 @@ Usage: webinject.pl testcase_file <<options>>
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 -n|--no-output                                      -n
+-e|--verbose                                        -e
 -u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
 
 or

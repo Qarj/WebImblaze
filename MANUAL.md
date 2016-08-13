@@ -664,6 +664,7 @@ The command line options are:
 -r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 -n|--no-output                                      -n
+-e|--verbose                                        -e
 -u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
 ```
 
@@ -746,6 +747,10 @@ Specifies to ignore any retry or retryfromstep parameters.
 `-n` or `--no-output`
 
 Specifies to not output anything to standard out (except any Nagios data)
+
+`-e` or `--verbose`
+
+Specifies to display the request and response as_string for each test step
 
 `-u` or `--publish-to`
 
