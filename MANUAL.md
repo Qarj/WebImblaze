@@ -1046,6 +1046,13 @@ another three `|||` and writing any message after the custom error message.
     verifypositive="Record 5520|||Record 5520 is within 15 miles so should show|||Production Bug"
 ```
 
+In addition, you can prepend a `fail fast!` flag to the start of the assertion to indicate that in the event the assertion fails,
+WebInject should not retry the current test case.
+
+```
+    verifypositive="fail fast!All Canary Tests Passed OK"
+```
+
 <br />
 
 
@@ -1075,6 +1082,13 @@ another three `|||` and writing any message after the custom error message.
 
 ```
     verifynegative="Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221"
+```
+
+In addition, you can prepend a `fail fast!` flag to the start of the assertion to indicate that in the event the assertion fails,
+WebInject should not retry the current test case.
+
+```
+    verifynegative="fail fast!A critical error has occurred"
 ```
 
 <br />
@@ -1466,14 +1480,11 @@ wait 5 seconds.) If and when the test step passes, WebInject will not wait 5 sec
     sleep="5"
 ```
 
-If one of the verifynegatives fail, the test case will not be retried further. The logic is that you are
-prepared to wait for something you expect to see (verifypositive etc), but if you find something you
-don't want to see (like an error page), there is no point retrying further. This is called fail fast.
+Note that if a `fail fast!` flag is present on a verifypositive or verifynegative assertion, the test step
+will not be retried.
 
-If you do want to do a retry on a verifynegative, encode it as a verifypositive instead. The following example
-shows how to do this:
 ```
-    verifypositive20="^((?!ErrorPage.aspx).)*$|||Error detected"
+    verifynegative="fail fast!ErrorPage.aspx|||Error detected"
 ```
 
 Note that you can specify a global retry limit to prevent more than a specified number of retries

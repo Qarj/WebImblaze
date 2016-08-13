@@ -52,7 +52,7 @@ my (%test_step_time); ## record in a hash the latency for every step for later u
 my ($cookie_jar, @http_auth);
 my ($run_count, $total_run_count, $case_passed_count, $case_failed_count, $passed_count, $failed_count);
 my ($total_response, $avg_response, $max_response, $min_response);
-my ($current_case_file, $current_case_filename, $case_count, $is_failure, $verifynegative_failed);
+my ($current_case_file, $current_case_filename, $case_count, $is_failure, $fast_fail_invoked);
 my (%case, %case_save);
 my (%config);
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
@@ -203,7 +203,7 @@ foreach ($start .. $repeat) {
             set_retry_to_zero_if_global_limit_exceeded();
 
             $is_failure = 0;
-            $verifynegative_failed = 'false';
+            $fast_fail_invoked = 'false';
             $retry_passed_count = 0;
             $retry_failed_count = 0;
 
@@ -522,7 +522,7 @@ sub execute_test_step {
 sub pass_fail_or_retry {
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($verifynegative_failed eq 'true')) {
+    if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         ## however if a verifynegative fails then the case is always a failure
         $results_xml .= qq|            <success>false</success>\n|;
@@ -642,7 +642,7 @@ sub output_test_step_results {
 sub increment_run_count {
 
     if ( ( ($is_failure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
-         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($verifynegative_failed eq 'false') )
+         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($fast_fail_invoked eq 'false') )
        ) {
         ## do not count this in run count if we are retrying
     }
@@ -2422,6 +2422,7 @@ sub _verify_verifypositive {
             $_verify_number =~ s/^verifypositive//g; ## remove verifypositive from string
             if (!$_verify_number) {$_verify_number = '0';} #In case of verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+            my $_fail_fast = _is_fail_fast(\$_verifyparms[0]); ## will strip off leading fail fast! if present
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Positive Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Positive Verification $_verify_number - $_verifyparms[2] \n";
@@ -2453,6 +2454,11 @@ sub _verify_verifypositive {
                     $failed_count++;
                     $retry_failed_count++;
                     $is_failure++;
+                    if ($_fail_fast) {
+                        if ($retry > 0) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
+                        $retry=0; ## we won't retry if a fail fast was invoked
+                        $fast_fail_invoked = 'true';
+                    }
                 }
                 $results_xml .= qq|            </$_case_attribute>\n|;
             }
@@ -2471,6 +2477,7 @@ sub _verify_verifynegative {
             $_verify_number =~ s/^verifynegative//g; ## remove verifynegative from string
             if (!$_verify_number) {$_verify_number = '0';} ## in case of verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; #index 0 contains the actual string to verify
+            my $_fail_fast = _is_fail_fast(\$_verifyparms[0]); ## will strip off leading !!! if present
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Negative Verification $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Negative Verification $_verify_number - $_verifyparms[2] \n";
@@ -2494,9 +2501,11 @@ sub _verify_verifynegative {
                     $failed_count++;
                     $retry_failed_count++;
                     $is_failure++;
-                    if ($retry > 0) { $results_stdout .= "==> Won't retry - a verifynegative failed \n"; }
-                    $retry=0; ## we won't retry if any of the verifynegatives fail
-                    $verifynegative_failed = 'true';
+                    if ($_fail_fast) {
+                        if ($retry > 0) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
+                        $retry=0; ## we won't retry if a fail fast was invoked
+                        $fast_fail_invoked = 'true';
+                    }
                 }
                 else {
                     $results_html .= qq|<span class="pass">Passed Negative Verification</span><br />\n|;
@@ -2508,6 +2517,18 @@ sub _verify_verifynegative {
                 $results_xml .= qq|            </$_case_attribute>\n|;
             }
         }
+    }
+
+    return;
+}
+
+
+sub _is_fail_fast {
+    my ($_assertion) = @_;
+
+    ## since a reference to the original variable has been passed, it will be stripped of the leading !!! if present
+    if ( ${$_assertion} =~ s/^fail fast!// ) {
+        return 1;
     }
 
     return;

@@ -27,12 +27,12 @@ Expected failures will be asserted by the master test file.
 is present - there is no point retrying i.e. fail fast -->
 <case
     id="30"
-    description1="Should not jump back since a verifynegative fails - fast fail"
+    description1="Should not jump back since a fail fast flag is present"
     method="cmd"
     command="echo one one one"
     command1="echo critical error"
     verifypositive="one"
-    verifynegative="critical error"
+    verifynegative="fail fast!critical error"
     assertcount="one|||6"
     retryfromstep="10"
 />
