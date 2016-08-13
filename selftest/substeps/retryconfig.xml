@@ -2,7 +2,7 @@
 <testcasefile>examples\simple.xml</testcasefile>
 <globalhttplog>yes</globalhttplog>
 <standaloneplot>off</standaloneplot>
-<globalretry>10</globalretry> <!-- Global limit for the number of retries for a test run --> 
+<globalretry>12</globalretry> <!-- Global limit for the number of retries for a test run --> 
 <globaljumpbacks>4</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
 <userdefined> 
     <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 

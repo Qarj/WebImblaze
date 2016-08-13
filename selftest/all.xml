@@ -113,15 +113,6 @@ Run all self tests
 />
 
 <case
-    id="130"
-    description1="retryresponsecode"
-    method="cmd"
-    command=".\webinject.pl -o selftest\output\retryresponsecode selftest\retryresponsecode.xml"
-    verifypositive="TEST CASE PASSED"
-    verifynegative="TEST CASE FAILED"
-/>
-
-<case
     id="140"
     description1="restartbrowseronfail"
     method="cmd"

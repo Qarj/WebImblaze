@@ -64,7 +64,6 @@ my ($return_message); ## error message to return to nagios
 my ($testnum, $xml_test_cases, $step_index, @test_steps);
 my ($testnum_display, $previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 my ($retry, $retries, $globalretries, $retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks, $jumpbacks_print); ## retry failed tests
-my ($forced_retry); ## force retry when specific http error code received
 my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($start_time); ## to store a copy of $start_run_timer in a global variable
 my ($output, $output_folder, $output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
@@ -358,7 +357,7 @@ sub substitute_variables {
     ## "verifypositive", "verifypositive1", ... "verifypositive9999",
     ## "verifynegative", "verifynegative1", ... "verifynegative9999",
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
-    ## "verifyresponsetime", "retryresponsecode", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
+    ## "verifyresponsetime", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
     ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "formatxml", "formatjson",
     ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
@@ -479,12 +478,6 @@ sub output_assertions {
         $results_html .= qq|Verify Response Time: at most "$case{verifyresponsetime} seconds" <br />\n|;
         $results_stdout .= qq|Verify Response Time: at most "$case{verifyresponsetime}" seconds\n|;
         $results_xml .= qq|            <verifyresponsetime>$case{verifyresponsetime}</verifyresponsetime>\n|;
-    }
-
-    if ($case{retryresponsecode}) {## retry if a particular response code was returned
-        $results_html .= qq|Retry Response Code: "$case{retryresponsecode}" <br />\n|;
-        $results_stdout .= qq|Will retry if we get response code: "$case{retryresponsecode}" \n|;
-        $results_xml .= qq|            <retryresponsecode>$case{retryresponsecode}</retryresponsecode>\n|;
     }
 
     return;
@@ -2230,17 +2223,6 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }
      }
 
-    $forced_retry='false';
-    if ($case{retryresponsecode}) {## retryresponsecode - retry on a certain response code, normally we would immediately fail the case
-        if ($case{retryresponsecode} == $response->code()) { ## verify returned HTTP response code matches retryresponsecode set in test case
-            $results_html .= qq|<span class="pass">Will retry on response code </span><br />\n|;
-            $results_xml .= qq|            <retryresponsecode-success>true</retryresponsecode-success>\n|;
-            $results_xml .= qq|            <retryresponsecode-message>Found Retry HTTP Response Code</retryresponsecode-message>\n|;
-            $results_stdout .= qq|Found Retry HTTP Response Code \n|;
-            $forced_retry='true'; ## force a retry even though we received a potential error code
-        }
-    }
-
     if ($case{verifyresponsecode}) {
         if ($case{verifyresponsecode} == $response->code()) { #verify returned HTTP response code matches verifyresponsecode set in test case
             $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification </span><br />\n|;
@@ -2285,13 +2267,9 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
                 $results_stdout .= "Failed - No Response \n"; #($1$2) is HTTP response code
             }
-            if ($forced_retry eq 'false') {
-                $failed_count++;
-                $retry_failed_count++;
-                $is_failure++;
-                if ($retry > 0) { $results_stdout .= "==> Won't retry - received HTTP error code\n"; }
-                $retry=0; # we won't try again if we can't connect
-            }
+            $failed_count++;
+            $retry_failed_count++;
+            $is_failure++;
         }
     }
 
@@ -2447,7 +2425,7 @@ sub _verify_verifypositive {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    $results_stdout .= "Failed Positive Verification \n";
+                    $results_stdout .= "Failed Positive Verification $_verify_number\n";
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2494,7 +2472,7 @@ sub _verify_verifynegative {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                          $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    $results_stdout .= "Failed Negative Verification \n";
+                    $results_stdout .= "Failed Negative Verification $_verify_number\n";
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }

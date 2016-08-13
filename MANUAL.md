@@ -121,8 +121,6 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [retryfromstep](#retryfromstep)
 
-[retryresponsecode](#retryresponsecode)
-
 [restartbrowseronfail](#restartbrowseronfail)
 
 [restartbrowser](#restartbrowser)
@@ -1522,20 +1520,6 @@ rather than the current step.
 In this example, if the message "Welcome admin" is not found, then execution will continue from step 10
 without failing step 20. This will continue to happen until "Welcome admin" is found, or up to the
 globaljumpbacks setting in the config file (defaulted to 20 if not present).
-
-<br />
-
-
-<a name="retryresponsecode"></a>
-#### retryresponsecode
-If a retry is present, retry if we get this reponse code, even if it is an error code.
-
-When we retry, we normally give up instantly if we receive an error code in order to "fail fast".
-However sometimes we need to override this behaviour.
-
-```
-    retryresponsecode="500"
-```
 
 <br />
 
