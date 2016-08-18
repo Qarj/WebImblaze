@@ -3812,7 +3812,6 @@ Usage: webinject.pl testcase_file <<options>>
 -A|--autocontroller                                 -a
 -p|--port selenium_port                             -p 8325
 -x|--proxy proxy_server                             -x localhost:9222
--b|--basefolder baselined image folder              -b examples/basefoler/
 -d|--driver chrome/chromedriver                     -d chrome
 -y|--binary (if chromedriver option chosen)         -y C:\selenium-server\chromedriver.exe
 -r|--proxyrules                                     -r true
