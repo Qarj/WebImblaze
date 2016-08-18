@@ -661,7 +661,6 @@ The command line options are:
 -x|--proxy proxy_server                             -x localhost:9222
 -d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
 -y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
--r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 -n|--no-output                                      -n
 -e|--verbose                                        -e
@@ -735,10 +734,6 @@ Specifies which driver to use for Selenium i.e, chromedriver, phantomjs or firef
 `-y` or `--binary`
 
 Location of chromedriver, e.g. `--binary C:\selenium-server\chromedriver.exe`
-
-`-r` or `--proxyrules`
-
-Specifies to apply Browsermob Proxy rules e.g. `--proxyrules --true`
 
 `-i` or `--ignoreretry`
 
@@ -2346,7 +2341,6 @@ Constant | Description
 **{CONCURRENCY}** | Output folder name only - not the full path
 **{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder
 **{TESTFILENAME}** | Test file name
-**{OPT_PROXYRULES}** | What proxyrules option was specified via the command line to webinject.pl
 **{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file

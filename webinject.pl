@@ -57,7 +57,7 @@ my (%case, %case_save);
 my (%config);
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
-my ($opt_driver, $opt_proxyrules, $opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
+my ($opt_driver, $opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
 
 my ($report_type); ## 'standard' and 'nagios' supported
 my ($return_message); ## error message to return to nagios
@@ -2884,7 +2884,6 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{SINGLEQUOTE}/'/g; #'
     $_[0] =~ s/{TIMESTAMP}/$timestamp/g;
     $_[0] =~ s/{STARTTIME}/$start_time/g;
-    $_[0] =~ s/{OPT_PROXYRULES}/$opt_proxyrules/g;
     $_[0] =~ s/{OPT_PROXY}/$opt_proxy/g;
 
     $_[0] =~ m/{TESTSTEPTIME:(\d+)}/s;
@@ -3741,7 +3740,6 @@ sub get_options {  #shell options
         'x|proxy=s'   => \$opt_proxy,
         'd|driver=s'   => \$opt_driver,
         'y|binary=s'   => \$opt_chromedriver_binary,
-        'r|proxyrules=s'   => \$opt_proxyrules,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'n|no-output'   => \$opt_no_output,
         'e|verbose'   => \$opt_verbose,
@@ -3814,7 +3812,6 @@ Usage: webinject.pl testcase_file <<options>>
 -x|--proxy proxy_server                             -x localhost:9222
 -d|--driver chrome/chromedriver                     -d chrome
 -y|--binary (if chromedriver option chosen)         -y C:\selenium-server\chromedriver.exe
--r|--proxyrules                                     -r true
 -i|--ignoreretry                                    -i
 -n|--no-output                                      -n
 -e|--verbose                                        -e
