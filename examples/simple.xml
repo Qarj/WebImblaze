@@ -13,7 +13,7 @@
     id="20"
     description1="Get Totaljobs Search Results"
     method="get"
-    url="https://www.totaljobs.com/JobSearch/Results.aspx?Keywords=webdriver"
+    url="https://www.totaljobs.com/jobs/webdriver"
     verifypositive="Automation"
 />
 

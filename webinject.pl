@@ -794,9 +794,11 @@ sub write_initial_xml {  #write opening tags for results file
 sub _write_xml {
     my ($_xml) = @_;
 
-    open my $_RESULTS_XML, '>>', "$opt_publish_full".$results_xml_file_name or die "\nERROR: Failed to open results.xml file\n\n";
-    print {$_RESULTS_XML} ${$_xml};
-    close $_RESULTS_XML or die "\nCould not close xml results file\n\n";
+    if (not $opt_no_output) {
+        open my $_RESULTS_XML, '>>', "$opt_publish_full".$results_xml_file_name or die "\nERROR: Failed to open results.xml file\n\n";
+        print {$_RESULTS_XML} ${$_xml};
+        close $_RESULTS_XML or die "\nCould not close xml results file\n\n";
+    }
 
     return;
 }
@@ -805,9 +807,11 @@ sub _write_xml {
 sub _write_html {
     my ($_html) = @_;
 
-    open my $_RESULTS_HTML, '>>', $opt_publish_full.'results.html' or die "\nERROR: Failed to open results.html file\n\n";
-    print {$_RESULTS_HTML} ${$_html};
-    close $_RESULTS_HTML or die "\nCould not close html results file\n\n";
+    if (not $opt_no_output) {
+        open my $_RESULTS_HTML, '>>', $opt_publish_full.'results.html' or die "\nERROR: Failed to open results.html file\n\n";
+        print {$_RESULTS_HTML} ${$_html};
+        close $_RESULTS_HTML or die "\nCould not close html results file\n\n";
+    }
 
     return;
 }
@@ -3169,9 +3173,11 @@ sub _write_http_log {
     $_log_separator .= "  *************************************************************  \n";
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
-    open my $_HTTPLOGFILE, '>>' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
-    print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref }, $_log_separator;
-    close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
+    if (not $opt_no_output) {
+        open my $_HTTPLOGFILE, '>>' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
+        print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref }, $_log_separator;
+        close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
+    }
 
     return;
 }
@@ -3489,9 +3495,11 @@ sub _delayed_write_step_html {
             # substitute in the next test step number now that we know what it is
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
-        open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
-        print {$_FILE} $delayed_html;
-        close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
+        if (not $opt_no_output) {
+            open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
+            print {$_FILE} $delayed_html;
+            close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
+        }
     }
 
     $delayed_file_full = $_file_full;
