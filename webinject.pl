@@ -180,6 +180,7 @@ foreach ($start .. $repeat) {
         $retries_print = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
         set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
+        set_max_redirect($xml_test_cases->{case}->{$testnum}->{maxredirect});
 
         my $skip_message = get_test_step_skip_message();
         if ( $skip_message ) {
@@ -301,6 +302,17 @@ sub set_useragent {
     if (not $_useragent) { return; }
 
     $useragent->agent($_useragent);
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub set_max_redirect {
+    my ($_max_redirect) = @_;
+
+    if (not $_max_redirect) { return; }
+
+    $useragent->max_redirect($_max_redirect);
 
     return;
 }
@@ -3706,6 +3718,7 @@ sub start_session {     ## creates the webinject user agent
     $useragent->agent('WebInject');  ## http useragent that will show up in webserver logs
     #$useragent->timeout(200); ## it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  #don't follow redirects for GET's (POST's already don't follow, by default)
+    #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
     eval
     {
        $useragent->ssl_opts(verify_hostname=>0); ## stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval

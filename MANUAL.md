@@ -98,6 +98,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [useragent](#useragentparameter)
 
+[maxredirect](#maxredirect)
+
 [include] (#include)
 
 #### [3.3.3 - Additional Assertion Parameters](#asserts)
@@ -1353,6 +1355,29 @@ it will stay changed for subsequent test steps.
 ```
     useragent="Firefox on Windows 2016"
 ```
+
+<br />
+
+
+<a name="maxredirect"></a>
+#### maxredirect
+
+Changes the maximum number of times WebInject will redirect for GET requests.
+
+```
+    maxredirect="5"
+```
+
+This will be in force for subsequent test steps.
+
+This does not work for POST requests. You can enable it by uncommenting the line in `webinject.pl` that reads
+
+```
+    #push @{ $useragent->requests_redirectable }, 'POST';
+```
+
+However it does not seem to work very well. Presumably because cookies set by the POST response are probably
+not captured.
 
 <br />
 
