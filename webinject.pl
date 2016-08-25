@@ -179,9 +179,6 @@ foreach ($start .. $repeat) {
         $retries = 1; ## we increment retries after writing to the log
         $retries_print = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
-        set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
-        set_max_redirect($xml_test_cases->{case}->{$testnum}->{maxredirect});
-
         my $skip_message = get_test_step_skip_message();
         if ( $skip_message ) {
             $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
@@ -520,6 +517,9 @@ sub execute_test_step {
     if (not $session_started) {
         start_session();
     }
+
+    set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
+    set_max_redirect($xml_test_cases->{case}->{$testnum}->{maxredirect});
 
     if ($case{method}) {
         if ($case{method} eq 'get') { httpget(); return;}
