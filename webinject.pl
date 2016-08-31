@@ -3636,10 +3636,10 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
         print "\nError: $@ Failed to connect on port $opt_port after $_max tries\n\n";
         $results_xml .= qq|        <testcase id="999999">\n|;
         $results_xml .= qq|            <description1>WebInject ended execution early !!!</description1>\n|;
-        $results_xml .= qq|            <verifypositive>\n|;
+        $results_xml .= qq|            <verifynegative>\n|;
         $results_xml .= qq|                <assert>WebInject Aborted - could not connect to Selenium Server</assert>\n|;
         $results_xml .= qq|                <success>false</success>\n|;
-        $results_xml .= qq|            </verifypositive>\n|;
+        $results_xml .= qq|            </verifynegative>\n|;
         $results_xml .= qq|            <success>false</success>\n|;
         $results_xml .= qq|            <result-message>WEBINJECT ABORTED</result-message>\n|;
         $results_xml .= qq|            <responsetime>0.001</responsetime>\n|;
