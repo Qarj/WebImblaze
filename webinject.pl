@@ -57,7 +57,8 @@ my (%case, %case_save);
 my (%config);
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller, $opt_port, $opt_proxy);
-my ($opt_driver, $opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help, $opt_chromedriver_binary, $opt_publish_full);
+my ($opt_driver, $opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help, $opt_chromedriver_binary, $opt_selenium_binary, $opt_publish_full);
+my ($selenium_port);
 
 my ($report_type); ## 'standard' and 'nagios' supported
 my ($return_message); ## error message to return to nagios
@@ -79,6 +80,7 @@ my $assertion_skips_message = q{}; ## support tagging an assertion as disabled w
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my $session_started; ## only start up http sesion if http is being used
 my ($selresp, $driver); ## support for Selenium WebDriver test cases
+my ($testfile_contains_selenium); ## so we know if Selenium Browser Session needs to be started
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -115,7 +117,7 @@ my $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
 ## Startup
 get_options();  #get command line options
-process_case_file();
+process_config_file();
 write_initial_stdout();  #write opening tags for STDOUT.
 
 _whack($opt_publish_full.'http.txt');
@@ -143,7 +145,7 @@ $current_case_filename = basename($current_case_file); ## with extension
 $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
-#start_session(); #starts, or restarts the webinject session
+#start_session(); #starts, or restarts the webinject session - now started immediately before executing the test step if needed
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
@@ -152,8 +154,6 @@ $start = $xml_test_cases->{start};  #grab the start for repeating (for restart)
 if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
 
 $counter = $start - 1; #so starting position and counter are aligned
-
-if ($opt_driver) { start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
 $results_stdout .= "-------------------------------------------------------\n";
 
@@ -257,8 +257,9 @@ $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg
 
 final_tasks();  #do return/cleanup tasks
 
-## shut down the Selenium server last - it is less important than closing the files
+## shut down the Selenium session and Selenium Server last - it is less important than closing the files
 shutdown_selenium();
+shutdown_selenium_server($selenium_port);
 
 my $status = $case_failed_count cmp 0;
 exit $status;
@@ -511,11 +512,14 @@ sub execute_test_step {
 
     if ($case{method}) {
         if ($case{method} eq 'cmd') { cmd(); return; }
-        if ($case{method} eq 'selenium') { selenium(); return; }
     }
 
     if (not $session_started) {
         start_session();
+    }
+
+    if ($case{method}) {
+        if ($case{method} eq 'selenium') { selenium(); return; }
     }
 
     set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
@@ -687,16 +691,11 @@ sub restart_browser {
 
     if ($case{restartbrowseronfail} && ($is_failure > 0)) { ## restart the Selenium browser session and also the WebInject session
         $results_stdout .= qq|RESTARTING SESSION DUE TO FAIL ... \n|;
-        if ($opt_driver) { start_selenium_browser(); }
         start_session();
     }
 
     if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
-        $results_stdout .= qq|RESTARTING BROWSER ... \n|;
-        if ($opt_driver) {
-                $results_stdout .= "RESTARTING SESSION ...\n";
-                start_selenium_browser();
-            }
+        $results_stdout .= qq|RESTARTING SESSION ... \n|;
         start_session();
     }
 
@@ -2659,8 +2658,7 @@ sub slash_me {
 }
 
 #------------------------------------------------------------------
-sub process_case_file {  #get test case files to run (from command line or config file) and evaluate constants
-                       #parse config file and grab values it sets
+sub process_config_file { #parse config file and grab values it sets
 
     my $_config_file_path;
 
@@ -2751,6 +2749,19 @@ sub process_case_file {  #get test case files to run (from command line or confi
         }
     }
 
+
+    my $_os;
+    if ($is_windows) { $_os = 'windows'; }
+    $_os //= 'linux';
+    
+    if (defined $user_config->{$_os}->{'chromedriver-binary'}) {
+        $opt_chromedriver_binary //= $user_config->{$_os}->{'chromedriver-binary'}; # default to value from config file if present
+    }
+
+    if (defined $user_config->{$_os}->{'selenium-binary'}) {
+        $opt_selenium_binary //= $user_config->{$_os}->{'selenium-binary'};
+    }
+
     return;
 }
 
@@ -2822,6 +2833,9 @@ sub read_test_case_file {
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
 
+    $testfile_contains_selenium = _does_testfile_contain_selenium(\$_xml);
+    #print "Contains Selenium:$testfile_contains_selenium\n";
+
     return;
 }
 
@@ -2875,6 +2889,17 @@ sub _include_file {
     #close $_INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
 
     return $_include;
+}
+
+#------------------------------------------------------------------
+sub _does_testfile_contain_selenium {
+    my ($_text) = @_; # sub is passed reference to file contents in string
+
+    if (${$_text} =~ m/\$driver->/) {
+        return 'true';
+    }
+
+    return;
 }
 
 #------------------------------------------------------------------
@@ -3542,15 +3567,28 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
     require Selenium::Remote::Driver;
     require Selenium::Chrome;
 
-    if (defined $driver) { #shut down any existing selenium browser session
-        $results_stdout .= " driver is defined so shutting down Selenium first\n";
-        shutdown_selenium();
-        sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
-        $results_stdout .= " Done shutting down Selenium\n";
+    if (not $opt_chromedriver_binary) {
+        die "\n\nYou must specify --chromedriver-binary for Selenium tests\n\n";
     }
 
-    if ($opt_port) {
-        $results_stdout .= "\nConnecting to Selenium Remote Control server on port $opt_port \n";
+    if (not -e $opt_chromedriver_binary) {
+        die "\n\nCannot find ChromeDriver at $opt_chromedriver_binary\n\n";
+    }
+
+    if (defined $driver) { #shut down any existing selenium browser session
+        $results_stdout .= "    [\$driver is defined so shutting down Selenium first]\n";
+        shutdown_selenium();
+        shutdown_selenium_server($selenium_port);
+        sleep 2.1; ## Sleep for 2.1 seconds, give system a chance to settle before starting new browser
+        $results_stdout .= "    [Done shutting down Selenium]\n";
+    }
+
+    $opt_driver //= 'chromedriver'; ## if variable is undefined, set to default value
+    $opt_driver = lc $opt_driver;
+
+    if ($opt_driver eq 'chrome') {
+        $selenium_port = _start_selenium_server();
+        $results_stdout .= "    [Connecting to Selenium Remote Control server on port $selenium_port]\n";
     }
 
     my $_max = 30;
@@ -3569,7 +3607,7 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
             if ($opt_driver eq 'chromedriver') {
                 my $_port = find_available_port(9585); ## find a free port to bind to, starting from this number
                 if ($opt_proxy) {
-                    $results_stdout .= "Starting ChromeDriver using proxy at $opt_proxy\n";
+                    $results_stdout .= "    [Starting ChromeDriver without Selenium Server through proxy on port $opt_proxy]\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  binary_port => $_port,
                                                  _binary_args => " --port=$_port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
@@ -3578,7 +3616,7 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
                                                  );
 
                 } else {
-                    $results_stdout .= "Starting ChromeDriver without a proxy\n";
+                    $results_stdout .= "    [Starting ChromeDriver without Selenium Server]\n";
                     $driver = Selenium::Chrome->new (binary => $opt_chromedriver_binary,
                                                  binary_port => $_port,
                                                  _binary_args => " --port=$_port --url-base=/wd/hub --verbose --log-path=$output".'chromedriver.log',
@@ -3591,16 +3629,17 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
             if ($opt_driver eq 'chrome') {
                 my $_chrome_proxy = q{};
                 if ($opt_proxy) {
-                    $results_stdout .= qq|Starting Chrome using proxy on port $opt_proxy\n|;
+                    $results_stdout .= qq|    [Starting Chrome with Selenium Server Standalone on port $selenium_port through proxy on port $opt_proxy]\n|;
                     $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                        'port' => $opt_port,
+                                                        'port' => $selenium_port,
                                                         'browser_name' => 'chrome',
                                                         'proxy' => {'proxyType' => 'manual', 'httpProxy' => $opt_proxy, 'sslProxy' => $opt_proxy },
                                                         'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
                                                         );
                 } else {
+                    $results_stdout .= "    [Starting Chrome using Selenium Server Standalone on $selenium_port]\n";
                     $driver = Selenium::Remote::Driver->new('remote_server_addr' => 'localhost',
-                                                        'port' => $opt_port,
+                                                        'port' => $selenium_port,
                                                         'browser_name' => 'chrome',
                                                         'extra_capabilities' => {'chromeOptions' => {'args' => ['window-size=1260,968']}}
                                                         );
@@ -3626,7 +3665,7 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
 
         if ( $@ and $_try++ < $_max )
         {
-            print "\nError: $@ Failed try $_try to connect to Selenium Server, retrying...\n";
+            print "[Error: $@ Failed try $_try to connect to Selenium Server, retrying...]\n";
             sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
             redo ATTEMPT;
         }
@@ -3646,13 +3685,87 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
         $results_xml .= qq|        </testcase>\n|;
         $case_failed_count++;
         write_final_xml();
-        die "WebInject Aborted - could not connect to Selenium Server\n";
+        die "\n\nWebInject Aborted - could not connect to Selenium Server\n";
     }
 
     eval { $driver->set_timeout('page load', 30_000); };
 
     return;
 }
+
+#------------------------------------------------------------------
+sub shutdown_selenium_server {
+    my ($_selenium_port) = @_;
+
+    if (not defined $_selenium_port) {
+        return;
+    }
+
+    require LWP::Simple;
+
+    my $_url = "http://localhost:$_selenium_port/selenium-server/driver/?cmd=shutDownSeleniumServer";
+    my $_content = LWP::Simple::get $_url;
+    #print {*STDOUT} "Shutdown Server:$_content\n";
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub _start_selenium_server {
+
+    if (not -e $opt_selenium_binary) {
+        die "\nCannot find Selenium Server at $opt_selenium_binary\n";
+    }
+
+    # copy chromedriver - source location hardcoded for now
+    copy $opt_chromedriver_binary, $output_folder;
+
+    # find free port
+    my $_selenium_port = find_available_port(int(rand 999)+11_000);
+    #print "_selenium_port:$_selenium_port\n";
+
+    my $_abs_chromedriver_full = File::Spec->rel2abs( "$output_folder/chromedriver.eXe" );
+    my $_abs_selenium_log_full = File::Spec->rel2abs( $output_folder.'/selenium_log.txt' );
+
+    if ($is_windows) {
+        my $_pid = _start_windows_process(qq{cmd /c java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
+    } else {
+        _start_linux_process(qq{java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
+    }
+
+    return $_selenium_port;
+}
+
+#------------------------------------------------------------------
+sub _start_windows_process {
+    my ($_command) = @_;
+
+    my $_wmic = "wmic process call create '$_command'"; #
+    my $_result = `$_wmic`;
+    #print "_wmic:$_wmic\n";
+    #print "$_result\n";
+
+    my $_pid;
+    if ( $_result =~ m/ProcessId = (\d+)/ ) {
+        $_pid = $1;
+    }
+
+    return $_pid;
+}
+
+#------------------------------------------------------------------
+sub _start_linux_process {
+    my ($_command) = @_;
+
+    my $_gnome_terminal = qq{(gnome-terminal -e "$_command" &)}; #
+    my $_result = `$_gnome_terminal`;
+    #print "_gnome_terminal:_gnome_terminal\n";
+    #print "$_result\n";
+
+    return;
+}
+
+#------------------------------------------------------------------
 
 sub port_available {
     my ($_port) = @_;
@@ -3755,6 +3868,8 @@ sub start_session {     ## creates the webinject user agent
         }
     }
 
+    if ($testfile_contains_selenium) { start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
+
     $session_started='true';
 
     return;
@@ -3766,17 +3881,17 @@ sub get_options {  #shell options
     Getopt::Long::Configure('bundling');
     GetOptions(
         'v|V|version'   => \$opt_version,
+        'h|help'   => \$opt_help,
         'c|config=s'    => \$opt_configfile,
         'o|output=s'    => \$opt_output,
         'a|autocontroller'    => \$opt_autocontroller,
-        'p|port=s'    => \$opt_port,
         'x|proxy=s'   => \$opt_proxy,
         'd|driver=s'   => \$opt_driver,
-        'y|binary=s'   => \$opt_chromedriver_binary,
+        'r|chromedriver-binary=s'   => \$opt_chromedriver_binary,
+        's|selenium-binary=s'   => \$opt_selenium_binary,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'n|no-output'   => \$opt_no_output,
         'e|verbose'   => \$opt_verbose,
-        'h|help'   => \$opt_help,
         'u|publish-to=s' => \$opt_publish_full,
         )
         or do {
@@ -3793,16 +3908,6 @@ sub get_options {  #shell options
         print_version();
         print_usage();
         exit;
-    }
-
-    if (defined $opt_driver) {
-        if ($opt_driver eq 'chromedriver') {
-            if (not defined $opt_chromedriver_binary) {
-                print "\nLocation of chromedriver binary must be specified when chromedriver selected.\n\n";
-                print "--binary C:\\selenium\\chromedriver.exe\n";
-                exit;
-            }
-        }
     }
 
     if ($opt_output) {  #use output location if it is passed from the command line
@@ -3835,20 +3940,21 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-Usage: webinject.pl testcase_file <<options>>
+Usage: webinject.pl test_case_file <<options>>
 
-                                                    examples/simple.xml
--c|--config config_file                             -c config.xml
--o|--output output_location                         -o output/
--A|--autocontroller                                 -a
--p|--port selenium_port                             -p 8325
--x|--proxy proxy_server                             -x localhost:9222
--d|--driver chrome/chromedriver                     -d chrome
--y|--binary (if chromedriver option chosen)         -y C:\selenium-server\chromedriver.exe
--i|--ignoreretry                                    -i
--n|--no-output                                      -n
--e|--verbose                                        -e
--u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
+                                     examples/simple.xml
+-c|--config config_file           -c config.xml
+-o|--output output_location       -o output/
+-a|--autocontroller               -a
+-p|--port selenium_port           -p 8325
+-x|--proxy proxy_server           -x localhost:9222
+-d|--driver chrome|chromedriver   -d chrome
+-r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
+-s|--selenium-binary              -s C:\selenium-server\selenium-server-standalone-2.53.1.jar
+-i|--ignoreretry                  -i
+-n|--no-output                    -n
+-e|--verbose                      -e
+-u|--publish-to                   -u C:\inetpub\wwwroot\this_run_home
 
 or
 

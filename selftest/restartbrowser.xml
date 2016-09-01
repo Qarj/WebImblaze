@@ -11,7 +11,7 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 1"
-    assertcount="RESTARTING BROWSER \.\.\.|||1"
+    assertcount="RESTARTING SESSION \.\.\.|||1"
     ignoresmartassertions="true"
 />
 

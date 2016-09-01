@@ -11,5 +11,13 @@
     </autoassertions> 
     <smartassertions> 
        <smartassertion1>Set\-Cookie: |||Cache\-Control: private|Cache\-Control: no\-cache|||Must have a Cache-Control of private or no-cache when a cookie is set</smartassertion1> 
-    </smartassertions> 
+    </smartassertions>
+    <windows>
+        <chromedriver-binary>C:\selenium\chromedriver.exe</chromedriver-binary>
+        <selenium-binary>C:\selenium\selenium-server-standalone-2.53.1.jar</selenium-binary>
+    </windows>
+    <linux>
+        <chromedriver-binary>$HOME/selenium/chromedriver</chromedriver-binary>
+        <selenium-binary>$HOME/selenium/selenium-server-standalone-2.53.1.jar</selenium-binary>
+    </linux>
 </root> 

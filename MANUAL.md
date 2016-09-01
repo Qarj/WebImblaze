@@ -44,6 +44,8 @@ Adapted from the original manual written by Corey Goldberg - find it at www.webi
 
 [WebInject Framework (webinjectframework)](#webinjectframework)
 
+[Selenium Binaries Location](#seleniumbinaries)
+
 ### [2.2 - Test Case Files (specifying in configuration file)](#filenames)
 
 ### [2.3 - Command Line Options and Specifying Alternate Test Case/Config Files](#cmdlineopts)
@@ -618,6 +620,36 @@ If this section is not present, the links will be null.
 <br />
 
 
+<a name="seleniumbinaries"></a>
+#### Selenium binaries location
+
+In order to support Selenium WebInject needs to know where to find the relevant binaries.
+
+The binaries locations can be specified through command line options. They can also be specified
+in the config file as follows.
+
+For Windows:
+```xml
+    <windows>
+        <chromedriver-binary>C:\selenium\chromedriver.exe</chromedriver-binary>
+        <selenium-binary>C:\selenium\selenium-server-standalone-2.53.1.jar</selenium-binary>
+    </windows>
+```
+
+For Linux:
+```xml
+    <linux>
+        <chromedriver-binary>$HOME/selenium/chromedriver</chromedriver-binary>
+        <selenium-binary>$HOME/selenium/selenium-server-standalone-2.53.1.jar</selenium-binary>
+    </linux>
+```
+
+It is possible to have the Linux and Windows values in the same config file. WebInject works out whether
+to use the Windows or Linux variables at run time.
+
+<br />
+
+
 <a name="filenames"></a>
 ### 2.2 - Test Case Files (specifying in configuration file)
 
@@ -656,17 +688,18 @@ webinject.pl examples/simple.xml
 The command line options are:
 
 ```
--c|--config config_file                             -c config.xml
--o|--output output_location                         -o output/
--A|--autocontroller                                 -a
--p|--port selenium_port                             -p 8325
--x|--proxy proxy_server                             -x localhost:9222
--d|--driver chromedriver OR phantomjs OR firefox    -d chromedriver
--y|--binary for chromedriver                        -y C:\selenium-server\chromedriver.exe
--i|--ignoreretry                                    -i
--n|--no-output                                      -n
--e|--verbose                                        -e
--u|--publish-to                                     -u C:\inetpub\wwwroot\this_run_home
+-c|--config config_file           -c config.xml
+-o|--output output_location       -o output/
+-a|--autocontroller               -a
+-p|--port selenium_port           -p 8325
+-x|--proxy proxy_server           -x localhost:9222
+-d|--driver chrome|chromedriver   -d chrome
+-r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
+-s|--selenium-binary              -s C:\selenium-server\selenium-server-standalone-2.53.1.jar
+-i|--ignoreretry                  -i
+-n|--no-output                    -n
+-e|--verbose                      -e
+-u|--publish-to                   -u C:\inetpub\wwwroot\this_run_home
 ```
 
 or
@@ -721,21 +754,26 @@ elsewhere.
 
 Specifies to run autocontrolleronly testcases.
 
-`-p` or `--port`
-
-Specifies the port to run Selenium Server under, e.g. `--port 8325`
-
 `x` or `--proxy`
 
 Specifies proxy to use, e.g. `--proxy localhost:9222`
 
 `-d` or `--driver`
 
-Specifies which driver to use for Selenium i.e, chromedriver, phantomjs or firefox, e.g. `--driver chromedriver`
+Specifies how to connect to Selenium.
 
-`-y` or `--binary`
+`--driver chromedriver` indicates to connect via chromedriver.exe without using the Selenium Server Standalone JAR file
 
-Location of chromedriver, e.g. `--binary C:\selenium-server\chromedriver.exe`
+`--driver chrome` indicates to connect via the Selenium Server Standalone JAR file
+
+
+`-r` or `--chromedriver-binary`
+
+Location of chromedriver executatble, e.g. `--chromedriver-binary C:\selenium-server\chromedriver.exe`
+
+`-s` or `--selenium-binary`
+
+Location of Selenium Server Standalone JAR file, e.g. `--selenium-binary C:\selenium-server\selenium-server-standalone-2.53.1.jar`
 
 `-i` or `--ignoreretry`
 
