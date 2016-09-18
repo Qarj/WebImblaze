@@ -2906,6 +2906,16 @@ sub _does_testfile_contain_selenium {
 ## no critic (RequireArgUnpacking)
 sub convert_back_xml {  #converts replaced xml with substitutions
 
+## perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
+    my ($_value, $_KEY);
+    foreach my $_key (keys %{ $user_config->{userdefined} } ) {
+        $_value = $user_config->{userdefined}{$_key};
+        if (ref($_value) eq 'HASH') { ## if we found a HASH, we treat it as blank
+            $_value = q{};
+        }
+        $_KEY = uc $_key; ## convert to uppercase
+        $_[0] =~ s/{$_KEY}/$_value/g;
+    }
 
 ## length feature for returning the size of the response
     my $_my_length;
@@ -2973,17 +2983,6 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
     $_[0] =~ s/{BASEURL1}/$config{baseurl1}/g;
     $_[0] =~ s/{BASEURL2}/$config{baseurl2}/g;
-
-## perform arbirtary user defined config substituions
-    my ($_value, $_KEY);
-    foreach my $_key (keys %{ $user_config->{userdefined} } ) {
-        $_value = $user_config->{userdefined}{$_key};
-        if (ref($_value) eq 'HASH') { ## if we found a HASH, we treat it as blank
-            $_value = q{};
-        }
-        $_KEY = uc $_key; ## convert to uppercase
-        $_[0] =~ s/{$_KEY}/$_value/g;
-    }
 
     return;
 }

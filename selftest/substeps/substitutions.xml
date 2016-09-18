@@ -231,4 +231,17 @@ Expected failures will be asserted by the master test file.
     verifypositive="_0_"
 />
 
+<!--
+In the config file ports_variable is set to convert_back which will swap {:8080} with :8080
+If convert_back was set to null, {:8080} would be converted to null
+-->
+<case
+    varSUB="_{WEBSITE_PORT}_"
+    id="260"
+    description1="User Defined variable WEBSITE_PORT is {WEBSITE_PORT}"
+    method="cmd"
+    command="echo {SUB}"
+    verifypositive="_:8080_"
+/>
+
 </testcases>
