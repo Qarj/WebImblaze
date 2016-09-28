@@ -2260,32 +2260,36 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         }
     }
     else { #verify http response code is in the 100-399 range
-        if (($response->as_string() =~ /HTTP\/1.(0|1) (1|2|3)/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
-            $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|;
-            $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
-            $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
-            $results_stdout .= qq|Passed HTTP Response Code Verification \n|;
-            #succesful response codes: 100-399
-            $passed_count++;
-            $retry_passed_count++;
-        }
-        else {
-            $response->as_string() =~ /(HTTP\/1.)(.*)/i;
-            if ($1) {  #this is true if an HTTP response returned
-                $results_html .= qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
-                $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                $results_xml .= qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
-                $results_stdout .= "Failed HTTP Response Code Verification ($1$2) \n"; #($1$2) is HTTP response code
+        if (not $case{ignorehttpresponsecode}) {
+            if (($response->as_string() =~ /HTTP\/1.(0|1) (1|2|3)/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
+                $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|;
+                $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
+                $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
+                $results_stdout .= qq|Passed HTTP Response Code Verification \n|;
+                #succesful response codes: 100-399
+                $passed_count++;
+                $retry_passed_count++;
             }
-            else {  #no HTTP response returned.. could be error in connection, bad hostname/address, or can not connect to web server
-                $results_html .= qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
-                $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
-                $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
-                $results_stdout .= "Failed - No Response \n"; #($1$2) is HTTP response code
+            else {
+                $response->as_string() =~ /(HTTP\/1.)(.*)/i;
+                if ($1) {  #this is true if an HTTP response returned
+                    $results_html .= qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
+                    $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+                    $results_xml .= qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
+                    $results_stdout .= "Failed HTTP Response Code Verification ($1$2) \n"; #($1$2) is HTTP response code
+                }
+                else {  #no HTTP response returned.. could be error in connection, bad hostname/address, or can not connect to web server
+                    $results_html .= qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
+                    $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
+                    $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
+                    $results_stdout .= "Failed - No Response \n"; #($1$2) is HTTP response code
+                }
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
             }
-            $failed_count++;
-            $retry_failed_count++;
-            $is_failure++;
+        } else {
+            $results_stdout .= qq|Ignored HTTP Response Code Verification \n|;
         }
     }
 
