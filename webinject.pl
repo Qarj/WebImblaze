@@ -3727,12 +3727,13 @@ sub _start_selenium_server {
     my $_selenium_port = find_available_port(int(rand 999)+11_000);
     #print "_selenium_port:$_selenium_port\n";
 
-    my $_abs_chromedriver_full = File::Spec->rel2abs( "$output_folder/chromedriver.eXe" );
     my $_abs_selenium_log_full = File::Spec->rel2abs( $output_folder.'/selenium_log.txt' );
 
     if ($is_windows) {
+        my $_abs_chromedriver_full = File::Spec->rel2abs( "$output_folder/chromedriver.eXe" );
         my $_pid = _start_windows_process(qq{cmd /c java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
     } else {
+        my $_abs_chromedriver_full = File::Spec->rel2abs( "$output_folder/chromedriver" );
         _start_linux_process(qq{java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
     }
 
