@@ -42,7 +42,6 @@ command will run on both Windows and Linux
     verifypositive1="__RequestVerificationToken"
     verifypositive2="Test Cases Failed: 0"
     verifypositive3="Connecting to Selenium Remote Control server on port"
-    verifynegative="possible Chrome and ChromeDriver version compatibility issue"
 />
 
 <case
