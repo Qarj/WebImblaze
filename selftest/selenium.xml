@@ -6,10 +6,22 @@ Self test master file. All test steps in this file should pass.
 
 <testvar varname="feature">selenium</testvar>
 
-<!--
-    command='start java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -Dwebdriver.chrome.logfile="selftest\substeps\${feature}chrome_logfile.xml" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates"'
-    command='wmic process call create "cmd /c java -Dwebdriver.chrome.driver=C:\selenium-server\chromedriver.exe -Dwebdriver.chrome.logfile={SINGLEQUOTE}selftest\substeps\${feature}chrome_logfile.xml{SINGLEQUOTE} -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates"'
-    command="wmic process call create 'cmd /c java -Dwebdriver.chrome.driver="C:\selenium-server\chromedriver.exe" -Dwebdriver.chrome.logfile="selftest\substeps\${feature}chrome_logfile.xml" -jar C:\selenium-server\selenium-server-standalone-2.53.0.jar -port 9988 -trustAllSSLCertificates'"
+<!-- Windows Manual Start of Selenium Server Example (Info only - WebInject will do this automatically)
+
+wmic process call create 'cmd /c java -Dwebdriver.chrome.driver="C:\selenium\chromedriver.exe" -jar C:\selenium\selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates'
+
+-->
+
+<!-- Linux Manual Start of Selenium Server Example (Info only - WebInject will do this automatically)
+
+(gnome-terminal -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &)
+
+-->
+
+<!-- Shutdown Selenium Server
+
+http://localhost:9988/selenium-server/driver/?cmd=shutDownSeleniumServer
+
 -->
 
 <!-- Windows and Linux Notes
@@ -22,36 +34,23 @@ command will run on both Windows and Linux
 -->
 
 <case
-    id="10"
-    description1="Start Selenium Server with ChromeDriver"
+    id="100"
+    description1="Run WebInject using Selenium Remote Control Server running under Java"
     method="cmd"
-    command1='wmic process call create {SINGLEQUOTE}cmd /c java -Dwebdriver.chrome.driver="C:\selenium\chromedriver.exe" -jar C:\selenium\selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates{SINGLEQUOTE}'
-    command2='(gnome-terminal -e "java -Dwebdriver.chrome.driver=$HOME/selenium/chromedriver -jar $HOME/selenium/selenium-server-standalone-2.53.1.jar -port 9988 -trustAllSSLCertificates" &)'
-/>
-
-<case
-    id="20"
-    description1="Run WebInject pointing to the Selenium Server port"
-    method="cmd"
-    command="perl webinject.pl -o selftest\output\${feature}server_chrome_sub --port 9988 --driver chrome selftest\substeps\${feature}.xml"
+    command="webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary C:\selenium\chromedriver.exe --selenium-binary C:\selenium\selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
+    command="./webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary $HOME/selenium/chromedriver.exe --selenium-binary $HOME/selenium/selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
     verifypositive1="__RequestVerificationToken"
     verifypositive2="Test Cases Failed: 0"
     verifypositive3="Connecting to Selenium Remote Control server on port"
+    verifynegative="possible Chrome and ChromeDriver version compatibility issue"
 />
 
 <case
-    id="30"
-    description1="Shutdown Selenium Server"
-    method="get"
-    url="http://localhost:9988/selenium-server/driver/?cmd=shutDownSeleniumServer"
-/>
-
-<case
-    id="100"
+    id="200"
     description1="Run WebInject pointing to the ChromeDriver binary - does not require Selenium Server or java"
     method="cmd"
-    command1="webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --binary C:\selenium\chromedriver.exe selftest\substeps\${feature}.xml"
-    command2=" ./webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --binary $HOME/selenium/chromedriver selftest\substeps\${feature}.xml"
+    command1="webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --chromedriver-binary C:\selenium\chromedriver.exe selftest\substeps\${feature}.xml"
+    command2=" ./webinject.pl -o selftest\output\${feature}_chromedriver_standalone_sub --driver chromedriver --chromedriver-binary $HOME/selenium/chromedriver selftest\substeps\${feature}.xml"
     verifypositive1="__RequestVerificationToken"
     verifypositive2="Test Cases Failed: 0"
 />

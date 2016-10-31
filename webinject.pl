@@ -3668,7 +3668,7 @@ sub start_selenium_browser {     ## start Browser using Selenium Server or Chrom
 
         if ( $@ and $_try++ < $_max )
         {
-            print "[Error: $@ Failed try $_try to connect to Selenium Server, retrying...]\n";
+            print "\n[Selenium Start Error - possible Chrome and ChromeDriver version compatibility issue]\n$@\nFailed try $_try to connect to Selenium Server, retrying...\n\n";
             sleep 4; ## sleep for 4 seconds, Selenium Server may still be starting up
             redo ATTEMPT;
         }

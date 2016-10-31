@@ -186,7 +186,7 @@ and place it in `C:\selenium`
 1. First obtain ChromeDriver and put it in a folder called ~/selenium by running these commands
     ```
     mkdir ~/selenium
-    wget -N http://chromedriver.storage.googleapis.com/2.22/chromedriver_linux64.zip -P ~/selenium
+    wget -N http://chromedriver.storage.googleapis.com/2.25/chromedriver_linux64.zip -P ~/selenium
     sudo apt install unzip
     unzip ~/selenium/chromedriver_linux64.zip -d ~/selenium
     chmod +x ~/selenium/chromedriver
@@ -199,6 +199,7 @@ and place it in `C:\selenium`
 
 3. A few extra commands are needed to ensure the dependencies are covered
     ```
+    sudo apt-get update
     sudo apt install gnome-terminal
     sudo apt install default-jre
     sudo cpan Selenium::Remote::Driver
