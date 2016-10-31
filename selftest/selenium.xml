@@ -38,7 +38,7 @@ command will run on both Windows and Linux
     description1="Run WebInject using Selenium Remote Control Server running under Java"
     method="cmd"
     command1="webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary C:\selenium\chromedriver.exe --selenium-binary C:\selenium\selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
-    command2=" ./webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary $HOME/selenium/chromedriver.exe --selenium-binary $HOME/selenium/selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
+    command2=" ./webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary $HOME/selenium/chromedriver --selenium-binary $HOME/selenium/selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
     verifypositive1="__RequestVerificationToken"
     verifypositive2="Test Cases Failed: 0"
     verifypositive3="Connecting to Selenium Remote Control server on port"
