@@ -3734,7 +3734,7 @@ sub _start_selenium_server {
         my $_pid = _start_windows_process(qq{cmd /c java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
     } else {
         my $_abs_chromedriver_full = File::Spec->rel2abs( "$output_folder/chromedriver" );
-        chmod 775, $_abs_chromedriver_full; # Linux loses the write permission with file copy
+        chmod 0775, $_abs_chromedriver_full; # Linux loses the write permission with file copy
         _start_linux_process(qq{java -Dwebdriver.chrome.driver="$_abs_chromedriver_full" -Dwebdriver.chrome.logfile="$_abs_selenium_log_full" -jar $opt_selenium_binary -port $_selenium_port -trustAllSSLCertificates});
     }
 
