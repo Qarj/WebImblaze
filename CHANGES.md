@@ -8,6 +8,22 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.1.0 - Nov 1, 2016
+* new fail fast! feature for assertions, i.e. if assertion fails, do not retry
+* removed retryresponsecode feature - no longer relevant due to fail fast! feature
+* display on STDOUT which verifypositive or verifynegative failed
+* --verbose option will make WebInject show the request and response on STDOUT
+* --basefolder option removed (was used for image comparison which is now implemented differently)
+* --no-output option will now also not create files in the output folder (in addition to no STDOUT) unless the tests specifically create files, or Selenium is used
+* WebInject aborts in a handled way (i.e. with error messaging) when there are connectivity issues with Selenium Server
+* maxredirect parameter added for GET requests
+* fixed a bug with useragent parameter (did not work on first test step)
+* Selenium Server is now started by WebInject using --selenium-binary option (which means WebInject can restart the Selenium Server if it needs a kick)
+* --binary option changed to --chromedriver-binary
+* variables set in the user_defined section of the config file can now refer to variables themselves e.g. {:8080} 
+* ignorehttpresponsecode parameter is no longer counted as a passed verification
+* a message is logged to STDOUT when ignorehttpresponsecode is used
+
 ### Version 2.0.0 - Aug 7, 2016
 * created a self test for Selenium functionality - works on both Windows and Linux
 * removed Firefox and PhantomJS support
