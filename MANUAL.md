@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.1.0
+# Manual for WebInject version 2.2.0
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2085,6 +2085,16 @@ helper_switch_to_window(`window number`);
 
 ```
 command="$selresp = helper_switch_to_window(0);"
+```
+
+##### helper_keys_to_input_after
+
+helper_keys_to_input_after(`label`,`keys to put in input`);
+
+Will look for some text in the page source, and enter a value to the following input field.
+
+```
+command="$selresp = helper_keys_to_input_after('What','WebDriver Jobs');"
 ```
 
 ##### helper_js_click

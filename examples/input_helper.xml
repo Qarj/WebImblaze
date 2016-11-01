@@ -1,0 +1,21 @@
+<testcases repeat="1">
+
+<case
+    section="Input Helper Demo"
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="selenium"
+    command='$selresp = $driver->get("https://www.totaljobs.com");'
+    verifytext="get_page_source,get_current_url"
+    verifypositive="Location"
+/>
+
+<case
+    id="20"
+    description1="Enter What and Where to search"
+    method="selenium"
+    command1="$selresp = helper_keys_to_input_after('What','WebDriver Jobs');"
+    command2="$selresp = helper_keys_to_input_after('Where','London');"
+/>
+
+</testcases>

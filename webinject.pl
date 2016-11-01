@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.1.0';
+$VERSION = '2.2.0';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1147,6 +1147,46 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     my $_handles = $driver->get_window_handles;
     print Data::Dumper::Dumper($_handles);
     my $_response =  $driver->switch_to_window($_handles->[$_window_number]);
+
+    return $_response;
+}
+
+sub helper_keys_to_input_after { ## usage: helper_keys_to_input_after(anchor,keys);
+                                 ##        helper_keys_to_input_after('Where','London');
+
+    my ($_anchor,$_keys) = @_;
+
+    my $_script = q|
+        var anchor = arguments[0];
+        var keys = arguments[1];
+        var all = window.document.getElementsByTagName("*");
+
+        var remIndex = -1;
+        for (var i=0, max=all.length; i < max; i++) {
+             if (all[i].children.length < 1) { // Do not want search parent elements since they potentially contain everything
+                if (all[i].textContent.indexOf(anchor) != -1) {
+                    //console.log(all[i].textContent);
+                    remIndex = i;
+                    break;
+                }
+            }
+        }
+        console.log(remIndex);
+
+        if (remIndex == -1) {
+            return "Anchor text not found";
+        }
+
+        for (var i=remIndex+1, max=all.length; i < max; i++) {
+            if (all[i].tagName == "INPUT") {
+                all[i].value=keys;
+                return "input tag set to value OK";
+            }
+        }
+
+        return "Could not find an input element after the anchor text";
+    |;
+    my $_response = $driver->execute_script($_script,$_anchor,$_keys);
 
     return $_response;
 }

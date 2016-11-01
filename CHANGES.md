@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.2.0 - Nov 1, 2016
+* new helper function helper_keys_to_input_after which searches the page for some text and sets the next input field to a desired value
+
 ### Version 2.1.0 - Nov 1, 2016
 * new fail fast! feature for assertions, i.e. if assertion fails, do not retry
 * removed retryresponsecode feature - no longer relevant due to fail fast! feature
