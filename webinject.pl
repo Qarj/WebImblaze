@@ -1163,21 +1163,23 @@ sub helper_keys_to_input_after { ## usage: helper_keys_to_input_after(anchor,key
 
         var remIndex = -1;
         for (var i=0, max=all.length; i < max; i++) {
-             if (all[i].children.length < 1) { // Do not want search parent elements since they potentially contain everything
-                if (all[i].textContent.indexOf(anchor) != -1) {
-                    //console.log(all[i].textContent);
-                    remIndex = i;
-                    break;
-                }
+            var text = '';
+            for (var j = 0; j < all[i].childNodes.length; ++j) {
+               if (all[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                    text += all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+               }
+            }
+            if (text.indexOf(anchor) != -1) {
+                remIndex = i;
+                break;
             }
         }
-        console.log(remIndex);
 
         if (remIndex == -1) {
             return "Anchor text not found";
         }
 
-        for (var i=remIndex+1, max=all.length; i < max; i++) {
+        for (var i=remIndex, max=all.length; i < max; i++) {
             if (all[i].tagName == "INPUT") {
                 all[i].value=keys;
                 return "input tag set to value OK";
