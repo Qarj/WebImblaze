@@ -8,6 +8,11 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.2.1 - Nov 2, 2016
+* new helper function helper_keys_to_input_after renamed to helper_keys_to_element_after and made compatible with Salesforce
+* helper_keys_to_element_after can now set SELECT i.e. drop down values
+* helper_keys_to_element_after can now check and uncheck checkboxes
+
 ### Version 2.2.0 - Nov 1, 2016
 * new helper function helper_keys_to_input_after which searches the page for some text and sets the next input field to a desired value
 

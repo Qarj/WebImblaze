@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.2.0';
+$VERSION = '2.2.1';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1151,44 +1151,57 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     return $_response;
 }
 
-sub helper_keys_to_input_after { ## usage: helper_keys_to_input_after(anchor,keys);
-                                 ##        helper_keys_to_input_after('Where','London');
+sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
+                                   ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
+                                   ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
+                                   ##        helper_keys_to_element_after('Send me marketing','check');    # will check   if INPUT is a checkbox
+                                   ##        helper_keys_to_element_after('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
-    my ($_anchor,$_keys) = @_;
+    my ($_anchor,$_keys,$_tag) = @_;
+    $_tag //= 'INPUT';
 
     my $_script = q|
-        var anchor = arguments[0];
-        var keys = arguments[1];
-        var all = window.document.getElementsByTagName("*");
+        var _anchor = arguments[0];
+        var _keys = arguments[1];
+        var _tag = arguments[2];
+        var _all = window.document.getElementsByTagName("*");
 
-        var remIndex = -1;
-        for (var i=0, max=all.length; i < max; i++) {
-            var text = '';
-            for (var j = 0; j < all[i].childNodes.length; ++j) {
-               if (all[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
-                    text += all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+        var _remIndex = -1;
+        for (var i=0, max=_all.length; i < max; i++) {
+            var _text = '';
+            for (var j = 0; j < _all[i].childNodes.length; ++j) {
+               if (_all[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                   _text += _all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                }
             }
-            if (text.indexOf(anchor) != -1) {
-                remIndex = i;
+            if (_text.indexOf(_anchor) != -1) {
+                _remIndex = i;
                 break;
             }
         }
 
-        if (remIndex == -1) {
+        if (_remIndex == -1) {
             return "Anchor text not found";
         }
 
-        for (var i=remIndex, max=all.length; i < max; i++) {
-            if (all[i].tagName == "INPUT") {
-                all[i].value=keys;
-                return "input tag set to value OK";
+        for (var i=_remIndex, max=_all.length; i < max; i++) {
+            if (_all[i].tagName == _tag) {
+                if (_all[i].type && _all[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
+                    if (_keys) {
+                        _all[i].checked = true;
+                    } else {
+                        _all[i].checked = false;
+                    }
+                } else { // just set the value, this will work for SELECT elements too
+                    _all[i].value=_keys;
+                }
+                return _tag + " tag set to value OK";
             }
         }
 
-        return "Could not find an input element after the anchor text";
+        return "Could not find " + _tag + " element after the anchor text";
     |;
-    my $_response = $driver->execute_script($_script,$_anchor,$_keys);
+    my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
 
     return $_response;
 }

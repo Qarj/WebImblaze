@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.2.0
+# Manual for WebInject version 2.2.1
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2087,14 +2087,33 @@ helper_switch_to_window(`window number`);
 command="$selresp = helper_switch_to_window(0);"
 ```
 
-##### helper_keys_to_input_after
+##### helper_keys_to_element_after
 
-helper_keys_to_input_after(`label`,`keys to put in input`);
+helper_keys_to_input_after(`label`,`keys to put in input`,`OPTIONAL - tag name`);
 
-Will look for some text in the page source, and enter a value to the following input field.
+                                   ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
+                                   ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
+                                   ##        helper_keys_to_element_after('Send me marketing','check');    # will check   if INPUT is a checkbox
+                                   ##        helper_keys_to_element_after('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
+Will look for some text in the page source, and enter a value to the following INPUT tag.
 ```
-command="$selresp = helper_keys_to_input_after('What','WebDriver Jobs');"
+command="$selresp = helper_keys_to_element_after('What','WebDriver Jobs');"
+```
+
+Select "Contract" in the "Job Type" drop down.
+```
+command="$selresp = helper_keys_to_element_after('Job Type','Contract','SELECT');"
+```
+
+Will check the "Send me marketing" checkbox.
+```
+command="$selresp = helper_keys_to_element_after('Send me marketing','check');"
+```
+
+Will uncheck the "Send me marketing" checkbox.
+```
+command="$selresp = helper_keys_to_element_after('Send me marketing','');"
 ```
 
 ##### helper_js_click
