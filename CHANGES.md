@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.3.0 - Nov 4, 2016
+* httpauth delimiter can now be any character you want - the first character of the httpauth string specifies the delimiter
+
 ### Version 2.2.1 - Nov 2, 2016
 * new helper function helper_keys_to_input_after renamed to helper_keys_to_element_after and made compatible with Salesforce
 * helper_keys_to_element_after can now set SELECT i.e. drop down values

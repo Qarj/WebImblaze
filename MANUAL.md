@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.2.1
+# Manual for WebInject version 2.3.0
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -304,20 +304,28 @@ User-Agent string sent is "WebInject".  A User-Agent string is how each request 
 
 Specifies authorization headers to your request for HTTP Basic Authentication.  HTTP provides a simple challenge-response
 authentication mechanism which may be used by a server to challenge a client request and by a client to provide authentication
-information.  This configuration parameter takes a list of 5 colon delimited values that correspond to:
-`servername:portnumber:realm-name:username:password`
+information.  This configuration parameter takes a list of 5 delimited values that correspond to:
+`:servername:portnumber:realm-name:username:password`
+
+Note that you specify the delimiter with the first character.
 
 ```xml
-<httpauth>www.fakedomain.com:80:my_realm:foo:welcome</httpauth>
+<httpauth>|www.fakedomain.com|80|my_realm|foo|welcome</httpauth>
 ```
 
 You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
 
 ```xml
-<httpauth>server.companyintranet:80::ntdomain\username:password</httpauth>
+<httpauth>|server.companyintranet|80||ntdomain\username|password</httpauth>
 ```
 
 Note: You can have as many httpauth entries as you need.
+
+```xml
+    <httpauth>!www.example.com!8080!my_area!foo2!welcome2</httpauth>
+    <httpauth>?github.com?443?darkmoon?user?pass</httpauth>
+    <httpauth> tfl.gov.uk 80 realm username password</httpauth>
+```
 
 <a name="baseurl"></a>
 

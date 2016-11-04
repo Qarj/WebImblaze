@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.2.1';
+$VERSION = '2.3.0';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -2827,10 +2827,13 @@ sub process_config_file { #parse config file and grab values it sets
 sub _push_httpauth {
     my ($_auth) = @_;
 
+    my $_delimiter = quotemeta substr $_auth,0,1;
+    my $_err_delim = substr $_auth,0,1;
+
     #print "\nhttpauth:$auth\n";
-    my @_auth_entry = split /:/, $_auth;
-    if ($#_auth_entry != 4) {
-        print {*STDERR} "\nError: httpauth should have 5 fields delimited by colons\n\n";
+    my @_auth_entry = split /$_delimiter/, $_auth;
+    if ($#_auth_entry != 5) {
+        print {*STDERR} "\n$_auth\nError: httpauth should have 5 fields delimited by the first character [$_err_delim]\n\n";
     }
     else {
         push @http_auth, [@_auth_entry];
