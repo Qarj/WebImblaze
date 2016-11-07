@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.3.0';
+$VERSION = '2.3.1';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1185,7 +1185,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         }
 
         for (var i=_remIndex, max=_all.length; i < max; i++) {
-            if (_all[i].tagName == _tag) {
+            if (_all[i].tagName == _tag && !(_all[i].getAttribute('type') === 'hidden')) {
                 if (_all[i].type && _all[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
                     if (_keys) {
                         _all[i].checked = true;

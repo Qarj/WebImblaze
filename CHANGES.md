@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.3.1 - Nov 7, 2016
+* helper_keys_to_element_after now will ignore elements with type == 'hidden'
+
 ### Version 2.3.0 - Nov 4, 2016
 * httpauth delimiter can now be any character you want - the first character of the httpauth string specifies the delimiter
 
