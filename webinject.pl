@@ -1165,6 +1165,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         var _keys = arguments[1];
         var _tag = arguments[2];
         var _all = window.document.getElementsByTagName("*");
+        var _idx = -1;
 
         var _remIndex = -1;
         for (var i=0, max=_all.length; i < max; i++) {
@@ -1174,7 +1175,8 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                    _text += _all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                }
             }
-            if (_text.indexOf(_anchor) != -1) {
+            _idx = _text.indexOf(_anchor);
+            if (_idx != -1 && _idx < 3) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
                 _remIndex = i;
                 break;
             }
@@ -1195,7 +1197,11 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 } else { // just set the value, this will work for SELECT elements too
                     _all[i].value=_keys;
                 }
-                return _tag + " tag set to value OK";
+                var _id = '';
+                if (_all[i].id) {
+                    _id=" id[" + _all[i].id + "]";
+                } 
+                return _tag + " tag set to value OK (text index " + _idx + ")" + _id;
             }
         }
 
