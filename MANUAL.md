@@ -2061,10 +2061,10 @@ Here is a full list of the helper functions.
 
 ##### helper_select_by_text
 
-helper_select_by_label(`target`, `locator`, `label`);
+helper_select_by_text(`target`, `locator`, `label`);
 
 ```
-command="$selresp = helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');"
+command="$selresp = helper_select_by_text('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');"
 ```
 
 ##### helper_clear_and_send_keys

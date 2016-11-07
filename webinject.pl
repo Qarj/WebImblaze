@@ -1101,8 +1101,8 @@ sub _screenshot {
     return;
 }
 
-sub helper_select_by_text { ## usage: helper_select_by_label(Search Target, Locator, Label);
-                            ##        helper_select_by_label('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
+sub helper_select_by_text { ## usage: helper_select_by_text(Search Target, Locator, Label);
+                            ##        helper_select_by_text('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
 
     my ($_search_target, $_locator, $_labeltext) = @_;
 
