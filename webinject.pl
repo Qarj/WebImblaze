@@ -1166,6 +1166,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         var _tag = arguments[2];
         var _all = window.document.getElementsByTagName("*");
         var _idx = -1;
+        var _debug = '';
 
         var _remIndex = -1;
         for (var i=0, max=_all.length; i < max; i++) {
@@ -1175,6 +1176,10 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                    _text += _all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                }
             }
+            //_debug = _debug + ' ' + _all[i].tagName;
+            //if (_all[i].id) {
+            //    _debug = _debug + " id[" + _all[i].id + "]";
+            //}
             _idx = _text.indexOf(_anchor);
             if (_idx != -1 && _idx < 3) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
                 _remIndex = i;
@@ -1183,7 +1188,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         }
 
         if (_remIndex == -1) {
-            return "Anchor text not found";
+            return "Anchor text not found" + _debug;
         }
 
         for (var i=_remIndex, max=_all.length; i < max; i++) {
@@ -1201,11 +1206,11 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 if (_all[i].id) {
                     _id=" id[" + _all[i].id + "]";
                 } 
-                return _tag + " tag set to value OK (text index " + _idx + ")" + _id;
+                return _tag + " tag set to value OK (text index " + _idx + ")" + _id + _debug;
             }
         }
 
-        return "Could not find " + _tag + " element after the anchor text";
+        return "Could not find " + _tag + " element after the anchor text" + _debug;
     |;
     my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
 
