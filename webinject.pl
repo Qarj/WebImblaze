@@ -1164,21 +1164,21 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         var _anchor = arguments[0];
         var _keys = arguments[1];
         var _tag = arguments[2];
-        var _all = window.document.getElementsByTagName("*");
+        var _all_ = window.document.getElementsByTagName("*");
         var _idx = -1;
-        var _debug = '';
+        var _debug_ = '';
 
         var _remIndex = -1;
-        for (var i=0, max=_all.length; i < max; i++) {
+        for (var i=0, max=_all_.length; i < max; i++) {
             var _text = '';
-            for (var j = 0; j < _all[i].childNodes.length; ++j) {
-               if (_all[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
-                   _text += _all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+            for (var j = 0; j < _all_[i].childNodes.length; ++j) {
+               if (_all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                   _text += _all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                }
             }
-            //_debug = _debug + ' ' + _all[i].tagName;
-            //if (_all[i].id) {
-            //    _debug = _debug + " id[" + _all[i].id + "]";
+            //_debug_ = _debug_ + ' ' + _all_[i].tagName;
+            //if (_all_[i].id) {
+            //    _debug_ = _debug_ + " id[" + _all_[i].id + "]";
             //}
             _idx = _text.indexOf(_anchor);
             if (_idx != -1 && _idx < 3) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
@@ -1188,29 +1188,29 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         }
 
         if (_remIndex == -1) {
-            return "Anchor text not found" + _debug;
+            return "Anchor text not found" + _debug_;
         }
 
-        for (var i=_remIndex, max=_all.length; i < max; i++) {
-            if (_all[i].tagName == _tag && !(_all[i].getAttribute('type') === 'hidden')) {
-                if (_all[i].type && _all[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
+        for (var i=_remIndex, max=_all_.length; i < max; i++) {
+            if (_all_[i].tagName == _tag && !(_all_[i].getAttribute('type') === 'hidden')) {
+                if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
                     if (_keys) {
-                        _all[i].checked = true;
+                        _all_[i].checked = true;
                     } else {
-                        _all[i].checked = false;
+                        _all_[i].checked = false;
                     }
                 } else { // just set the value, this will work for SELECT elements too
-                    _all[i].value=_keys;
+                    _all_[i].value=_keys;
                 }
                 var _id = '';
-                if (_all[i].id) {
-                    _id=" id[" + _all[i].id + "]";
+                if (_all_[i].id) {
+                    _id=" id[" + _all_[i].id + "]";
                 } 
-                return _tag + " tag set to value OK (text index " + _idx + ")" + _id + _debug;
+                return _tag + " tag set to value OK (text index " + _idx + ")" + _id + _debug_;
             }
         }
 
-        return "Could not find " + _tag + " element after the anchor text" + _debug;
+        return "Could not find " + _tag + " element after the anchor text" + _debug_;
     |;
     my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
 
@@ -1228,7 +1228,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
 
         var anchor_ = arguments[0];
         var instance_ = arguments[1];
-        var all_ = window.document.getElementsByTagName("*");
+        var _all_ = window.document.getElementsByTagName("*");
         var debug_ = '';
         var depth_ = [1,3,15,50];
 
@@ -1245,13 +1245,13 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
             return "Anchor text not found" + debug_;
         }
 
-        all_[info_.elementIndex].click();
+        _all_[info_.elementIndex].click();
 
         var id_ = '';
-        if (all_[info_.elementIndex].id) {
-            id_=" id[" + all_[info_.elementIndex].id + "]";
+        if (_all_[info_.elementIndex].id) {
+            id_=" id[" + _all_[info_.elementIndex].id + "]";
         } 
-        return "Clicked [" + anchor_ + "] in tag " + all_[info_.elementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+        return "Clicked [" + anchor_ + "] in tag " + _all_[info_.elementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_instance);
 
@@ -1269,7 +1269,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
         var anchor_ = arguments[0];
         var tag_ = arguments[1].split("|");
         var instance_ = arguments[2];
-        var all_ = window.document.getElementsByTagName("*");
+        var _all_ = window.document.getElementsByTagName("*");
         var _debug_ = '';
         var depth_ = [1,3,15,50];
 
@@ -1298,7 +1298,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
             return "Found anchor but not element " + tag_;
         }
 
-        all_[targetElementIndex_].click();
+        _all_[targetElementIndex_].click();
 
         return element_clicked_info(targetElementIndex_,"BEFORE",anchor_,info_.textIndex);
     `;
@@ -1315,20 +1315,20 @@ sub _helper_javascript_functions {
             var _textIndex = -1;
             var _elementIndex = -1;
             var _found_instance = 0;
-            for (var i=0, max=all_.length; i < max; i++) {
-                if (all_[i].getAttribute('type') === 'hidden') { 
+            for (var i=0, max=_all_.length; i < max; i++) {
+                if (_all_[i].getAttribute('type') === 'hidden') { 
                     continue; // Ignore hidden elements
                 }
                 var _text = '';
-                for (var j = 0; j < all_[i].childNodes.length; ++j) {
-                   if (all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
-                       _text += all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+                for (var j = 0; j < _all_[i].childNodes.length; ++j) {
+                   if (_all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                       _text += _all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                    }
                 }
 
-                //_debug_ = _debug_ + ' ' + all_[i].tagName;
-                //if (all_[i].id) {
-                //    _debug_ = _debug_ + " id[" + all_[i].id + "]";
+                //_debug_ = _debug_ + ' ' + _all_[i].tagName;
+                //if (_all_[i].id) {
+                //    _debug_ = _debug_ + " id[" + _all_[i].id + "]";
                 //}
 
                 _textIndex = _text.indexOf(_anchor);
@@ -1351,7 +1351,7 @@ sub _helper_javascript_functions {
 
         function get_element_before(_tags,_i) {
             for (var j=0; j < _tags.length; j++) {
-                if (all_[_i].tagName == _tags[j] && !(all_[_i].getAttribute('type') === 'hidden')) {
+                if (_all_[_i].tagName == _tags[j] && !(_all_[_i].getAttribute('type') === 'hidden')) {
                     return _i;
                 }
             }
@@ -1360,10 +1360,10 @@ sub _helper_javascript_functions {
 
         function element_clicked_info(_targetElementIndex,_anchor_info,_anchor,_textIndex) {
             var _id = '';
-            if (all_[_targetElementIndex].id) {
-                _id=" id[" + all_[_targetElementIndex].id + "]";
+            if (_all_[_targetElementIndex].id) {
+                _id=" id[" + _all_[_targetElementIndex].id + "]";
             } 
-            return "Clicked tag " + all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
+            return "Clicked tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
         }
     `; 
 }
