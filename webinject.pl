@@ -1186,11 +1186,6 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 } else { // just set the value, this will work for SELECT elements too
                     _all_[i].value=keys_;
                 }
-                //var _id = '';
-                //if (_all_[i].id) {
-                //    _id=" id[" + _all_[i].id + "]";
-                //} 
-                //return tag_[0] + " tag set to value OK (text index " + info_.textIndex + ")" + _id + _debug_;
                 return element_action_info("Set value of",info_.elementIndex,"AFTER",anchor_,info_.textIndex);
             }
         }
