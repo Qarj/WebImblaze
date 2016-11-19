@@ -1230,16 +1230,8 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
         var instance_ = arguments[1];
         var _all_ = window.document.getElementsByTagName("*");
         var _debug_ = '';
-        var depth_ = [1,3,15,50];
 
-        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
-        var info_;
-        for (var i=0; i < depth_.length; i++) {
-            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
-            if (info_.elementIndex > -1) {
-                break;
-            }
-        }
+        var info_ = search_for_element(anchor_,instance_);
 
         if (info_.elementIndex == -1) {
             return "Anchor text not found" + _debug_;
@@ -1344,6 +1336,27 @@ sub _helper_javascript_functions {
                 textIndex : _textIndex
             }
         }
+
+        function search_for_element(_anchor,_instance) {
+            var _depth = [1,3,15,50];
+    
+            var _info;
+            // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
+            for (var i=0; i < _depth.length; i++) {
+                _info = get_element_number_by_text(_anchor,_depth[i],_instance);
+                if (_info.elementIndex > -1) {
+                    return {
+                        elementIndex : _info.elementIndex,
+                        textIndex : _info.textIndex
+                    }
+                }
+            }
+            return {
+                elementIndex : -1,
+                textIndex : -1
+            }
+        }
+
 
         function get_element_before(_tags,_i) {
             for (var j=0; j < _tags.length; j++) {
