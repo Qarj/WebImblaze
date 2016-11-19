@@ -1160,39 +1160,24 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
     my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    my $_script = q|
-        var _anchor = arguments[0];
+    my $_script = _helper_javascript_functions() . q`
+
+        var anchor_ = arguments[0];
         var _keys = arguments[1];
-        var _tag = arguments[2];
+        var tag_ = arguments[2].split("|");
+        var instance_ = 1;
         var _all_ = window.document.getElementsByTagName("*");
         var _idx = -1;
         var _debug_ = '';
 
-        var _remIndex = -1;
-        for (var i=0, max=_all_.length; i < max; i++) {
-            var _text = '';
-            for (var j = 0; j < _all_[i].childNodes.length; ++j) {
-               if (_all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
-                   _text += _all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
-               }
-            }
-            //_debug_ = _debug_ + ' ' + _all_[i].tagName;
-            //if (_all_[i].id) {
-            //    _debug_ = _debug_ + " id[" + _all_[i].id + "]";
-            //}
-            _idx = _text.indexOf(_anchor);
-            if (_idx != -1 && _idx < 3) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
-                _remIndex = i;
-                break;
-            }
+        var info_ = search_for_element(anchor_,instance_);
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
         }
 
-        if (_remIndex == -1) {
-            return "Anchor text not found" + _debug_;
-        }
-
-        for (var i=_remIndex, max=_all_.length; i < max; i++) {
-            if (_all_[i].tagName == _tag && !(_all_[i].getAttribute('type') === 'hidden')) {
+        for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
+            if (_all_[i].tagName == tag_[0] && !(_all_[i].getAttribute('type') === 'hidden')) {
                 if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
                     if (_keys) {
                         _all_[i].checked = true;
@@ -1206,12 +1191,12 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 if (_all_[i].id) {
                     _id=" id[" + _all_[i].id + "]";
                 } 
-                return _tag + " tag set to value OK (text index " + _idx + ")" + _id + _debug_;
+                return tag_[0] + " tag set to value OK (text index " + info_.textIndex + ")" + _id + _debug_;
             }
         }
 
-        return "Could not find " + _tag + " element after the anchor text" + _debug_;
-    |;
+        return "Could not find " + tag_[0] + " element after the anchor text" + _debug_;
+    `;
     my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
 
     return $_response;
