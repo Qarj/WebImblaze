@@ -1259,16 +1259,8 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
         var instance_ = arguments[2];
         var _all_ = window.document.getElementsByTagName("*");
         var _debug_ = '';
-        var depth_ = [1,3,15,50];
 
-        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
-        var info_;
-        for (var i=0; i < depth_.length; i++) {
-            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
-            if (info_.elementIndex > -1) {
-                break;
-            }
-        }
+        var info_ = search_for_element(anchor_,instance_);
 
         if (info_.elementIndex == -1) {
             return "Anchor text not found" + debug_;
