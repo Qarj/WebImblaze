@@ -1270,7 +1270,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
         var tag_ = arguments[1].split("|");
         var instance_ = arguments[2];
         var all_ = window.document.getElementsByTagName("*");
-        var debug_ = '';
+        var _debug_ = '';
         var depth_ = [1,3,15,50];
 
         // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
@@ -1286,25 +1286,21 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
             return "Anchor text not found" + debug_;
         }
 
-        var _targetElementIndex = -1;
+        var targetElementIndex_ = -1;
         for (var i=info_.elementIndex, min=-1; i > min; i--) {
-            _targetElementIndex = get_element_before(tag_,i);
-            if (_targetElementIndex > -1) {
+            targetElementIndex_ = get_element_before(tag_,i);
+            if (targetElementIndex_ > -1) {
                 break;
             }
         }
 
-        if (_targetElementIndex === -1) {
+        if (targetElementIndex_ === -1) {
             return "Found anchor but not element " + tag_;
         }
 
-        all_[_targetElementIndex].click();
+        all_[targetElementIndex_].click();
 
-        var id_ = '';
-        if (all_[_targetElementIndex].id) {
-            id_=" id[" + all_[_targetElementIndex].id + "]";
-        } 
-        return "Clicked [" + anchor_ + "] in tag " + all_[_targetElementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+        return element_clicked_info(targetElementIndex_,"BEFORE",anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
 
@@ -1329,10 +1325,12 @@ sub _helper_javascript_functions {
                        _text += all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                    }
                 }
-                //debug_ = debug_ + ' ' + all_[i].tagName;
+
+                //_debug_ = _debug_ + ' ' + all_[i].tagName;
                 //if (all_[i].id) {
-                //    debug_ = debug_ + " id[" + all_[i].id + "]";
+                //    _debug_ = _debug_ + " id[" + all_[i].id + "]";
                 //}
+
                 _textIndex = _text.indexOf(_anchor);
                 if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
                     _found_instance = _found_instance + 1;
@@ -1358,6 +1356,14 @@ sub _helper_javascript_functions {
                 }
             }
             return -1;
+        }
+
+        function element_clicked_info(_targetElementIndex,_anchor_info,_anchor,_textIndex) {
+            var _id = '';
+            if (all_[_targetElementIndex].id) {
+                _id=" id[" + all_[_targetElementIndex].id + "]";
+            } 
+            return "Clicked tag " + all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
         }
     `; 
 }
