@@ -1229,7 +1229,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
         var anchor_ = arguments[0];
         var instance_ = arguments[1];
         var _all_ = window.document.getElementsByTagName("*");
-        var debug_ = '';
+        var _debug_ = '';
         var depth_ = [1,3,15,50];
 
         // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
@@ -1242,16 +1242,12 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
         }
 
         if (info_.elementIndex == -1) {
-            return "Anchor text not found" + debug_;
+            return "Anchor text not found" + _debug_;
         }
 
         _all_[info_.elementIndex].click();
 
-        var id_ = '';
-        if (_all_[info_.elementIndex].id) {
-            id_=" id[" + _all_[info_.elementIndex].id + "]";
-        } 
-        return "Clicked [" + anchor_ + "] in tag " + _all_[info_.elementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+        return element_clicked_info(info_.elementIndex,"WITH",anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_instance);
 
@@ -1390,7 +1386,6 @@ sub helper_is_checked { ## usage: helper_is_checked(Search Target, Locator);
     my ($_search_target, $_locator) = @_;
 
     my $_element = $driver->find_element("$_search_target", "$_locator");
-    print "_element:".$_element."\n";
 
     my $_script = q|
         var _element = arguments[0];
