@@ -1,0 +1,78 @@
+<testcases repeat="1">
+
+<case
+    section="Click Helper Self Test - Anchor found at start of text in element"
+    id="100"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    verifytext="get_page_source,get_current_url"
+    verifypositive="Location"
+/>
+
+<case
+    id="110"
+    description1="Click Upload your CV"
+    method="selenium"
+    command1="$selresp = helper_click('Upload your CV');"
+    command2="$selresp = helper_wait_for_text_visible('from this device','body','tag_name','3');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    section="Click Helper Self Test - Second instance of Anchor"
+    id="200"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    verifytext="get_page_source,get_current_url"
+    verifypositive="Location"
+/>
+
+<case
+    id="210"
+    description1="Click 2nd Yes"
+    method="selenium"
+    command1="$selresp = helper_click('Yes',2);"
+    command2="$selresp = helper_get_attribute(q|label[for='eligibilityEuYes']|,'css','class');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="btn btn-select active"
+/>
+
+<case
+    section="Click Helper Self Test - INPUT before text"
+    id="300"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifytext="get_page_source,get_current_url"
+    verifypositive1="Location"
+    verifypositive2="Element is checked"
+/>
+
+<case
+    id="310"
+    description1="Click INPUT element before 'Enable other employers to find me'"
+    method="selenium"
+    command1="$selresp = helper_mouse_move_to_location('register','id',1,1);"
+    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
+    command3="$selresp = helper_click_before('Enable other employers to find me');"
+    command4="$selresp = helper_get_attribute('cvdbOptIn','id','checked');"
+    command5="$selresp = helper_get_attribute('cvdbOptIn','id','value');"
+    command6="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+<case
+    id="320"
+    description1="Check that checkbox is now unchecked"
+    method="selenium"
+    command1="$selresp = helper_get_attribute('cvdbOptIn','id','checked');"
+    command2="$selresp = helper_get_attribute('cvdbOptIn','id','value');"
+    command3="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifypositive="Element is not checked"
+/>
+
+</testcases>

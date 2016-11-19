@@ -1166,6 +1166,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         var _tag = arguments[2];
         var _all = window.document.getElementsByTagName("*");
         var _idx = -1;
+        var _debug = '';
 
         var _remIndex = -1;
         for (var i=0, max=_all.length; i < max; i++) {
@@ -1175,6 +1176,10 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                    _text += _all[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
                }
             }
+            //_debug = _debug + ' ' + _all[i].tagName;
+            //if (_all[i].id) {
+            //    _debug = _debug + " id[" + _all[i].id + "]";
+            //}
             _idx = _text.indexOf(_anchor);
             if (_idx != -1 && _idx < 3) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
                 _remIndex = i;
@@ -1183,7 +1188,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         }
 
         if (_remIndex == -1) {
-            return "Anchor text not found";
+            return "Anchor text not found" + _debug;
         }
 
         for (var i=_remIndex, max=_all.length; i < max; i++) {
@@ -1201,14 +1206,221 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 if (_all[i].id) {
                     _id=" id[" + _all[i].id + "]";
                 } 
-                return _tag + " tag set to value OK (text index " + _idx + ")" + _id;
+                return _tag + " tag set to value OK (text index " + _idx + ")" + _id + _debug;
             }
         }
 
-        return "Could not find " + _tag + " element after the anchor text";
+        return "Could not find " + _tag + " element after the anchor text" + _debug;
     |;
     my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
 
+    return $_response;
+}
+
+sub helper_click { ## usage: helper_click(anchor[,instance]);
+                   ## usage: helper_click('Yes');
+                   ## usage: helper_click('Yes',2);
+
+    my ($_anchor,$_instance) = @_;
+    $_instance //= 1;
+
+    my $_script = q|
+
+        function get_element_number_by_text(_anchor,_depth,_instance)
+        {
+            var _textIndex = -1;
+            var _elementIndex = -1;
+            var _found_instance = 0;
+            for (var i=0, max=all_.length; i < max; i++) {
+                if (all_[i].getAttribute('type') === 'hidden') { 
+                    continue; // Ignore hidden elements
+                }
+                var _text = '';
+                for (var j = 0; j < all_[i].childNodes.length; ++j) {
+                   if (all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                       _text += all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+                   }
+                }
+                //debug_ = debug_ + ' ' + all_[i].tagName;
+                //if (all_[i].id) {
+                //    debug_ = debug_ + " id[" + all_[i].id + "]";
+                //}
+                _textIndex = _text.indexOf(_anchor);
+                if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
+                    _found_instance = _found_instance + 1;
+                    if (_instance === _found_instance) {
+                        _elementIndex = i;
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            return {
+                elementIndex : _elementIndex,
+                textIndex : _textIndex
+            }
+        }
+
+        var anchor_ = arguments[0];
+        var instance_ = arguments[1];
+        var all_ = window.document.getElementsByTagName("*");
+        var debug_ = '';
+        var depth_ = [1,3,15,50];
+
+        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
+        var info_;
+        for (var i=0; i < depth_.length; i++) {
+            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
+            if (info_.elementIndex > -1) {
+                break;
+            }
+        }
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        all_[info_.elementIndex].click();
+
+        var id_ = '';
+        if (all_[info_.elementIndex].id) {
+            id_=" id[" + all_[info_.elementIndex].id + "]";
+        } 
+        return "Clicked [" + anchor_ + "] in tag " + all_[info_.elementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+    |;
+    my $_response = $driver->execute_script($_script,$_anchor,$_instance);
+
+    return $_response;
+}
+
+sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance]);
+
+    my ($_anchor,$_element,$_instance) = @_;
+    $_element //= 'INPUT';
+    $_instance //= 1;
+
+    my $_script = q|
+
+        function get_element_number_by_text(_anchor,_depth,_instance)
+        {
+            var _textIndex = -1;
+            var _elementIndex = -1;
+            var _found_instance = 0;
+            for (var i=0, max=all_.length; i < max; i++) {
+                if (all_[i].getAttribute('type') === 'hidden') { 
+                    continue; // Ignore hidden elements
+                }
+                var _text = '';
+                for (var j = 0; j < all_[i].childNodes.length; ++j) {
+                   if (all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                       _text += all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+                   }
+                }
+                //debug_ = debug_ + ' ' + all_[i].tagName;
+                //if (all_[i].id) {
+                //    debug_ = debug_ + " id[" + all_[i].id + "]";
+                //}
+                _textIndex = _text.indexOf(_anchor);
+                if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
+                    _found_instance = _found_instance + 1;
+                    if (_instance === _found_instance) {
+                        _elementIndex = i;
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+            }
+
+            return {
+                elementIndex : _elementIndex,
+                textIndex : _textIndex
+            }
+        }
+
+        var anchor_ = arguments[0];
+        var tag_ = arguments[1];
+        var instance_ = arguments[2];
+        var all_ = window.document.getElementsByTagName("*");
+        var debug_ = '';
+        var depth_ = [1,3,15,50];
+
+        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
+        var info_;
+        for (var i=0; i < depth_.length; i++) {
+            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
+            if (info_.elementIndex > -1) {
+                break;
+            }
+        }
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        var _targetElementIndex = -1;
+        for (var i=info_.elementIndex, min=-1; i > min; i--) {
+            if (all_[i].tagName == tag_ && !(all_[i].getAttribute('type') === 'hidden')) {
+                _targetElementIndex = i;
+                break;
+            }
+        }
+
+        if (_targetElementIndex === -1) {
+            return "Found anchor but not element " + tag_;
+        }
+
+        all_[_targetElementIndex].click();
+
+        var id_ = '';
+        if (all_[_targetElementIndex].id) {
+            id_=" id[" + all_[_targetElementIndex].id + "]";
+        } 
+        return "Clicked [" + anchor_ + "] in tag " + all_[_targetElementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+    |;
+    my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
+
+    return $_response;
+}
+
+sub helper_get_attribute { ## usage: helper_get_attribute(Search Target, Locator, Target Attribute);
+                           ##        helper_get_attribute(q|label[for='eligibilityUkYes']|,'css','class');
+
+    my ($_search_target, $_locator, $_attribute) = @_;
+
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+
+    my $_script = q|
+        var _element = arguments[0];
+        var _attribute = arguments[1];
+        return _element.getAttribute(_attribute);
+    |;
+
+    my $_response = $driver->execute_script($_script,$_element,$_attribute);
+    return $_response;
+}
+
+sub helper_is_checked { ## usage: helper_is_checked(Search Target, Locator);
+
+    my ($_search_target, $_locator) = @_;
+
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+    print "_element:".$_element."\n";
+
+    my $_script = q|
+        var _element = arguments[0];
+        var _return;
+        if (_element.checked) {
+            _return = 'Element is checked';
+        } else {
+            _return = 'Element is not checked';
+        }
+        return _return;
+    |;
+
+    my $_response = $driver->execute_script($_script,$_element);
     return $_response;
 }
 
