@@ -1186,11 +1186,12 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 } else { // just set the value, this will work for SELECT elements too
                     _all_[i].value=keys_;
                 }
-                var _id = '';
-                if (_all_[i].id) {
-                    _id=" id[" + _all_[i].id + "]";
-                } 
-                return tag_[0] + " tag set to value OK (text index " + info_.textIndex + ")" + _id + _debug_;
+                //var _id = '';
+                //if (_all_[i].id) {
+                //    _id=" id[" + _all_[i].id + "]";
+                //} 
+                //return tag_[0] + " tag set to value OK (text index " + info_.textIndex + ")" + _id + _debug_;
+                return element_action_info("Set value of",info_.elementIndex,"AFTER",anchor_,info_.textIndex);
             }
         }
 
@@ -1223,7 +1224,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
 
         _all_[info_.elementIndex].click();
 
-        return element_clicked_info(info_.elementIndex,"WITH",anchor_,info_.textIndex);
+        return element_action_info("Clicked",info_.elementIndex,"WITH",anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_instance);
 
@@ -1264,7 +1265,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
 
         _all_[targetElementIndex_].click();
 
-        return element_clicked_info(targetElementIndex_,"BEFORE",anchor_,info_.textIndex);
+        return element_action_info("Clicked",targetElementIndex_,"BEFORE",anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
 
@@ -1343,12 +1344,12 @@ sub _helper_javascript_functions {
             return -1;
         }
 
-        function element_clicked_info(_targetElementIndex,_anchor_info,_anchor,_textIndex) {
+        function element_action_info(_action,_targetElementIndex,_anchor_info,_anchor,_textIndex) {
             var _id = '';
             if (_all_[_targetElementIndex].id) {
                 _id=" id[" + _all_[_targetElementIndex].id + "]";
             } 
-            return "Clicked tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
+            return _action + " tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
         }
     `; 
 }
