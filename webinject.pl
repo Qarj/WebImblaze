@@ -1157,17 +1157,16 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                                    ##        helper_keys_to_element_after('Send me marketing','check');    # will check   if INPUT is a checkbox
                                    ##        helper_keys_to_element_after('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
-    my ($_anchor,$_keys,$_tag) = @_;
+    my ($_anchor,$keys_,$_tag) = @_;
     $_tag //= 'INPUT';
 
     my $_script = _helper_javascript_functions() . q`
 
         var anchor_ = arguments[0];
-        var _keys = arguments[1];
+        var keys_ = arguments[1];
         var tag_ = arguments[2].split("|");
         var instance_ = 1;
         var _all_ = window.document.getElementsByTagName("*");
-        var _idx = -1;
         var _debug_ = '';
 
         var info_ = search_for_element(anchor_,instance_);
@@ -1179,13 +1178,13 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
         for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
             if (_all_[i].tagName == tag_[0] && !(_all_[i].getAttribute('type') === 'hidden')) {
                 if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
-                    if (_keys) {
+                    if (keys_) {
                         _all_[i].checked = true;
                     } else {
                         _all_[i].checked = false;
                     }
                 } else { // just set the value, this will work for SELECT elements too
-                    _all_[i].value=_keys;
+                    _all_[i].value=keys_;
                 }
                 var _id = '';
                 if (_all_[i].id) {
@@ -1197,7 +1196,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
 
         return "Could not find " + tag_[0] + " element after the anchor text" + _debug_;
     `;
-    my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
+    my $_response = $driver->execute_script($_script,$_anchor,$keys_,$_tag);
 
     return $_response;
 }
