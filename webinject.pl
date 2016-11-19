@@ -1224,44 +1224,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
     my ($_anchor,$_instance) = @_;
     $_instance //= 1;
 
-    my $_script = q|
-
-        function get_element_number_by_text(_anchor,_depth,_instance)
-        {
-            var _textIndex = -1;
-            var _elementIndex = -1;
-            var _found_instance = 0;
-            for (var i=0, max=all_.length; i < max; i++) {
-                if (all_[i].getAttribute('type') === 'hidden') { 
-                    continue; // Ignore hidden elements
-                }
-                var _text = '';
-                for (var j = 0; j < all_[i].childNodes.length; ++j) {
-                   if (all_[i].childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
-                       _text += all_[i].childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
-                   }
-                }
-                //debug_ = debug_ + ' ' + all_[i].tagName;
-                //if (all_[i].id) {
-                //    debug_ = debug_ + " id[" + all_[i].id + "]";
-                //}
-                _textIndex = _text.indexOf(_anchor);
-                if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
-                    _found_instance = _found_instance + 1;
-                    if (_instance === _found_instance) {
-                        _elementIndex = i;
-                        break;
-                    } else {
-                        continue;
-                    }
-                }
-            }
-
-            return {
-                elementIndex : _elementIndex,
-                textIndex : _textIndex
-            }
-        }
+    my $_script = _helper_javascript_functions() . q`
 
         var anchor_ = arguments[0];
         var instance_ = arguments[1];
@@ -1289,7 +1252,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
             id_=" id[" + all_[info_.elementIndex].id + "]";
         } 
         return "Clicked [" + anchor_ + "] in tag " + all_[info_.elementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
-    |;
+    `;
     my $_response = $driver->execute_script($_script,$_anchor,$_instance);
 
     return $_response;
@@ -1298,11 +1261,59 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
 sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance]);
 
     my ($_anchor,$_element,$_instance) = @_;
-    $_element //= 'INPUT';
+    $_element //= 'INPUT|BUTTON|SELECT|A';
     $_instance //= 1;
 
-    my $_script = q|
+    my $_script = _helper_javascript_functions() . q`
 
+        var anchor_ = arguments[0];
+        var tag_ = arguments[1].split("|");
+        var instance_ = arguments[2];
+        var all_ = window.document.getElementsByTagName("*");
+        var debug_ = '';
+        var depth_ = [1,3,15,50];
+
+        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
+        var info_;
+        for (var i=0; i < depth_.length; i++) {
+            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
+            if (info_.elementIndex > -1) {
+                break;
+            }
+        }
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        var _targetElementIndex = -1;
+        for (var i=info_.elementIndex, min=-1; i > min; i--) {
+            _targetElementIndex = get_element_before(tag_,i);
+            if (_targetElementIndex > -1) {
+                break;
+            }
+        }
+
+        if (_targetElementIndex === -1) {
+            return "Found anchor but not element " + tag_;
+        }
+
+        all_[_targetElementIndex].click();
+
+        var id_ = '';
+        if (all_[_targetElementIndex].id) {
+            id_=" id[" + all_[_targetElementIndex].id + "]";
+        } 
+        return "Clicked [" + anchor_ + "] in tag " + all_[_targetElementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
+    `;
+    my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
+
+    return $_response;
+}
+
+sub _helper_javascript_functions {
+
+    return q`
         function get_element_number_by_text(_anchor,_depth,_instance)
         {
             var _textIndex = -1;
@@ -1340,49 +1351,15 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
             }
         }
 
-        var anchor_ = arguments[0];
-        var tag_ = arguments[1];
-        var instance_ = arguments[2];
-        var all_ = window.document.getElementsByTagName("*");
-        var debug_ = '';
-        var depth_ = [1,3,15,50];
-
-        // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
-        var info_;
-        for (var i=0; i < depth_.length; i++) {
-            info_ = get_element_number_by_text(anchor_,depth_[i],instance_);
-            if (info_.elementIndex > -1) {
-                break;
+        function get_element_before(_tags,_i) {
+            for (var j=0; j < _tags.length; j++) {
+                if (all_[_i].tagName == _tags[j] && !(all_[_i].getAttribute('type') === 'hidden')) {
+                    return _i;
+                }
             }
+            return -1;
         }
-
-        if (info_.elementIndex == -1) {
-            return "Anchor text not found" + debug_;
-        }
-
-        var _targetElementIndex = -1;
-        for (var i=info_.elementIndex, min=-1; i > min; i--) {
-            if (all_[i].tagName == tag_ && !(all_[i].getAttribute('type') === 'hidden')) {
-                _targetElementIndex = i;
-                break;
-            }
-        }
-
-        if (_targetElementIndex === -1) {
-            return "Found anchor but not element " + tag_;
-        }
-
-        all_[_targetElementIndex].click();
-
-        var id_ = '';
-        if (all_[_targetElementIndex].id) {
-            id_=" id[" + all_[_targetElementIndex].id + "]";
-        } 
-        return "Clicked [" + anchor_ + "] in tag " + all_[_targetElementIndex].tagName + " OK (text index " + info_.textIndex + ")" + id_ + debug_;
-    |;
-    my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
-
-    return $_response;
+    `; 
 }
 
 sub helper_get_attribute { ## usage: helper_get_attribute(Search Target, Locator, Target Attribute);

@@ -75,4 +75,25 @@
     verifypositive="Element is not checked"
 />
 
+<case
+    section="Click Helper Self Test - BUTTON before text"
+    id="400"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    verifytext="get_page_source,get_current_url"
+    verifypositive1="Location"
+/>
+
+<case
+    id="410"
+    description1="Click BUTTON element before 'We accept MS Word'"
+    method="selenium"
+    command1="$selresp = helper_click_before('We accept MS Word','BUTTON');"
+    command2="$selresp = helper_wait_for_text_visible('from this device','body','tag_name','3');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+
 </testcases>
