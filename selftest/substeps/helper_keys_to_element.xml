@@ -45,5 +45,23 @@
     verifypositive="\[538\] Diploma"
 />
 
+<case
+    section="Keys to checkbox"
+    id="200"
+    description1="View 'Switch on one-click apply' current state"
+    method="selenium"
+    command1="$selresp = helper_is_checked('ocaOptIn','id');"
+    command2="$selresp = helper_mouse_move_to_location('register','id',1,1);"
+    verifypositive="Element is checked"
+/>
+
+<case
+    id="210"
+    description1="Uncheck 'Switch on one-click apply'"
+    method="selenium"
+    command3="$selresp = helper_keys_to_element_after('Enable other employers to find me','');"
+    command4="$selresp = helper_is_checked('ocaOptIn','id');"
+    verifypositive="Element is not checked"
+/>
 
 </testcases>
