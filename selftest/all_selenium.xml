@@ -14,4 +14,24 @@ Run all WebInject Selenium self tests
     verifynegative="TEST CASE FAILED"
 />
 
+<case
+    varFEATURE="helper_click"
+    id="110"
+    description1="{FEATURE}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
+    varFEATURE="helper_keys_to_element"
+    id="120"
+    description1="{FEATURE}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
 </testcases>

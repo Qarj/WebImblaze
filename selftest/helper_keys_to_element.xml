@@ -1,44 +1,14 @@
 <testcases repeat="1">
 
-<case
-    section="RIMATTEST Search Form"
-    id="10"
-    description1="Get RIMATTEST Search Form"
-    method="selenium"
-    command='$selresp = $driver->get("http://{RAN}/Search/SearchForm");'
-    command1='$selresp = $driver->get_all_cookies();'
-    verifytext="get_page_source,get_current_url"
-    verifypositive="Search Recipes"
-    verifypositive1="Max Preparation Time"
-/>
-
 <!--
-    command4="$selresp = helper_wait_for_text_present('Cuisine','5');"
-    command4="$selresp = helper_wait_for_text_visible('Cuisinex', 'body', 'tag_name', 5);"
-    command4="$selresp = helper_wait_for_element_present('TxtCuisine','id',5);"
-    command4="$selresp = helper_wait_for_element_visible('TxtCuisine','id',5);"
-    command4="$selresp = helper_wait_for_text_not_present('Cuisine',5);"
-    command4="$selresp = helper_wait_for_text_not_visible('This text will not be found',5);"
+Self test master file. All test steps in this file should pass.
 -->
-<case
-    id="20"
-    description1="Fill out Search Form"
-    method="selenium"
-    command1="$selresp = helper_keys_to_element_after('Recipe Name','Shepherds Pie');"
-    command2="$selresp = helper_keys_to_element_after('Cuisine','British');"
-    command3="$selresp = helper_keys_to_element_after('Max Prep','2');"
-    command4="$selresp = helper_wait_for_text_visible('Cuisine', 'body', 'tag_name', 5);"
-    verifytext="get_page_source,get_current_url"
-    verifypositive="Cuisine"
-/>
 
-<case
-    id="30"
-    description1="Submit Search"
-    method="selenium"
-    command1='$selresp = $driver->find_element("input[name=BtnSubmit]","css")->click();'
-    verifytext="get_page_source,get_current_url"
-    verifypositive="you just submitted a search"
+<testvar varname="feature">helper_keys_to_element</testvar>
+
+<include
+    id="10"
+    file="selftest\helpers\selenium_runner.xml"
 />
 
 </testcases>

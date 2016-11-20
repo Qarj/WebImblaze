@@ -1,0 +1,9 @@
+
+<case
+    id="00"
+    description1="Run WebInject using Selenium Remote Control Server"
+    method="cmd"
+    command1="webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary C:\selenium\chromedriver.exe --selenium-binary C:\selenium\selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
+    command2=" ./webinject.pl -o selftest\output\${feature}server_chrome_sub --driver chrome --chromedriver-binary $HOME/selenium/chromedriver --selenium-binary $HOME/selenium/selenium-server-standalone-2.53.1.jar selftest\substeps\${feature}.xml"
+    verifypositive2="Test Cases Failed: 0"
+/>
