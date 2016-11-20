@@ -12,14 +12,6 @@
     verifypositive1="Max Preparation Time"
 />
 
-<!--
-    command4="$selresp = helper_wait_for_text_present('Cuisine','5');"
-    command4="$selresp = helper_wait_for_text_visible('Cuisinex', 'body', 'tag_name', 5);"
-    command4="$selresp = helper_wait_for_element_present('TxtCuisine','id',5);"
-    command4="$selresp = helper_wait_for_element_visible('TxtCuisine','id',5);"
-    command4="$selresp = helper_wait_for_text_not_present('Cuisine',5);"
-    command4="$selresp = helper_wait_for_text_not_visible('This text will not be found',5);"
--->
 <case
     id="20"
     description1="Fill out Search Form"
@@ -40,5 +32,18 @@
     verifytext="get_page_source,get_current_url"
     verifypositive="you just submitted a search"
 />
+
+<case
+    section="Keys to SELECT element"
+    id="100"
+    description1="Set Highest level of education to Diploma"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    command2="$selresp = helper_keys_to_element_after('Highest level of education','538','SELECT');"
+    command3="$selresp = helper_get_selection(q|select[id='ddlEducation']|,'css');"
+    verifytext="get_page_source,get_current_url"
+    verifypositive="\[538\] Diploma"
+/>
+
 
 </testcases>

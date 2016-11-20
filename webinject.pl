@@ -1186,7 +1186,7 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                 } else { // just set the value, this will work for SELECT elements too
                     _all_[i].value=keys_;
                 }
-                return element_action_info("Set value of",info_.elementIndex,"AFTER",anchor_,info_.textIndex);
+                return element_action_info("Set value of",i,"AFTER",anchor_,info_.textIndex);
             }
         }
 
@@ -1363,6 +1363,24 @@ sub helper_get_attribute { ## usage: helper_get_attribute(Search Target, Locator
     |;
 
     my $_response = $driver->execute_script($_script,$_element,$_attribute);
+    return $_response;
+}
+
+sub helper_get_selection { ## usage: helper_get_selection(Search Target, Locator);
+                           ##        helper_get_selection(q|select[id='ddlEducation']|,'css');
+
+    my ($_search_target, $_locator) = @_;
+
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+
+    my $_script = q|
+        var _element = arguments[0];
+        var _selectedValue = _element.options[_element.selectedIndex].value;
+        var _selectedText = _element.options[_element.selectedIndex].text;
+        return "[" + _selectedValue + "] " + _selectedText;
+    |;
+
+    my $_response = $driver->execute_script($_script,$_element);
     return $_response;
 }
 
