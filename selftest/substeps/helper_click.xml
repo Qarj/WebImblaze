@@ -95,5 +95,24 @@
     verifypositive20="Found sought text"
 />
 
+<case
+    section="Click by element title"
+    id="500"
+    description1="Move to bottom of page"
+    method="selenium"
+    command1="$selresp = helper_mouse_move_to_location(q|//*[contains(text(),'Copyright and database')]|,'xpath',1,1);"
+    verifytext="get_current_url,get_window_handles"
+/>
+
+<case
+    id="510"
+    description1="Click facebook link"
+    method="selenium"
+    command1="$selresp = helper_click('facebook');"
+    verifytext="get_current_url,get_window_handles"
+    assertcount="window-|||2|||Facebook should be open in 2nd tab"
+    verifypositive="Clicked tag A WITH\[facebook\] OK"
+/>
+
 
 </testcases>
