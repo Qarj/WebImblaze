@@ -64,4 +64,14 @@
     verifypositive="Element is not checked"
 />
 
+<case
+    section="Keys to element mathcing placeholder attribute"
+    id="300"
+    description1="Send Test Automation Architect to Current/most recent job title"
+    method="selenium"
+    command1="$selresp = helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');"
+    command2="$selresp = helper_get_element_value('currentJobTitle','id','value');"
+    verifypositive="SELRESP:Test Automation Architect"
+/>
+
 </testcases>

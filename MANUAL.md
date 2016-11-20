@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.3.1
+# Manual for WebInject version 2.4.0
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2099,11 +2099,6 @@ command="$selresp = helper_switch_to_window(0);"
 
 helper_keys_to_input_after(`label`,`keys to put in input`,`OPTIONAL - tag name`);
 
-                                   ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
-                                   ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
-                                   ##        helper_keys_to_element_after('Send me marketing','check');    # will check   if INPUT is a checkbox
-                                   ##        helper_keys_to_element_after('Send me marketing','');         # will uncheck if INPUT is a checkbox
-
 Will look for some text in the page source, and enter a value to the following INPUT tag.
 ```
 command="$selresp = helper_keys_to_element_after('What','WebDriver Jobs');"
@@ -2122,6 +2117,84 @@ command="$selresp = helper_keys_to_element_after('Send me marketing','check');"
 Will uncheck the "Send me marketing" checkbox.
 ```
 command="$selresp = helper_keys_to_element_after('Send me marketing','');"
+```
+
+##### helper_keys_to_element
+
+helper_keys_to_element(`text anchor`,`keys`);
+
+Targets an element by its text or attribute values. In this example, the element is targeted with place holder text.
+```
+command="$selresp = helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');"
+```
+
+##### helper_click
+
+helper_click(`anchor`[,`instance`]);
+
+Clicks the first element on the page with Yes in it somewhere. Exact matches are priortised over partial matches.
+Element text is prioritised over attribute values.
+```
+command="$selresp = helper_click('Yes');"
+```
+
+Clicks the second instance that matches `Yes`.
+```
+command="$selresp = helper_click('Yes',2);"
+```
+
+##### helper_click_before
+
+helper_click_before(`anchor`[,`element`,`instance`]);
+
+Will click the first element it finds before the text anchor, so long as it is one of INPUT, BUTTON, SELECT or A (i.e. link).
+
+Clicks the first button before the second instance that matches `Yes`.
+```
+command="$selresp = helper_click_before('Yes','BUTTON',2);"
+```
+
+Due to the heuristics, if there are two exact matches for `Yes` then only those will be counted. The other `Yes` matches will
+be ignored if they are considered to be of poorer quality.
+
+##### helper_click_after
+
+helper_click_after(`anchor`[,`element`,`instance`]);
+
+Works just like helper_click_before, except that it looks after the matching anchor text.
+
+##### helper_get_attribute 
+
+helper_get_attribute(`Search Target`, `Locator`, `Target Attribute`);
+
+Gets the value of the attribute (in this example `class`) for the target element.
+```
+command="$selresp = helper_get_attribute(q|label[for='eligibilityUkYes']|,'css','class');"
+```
+
+##### helper_get_element_value
+
+helper_get_element_value(`Search Target`, `Locator`);
+
+Gets the text value of the target element.
+```
+command="$selresp = helper_get_element_value('currentJobTitle','id');"
+```
+
+##### helper_get_selection
+
+helper_get_selection(`Search Target`, `Locator`);
+
+Gets the selection for the targeted drop down.
+```
+command="$selresp = helper_get_selection(q|select[id='ddlEducation']|,'css');"
+```
+
+##### helper_is_checked
+
+Indicates if the targeted checkbox is checked or not.
+```
+command="$selresp = helper_is_checked(Search Target, Locator);"
 ```
 
 ##### helper_js_click

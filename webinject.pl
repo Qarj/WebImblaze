@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.3.1';
+$VERSION = '2.4.0';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1197,6 +1197,42 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
     return $_response;
 }
 
+sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
+                             ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
+
+    my ($_anchor,$keys_) = @_;
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var anchor_ = arguments[0];
+        var keys_ = arguments[1];
+        var instance_ = 1;
+        var _all_ = window.document.getElementsByTagName("*");
+        var _debug_ = '';
+
+        var info_ = search_for_element(anchor_,instance_);
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        if (_all_[info_.elementIndex].type && _all_[info_.elementIndex].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
+            if (keys_) {
+                _all_[info_.elementIndex].checked = true;
+            } else {
+                _all_[info_.elementIndex].checked = false;
+            }
+        } else { // just set the value, this will work for SELECT elements too
+            _all_[info_.elementIndex].value=keys_;
+        }
+
+        return element_action_info("Set value of",info_.elementIndex,"WITH",anchor_,info_.textIndex);
+    `;
+    my $_response = $driver->execute_script($_script,$_anchor,$keys_);
+
+    return $_response;
+}
+
 sub helper_click { ## usage: helper_click(anchor[,instance]);
                    ## usage: helper_click('Yes');
                    ## usage: helper_click('Yes',2);
@@ -1452,6 +1488,22 @@ sub helper_get_attribute { ## usage: helper_get_attribute(Search Target, Locator
     |;
 
     my $_response = $driver->execute_script($_script,$_element,$_attribute);
+    return $_response;
+}
+
+sub helper_get_element_value { ## usage: helper_get_element_value(Search Target, Locator);
+                               ##        helper_get_element_value('currentJobTitle','id');
+
+    my ($_search_target, $_locator) = @_;
+
+    my $_element = $driver->find_element("$_search_target", "$_locator");
+
+    my $_script = q|
+        var _element = arguments[0];
+        return _element.value;
+    |;
+
+    my $_response = $driver->execute_script($_script,$_element);
     return $_response;
 }
 

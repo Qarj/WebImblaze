@@ -8,6 +8,12 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.4.0 - Nov 20, 2016
+* set of helpers I think of as "Locators for Testers" - heuristics find target element without needing to view source or inspect element
+* these "Locators for Testers" are helper_keys_to_element, helper_keys_to_element_after, helper_click, helper_click_before, helper_click_after
+* additional helpers to easily get current state: helper_get_attribute, helper_get_element_value, helper_get_selection, helper_is_checked
+* put a framework in place for WebInject Selenium self tests
+
 ### Version 2.3.1 - Nov 7, 2016
 * helper_keys_to_element_after now will ignore elements with type == 'hidden'
 
