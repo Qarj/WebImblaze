@@ -1,7 +1,7 @@
 <testcases repeat="1">
 
 <!--
-Run all self tests
+Run all WebInject core self tests
 -->
 
 <case

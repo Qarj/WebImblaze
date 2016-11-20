@@ -1,0 +1,17 @@
+<testcases repeat="1">
+
+<!--
+Run all WebInject Selenium self tests
+-->
+
+<case
+    varFEATURE="selenium_core"
+    id="100"
+    description1="{FEATURE}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+</testcases>
