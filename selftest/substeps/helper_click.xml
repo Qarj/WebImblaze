@@ -41,7 +41,7 @@
 />
 
 <case
-    section="Click Helper Self Test - INPUT before text"
+    section="Click Helper Self Test - INPUT *before* text and INPUT *after* text"
     id="300"
     description1="Get Totaljobs Jobseeker Account Register Page"
     method="selenium"
@@ -54,7 +54,7 @@
 
 <case
     id="310"
-    description1="Click INPUT element before 'Enable other employers to find me'"
+    description1="Click INPUT element *before* 'Enable other employers to find me'"
     method="selenium"
     command1="$selresp = helper_mouse_move_to_location('register','id',1,1);"
     command2="$selresp = helper_is_checked('cvdbOptIn','id');"
@@ -72,6 +72,29 @@
     command1="$selresp = helper_get_attribute('cvdbOptIn','id','checked');"
     command2="$selresp = helper_get_attribute('cvdbOptIn','id','value');"
     command3="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifypositive="Element is not checked"
+/>
+
+<case
+    id="330"
+    description1="Click INPUT element *after* 'Enable other employers to find me'"
+    method="selenium"
+    command1="$selresp = helper_mouse_move_to_location('register','id',1,1);"
+    command2="$selresp = helper_is_checked('ocaOptIn','id');"
+    command3="$selresp = helper_click_after('Enable other employers to find me');"
+    command4="$selresp = helper_get_attribute('ocaOptIn','id','checked');"
+    command5="$selresp = helper_get_attribute('ocaOptIn','id','value');"
+    command6="$selresp = helper_is_checked('ocaOptIn','id');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+<case
+    id="340"
+    description1="Check that checkbox is now unchecked"
+    method="selenium"
+    command1="$selresp = helper_get_attribute('ocaOptIn','id','checked');"
+    command2="$selresp = helper_get_attribute('ocaOptIn','id','value');"
+    command3="$selresp = helper_is_checked('ocaOptIn','id');"
     verifypositive="Element is not checked"
 />
 

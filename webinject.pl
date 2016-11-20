@@ -1248,7 +1248,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
 
         var targetElementIndex_ = -1;
         for (var i=info_.elementIndex, min=-1; i > min; i--) {
-            targetElementIndex_ = get_element_before(tag_,i);
+            targetElementIndex_ = is_element_at_index_a_match(tag_,i);
             if (targetElementIndex_ > -1) {
                 break;
             }
@@ -1261,6 +1261,47 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
         _all_[targetElementIndex_].click();
 
         return element_action_info("Clicked",targetElementIndex_,"BEFORE",anchor_,info_.textIndex);
+    `;
+    my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
+
+    return $_response;
+}
+
+sub helper_click_after { ## usage: helper_click_after(anchor[,element,instance]);
+
+    my ($_anchor,$_element,$_instance) = @_;
+    $_element //= 'INPUT|BUTTON|SELECT|A';
+    $_instance //= 1;
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var anchor_ = arguments[0];
+        var tag_ = arguments[1].split("|");
+        var instance_ = arguments[2];
+        var _all_ = window.document.getElementsByTagName("*");
+        var _debug_ = '';
+
+        var info_ = search_for_element(anchor_,instance_);
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        var targetElementIndex_ = -1;
+        for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
+            targetElementIndex_ = is_element_at_index_a_match(tag_,i);
+            if (targetElementIndex_ > -1) {
+                break;
+            }
+        }
+
+        if (targetElementIndex_ === -1) {
+            return "Found anchor but not element " + tag_;
+        }
+
+        _all_[targetElementIndex_].click();
+
+        return element_action_info("Clicked",targetElementIndex_,"AFTER",anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_element,$_instance);
 
@@ -1378,7 +1419,7 @@ sub _helper_javascript_functions {
         }
 
 
-        function get_element_before(_tags,_i) {
+        function is_element_at_index_a_match(_tags,_i) {
             for (var j=0; j < _tags.length; j++) {
                 if (_all_[_i].tagName == _tags[j] && !(_all_[_i].getAttribute('type') === 'hidden')) {
                     return _i;
