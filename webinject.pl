@@ -1197,6 +1197,52 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
     return $_response;
 }
 
+sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
+                                    ##        helper_keys_to_element_before('Where','London');               # will default to 'INPUT'
+                                    ##        helper_keys_to_element_before('Job Type','Contract','SELECT');
+                                    ##        helper_keys_to_element_before('Send me marketing','check');    # will check   if INPUT is a checkbox
+                                    ##        helper_keys_to_element_before('Send me marketing','');         # will uncheck if INPUT is a checkbox
+
+    my ($_anchor,$keys_,$_tag) = @_;
+    $_tag //= 'INPUT';
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var anchor_ = arguments[0];
+        var keys_ = arguments[1];
+        var tag_ = arguments[2].split("|");
+        var instance_ = 1;
+        var _all_ = window.document.getElementsByTagName("*");
+        var _debug_ = '';
+
+        var info_ = search_for_element(anchor_,instance_);
+
+        if (info_.elementIndex == -1) {
+            return "Anchor text not found" + debug_;
+        }
+
+        for (var i=info_.elementIndex, min=-1; i > min; i--) {
+            if (_all_[i].tagName == tag_[0] && !(_all_[i].getAttribute('type') === 'hidden')) {
+                if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
+                    if (keys_) {
+                        _all_[i].checked = true;
+                    } else {
+                        _all_[i].checked = false;
+                    }
+                } else { // just set the value, this will work for SELECT elements too
+                    _all_[i].value=keys_;
+                }
+                return element_action_info("Set value of",i,"BEFORE",anchor_,info_.textIndex);
+            }
+        }
+
+        return "Could not find " + tag_[0] + " element before the anchor text" + _debug_;
+    `;
+    my $_response = $driver->execute_script($_script,$_anchor,$keys_,$_tag);
+
+    return $_response;
+}
+
 sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
                              ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
 

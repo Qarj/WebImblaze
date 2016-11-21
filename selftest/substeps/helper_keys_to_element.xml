@@ -65,7 +65,7 @@
 />
 
 <case
-    section="Keys to element mathcing placeholder attribute"
+    section="Keys to element matching placeholder attribute"
     id="300"
     description1="Send Test Automation Architect to Current/most recent job title"
     method="selenium"
@@ -73,5 +73,18 @@
     command2="$selresp = helper_get_element_value('currentJobTitle','id','value');"
     verifypositive="SELRESP:Test Automation Architect"
 />
+
+<case
+    section="Keys to element before"
+    id="400"
+    description1="Set Highest level of education to Diploma"
+    method="selenium"
+    command1='$selresp = $driver->get("http://www.jobsite.co.uk");'
+    command2="$selresp = helper_keys_to_element_before('Job title or skill','Automated Testing');"
+    command3="$selresp = helper_keys_to_element_before('Location','London');"
+    verifytext="get_current_url,get_body_text"
+    sleep="5"
+/>
+
 
 </testcases>
