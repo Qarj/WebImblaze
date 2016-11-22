@@ -1265,37 +1265,9 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
 sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
                              ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
 
-    my ($_anchor,$keys_) = @_;
+    my ($_anchor,$_keys) = @_;
 
-    my $_script = _helper_javascript_functions() . q`
-
-        var anchor_ = arguments[0];
-        var keys_ = arguments[1];
-        var instance_ = 1;
-        var _all_ = window.document.getElementsByTagName("*");
-        var _debug_ = '';
-
-        var info_ = search_for_element(anchor_,instance_);
-
-        if (info_.elementIndex == -1) {
-            return "Anchor text not found" + debug_;
-        }
-
-        if (_all_[info_.elementIndex].type && _all_[info_.elementIndex].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
-            if (keys_) {
-                _all_[info_.elementIndex].checked = true;
-            } else {
-                _all_[info_.elementIndex].checked = false;
-            }
-        } else { // just set the value, this will work for SELECT elements too
-            _all_[info_.elementIndex].value=keys_;
-        }
-
-        return element_action_info("Set value of",info_.elementIndex,"WITH",anchor_,info_.textIndex);
-    `;
-    my $_response = $driver->execute_script($_script,$_anchor,$keys_);
-
-    return $_response;
+    return _helper_keys_to_element($_anchor,1,'*',0,$_keys);
 }
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);
