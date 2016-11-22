@@ -996,8 +996,9 @@ sub selenium {  ## send Selenium command and read response
         if ($case{$_}) {#perform command
             my $_command = $case{$_};
             undef $selresp;
-            my $_eval_response = eval { eval "$_command"; }; ## no critic(ProhibitStringyEval)
-            #$results_stdout .= "EVALRESP:$_eval_response\n";
+            my $_eval_response = eval { eval "$_command"; if ($@) { print "\nSelenium Exception: $@\n"; } }; ## no critic(ProhibitStringyEval)
+            
+             #$results_stdout .= "EVALRESP:$_eval_response\n";
             if (defined $selresp) { ## phantomjs does not return a defined response sometimes
                 if (($selresp =~ m/(^|=)HASH\b/) || ($selresp =~ m/(^|=)ARRAY\b/)) { ## check to see if we have a HASH or ARRAY object returned
                     my $_dumper_response = Data::Dumper::Dumper($selresp);
@@ -1154,47 +1155,12 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
 sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
                                    ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
                                    ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
-                                   ##        helper_keys_to_element_after('Send me marketing','check');    # will check   if INPUT is a checkbox
-                                   ##        helper_keys_to_element_after('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
-    my ($_anchor,$keys_,$_tag) = @_;
+    my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    my $_script = _helper_javascript_functions() . q`
-
-        var anchor_ = arguments[0];
-        var keys_ = arguments[1];
-        var tag_ = arguments[2].split("|");
-        var instance_ = 1;
-        var _all_ = window.document.getElementsByTagName("*");
-        var _debug_ = '';
-
-        var info_ = search_for_element(anchor_,instance_);
-
-        if (info_.elementIndex == -1) {
-            return "Anchor text not found" + debug_;
-        }
-
-        for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
-            if (_all_[i].tagName == tag_[0] && !(_all_[i].getAttribute('type') === 'hidden')) {
-                if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
-                    if (keys_) {
-                        _all_[i].checked = true;
-                    } else {
-                        _all_[i].checked = false;
-                    }
-                } else { // just set the value, this will work for SELECT elements too
-                    _all_[i].value=keys_;
-                }
-                return element_action_info("Set value of",i,"AFTER",anchor_,info_.textIndex);
-            }
-        }
-
-        return "Could not find " + tag_[0] + " element after the anchor text" + _debug_;
-    `;
-    my $_response = $driver->execute_script($_script,$_anchor,$keys_,$_tag);
-
-    return $_response;
+    print "Got to helper_keys_to_element_after\n";
+    return _helper_keys_to_element($_anchor,1,$_tag,1,$_keys);
 }
 
 sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
@@ -1204,19 +1170,30 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
     my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    return _helper_keys_to_element_before($_anchor,1,$_tag,-1,$_keys);
+    return _helper_keys_to_element($_anchor,1,$_tag,-1,$_keys);
 }
 
-sub _helper_keys_to_element_before {
+sub _helper_keys_to_element {
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
 
+    #print "Got to helper_keys_to_element BEFORE call to _helper_click_element\n";
     my $_response = _helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
     if ($_response =~ m/Could not find/) { return $_response; }
+    #print "Got to helper_keys_to_element AFTER check for Could not find\n";
 
-    my $_keys_response = $driver->get_active_element()->clear();
-    $_keys_response = $driver->send_keys_to_active_element($_keys);
+
+    if ($_tag eq 'SELECT') {
+        my $_element = $driver->get_active_element();
+        my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
+    } else {
+        my $_keys_response = $driver->get_active_element()->clear();
+        #print "Got to helper_keys_to_element - clear active element\n";
+        $_keys_response = $driver->send_keys_to_active_element($_keys);
+        #print "Got to helper_keys_to_element - send keys to active element\n";
+    }
 
     return $_response . ' then sent keys OK';
 }
@@ -1271,6 +1248,7 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
         }
 
         if (target_element_index_ > -1) {
+            _all_[target_element_index_].focus();
             _all_[target_element_index_].click();
         } else {
             return "Could not find " + tag_.toString() + " element before the anchor text" + _debug_;

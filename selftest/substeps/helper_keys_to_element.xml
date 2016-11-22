@@ -39,7 +39,7 @@
     description1="Set Highest level of education to Diploma"
     method="selenium"
     command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    command2="$selresp = helper_keys_to_element_after('Highest level of education','538','SELECT');"
+    command2="$selresp = helper_keys_to_element_after('Highest level of education','Diploma','SELECT');"
     command3="$selresp = helper_get_selection(q|select[id='ddlEducation']|,'css');"
     verifytext="get_page_source,get_current_url"
     verifypositive="\[538\] Diploma"
