@@ -82,8 +82,13 @@
     command1='$selresp = $driver->get("http://www.jobsite.co.uk");'
     command2="$selresp = helper_keys_to_element_before('Job title or skill','Automated Testing');"
     command3="$selresp = helper_keys_to_element_before('Location','London');"
+    command4="$selresp = helper_keys_to_element_before('Blah de blah blah','London');"
+    command5="$selresp = helper_keys_to_element_before('Location','DINGDONG','PINGPONG');"
     verifytext="get_current_url,get_body_text"
     verifypositive="Automated Testing"
+    verifypositive1="Could not find anchor text"
+    verifypositive2="Could not find PINGPONG element before the anchor text"
+    verifypositive3="Clicked tag INPUT BEFORE"
 />
 
 

@@ -1208,12 +1208,12 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
 
     my $_response = _helper_click_element($_anchor,1,$_tag,-1);
 
-    ## TODO: Check if element was found
+    if ($_response =~ m/Could not find/) { return $_response; }
 
     my $_keys_response = $driver->get_active_element()->clear();
     $_keys_response = $driver->send_keys_to_active_element($_keys);
 
-    return $_response;
+    return $_response . ' then sent keys OK';
 }
 
 sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
@@ -1235,7 +1235,7 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
         var info_ = search_for_element(anchor_,anchor_instance_);
 
         if (info_.elementIndex == -1) {
-            return "Could not find anchor text" + debug_;
+            return "Could not find anchor text" + _debug_;
         }
 
         var target_element_index_ = -1;
