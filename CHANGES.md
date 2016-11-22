@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.4.1 - Nov 22, 2016
+* optimised the "Locators for Testers" so they use a generic framework rather than copy and pasted code with slight variations
+* helper_send_keys_to_element[_after/_before] now uses Selenium to send the keys rather than setting value directly via JavaScript
+
 ### Version 2.4.0 - Nov 20, 2016
 * set of helpers I think of as "Locators for Testers" - heuristics find target element without needing to view source or inspect element
 * these "Locators for Testers" are helper_keys_to_element, helper_keys_to_element_after, helper_click, helper_click_before, helper_click_after

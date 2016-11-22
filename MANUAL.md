@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.4.0
+# Manual for WebInject version 2.4.1
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2109,15 +2109,9 @@ Select "Contract" in the "Job Type" drop down.
 command="$selresp = helper_keys_to_element_after('Job Type','Contract','SELECT');"
 ```
 
-Will check the "Send me marketing" checkbox.
-```
-command="$selresp = helper_keys_to_element_after('Send me marketing','check');"
-```
+##### helper_keys_to_element_before
 
-Will uncheck the "Send me marketing" checkbox.
-```
-command="$selresp = helper_keys_to_element_after('Send me marketing','');"
-```
+Works just like `helper_keys_to_element_after` but will search for a matching element before the anchor text.
 
 ##### helper_keys_to_element
 

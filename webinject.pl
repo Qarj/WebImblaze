@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.4.0';
+$VERSION = '2.4.1';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1178,12 +1178,11 @@ sub _helper_keys_to_element {
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
 
     #print "Got to helper_keys_to_element BEFORE call to _helper_click_element\n";
-    my $_response = _helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    my $_response = _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
     #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
     if ($_response =~ m/Could not find/) { return $_response; }
     #print "Got to helper_keys_to_element AFTER check for Could not find\n";
-
 
     if ($_tag eq 'SELECT') {
         my $_element = $driver->get_active_element();
@@ -1199,6 +1198,18 @@ sub _helper_keys_to_element {
 }
 
 sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
+
+    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
+
+    return _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+
+    ## Unfortunately Selenium is over-thinking the clicking and in some cases refusing to click elements that are clickable, so the focus helper will also click with JavaScript
+    #if ($_response =~ m/Could not find/) { return $_response; }
+    #my $_click_response = $driver->get_active_element()->click();
+    #return $_response . ' then clicked OK';
+}
+
+sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,anchor_instance,tag,tag_instance);
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
     $_anchor_instance //= 1; ## 1 means first instance of anchor
@@ -1254,7 +1265,7 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
             return "Could not find " + tag_.toString() + " element before the anchor text" + _debug_;
         }
 
-        return element_action_info("Clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex);
+        return element_action_info("Focused and clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex);
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
 
