@@ -1198,15 +1198,20 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
 }
 
 sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
-                                    ##        helper_keys_to_element_before('Where','London');               # will default to 'INPUT'
+                                    ##        helper_keys_to_element_before('Where','London');               # will default tag to 'INPUT'
                                     ##        helper_keys_to_element_before('Job Type','Contract','SELECT');
-                                    ##        helper_keys_to_element_before('Send me marketing','check');    # will check   if INPUT is a checkbox
-                                    ##        helper_keys_to_element_before('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
     my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    my $_response = _helper_click_element($_anchor,1,$_tag,-1);
+    return _helper_keys_to_element_before($_anchor,1,$_tag,-1,$_keys);
+}
+
+sub _helper_keys_to_element_before {
+
+    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
+
+    my $_response = _helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
 
     if ($_response =~ m/Could not find/) { return $_response; }
 
