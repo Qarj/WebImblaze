@@ -83,7 +83,7 @@
     command2="$selresp = helper_keys_to_element_before('Job title or skill','Automated Testing');"
     command3="$selresp = helper_keys_to_element_before('Location','London');"
     verifytext="get_current_url,get_body_text"
-    sleep="5"
+    verifypositive="Automated Testing"
 />
 
 

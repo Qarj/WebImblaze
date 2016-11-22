@@ -1203,7 +1203,7 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
                                     ##        helper_keys_to_element_before('Send me marketing','check');    # will check   if INPUT is a checkbox
                                     ##        helper_keys_to_element_before('Send me marketing','');         # will uncheck if INPUT is a checkbox
 
-    my ($_anchor,$keys_,$_tag) = @_;
+    my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
     my $_script = _helper_javascript_functions() . q`
@@ -1230,7 +1230,8 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
                         _all_[i].checked = false;
                     }
                 } else { // just set the value, this will work for SELECT elements too
-                    _all_[i].value=keys_;
+                    _all_[i].click();
+                    _all_[i].value='';
                 }
                 return element_action_info("Set value of",i,"BEFORE",anchor_,info_.textIndex);
             }
@@ -1238,7 +1239,9 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
 
         return "Could not find " + tag_[0] + " element before the anchor text" + _debug_;
     `;
-    my $_response = $driver->execute_script($_script,$_anchor,$keys_,$_tag);
+    my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
+
+    my $_keys_response = $driver->send_keys_to_active_element($_keys);
 
     return $_response;
 }
