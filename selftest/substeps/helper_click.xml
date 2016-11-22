@@ -37,7 +37,7 @@
     command1="$selresp = helper_click('Yes',2);"
     command2="$selresp = helper_get_attribute(q|label[for='eligibilityEuYes']|,'css','class');"
     verifytext="get_current_url,get_body_text"
-    verifypositive="btn btn-select active"
+    verifypositive="btn btn-select focus active"
 />
 
 <case
