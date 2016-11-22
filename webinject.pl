@@ -1206,45 +1206,78 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
     my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    my $_script = _helper_javascript_functions() . q`
+    my $_response = _helper_click_element($_anchor,1,$_tag,-1);
 
-        var anchor_ = arguments[0];
-        var keys_ = arguments[1];
-        var tag_ = arguments[2].split("|");
-        var instance_ = 1;
-        var _all_ = window.document.getElementsByTagName("*");
-        var _debug_ = '';
+    ## TODO: Check if element was found
 
-        var info_ = search_for_element(anchor_,instance_);
-
-        if (info_.elementIndex == -1) {
-            return "Anchor text not found" + debug_;
-        }
-
-        for (var i=info_.elementIndex, min=-1; i > min; i--) {
-            if (_all_[i].tagName == tag_[0] && !(_all_[i].getAttribute('type') === 'hidden')) {
-                if (_all_[i].type && _all_[i].type === 'checkbox') { //check a checkbox if there are keys, otherwise uncheck
-                    if (keys_) {
-                        _all_[i].checked = true;
-                    } else {
-                        _all_[i].checked = false;
-                    }
-                } else { // just set the value, this will work for SELECT elements too
-                    _all_[i].click();
-                    _all_[i].value='';
-                }
-                return element_action_info("Set value of",i,"BEFORE",anchor_,info_.textIndex);
-            }
-        }
-
-        return "Could not find " + tag_[0] + " element before the anchor text" + _debug_;
-    `;
-    my $_response = $driver->execute_script($_script,$_anchor,$_keys,$_tag);
-
-    my $_keys_response = $driver->send_keys_to_active_element($_keys);
+    my $_keys_response = $driver->get_active_element()->clear();
+    $_keys_response = $driver->send_keys_to_active_element($_keys);
 
     return $_response;
 }
+
+sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
+
+    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
+    $_anchor_instance //= 1; ## 1 means first instance of anchor
+    $_tag //= '*'; ## * means click the tag found by the anchor, whatever it is
+    $_tag_instance //= 0; ## -1 means search for the specified tag BEFORE, 1 means search for specified tag after, 0 is an error unless $_tag is '*' 
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var anchor_ = arguments[0];
+        var anchor_instance_ = arguments[1];
+        var tag_ = arguments[2].split("|");
+        var tag_instance_ = arguments[3];
+        var _all_ = window.document.getElementsByTagName("*");
+        var _debug_ = '';
+
+        var info_ = search_for_element(anchor_,anchor_instance_);
+
+        if (info_.elementIndex == -1) {
+            return "Could not find anchor text" + debug_;
+        }
+
+        var target_element_index_ = -1;
+        var action_keyword_;
+        if (tag_[0] === '*') {
+            target_element_index_ = info_.elementIndex;
+            action_keyword_ = 'WITH';
+        } else if (tag_instance_ > 0) {
+
+            for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
+                target_element_index_ = is_element_at_index_a_match(tag_,i);
+                if (target_element_index_ > -1) {
+                    break;
+                }
+            }
+            action_keyword_ = 'AFTER';
+
+        } else {
+
+            for (var i=info_.elementIndex, min=-1; i > min; i--) {
+                target_element_index_ = is_element_at_index_a_match(tag_,i);
+                if (target_element_index_ > -1) {
+                    break;
+                }
+            }
+            action_keyword_ = 'BEFORE';
+
+        }
+
+        if (target_element_index_ > -1) {
+            _all_[target_element_index_].click();
+        } else {
+            return "Could not find " + tag_.toString() + " element before the anchor text" + _debug_;
+        }
+
+        return element_action_info("Clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex);
+    `;
+    my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
+
+    return $_response;
+}
+
 
 sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
                              ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
