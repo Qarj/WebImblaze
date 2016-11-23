@@ -77,7 +77,7 @@
 <case
     section="Keys to element before"
     id="400"
-    description1="Set Highest level of education to Diploma"
+    description1="Fill out Jobsite search form"
     method="selenium"
     command1='$selresp = $driver->get("http://www.jobsite.co.uk");'
     command2="$selresp = helper_keys_to_element_before('Job title or skill','Automated Testing');"

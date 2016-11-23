@@ -1611,6 +1611,9 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
     my ($_search_text, $_target, $_locator, $_timeout) = @_;
+    $_target //= 'body';
+    $_locator //= 'tag_name';
+    $_timeout //= 5;
 
     $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
 

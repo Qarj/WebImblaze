@@ -1,0 +1,59 @@
+<testcases repeat="1">
+
+<case
+    section="Locators for Testers Example - Jobsite"
+    id="100"
+    description1="Fill out Jobsite search form"
+    method="selenium"
+    command1='$selresp = $driver->get("http://www.jobsite.co.uk");'
+    command2="$selresp = helper_keys_to_element_before('Job title or skill','Automated Testing');"
+    command3="$selresp = helper_keys_to_element_before('Location','London');"
+    command4="$selresp = helper_keys_to_element_before('Distance','20 Miles','SELECT');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Automated Testing"
+/>
+
+<case
+    id="110"
+    description1="Click Search"
+    method="selenium"
+    command1="$selresp = helper_click('Search');"
+    command2="$selresp = helper_wait_for_text_visible('Automated Testing jobs');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+<case
+    id="120"
+    description1="Dismiss 'Get new jobs' spotlight"
+    method="selenium"
+    command1="$selresp = helper_click('spotlight_dismiss');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+<case
+    id="130"
+    description1="Sort jobs by date"
+    method="selenium"
+    command1="$selresp = helper_keys_to_element_after('sortby', ' Date', 'SELECT');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+<case
+    id="140"
+    description1="Click 'Refine Search'"
+    method="selenium"
+    command1="$selresp = helper_click('Refine Search');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Advanced Search"
+/>
+
+<case
+    id="150"
+    description1="Enter 'Test Manager' into 'Job Title'"
+    method="selenium"
+    command1="$selresp = helper_keys_to_element_after('Job Title', 'Test Manager');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+</testcases>
