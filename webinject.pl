@@ -1605,15 +1605,15 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
 
 }
 
-sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text','target', 'locator', Timeout);
-                                   ##         helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);
+sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text', timeout, 'target', 'locator');
+                                   ##         helper_wait_for_text_visible('Job title', 10, 'body', 'tag_name');
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
-    my ($_search_text, $_target, $_locator, $_timeout) = @_;
+    my ($_search_text, $_timeout, $_target, $_locator) = @_;
+    $_timeout //= 5;
     $_target //= 'body';
     $_locator //= 'tag_name';
-    $_timeout //= 5;
 
     $results_stdout .= "VISIBLE SEARCH TEXT:$_search_text\n";
 

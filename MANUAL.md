@@ -2050,7 +2050,7 @@ for the text `Sign in` to appear.
     description1="Get Totaljobs Home Page"
     method="selenium"
     command1='$selresp = $driver->get("http://www.totaljobs.com");'
-	command2="$selresp = helper_wait_for_text_visible('Sign in','body','tag_name',25);"
+	command2="$selresp = helper_wait_for_text_visible('Sign in',25,'body','tag_name');"
     verifytext="get_current_url,get_page_source"
     verifypositive="Find your perfect job"
     verifypositive1="Found sought text"
@@ -2233,10 +2233,10 @@ command="$selresp = helper_wait_for_text_present('Job title',10);"
 
 ##### helper_wait_for_text_visible
 
-helper_wait_for_text_visible(`search text`,`target`, `locator`, `timeout`);
+helper_wait_for_text_visible(`search text`,`timeout`,`target`,`locator`);
 
 ```
-command="$selresp = helper_wait_for_text_visible('Job title', 'body', 'tag_name', 10);"
+command="$selresp = helper_wait_for_text_visible('Job title', 10, 'body', 'tag_name');"
 ```
 
 ##### helper_wait_for_element_present
