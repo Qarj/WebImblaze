@@ -15,7 +15,7 @@
     description1="Click Upload your CV"
     method="selenium"
     command1="$selresp = helper_click('Upload your CV');"
-    command2="$selresp = helper_wait_for_text_visible('from this device','body','tag_name','3');"
+    command2="$selresp = helper_wait_for_text_visible('from this device',3, 'body','tag_name');"
     verifytext="get_current_url,get_body_text"
     verifypositive20="Found sought text"
 />
@@ -113,7 +113,7 @@
     description1="Click BUTTON element before 'We accept MS Word'"
     method="selenium"
     command1="$selresp = helper_click_before('We accept MS Word','BUTTON');"
-    command2="$selresp = helper_wait_for_text_visible('from this device','body','tag_name','3');"
+    command2="$selresp = helper_wait_for_text_visible('from this device',3, 'body','tag_name');"
     verifytext="get_current_url,get_body_text"
     verifypositive20="Found sought text"
 />

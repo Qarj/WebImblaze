@@ -19,9 +19,10 @@
     command1="$selresp = helper_keys_to_element_after('Recipe Name','Shepherds Pie');"
     command2="$selresp = helper_keys_to_element_after('Cuisine','British');"
     command3="$selresp = helper_keys_to_element_after('Max Prep','2');"
-    command4="$selresp = helper_wait_for_text_visible('Cuisine', 'body', 'tag_name', 5);"
+    command4="$selresp = helper_wait_for_text_visible('Cuisine', 5, 'body', 'tag_name');"
     verifytext="get_page_source,get_current_url"
     verifypositive="Cuisine"
+    verifypositive20="Found sought text"
 />
 
 <case

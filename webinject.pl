@@ -1333,15 +1333,22 @@ sub _helper_javascript_functions {
                 //    _debug_ = _debug_ + " id[" + _all_[i].id + "]";
                 //}
 
-                _textIndex = _text.indexOf(_anchor);
-                if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
-                    _found_instance = _found_instance + 1;
-                    if (_instance === _found_instance) {
-                        _elementIndex = i;
-                        break;
-                    } else {
-                        continue;
+                if (_depth === 0) {
+                    if (_text.trim() === _anchor.trim()) {
+                        _found_instance = _found_instance + 1;
                     }
+                } else {
+                    _textIndex = _text.indexOf(_anchor);
+                    if (_textIndex != -1 && _textIndex < _depth) {  // Need to target near start of string so Type can be targeted instead of Account Record Type
+                        _found_instance = _found_instance + 1;
+                    }
+                }
+ 
+                if (_instance === _found_instance) {
+                    _elementIndex = i;
+                    break;
+                } else {
+                    continue;
                 }
             }
 
@@ -1391,7 +1398,7 @@ sub _helper_javascript_functions {
         }
 
         function search_for_element(_anchor,_instance) {
-            var _depth = [1,3,15,50];
+            var _depth = [0,1,3,15,50];
     
             var _info;
             // An element match at text index 0 is preferable to text index 30, so we start off strict, then gradually relax our criteria
@@ -1433,8 +1440,12 @@ sub _helper_javascript_functions {
             var _id = '';
             if (_all_[_targetElementIndex].id) {
                 _id=" id[" + _all_[_targetElementIndex].id + "]";
-            } 
-            return _action + " tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK (text index " + _textIndex + ")" + _id + _debug_;
+            }
+            var _match_type = "(exact match)";
+            if (_textIndex > -1) {
+                _match_type = "(text index " + _textIndex + ")";
+            }
+            return _action + " tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK " +_match_type + _id + _debug_;
         }
     `; 
 }
