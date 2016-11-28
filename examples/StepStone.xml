@@ -1,0 +1,44 @@
+<testcases repeat="1">
+
+<case
+    section="Locators for Testers Example - StepStone"
+    id="100"
+    description1="Fill out StepStone search form"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element('Was','Jobtitle, Firmenname');"
+    command3="$selresp = helper_keys_to_element_before('Ort','Berlin');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Job nach Berufsfeld"
+/>
+
+<case
+    id="110"
+    description1="Click Suchen"
+    method="selenium"
+    command1="$selresp = helper_click('Suchen');"
+    command2="$selresp = helper_wait_for_text_visible('Ihre Suche nach');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+<case
+    id="120"
+    description1="Click Sortieren nach"
+    method="selenium"
+    command1="$selresp = helper_click('Sortieren nach');"
+    command2="$selresp = helper_wait_for_text_visible('Datum');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+<case
+    id="130"
+    description1="Click Datum"
+    method="selenium"
+    command1="$selresp = helper_click('Datum');"
+    command2="$selresp = helper_wait_for_text_visible('Sortieren nach Datum');"
+    verifytext="get_current_url,get_body_text"
+/>
+
+</testcases>
