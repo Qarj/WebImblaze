@@ -996,7 +996,8 @@ sub selenium {  ## send Selenium command and read response
         if ($case{$_}) {#perform command
             my $_command = $case{$_};
             undef $selresp;
-            my $_eval_response = eval { eval "$_command"; if ($@) { print "\nSelenium Exception: $@\n"; } }; ## no critic(ProhibitStringyEval)
+            my $_selenium_exception;
+            my $_eval_response = eval { eval "$_command"; if ($@) { $_selenium_exception = $@; } }; ## no critic(ProhibitStringyEval)
             
              #$results_stdout .= "EVALRESP:$_eval_response\n";
             if (defined $selresp) { ## phantomjs does not return a defined response sometimes
@@ -1009,8 +1010,13 @@ sub selenium {  ## send Selenium command and read response
                     $selresp = "selresp:$selresp";
                 }
             } else {
-                $results_stdout .= "SELRESP:<undefined>\n";
-                $selresp = 'selresp:<undefined>';
+                if (defined $_selenium_exception && $_selenium_exception ne '') {
+                    $results_stdout .= "SELRESP:<undefined>, Selenium Exception: $_selenium_exception\n";
+                    $selresp = "selresp:<undefined>, Selenium Exception: $_selenium_exception\n";
+                } else {
+                    $results_stdout .= "SELRESP:<undefined>\n";
+                    $selresp = "selresp:<undefined>\n";
+                }
             }
             $_combined_response =~ s{$}{<$_>$_command</$_>\n$selresp\n\n\n}; ## include it in the response
         }
