@@ -1172,7 +1172,11 @@ sub helper_keys_to_element_after_alpha { ## usage: helper_keys_to_element_after(
     $_anchor[1] //= 1;
     $_tag[1] //= 1;
 
-    print " helper keys to element: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n";
+    # convert from string to number
+    $_anchor[1] = int($_anchor[1]);
+    $_tag[1] = int($_tag[1]);
+
+    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why?
     return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
 }
 
@@ -1255,7 +1259,7 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
         var info_ = search_for_element(anchor_,anchor_instance_);
 
         if (info_.elementIndex == -1) {
-            return "Could not find anchor text" + _debug_;
+            return "Could not find anchor text [" + anchor_ + "] " + anchor_ + "|" + anchor_instance_ + _debug_;
         }
 
         var target_element_index_ = -1;
@@ -1264,11 +1268,14 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
             target_element_index_ = info_.elementIndex;
             action_keyword_ = 'WITH';
         } else if (tag_instance_ > 0) {
-
+            var found_tag_instance_ = 0;
             for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
                 target_element_index_ = is_element_at_index_a_match(tag_,i);
                 if (target_element_index_ > -1) {
-                    break;
+                    found_tag_instance_++;
+                    if (found_tag_instance_ === tag_instance_) {
+                        break;
+                    }
                 }
             }
             action_keyword_ = 'AFTER';
