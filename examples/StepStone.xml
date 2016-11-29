@@ -6,8 +6,8 @@
     description1="Fill out StepStone search form"
     method="selenium"
     command1='$selresp = $driver->get("https://www.stepstone.de/");'
-    command2="$selresp = helper_keys_to_element('Was','Jobtitle, Firmenname');"
-    command3="$selresp = helper_keys_to_element_before('Ort','Berlin');"
+    command2="$selresp = helper_keys_to_element('Jobtitel, Firmenname','Test Automation');"
+    command3="$selresp = helper_keys_to_element('Ort oder 5','Berlin');"
     verifytext="get_current_url,get_body_text"
     verifypositive="Job nach Berufsfeld"
 />
