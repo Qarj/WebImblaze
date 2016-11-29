@@ -1,0 +1,28 @@
+<testcases repeat="1">
+
+<case
+    section="Locators for Testers Example - StepStone"
+    id="100"
+    description1="Fill out StepStone search form"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element_after('Was','Test Automation');"
+    command3="$selresp = helper_keys_to_element_after('Wo','Berlin');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Job nach Berufsfeld"
+/>
+
+<case
+    id="110"
+    description1="Try again"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element_after('Was','Test Automation','INPUT',1,2);"
+    command3="$selresp = helper_keys_to_element_after('Wo','Berlin','INPUT',1,2);"
+    command4="$selresp = helper_click('Suchen');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Job nach Berufsfeld"
+    verifypositive1="Ihre Such nach Test Automation"
+/>
+
+</testcases>
