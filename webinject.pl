@@ -1165,7 +1165,6 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
     my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
 
-    print "Got to helper_keys_to_element_after\n";
     return _helper_keys_to_element($_anchor,1,$_tag,1,$_keys);
 }
 
@@ -1190,15 +1189,19 @@ sub _helper_keys_to_element {
     if ($_response =~ m/Could not find/) { return $_response; }
     #print "Got to helper_keys_to_element AFTER check for Could not find\n";
 
-    if ($_tag eq 'SELECT') {
-        my $_element = $driver->get_active_element();
-        my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
-    } else {
-        my $_keys_response = $driver->get_active_element()->clear();
-        #print "Got to helper_keys_to_element - clear active element\n";
-        $_keys_response = $driver->send_keys_to_active_element($_keys);
-        #print "Got to helper_keys_to_element - send keys to active element\n";
-    }
+    eval {
+        if ($_tag eq 'SELECT') {
+            my $_element = $driver->get_active_element();
+            my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
+        } else {
+            my $_keys_response = $driver->get_active_element()->clear();
+            #print "Got to helper_keys_to_element - clear active element\n";
+            $_keys_response = $driver->send_keys_to_active_element($_keys);
+            #print "Got to helper_keys_to_element - send keys to active element\n";
+        }
+    };
+    
+    if ($@) { return $_response . " then got an exception clearing or sending keys\n" . $@; }
 
     return $_response . ' then sent keys OK';
 }
