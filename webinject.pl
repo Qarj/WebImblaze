@@ -1161,15 +1161,11 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
 sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
                                    ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
                                    ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
-                                   ##        helper_keys_to_element_after('What','Test Automation','INPUT',1,2);
 
-    my ($_anchor,$_keys,$_tag,$_anchor_instance,$_tag_instance) = @_;
+    my ($_anchor,$_keys,$_tag) = @_;
     $_tag //= 'INPUT';
-    $_anchor_instance //= 1;
-    $_tag_instance //= 1;
 
-    print " _helper_keys_to_element($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys)\n";
-    return _helper_keys_to_element($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys);
+    return _helper_keys_to_element($_anchor,1,$_tag,1,$_keys);
 }
 
 sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
@@ -1187,7 +1183,6 @@ sub _helper_keys_to_element {
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
 
     #print "Got to helper_keys_to_element BEFORE call to _helper_click_element\n";
-    print" _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance)\n";
     my $_response = _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
     #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
@@ -1251,14 +1246,11 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
             target_element_index_ = info_.elementIndex;
             action_keyword_ = 'WITH';
         } else if (tag_instance_ > 0) {
-            var found_tag_instance_ = 0;
+
             for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
                 target_element_index_ = is_element_at_index_a_match(tag_,i);
                 if (target_element_index_ > -1) {
-                    found_tag_instance_++;
-                    if (found_tag_instance_ === tag_instance_) {
-                        break;
-                    }
+                    break;
                 }
             }
             action_keyword_ = 'AFTER';
