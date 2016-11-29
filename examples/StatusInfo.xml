@@ -14,11 +14,24 @@
 
 <case
     id="110"
-    description1="Try again"
+    description1="Try with alpha"
     method="selenium"
     command1='$selresp = $driver->get("https://www.stepstone.de/");'
-    command2="$selresp = helper_keys_to_element_after('Was','Test Automation','INPUT',1,2);"
-    command3="$selresp = helper_keys_to_element_after('Wo','Berlin','INPUT',1,2);"
+    command2="$selresp = helper_keys_to_element_after_alpha('Was','Test Automation','INPUT|||2');"
+    command3="$selresp = helper_keys_to_element_after_alpha('Wo','Berlin','INPUT|||2');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Job nach Berufsfeld"
+    verifypositive1="Ihre Such nach Test Automation"
+    sleep="5"
+/>
+
+<case
+    id="120"
+    description1="Try with current version"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element_after('Was','Test Automation');"
+    command3="$selresp = helper_keys_to_element_after('Wo','Berlin');"
     command4="$selresp = helper_click('Suchen');"
     verifytext="get_current_url,get_body_text"
     verifypositive="Job nach Berufsfeld"

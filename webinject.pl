@@ -1158,6 +1158,24 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     return $_response;
 }
 
+sub helper_keys_to_element_after_alpha { ## usage: helper_keys_to_element_after(anchor,keys,tag);
+                                   ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
+                                   ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
+                                   ##        helper_keys_to_element_after('What|||1','Test Automation','INPUT|||2');
+
+    my ($_anchor_parms,$_keys,$_tag_parms) = @_;
+    $_tag_parms //= 'INPUT';
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+
+    $_anchor[1] //= 1;
+    $_tag[1] //= 1;
+
+    print " helper keys to element: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n";
+    return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
+}
+
 sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
                                    ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
                                    ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
