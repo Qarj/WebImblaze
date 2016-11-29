@@ -1172,11 +1172,7 @@ sub helper_keys_to_element_after_alpha { ## usage: helper_keys_to_element_after(
     $_anchor[1] //= 1;
     $_tag[1] //= 1;
 
-    # convert from string to number
-    $_anchor[1] = int($_anchor[1]);
-    $_tag[1] = int($_tag[1]);
-
-    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why?
+    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why? Fixed by putting parseInt in JavaScript
     return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
 }
 
@@ -1250,9 +1246,9 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
     my $_script = _helper_javascript_functions() . q`
 
         var anchor_ = arguments[0];
-        var anchor_instance_ = arguments[1];
+        var anchor_instance_ = parseInt(arguments[1], 10);
         var tag_ = arguments[2].split("|");
-        var tag_instance_ = arguments[3];
+        var tag_instance_ = parseInt(arguments[3], 10);
         var _all_ = window.document.getElementsByTagName("*");
         var _debug_ = '';
 
