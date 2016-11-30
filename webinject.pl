@@ -1215,7 +1215,7 @@ sub _helper_keys_to_element {
     my $_response = _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
     #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
-    if ($_response =~ m/Could not find/) { return $_response; }
+    if (%$_response{message} =~ m/Could not find/) { return %$_response{message}; }
     #print "Got to helper_keys_to_element AFTER check for Could not find\n";
 
     eval {
@@ -1230,16 +1230,16 @@ sub _helper_keys_to_element {
         }
     };
     
-    if ($@) { return $_response . " then got an exception clearing or sending keys\n" . $@; }
+    if ($@) { return %$_response{message} . " then got an exception clearing or sending keys\n" . $@; }
 
-    return $_response . ' then sent keys OK';
+    return %$_response{message} . ' then sent keys OK';
 }
 
 sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
 
-    return _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    return %{_helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance)}{message};
 
     ## Unfortunately Selenium is over-thinking the clicking and in some cases refusing to click elements that are clickable, so the focus helper will also click with JavaScript
     #if ($_response =~ m/Could not find/) { return $_response; }
@@ -1266,7 +1266,11 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
         var info_ = search_for_element(anchor_,anchor_instance_);
 
         if (info_.elementIndex == -1) {
-            return "Could not find anchor text [" + anchor_ + "] " + anchor_ + "|" + anchor_instance_ + _debug_;
+            return {
+                message : "Could not find anchor text [" + anchor_ + "] " + anchor_ + "|" + anchor_instance_ + _debug_,
+                element : "",
+                element_signature : ""
+            }
         }
 
         var target_element_index_ = -1;
@@ -1308,10 +1312,18 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
             _all_[target_element_index_].focus();
             _all_[target_element_index_].click();
         } else {
-            return "Could not find " + tag_.toString() + " element before the anchor text" + _debug_;
+            return { 
+                message : "Could not find " + tag_.toString() + " element before the anchor text" + _debug_,
+                element : "",
+                element_signature : ""
+            }
         }
 
-        return element_action_info("Focused and clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex);
+        return {
+            message : element_action_info("Focused and clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex),
+            element : _all_[target_element_index_],
+            element_signature : ""
+        }
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
 
