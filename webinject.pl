@@ -1179,11 +1179,20 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
 sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
                                     ##        helper_keys_to_element_before('Where','London');               # will default tag to 'INPUT'
                                     ##        helper_keys_to_element_before('Job Type','Contract','SELECT');
+                                    ##        helper_keys_to_element_before('Job Type|||2','Contract','SELECT|||2');
 
-    my ($_anchor,$_keys,$_tag) = @_;
-    $_tag //= 'INPUT';
+    my ($_anchor_parms,$_keys,$_tag_parms) = @_;
+    $_tag_parms //= 'INPUT';
 
-    return _helper_keys_to_element($_anchor,1,$_tag,-1,$_keys);
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+
+    $_anchor[1] //= 1;
+    $_tag[1] //= 1;
+    $_tag[1] = - abs $_tag[1];
+
+    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why? Fixed by putting parseInt in JavaScript
+    return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
 }
 
 sub _helper_keys_to_element {

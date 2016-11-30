@@ -14,7 +14,7 @@
 
 <case
     id="110"
-    description1="Try with alpha"
+    description1="Try with element instance - after"
     method="selenium"
     command1='$selresp = $driver->get("https://www.stepstone.de/");'
     command2="$selresp = helper_keys_to_element_after('Was','Test Automation','INPUT|||2');"
@@ -31,5 +31,17 @@
     verifytext="get_current_url,get_body_text"
     verifypositive1="Ihre Suche nach Test Automation"
 />
+
+<case
+    id="130"
+    description1="Try with element instance - before"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element_before('Suchen','Test Automation','INPUT|||3');"
+    command3="$selresp = helper_keys_to_element_before('Erweiterte Suche','Berlin','INPUT|||1');"
+    verifytext="get_current_url,get_body_text"
+    assertcount="then sent keys OK|||2"
+/>
+
 
 </testcases>
