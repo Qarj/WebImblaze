@@ -1230,7 +1230,7 @@ sub _helper_keys_to_element {
         }
     };
     
-    if ($@) { return %$_response{message} . " then got an exception clearing or sending keys\n" . $@; }
+    if ($@) { return %$_response{message} . " then got an exception clearing or sending keys\n\nSignature of focused element:\n" . %$_response{element_signature} . "\n\n" .$@; }
 
     return %$_response{message} . ' then sent keys OK';
 }
@@ -1322,7 +1322,7 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
         return {
             message : element_action_info("Focused and clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex),
             element : _all_[target_element_index_],
-            element_signature : ""
+            element_signature : element_signature(target_element_index_)
         }
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
@@ -1495,6 +1495,17 @@ sub _helper_javascript_functions {
                 _match_type = "(text index " + _textIndex + ")";
             }
             return _action + " tag " + _all_[_targetElementIndex].tagName + " " + _anchor_info + "[" +_anchor + "] OK " +_match_type + _id + _debug_;
+        }
+
+        function element_signature(_targetElementIndex) {
+            var _signature;
+            for (var j = 0; j < _all_[_targetElementIndex].attributes.length; j++) {
+                var _attrib = _all_[_targetElementIndex].attributes[j];
+                if (_attrib.specified) {
+                    _signature = _signature + _attrib.name + "[" + _attrib.value + "] ";
+                }
+            }
+            return _signature;
         }
     `; 
 }
