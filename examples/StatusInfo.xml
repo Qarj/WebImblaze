@@ -43,5 +43,20 @@
     assertcount="then sent keys OK|||2"
 />
 
+<!--
+    command3="$selresp = helper_keys_to_element('oder|||1','Test Automation');"
+
+    Will populate 'Wo' since the 'oder' in 'Was' is lower precedence (string depth is much greater) 
+-->
+<case
+    id="140"
+    description1="Try with element instance - on"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.stepstone.de/");'
+    command2="$selresp = helper_keys_to_element('Jobtitel|||1','Test Automation');"
+    command3="$selresp = helper_keys_to_element('oder|||2','Berlin');"
+    verifytext="get_current_url,get_body_text"
+    assertcount="then sent keys OK|||2"
+/>
 
 </testcases>

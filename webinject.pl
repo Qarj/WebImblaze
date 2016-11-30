@@ -1158,6 +1158,18 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     return $_response;
 }
 
+sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
+                             ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
+
+    my ($_anchor_parms,$_keys) = @_;
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+
+    $_anchor[1] //= 1;
+
+    return _helper_keys_to_element($_anchor[0],$_anchor[1],'*',0,$_keys);
+}
+
 sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
                                    ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
                                    ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
@@ -1304,15 +1316,6 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
 
     return $_response;
-}
-
-
-sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
-                             ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
-
-    my ($_anchor,$_keys) = @_;
-
-    return _helper_keys_to_element($_anchor,1,'*',0,$_keys);
 }
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);
