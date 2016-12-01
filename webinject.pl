@@ -1332,30 +1332,44 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);
                    ## usage: helper_click('Yes');
-                   ## usage: helper_click('Yes',2);
+                   ## usage: helper_click('Yes|||2');
 
-    my ($_anchor,$_anchor_instance) = @_;
-    $_anchor_instance //= 1;
+    my ($_anchor_parms) = @_;
 
-    return _helper_click_element($_anchor,$_anchor_instance,'*',0);
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+
+    $_anchor[1] //= 1;
+
+    return _helper_click_element($_anchor[0],$_anchor[1],'*',0);
 }
 
 sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance]);
 
-    my ($_anchor,$_tag,$_anchor_instance) = @_;
-    $_tag //= 'INPUT|BUTTON|SELECT|A';
-    $_anchor_instance //= 1;
+    my ($_anchor_parms,$_tag_parms) = @_;
+    $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
 
-    return _helper_click_element($_anchor,$_anchor_instance,$_tag,-1);
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+
+    $_anchor[1] //= 1;
+    $_tag[1] //= 1;
+    $_tag[1] = - abs $_tag[1];
+
+    return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
 }
 
-sub helper_click_after { ## usage: helper_click_after(anchor[,element,instance]);
+sub helper_click_after { ## usage: helper_click_after(anchor[,element]);
 
-    my ($_anchor,$_tag,$_anchor_instance) = @_;
-    $_tag //= 'INPUT|BUTTON|SELECT|A';
-    $_anchor_instance //= 1;
+    my ($_anchor_parms,$_tag_parms) = @_;
+    $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
 
-    return _helper_click_element($_anchor,$_anchor_instance,$_tag,1);
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+
+    $_anchor[1] //= 1;
+    $_tag[1] //= 1;
+
+    return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
 }
 
 sub _helper_javascript_functions {

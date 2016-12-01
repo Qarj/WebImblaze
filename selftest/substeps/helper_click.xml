@@ -34,7 +34,7 @@
     id="210"
     description1="Click 2nd Yes"
     method="selenium"
-    command1="$selresp = helper_click('Yes',2);"
+    command1="$selresp = helper_click('Yes|||2');"
     command2="$selresp = helper_get_attribute(q|label[for='eligibilityEuYes']|,'css','class');"
     verifytext="get_current_url,get_body_text"
     verifypositive="btn btn-select focus active"
@@ -137,5 +137,48 @@
     verifypositive="Clicked tag A WITH\[facebook\] OK"
 />
 
+<case
+    section="Click Helper Self Test - Click after - nth instance"
+    id="600"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifytext="get_page_source,get_current_url"
+    verifypositive1="Location"
+    verifypositive2="Element is checked"
+/>
+
+<case
+    id="610"
+    description1="Click 5th INPUT element after 2nd instance of Yes"
+    method="selenium"
+    command1="$selresp = helper_click_after('Yes|||2','INPUT|||5');"
+    command2="$selresp = helper_wait_for_text_visible('Select daily rate',3, 'body','tag_name');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    section="Click Helper Self Test - Click before - nth instance"
+    id="700"
+    description1="Get Totaljobs Jobseeker Account Register Page"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
+    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
+    verifytext="get_page_source,get_current_url"
+    verifypositive1="Location"
+    verifypositive2="Element is checked"
+/>
+
+<case
+    id="710"
+    description1="Click 3rd INPUT element before 2nd instance of password"
+    method="selenium"
+    command1="$selresp = helper_click_before('password|||2','INPUT|||3');"
+    command2="$selresp = helper_wait_for_text_visible('Select hourly rate',3, 'body','tag_name');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
 
 </testcases>
