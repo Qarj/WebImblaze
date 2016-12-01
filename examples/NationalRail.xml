@@ -1,0 +1,49 @@
+<testcases repeat="1">
+
+<!--
+    command1="$selresp = $driver->set_timeout('page load', 5_000);"
+-->
+
+<case
+    section="Locators for Testers Example - National Rail"
+    id="100"
+    description1="Fill out National Rail search form"
+    method="selenium"
+    command1='$selresp = $driver->get("http://www.nationalrail.co.uk/");'
+    command2="$selresp = helper_keys_to_element_after('From','London Bridge');"
+    command3="$selresp = helper_keys_to_element('to','Gatwick Airport');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Buy tickets"
+/>
+
+<case
+    id="110"
+    description1="Click Go"
+    method="selenium"
+    command1="$selresp = helper_click('Go');"
+    command2="$selresp = helper_wait_for_text_present('Edit journey',5);"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+<case
+    id="120"
+    description1="Click Buy cheapest"
+    method="selenium"
+    command1="$selresp = helper_click('Buy cheapest');"
+    command2="$selresp = helper_wait_for_text_present('opened a new tab',5);"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+<case
+    id="130"
+    description1="Click Save journey"
+    method="selenium"
+    command1="$selresp = helper_click('Save journey');"
+    command2="$selresp = helper_wait_for_text_present('Personal Information',5);"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Found sought text"
+/>
+
+</testcases>
