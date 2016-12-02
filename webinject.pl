@@ -1212,7 +1212,7 @@ sub _helper_keys_to_element {
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
 
     #print "Got to helper_keys_to_element BEFORE call to _helper_click_element\n";
-    my $_response = _helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    my $_response = _helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
     #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
     if (%$_response{message} =~ m/Could not find/) { return %$_response{message}; }
@@ -1235,11 +1235,11 @@ sub _helper_keys_to_element {
     return %$_response{message} . ' then sent keys OK';
 }
 
-sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
+sub _helper_click_element_deprecated { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
 
-    return %{_helper_focus_element($_anchor,$_anchor_instance,$_tag,$_tag_instance)}{message};
+    return %{_helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance)}{message};
 
     ## Unfortunately Selenium is over-thinking the clicking and in some cases refusing to click elements that are clickable, so the focus helper will also click with JavaScript
     #if ($_response =~ m/Could not find/) { return $_response; }
@@ -1247,7 +1247,19 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
     #return $_response . ' then clicked OK';
 }
 
-sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,anchor_instance,tag,tag_instance);
+sub helper_get_element {
+
+    my ($_anchor_parms) = @_;
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    $_anchor[1] //= 1;
+
+    my $_element_details_ref = _helper_get_element($_anchor[0],$_anchor[1],'*',0);
+
+    return 'Located' . %$_element_details_ref{message} . "\n Start Element Signature\n " . %$_element_details_ref{element_signature} . "\n End Element Signature";
+}
+
+sub _helper_get_element { ## internal use only: _helper_get_element(anchor,anchor_instance,tag,tag_instance);
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
     $_anchor_instance //= 1; ## 1 means first instance of anchor
@@ -1309,8 +1321,7 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
         }
 
         if (target_element_index_ > -1) {
-            _all_[target_element_index_].focus();
-            _all_[target_element_index_].click();
+            // the element was found
         } else {
             return { 
                 message : "Could not find " + tag_.toString() + " element before the anchor text" + _debug_,
@@ -1320,7 +1331,7 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
         }
 
         return {
-            message : element_action_info("Focused and clicked",target_element_index_,action_keyword_,anchor_,info_.textIndex),
+            message : element_action_info("",target_element_index_,action_keyword_,anchor_,info_.textIndex),
             element : _all_[target_element_index_],
             element_signature : element_signature(target_element_index_)
         }
@@ -1328,6 +1339,59 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
 
     return $_response;
+}
+
+sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,anchor_instance,tag,tag_instance);
+
+    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
+    $_anchor_instance //= 1; ## 1 means first instance of anchor
+    $_tag //= '*'; ## * means click the tag found by the anchor, whatever it is
+    $_tag_instance //= 0; ## -1 means search for the specified tag BEFORE, 1 means search for specified tag after, 0 is an error unless $_tag is '*' 
+
+    my $_element_details_ref = _helper_get_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    my %_element_details = %$_element_details_ref;
+
+    if (not $_element_details{element}) {return \%_element_details;}
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var element_ = arguments[0];
+        element_.focus();
+        return;
+
+    `;
+    my $_response = $driver->execute_script($_script,$_element_details{element});
+
+    $_element_details{message} = "Focused" . $_element_details{message};
+
+    return \%_element_details;
+}
+
+sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
+
+    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
+    $_anchor_instance //= 1; ## 1 means first instance of anchor
+    $_tag //= '*'; ## * means click the tag found by the anchor, whatever it is
+    $_tag_instance //= 0; ## -1 means search for the specified tag BEFORE, 1 means search for specified tag after, 0 is an error unless $_tag is '*' 
+
+    my $_element_details_ref = _helper_get_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
+    my %_element_details = %$_element_details_ref;
+
+    if (not $_element_details{element}) {return \%_element_details;}
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var element_ = arguments[0];
+        element_.focus();
+        element_.click();
+        return;
+
+    `;
+    my $_response = $driver->execute_script($_script,$_element_details{element});
+
+    $_element_details{message} = "Focused and clicked" . $_element_details{message};
+
+    return \%_element_details;
 }
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);
@@ -1340,7 +1404,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
 
     $_anchor[1] //= 1;
 
-    return _helper_click_element($_anchor[0],$_anchor[1],'*',0);
+    return %{_helper_click_element($_anchor[0],$_anchor[1],'*',0)}{message};
 }
 
 sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance]);
@@ -1355,7 +1419,8 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
     $_tag[1] //= 1;
     $_tag[1] = - abs $_tag[1];
 
-    return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
+    #return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
+    return %{_helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1])}{message};
 }
 
 sub helper_click_after { ## usage: helper_click_after(anchor[,element]);
@@ -1369,7 +1434,8 @@ sub helper_click_after { ## usage: helper_click_after(anchor[,element]);
     $_anchor[1] //= 1;
     $_tag[1] //= 1;
 
-    return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
+    #return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
+    return %{_helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1])}{message};
 }
 
 sub _helper_javascript_functions {
@@ -1512,11 +1578,11 @@ sub _helper_javascript_functions {
         }
 
         function element_signature(_targetElementIndex) {
-            var _signature;
+            var _signature = '';
             for (var j = 0; j < _all_[_targetElementIndex].attributes.length; j++) {
                 var _attrib = _all_[_targetElementIndex].attributes[j];
                 if (_attrib.specified) {
-                    _signature = _signature + _attrib.name + "[" + _attrib.value + "] ";
+                    _signature = _signature + _attrib.name + '="' + _attrib.value + '" ';
                 }
             }
             return _signature;

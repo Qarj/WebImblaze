@@ -56,11 +56,16 @@
     verifypositive="Element is checked"
 />
 
+
+<!--
+    command3="$selresp = helper_keys_to_element_after('Enable other employers to find me','');"
+-->
+
 <case
     id="210"
     description1="Uncheck 'Switch on one-click apply'"
     method="selenium"
-    command3="$selresp = helper_keys_to_element_after('Enable other employers to find me','');"
+    command3="$selresp = helper_click_after('Enable other employers to find me');"
     command4="$selresp = helper_is_checked('ocaOptIn','id');"
     verifypositive="Element is not checked"
 />
@@ -89,7 +94,7 @@
     verifypositive="Automated Testing"
     verifypositive1="Could not find anchor text"
     verifypositive2="Could not find PINGPONG element before the anchor text"
-    verifypositive3="Clicked tag INPUT BEFORE"
+    verifypositive3="Focused and clicked tag INPUT BEFORE"
 />
 
 

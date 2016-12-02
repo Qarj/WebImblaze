@@ -1,0 +1,29 @@
+<testcases repeat="1">
+
+<case
+    section="RIMATTEST Search Form"
+    id="10"
+    description1="Get RIMATTEST Search Form"
+    method="selenium"
+    command='$selresp = $driver->get("http://{RAN}/Search/SearchForm");'
+    command1='$selresp = $driver->get_all_cookies();'
+    verifytext="get_page_source,get_current_url"
+    verifypositive="Search Recipes"
+    verifypositive1="Max Preparation Time"
+/>
+
+<case
+    id="20"
+    description1="Fill out Search Form"
+    method="selenium"
+    command1="$selresp = helper_keys_to_element_after('Recipe Name','Shepherds Pie');"
+    command2="$selresp = helper_keys_to_element_after('Cuisine','British');"
+    command3="$selresp = helper_keys_to_element_after('Max Prep','2');"
+    command4="$selresp = helper_get_element('BtnSubmit');"
+    verifytext="get_current_url"
+    verifypositive='value="Search Recipes"'
+/>
+
+
+
+</testcases>
