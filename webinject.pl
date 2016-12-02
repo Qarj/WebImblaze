@@ -3338,6 +3338,7 @@ sub _include_file {
 
     my $_include = read_file(slash_me($_file));
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
+    $_include =~ s{\n(\s*)retryfromstep[\s]*=[\s]*"}{"\n".$1.'retryfromstep="'.$_id.'.'}eg; #'
 
     #open my $_INCLUDE, '>', "$output".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
     #print {$_INCLUDE} $_include;
