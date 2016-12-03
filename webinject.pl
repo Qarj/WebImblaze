@@ -1256,7 +1256,7 @@ sub helper_get_element {
 
     my $_element_details_ref = _helper_get_element($_anchor[0],$_anchor[1],'*',0);
 
-    return 'Located' . %$_element_details_ref{message} . "\n Start Element Signature\n " . %$_element_details_ref{element_signature} . "\n End Element Signature";
+    return 'Located' . %$_element_details_ref{message} . "\n Start Element Signature\n " . %$_element_details_ref{element_signature} . "\n End Element Signature\n Element Value [" . %$_element_details_ref{element_value} . "]";
 }
 
 sub _helper_get_element { ## internal use only: _helper_get_element(anchor,anchor_instance,tag,tag_instance);
@@ -1333,7 +1333,8 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
         return {
             message : element_action_info("",target_element_index_,action_keyword_,anchor_,info_.textIndex),
             element : _all_[target_element_index_],
-            element_signature : element_signature(target_element_index_)
+            element_signature : element_signature(target_element_index_),
+            element_value : _all_[target_element_index_].value
         }
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);

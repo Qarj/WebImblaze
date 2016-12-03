@@ -1,0 +1,81 @@
+<testcases repeat="1">
+
+<case
+    section="Locators for Testers Example - GOV.UK"
+    id="100"
+    description1="Fill out TFL search form"
+    method="selenium"
+    command1='$selresp = $driver->get("https://www.gov.uk");'
+    command2="$selresp = helper_keys_to_element('Search GOV.UK','Driving');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="best place to find government services"
+/>
+
+<case
+    id="110"
+    description1="Submit search"
+    method="selenium"
+    command1="$selresp = helper_click('submit');"
+    command2="$selresp = helper_wait_for_text_visible('Book your driving test');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    id="120"
+    description1="Click 'book-driving-test'"
+    method="selenium"
+    command1="$selresp = helper_click('book-driving-test');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="buses and coaches"
+/>
+
+<case
+    id="130"
+    description1="Click 'Start now'"
+    method="selenium"
+    command1="$selresp = helper_click('Start now');"
+    command2="$selresp = helper_wait_for_text_visible('Choose type of test',25);"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    id="140"
+    description1="Click 'manual and automatic'"
+    method="selenium"
+    command1="$selresp = helper_click('manual and automatic');"
+    command2="$selresp = helper_wait_for_text_visible('Driving licence number',25);"
+    verifytext="get_current_url,get_body_text"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    id="150"
+    description1="Click first 'Yes'"
+    method="selenium"
+    command1="$selresp = helper_click('Yes');"
+    verifytext="get_current_url"
+/>
+
+<case
+    id="160"
+    description1="Click second 'Yes'"
+    method="selenium"
+    command1="$selresp = helper_get_element('extended-test-yes');"
+    command2="$selresp = helper_click('Yes|||2');"
+    command3="$selresp = helper_get_element('extended-test-yes');"
+    verifytext="get_current_url"
+/>
+
+<case
+    id="170"
+    description1="Enter a driving licence number"
+    method="selenium"
+    command1="$selresp = helper_keys_to_element('eg MORGA','{RANDOM:5:ALPHA}{RANDOM:6:NUMERIC}{RANDOM:4:ALPHA}');"
+    command2="$selresp = helper_get_element('driverLicenceNumber');"
+    verifytext="get_current_url"
+    verifypositive="driving-licence"
+/>
+
+</testcases>
