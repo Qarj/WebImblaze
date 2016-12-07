@@ -6,6 +6,7 @@
     description1="Get Totaljobs Home Page"
     method="selenium"
     command='$selresp = $driver->get("https://www.totaljobs.com");'
+    command1="$selresp = helper_get_element('Copyright and database rights');"
     verifytext="get_current_url,get_body_text"
     verifypositive="Companies hiring"
 />
@@ -14,7 +15,9 @@
     id="20"
     description1="Move mouse to middle section"
     method="selenium"
-    command1="$selresp = helper_move_mouse_to('Register now');"
+    command1="$selresp = helper_get_element('Register now');"
+    command2="$selresp = helper_move_mouse_to('Register now');"
+    command3="$selresp = helper_get_element('Register now');"
     verifytext="get_current_url"
 />
 
@@ -22,7 +25,9 @@
     id="30"
     description1="Move mouse to iPhone picture"
     method="selenium"
-    command1="$selresp = helper_move_mouse_to('Download the job app now');"
+    command1="$selresp = helper_get_element('Download the job app now');"
+    command2="$selresp = helper_move_mouse_to('Download the job app now');"
+    command3="$selresp = helper_get_element('Download the job app now');"
     verifytext="get_current_url"
 />
 
@@ -30,7 +35,9 @@
     id="40"
     description1="Move mouse to bottom of page"
     method="selenium"
-    command1="$selresp = helper_move_mouse_to('Copyright and database rights');"
+    command1="$selresp = helper_get_element('Copyright and database rights');"
+    command2="$selresp = helper_move_mouse_to('Copyright and database rights');"
+    command3="$selresp = helper_get_element('Copyright and database rights');"
     verifytext="get_current_url"
 />
 

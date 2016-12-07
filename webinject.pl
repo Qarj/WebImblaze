@@ -1249,9 +1249,29 @@ sub helper_get_element {
     my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
     $_anchor[1] //= 1;
 
-    my $_element_details_ref = _helper_get_element($_anchor[0],$_anchor[1],'*',0);
+    my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
 
-    return 'Located' . %$_element_details_ref{message} . "\n Start Element Signature\n " . %$_element_details_ref{element_signature} . "\n End Element Signature\n Element Value [" . %$_element_details_ref{element_value} . "]";
+    if (not $_element_details{element}) {return $_element_details{message};}
+
+    $_element_details{element_value} //= '_NULL_';
+    my $_basic_info = 'Located' . $_element_details{message} . "\n Start Element Signature\n  " . $_element_details{element_signature} . "\n End Element Signature\n Element Value [" . $_element_details{element_value} . "]";
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var _element = arguments[0];
+        
+        return {
+            scrollTop : _element.scrollTop, 
+            scrollHeight : _element.scrollHeight,
+            clientHeight : _element.clientHeight
+        }
+
+    `;
+    my %_element_extra = % { $driver->execute_script($_script,$_element_details{element}) };
+
+    my $_extra_info = "\n scrollTop[".$_element_extra{scrollTop}."] scrollHeight[".$_element_extra{scrollHeight}."] clientHeight[".$_element_extra{clientHeight}."]";
+
+    return $_basic_info . $_extra_info;
 }
 
 sub _helper_get_element { ## internal use only: _helper_get_element(anchor,anchor_instance,tag,tag_instance);
