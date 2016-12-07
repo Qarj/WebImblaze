@@ -1211,12 +1211,9 @@ sub _helper_keys_to_element {
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance,$_keys) = @_;
 
-    #print "Got to helper_keys_to_element BEFORE call to _helper_click_element\n";
     my $_response = _helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance);
-    #print "Got to helper_keys_to_element AFTER call to _helper_click_element\n";
 
     if (%$_response{message} =~ m/Could not find/) { return %$_response{message}; }
-    #print "Got to helper_keys_to_element AFTER check for Could not find\n";
 
     eval {
         if ($_tag eq 'SELECT') {
@@ -1224,9 +1221,7 @@ sub _helper_keys_to_element {
             my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
         } else {
             my $_keys_response = $driver->get_active_element()->clear();
-            #print "Got to helper_keys_to_element - clear active element\n";
             $_keys_response = $driver->send_keys_to_active_element($_keys);
-            #print "Got to helper_keys_to_element - send keys to active element\n";
         }
     };
     
@@ -1393,6 +1388,28 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
     $_element_details{message} = "Focused and clicked" . $_element_details{message};
 
     return \%_element_details;
+}
+
+sub helper_move_mouse_to { ## usage: helper_move_mouse_to(anchor,x offset, y offset]);
+                           ## usage: helper_move_mouse_to('Yes');
+                           ## usage: helper_move_mouse_to('Yes|||2',320,200);
+
+    my ($_anchor_parms,$_x_offset,$_y_offset) = @_;
+
+    $_x_offset //= 0;
+    $_y_offset //= 0;
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+
+    $_anchor[1] //= 1;
+
+    my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
+
+    if (not $_element_details{element}) {return $_element_details{message};}
+
+    my $_response = $driver->mouse_move_to_location(element => $_element_details{element}, xoffset => $_x_offset, yoffset => $_y_offset);
+
+    return 'Found ' . $_element_details{message} . ' then moved mouse';
 }
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);

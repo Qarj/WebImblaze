@@ -1,0 +1,37 @@
+<testcases repeat="1">
+
+<case
+    section="helper_move_mouse_to"
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="selenium"
+    command='$selresp = $driver->get("https://www.totaljobs.com");'
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Companies hiring"
+/>
+
+<case
+    id="20"
+    description1="Move mouse to middle section"
+    method="selenium"
+    command1="$selresp = helper_move_mouse_to('Register now');"
+    verifytext="get_current_url"
+/>
+
+<case
+    id="30"
+    description1="Move mouse to iPhone picture"
+    method="selenium"
+    command1="$selresp = helper_move_mouse_to('Download the job app now');"
+    verifytext="get_current_url"
+/>
+
+<case
+    id="40"
+    description1="Move mouse to bottom of page"
+    method="selenium"
+    command1="$selresp = helper_move_mouse_to('Copyright and database rights');"
+    verifytext="get_current_url"
+/>
+
+</testcases>
