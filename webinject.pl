@@ -3068,23 +3068,25 @@ sub _verify_assertcount {
                 $assertion_skips_message = $assertion_skips_message . '[' . $_verify_count_parms[2] . ']';
             }
             else {
+                $results_xml .= "            <$_case_attribute>\n";
                 if ($_count == $_verify_count_parms[1]) {
                     $results_html .= qq|<span class="pass">Passed Count Assertion of $_verify_count_parms[1]</span><br />\n|;
-                    $results_xml .= qq|            <$_case_attribute-success>true</$_case_attribute-success>\n|;
+                    $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Count Assertion of $_verify_count_parms[1] \n";
                     $passed_count++;
                     $retry_passed_count++;
                 }
                 else {
-                    $results_xml .= qq|            <$_case_attribute-success>false</$_case_attribute-success>\n|;
+                    $results_xml .= qq|                <success>false</success>\n|;
                     if ($_verify_count_parms[2]) {## if there is a custom message, write it out
                         $results_html .= qq|<span class="fail">Failed Count Assertion of $_verify_count_parms[1], got $_count</span><br />\n|;
                         $results_html .= qq|<span class="fail">$_verify_count_parms[2]</span><br />\n|;
-                        $results_xml .= qq|            <$_case_attribute-message>|._sub_xml_special($_verify_count_parms[2]).qq| [got $_count]</$_case_attribute-message>\n|;
+                        $results_xml .= '                <message>'._sub_xml_special($_verify_count_parms[2])." [got $_count]</message>\n";
                     }
                     else {# we make up a standard message
                         $results_html .= qq|<span class="fail">Failed Count Assertion of $_verify_count_parms[1], got $_count</span><br />\n|;
                         $results_xml .= qq|            <$_case_attribute-message>Failed Count Assertion of $_verify_count_parms[1], got $_count</$_case_attribute-message>\n|;
+                        $results_xml .= "                <message>Failed Count Assertion of $_verify_count_parms[1], got $_count</message>\n";
                     }
                     $results_stdout .= "Failed Count Assertion of $_verify_count_parms[1], got $_count \n";
                     if ($_verify_count_parms[2]) {
@@ -3094,6 +3096,7 @@ sub _verify_assertcount {
                     $retry_failed_count++;
                     $is_failure++;
                 } ## end else _verifycountparms[2]
+                $results_xml .= qq|            </$_case_attribute>\n|;
             } ## end else _verifycountparms[3]
         } ## end if assertcount
     } ## end foreach
