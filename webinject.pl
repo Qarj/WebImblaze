@@ -1410,9 +1410,9 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
     return \%_element_details;
 }
 
-sub helper_move_mouse_to { ## usage: helper_move_mouse_to(anchor,x offset, y offset]);
-                           ## usage: helper_move_mouse_to('Yes');
-                           ## usage: helper_move_mouse_to('Yes|||2',320,200);
+sub helper_move_to { ## usage: helper_move_to(anchor,x offset, y offset]);
+                     ## usage: helper_move_to('Yes');
+                     ## usage: helper_move_to('Yes|||2',320,200);
 
     my ($_anchor_parms,$_x_offset,$_y_offset) = @_;
 
