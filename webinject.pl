@@ -1429,7 +1429,33 @@ sub helper_move_to { ## usage: helper_move_to(anchor,x offset, y offset]);
 
     my $_response = $driver->mouse_move_to_location(element => $_element_details{element}, xoffset => $_x_offset, yoffset => $_y_offset);
 
-    return 'Found ' . $_element_details{message} . ' then moved mouse';
+    return 'Found' . $_element_details{message} . ' then moved mouse';
+}
+
+sub helper_scroll_to { ## usage: helper_scroll_to(anchor);
+                       ## usage: helper_scroll_to('Yes');
+                       ## usage: helper_scroll_to('Yes|||2');
+
+    my ($_anchor_parms) = @_;
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+
+    $_anchor[1] //= 1;
+
+    my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
+
+    if (not $_element_details{element}) {return $_element_details{message};}
+
+    my $_script = _helper_javascript_functions() . q`
+
+        var element_ = arguments[0];
+        element_.scrollIntoView();
+        return;
+
+    `;
+    my $_response = $driver->execute_script($_script,$_element_details{element});
+
+    return 'Found' . $_element_details{message} . ' then scrolled into view';
 }
 
 sub helper_click { ## usage: helper_click(anchor[,instance]);
