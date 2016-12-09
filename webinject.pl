@@ -1254,7 +1254,11 @@ sub helper_get_element {
     if (not $_element_details{element}) {return $_element_details{message};}
 
     $_element_details{element_value} //= '_NULL_';
-    my $_basic_info = 'Located' . $_element_details{message} . "\n  " . $_element_details{element_signature} . "\n Element Value [" . $_element_details{element_value} . "]";
+    $_element_details{text} //= '_NULL_';
+    my $_basic_info = 'Located' . $_element_details{message} . "\n  "
+                                . $_element_details{element_signature}
+                                . "\n Element Text [" . $_element_details{text} . "]"
+                                . "\n Element Value [" . $_element_details{element_value} . "]";
 
     my $_script = _helper_javascript_functions() . q`
 
@@ -1366,7 +1370,8 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
             message : element_action_info("",target_element_index_,action_keyword_,anchor_,info_.textIndex),
             element : _all_[target_element_index_],
             element_signature : element_signature(target_element_index_),
-            element_value : _all_[target_element_index_].value
+            element_value : _all_[target_element_index_].value,
+            text : _all_[target_element_index_].text
         }
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
