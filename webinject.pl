@@ -1254,22 +1254,39 @@ sub helper_get_element {
     if (not $_element_details{element}) {return $_element_details{message};}
 
     $_element_details{element_value} //= '_NULL_';
-    my $_basic_info = 'Located' . $_element_details{message} . "\n Start Element Signature\n  " . $_element_details{element_signature} . "\n End Element Signature\n Element Value [" . $_element_details{element_value} . "]";
+    my $_basic_info = 'Located' . $_element_details{message} . "\n  " . $_element_details{element_signature} . "\n Element Value [" . $_element_details{element_value} . "]";
 
     my $_script = _helper_javascript_functions() . q`
 
-        var _element = arguments[0];
+        function isElementInViewport (el) {
         
+            var rect = el.getBoundingClientRect();
+        
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /*or $(window).height() */
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth) /*or $(window).width() */
+            );
+        }
+
+        var _element = arguments[0];
+
         return {
             scrollTop : _element.scrollTop, 
-            scrollHeight : _element.scrollHeight,
-            clientHeight : _element.clientHeight
+            offsetHeight : _element.offsetHeight,
+            offsetWidth : _element.offsetWidth,
+            inViewport : isElementInViewport(_element)
         }
 
     `;
     my %_element_extra = % { $driver->execute_script($_script,$_element_details{element}) };
 
-    my $_extra_info = "\n scrollTop[".$_element_extra{scrollTop}."] scrollHeight[".$_element_extra{scrollHeight}."] clientHeight[".$_element_extra{clientHeight}."]";
+    my $_extra_info = "\n scrollTop[".$_element_extra{scrollTop}.
+                      "] offsetWidth[".$_element_extra{offsetWidth}.
+                      "] offsetHeight[".$_element_extra{offsetHeight}.
+                      "] inViewport[".$_element_extra{inViewport}.
+                      "]\n";
 
     return $_basic_info . $_extra_info;
 }
@@ -1864,6 +1881,27 @@ sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible(
     my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_target, $_locator);
+
+}
+
+sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
+
+    my ($_anchor_parms,$_timeout) = @_;
+    $_timeout //= 5;
+
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    $_anchor[1] //= 1;
+
+    my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
+
+    if (not $_element_details{element}) {return $_element_details{message};}
+
+    $results_stdout .= "SEARCH VISIBLE: [$_anchor_parms] TIMEOUT[$_timeout]\n";
+
+    my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
+
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor[0], $_anchor[1]);
 
 }
 
