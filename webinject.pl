@@ -1218,7 +1218,7 @@ sub _helper_keys_to_element {
     eval {
         if ($_tag eq 'SELECT') {
             my $_element = $driver->get_active_element();
-            my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
+            my $_child = $driver->find_child_element($_element, "./option[contains(text(),'$_keys')]")->click();
         } else {
             my $_keys_response = $driver->get_active_element()->clear();
             $_keys_response = $driver->send_keys_to_active_element($_keys);
