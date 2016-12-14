@@ -1274,13 +1274,24 @@ sub helper_get_element {
             );
         }
 
+        function allText (el) {
+            var _text = '';
+            for (var j = 0; j < el.childNodes.length; ++j) {
+               if (el.childNodes[j].nodeType === 3) { // 3 means TEXT_NODE
+                   _text += el.childNodes[j].textContent; // We only want the text immediately within the element, not any child elements
+               }
+            }
+            return _text;
+        }
+
         var _element = arguments[0];
 
         return {
             scrollTop : _element.scrollTop, 
             offsetHeight : _element.offsetHeight,
             offsetWidth : _element.offsetWidth,
-            inViewport : isElementInViewport(_element)
+            inViewport : isElementInViewport(_element),
+            allText : allText(_element)
         }
 
     `;
@@ -1290,7 +1301,8 @@ sub helper_get_element {
                       "] offsetWidth[".$_element_extra{offsetWidth}.
                       "] offsetHeight[".$_element_extra{offsetHeight}.
                       "] inViewport[".$_element_extra{inViewport}.
-                      "]\n";
+                      "]\n".
+                      " allText[".$_element_extra{allText}."]\n";
 
     return $_basic_info . $_extra_info;
 }
