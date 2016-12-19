@@ -1108,17 +1108,6 @@ sub _screenshot {
     return;
 }
 
-sub helper_select_by_text { ## usage: helper_select_by_text(Search Target, Locator, Label);
-                            ##        helper_select_by_text('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');
-
-    my ($_search_target, $_locator, $_labeltext) = @_;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-    my $_child = $driver->find_child_element($_element, "./option[. = '$_labeltext']")->click();
-
-    return $_child;
-}
-
 sub helper_clear_and_send_keys { ## usage: helper_clear_and_send_keys(Search Target, Locator, Keys);
                                  ##        helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');
 
@@ -1215,16 +1204,23 @@ sub _helper_keys_to_element {
 
     if (%$_response{message} =~ m/Could not find/) { return %$_response{message}; }
 
-    eval {
-        if ($_tag eq 'SELECT') {
-            my $_element = $driver->get_active_element();
-            my $_child = $driver->find_child_element($_element, "./option[contains(text(),'$_keys')]")->click();
-        } else {
+    if ($_tag eq 'SELECT') {
+        my $_element = $driver->get_active_element();
+        eval { # Try exact match first so we do not select None instead of No
+            my $_child = $driver->find_child_element($_element, "./option[. = '$_keys']")->click();
+        };
+        if ($@) { # If exact match didn't work, try a contains match since there might be some special characters the Test Automator is trying to avoid using
+            eval {
+                my $_child = $driver->find_child_element($_element, "./option[contains(text(),'$_keys')]")->click();
+            };
+        }
+    } else {
+        eval {
             my $_keys_response = $driver->get_active_element()->clear();
             $_keys_response = $driver->send_keys_to_active_element($_keys);
-        }
-    };
-    
+        };
+    }
+
     if ($@) { return %$_response{message} . " then got an exception clearing or sending keys\n\nSignature of focused element:\n" . %$_response{element_signature} . "\n\n" .$@; }
 
     return %$_response{message} . ' then sent keys OK';
