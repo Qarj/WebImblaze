@@ -1119,20 +1119,6 @@ sub helper_clear_and_send_keys { ## usage: helper_clear_and_send_keys(Search Tar
     return $_response;
 }
 
-sub helper_mouse_move_to_location { ## usage: helper_mouse_move_to_location(Search Target, Locator, xoffset, yoffset);
-                                    ##        helper_mouse_move_to_location('closeBtn','id',3,4);
-                                    ##        helper_mouse_move_to_location('closeBtn','id'); # offsets are optional 
-
-    my ($_search_target, $_locator, $_xoffset, $_yoffset) = @_;
-    $_xoffset = int $_xoffset;
-    $_yoffset = int $_yoffset;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-    my $_child = $driver->mouse_move_to_location(element => $_element, xoffset => $_xoffset, yoffset => $_yoffset);
-
-    return $_child;
-}
-
 sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
                               ##        helper_switch_to_window(0);
                               ##        helper_switch_to_window(1);
