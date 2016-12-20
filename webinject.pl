@@ -1741,40 +1741,6 @@ sub helper_is_checked { ## usage: helper_is_checked(Search Target, Locator);
     return $_response;
 }
 
-sub helper_js_set_value {  ## usage: helper_js_set_value(id,value);
-                           ##        helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');
-                           ##
-                           ##        Single quotes will not treat \ as escape codes
-
-    my ($_id_to_set_value, $_value_to_set) = @_;
-
-    my $_script = q{
-        var arg1 = arguments[0];
-        var arg2 = arguments[1];
-        var elem = window.document.getElementById(arg1).value=arg2;
-        return elem;
-    };
-    my $_response = $driver->execute_script($_script,$_id_to_set_value,$_value_to_set);
-
-    return $_response;
-}
-
-sub helper_js_make_field_visible_to_webdriver {     ## usage: helper_js_make_field_visible(id);
-                                                    ##        helper_js_make_field_visible('cvProvider_filCVUploadFile');
-
-    my ($_id_to_set_css) = @_;
-
-    my $_script = q{
-        var arg1 = arguments[0];
-        window.document.getElementById(arg1).style.width = '5px';
-        var elem = window.document.getElementById(arg1).style.height = '5px';
-        return elem;
-    };
-    my $_response = $driver->execute_script($_script,$_id_to_set_css);
-
-    return $_response;
-}
-
 sub helper_check_element_within_pixels {     ## usage: helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
                                              ##        helper_check_element_within_pixels('txtEmail','id',193,325,30);
 
