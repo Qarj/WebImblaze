@@ -6,7 +6,7 @@
     description1="Fill out TFL search form"
     method="selenium"
     command1='$selresp = $driver->get("https://tfl.gov.uk");'
-    command2="$selresp = helper_keys_to_element('From','SE1 2UP');"
+    command2="$selresp = helper_keys_to_element('The From field is required.','SE1 2UP');"
     command3="$selresp = helper_keys_to_element('To','SW3 4TZ');"
     command4="$selresp = helper_click('Plan my journey');"
     verifytext="get_current_url,get_body_text"

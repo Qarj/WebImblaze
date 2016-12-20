@@ -1,184 +1,113 @@
 <testcases repeat="1">
 
 <case
-    section="Click Helper Self Test - Anchor found at start of text in element"
+    section="Click Helper Self Test - Anchors"
     id="100"
-    description1="Get Totaljobs Jobseeker Account Register Page"
+    description1="Get Search Recipes"
     method="selenium"
-    command='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    verifytext="get_page_source,get_current_url"
-    verifypositive="Location"
+    command='$selresp = $driver->get("http://{RAN}/Search/SearchRecipes");'
+    verifytext="get_current_url,get_page_source"
+    verifypositive="Recipe Name"
 />
 
 <case
     id="110"
-    description1="Click Upload your CV"
+    description1="Click Search"
+    description2="Partial match from start of string, 3rd instance"
     method="selenium"
-    command1="$selresp = helper_click('Upload your CV');"
-    command2="$selresp = helper_wait_for_text_visible('from this device',3, 'body','tag_name');"
+    command1="$selresp = helper_click('Search|||3');"
+    command2="$selresp = helper_wait_for_text_visible('MaxPrepTime field is required');"
     verifytext="get_current_url,get_body_text"
+    verifypositive1="Focused and clicked tag INPUT WITH\[Search] OK \(text index 0\)"
     verifypositive20="Found sought text"
 />
 
 <case
-    section="Click Helper Self Test - Second instance of Anchor"
-    id="200"
-    description1="Get Totaljobs Jobseeker Account Register Page"
+    id="120"
+    description1="Click Cancel"
+    description2="Exact Match of an attribute"
     method="selenium"
-    command='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    verifytext="get_page_source,get_current_url"
-    verifypositive="Location"
+    command1="$selresp = helper_click('Cancel');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Recipe Name"
+    verifypositive1="Focused and clicked tag INPUT WITH\[Cancel] OK \(exact match\)"
+    verifynegative="Please Provide Recipe Name"
+/>
+
+<case
+    id="130"
+    description1="Click Recipes"
+    description2="Partial Match of an attribute from within string, 3rd instance"
+    method="selenium"
+    command1="$selresp = helper_click('Recipes|||3');"
+    command2="$selresp = helper_wait_for_text_visible('MaxPrepTime field is required');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive1="Focused and clicked tag INPUT WITH\[Recipes] OK \(text index 7\)"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    id="140"
+    description1="Click Cancel"
+    method="selenium"
+    command1="$selresp = helper_click('Cancel');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive="Recipe Name"
+    verifynegative="Please Provide Recipe Name"
+/>
+
+<case
+    id="150"
+    description1="Click Search Recipes"
+    description2="Exact Match of an attribute"
+    method="selenium"
+    command1="$selresp = helper_click('Search Recipes');"
+    command2="$selresp = helper_wait_for_text_visible('MaxPrepTime field is required');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive1="Focused and clicked tag INPUT WITH\[Search Recipes] OK \(exact match\)"
+    verifypositive20="Found sought text"
+/>
+
+<case
+    id="160"
+    description1="Click Search Recipes."
+    description2="Exact Match of element text - H2 tag"
+    method="selenium"
+    command1="$selresp = helper_click('Search Recipes.');"
+    verifytext="get_current_url,get_body_text"
+    verifypositive1="Focused and clicked tag H2 WITH\[Search Recipes.] OK \(exact match\)"
+/>
+
+<case
+    section="Click Before and After"
+    id="200"
+    description1="Get Search Recipes"
+    method="selenium"
+    command='$selresp = $driver->get("http://{RAN}/Search/SearchRecipes");'
+    verifytext="get_current_url,get_page_source"
+    verifypositive="Recipe Name"
 />
 
 <case
     id="210"
-    description1="Click 2nd Yes"
+    description1="Click before Cancel"
+    description2="[Should target Search Recipes]"
     method="selenium"
-    command1="$selresp = helper_click('Yes|||2');"
-    command2="$selresp = helper_get_attribute(q|label[for='eligibilityEuYes']|,'css','class');"
-    verifytext="get_current_url,get_body_text"
-    verifypositive="btn btn-select focus active"
-/>
-
-<case
-    section="Click Helper Self Test - INPUT *before* text and INPUT *after* text"
-    id="300"
-    description1="Get Totaljobs Jobseeker Account Register Page"
-    method="selenium"
-    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
-    verifytext="get_page_source,get_current_url"
-    verifypositive1="Location"
-    verifypositive2="Element is checked"
-/>
-
-<case
-    id="310"
-    description1="Click INPUT element *before* 'Enable other employers to find me'"
-    method="selenium"
-    command1="$selresp = helper_mouse_move_to_location('register','id',1,1);"
-    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
-    command3="$selresp = helper_click_before('Enable other employers to find me');"
-    command4="$selresp = helper_get_attribute('cvdbOptIn','id','checked');"
-    command5="$selresp = helper_get_attribute('cvdbOptIn','id','value');"
-    command6="$selresp = helper_is_checked('cvdbOptIn','id');"
-    verifytext="get_current_url,get_body_text"
-/>
-
-<case
-    id="320"
-    description1="Check that checkbox is now unchecked"
-    method="selenium"
-    command1="$selresp = helper_get_attribute('cvdbOptIn','id','checked');"
-    command2="$selresp = helper_get_attribute('cvdbOptIn','id','value');"
-    command3="$selresp = helper_is_checked('cvdbOptIn','id');"
-    verifypositive="Element is not checked"
-/>
-
-<case
-    id="330"
-    description1="Click INPUT element *after* 'Enable other employers to find me'"
-    method="selenium"
-    command1="$selresp = helper_mouse_move_to_location('register','id',1,1);"
-    command2="$selresp = helper_is_checked('ocaOptIn','id');"
-    command3="$selresp = helper_click_after('Enable other employers to find me');"
-    command4="$selresp = helper_get_attribute('ocaOptIn','id','checked');"
-    command5="$selresp = helper_get_attribute('ocaOptIn','id','value');"
-    command6="$selresp = helper_is_checked('ocaOptIn','id');"
-    verifytext="get_current_url,get_body_text"
-/>
-
-<case
-    id="340"
-    description1="Check that checkbox is now unchecked"
-    method="selenium"
-    command1="$selresp = helper_get_attribute('ocaOptIn','id','checked');"
-    command2="$selresp = helper_get_attribute('ocaOptIn','id','value');"
-    command3="$selresp = helper_is_checked('ocaOptIn','id');"
-    verifypositive="Element is not checked"
-/>
-
-<case
-    section="Click Helper Self Test - BUTTON before text"
-    id="400"
-    description1="Get Totaljobs Jobseeker Account Register Page"
-    method="selenium"
-    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    verifytext="get_page_source,get_current_url"
-    verifypositive1="Location"
-/>
-
-<case
-    id="410"
-    description1="Click BUTTON element before 'We accept MS Word'"
-    method="selenium"
-    command1="$selresp = helper_click_before('We accept MS Word','BUTTON');"
-    command2="$selresp = helper_wait_for_text_visible('from this device',3, 'body','tag_name');"
+    command1="$selresp = helper_click_before('Cancel');"
+    command2="$selresp = helper_wait_for_text_visible('MaxPrepTime field is required');"
     verifytext="get_current_url,get_body_text"
     verifypositive20="Found sought text"
 />
 
 <case
-    section="Click by element title"
-    id="500"
-    description1="Move to bottom of page"
+    id="220"
+    description1="Click after Search Recipes"
+    description2="[Exact match to Search Recipes, Should target Cancel]"
     method="selenium"
-    command1="$selresp = helper_mouse_move_to_location(q|//*[contains(text(),'Copyright and database')]|,'xpath',1,1);"
-    verifytext="get_current_url,get_window_handles"
-/>
-
-<case
-    id="510"
-    description1="Click facebook link"
-    method="selenium"
-    command1="$selresp = helper_click('facebook');"
-    verifytext="get_current_url,get_window_handles"
-    assertcount="window-|||2|||Facebook should be open in 2nd tab"
-    verifypositive="Clicked tag A WITH\[facebook\] OK"
-/>
-
-<case
-    section="Click Helper Self Test - Click after - nth instance"
-    id="600"
-    description1="Get Totaljobs Jobseeker Account Register Page"
-    method="selenium"
-    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
-    verifytext="get_page_source,get_current_url"
-    verifypositive1="Location"
-    verifypositive2="Element is checked"
-/>
-
-<case
-    id="610"
-    description1="Click 5th INPUT element after 2nd instance of Yes"
-    method="selenium"
-    command1="$selresp = helper_click_after('Yes|||2','INPUT|||5');"
-    command2="$selresp = helper_wait_for_text_visible('Select daily rate',3, 'body','tag_name');"
+    command1="$selresp = helper_click_after('Search Recipes');"
     verifytext="get_current_url,get_body_text"
-    verifypositive20="Found sought text"
-/>
-
-<case
-    section="Click Helper Self Test - Click before - nth instance"
-    id="700"
-    description1="Get Totaljobs Jobseeker Account Register Page"
-    method="selenium"
-    command1='$selresp = $driver->get("https://www.totaljobs.com/account/register");'
-    command2="$selresp = helper_is_checked('cvdbOptIn','id');"
-    verifytext="get_page_source,get_current_url"
-    verifypositive1="Location"
-    verifypositive2="Element is checked"
-/>
-
-<case
-    id="710"
-    description1="Click 3rd INPUT element before 2nd instance of password"
-    method="selenium"
-    command1="$selresp = helper_click_before('password|||2','INPUT|||3');"
-    command2="$selresp = helper_wait_for_text_visible('Select hourly rate',3, 'body','tag_name');"
-    verifytext="get_current_url,get_body_text"
-    verifypositive20="Found sought text"
+    verifypositive="Recipe Name"
+    verifynegative="Please Provide Recipe Name"
 />
 
 </testcases>

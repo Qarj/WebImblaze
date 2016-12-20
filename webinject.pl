@@ -1211,18 +1211,6 @@ sub _helper_keys_to_element {
     return %$_response{message} . ' then sent keys OK';
 }
 
-sub _helper_click_element_deprecated { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
-
-    my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
-
-    return %{_helper_click_element($_anchor,$_anchor_instance,$_tag,$_tag_instance)}{message};
-
-    ## Unfortunately Selenium is over-thinking the clicking and in some cases refusing to click elements that are clickable, so the focus helper will also click with JavaScript
-    #if ($_response =~ m/Could not find/) { return $_response; }
-    #my $_click_response = $driver->get_active_element()->click();
-    #return $_response . ' then clicked OK';
-}
-
 sub helper_get_element {
 
     my ($_anchor_parms) = @_;
@@ -1322,7 +1310,7 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
         } else if (tag_instance_ > 0) {
 
             var found_tag_instance_ = 0;
-            for (var i=info_.elementIndex, max=_all_.length; i < max; i++) {
+            for (var i=info_.elementIndex+1, max=_all_.length; i < max; i++) {
                 target_element_index_ = is_element_at_index_a_match(tag_,i);
                 if (target_element_index_ > -1) {
                     found_tag_instance_++;
@@ -1336,7 +1324,7 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
         } else {
 
             var found_tag_instance_ = 0;
-            for (var i=info_.elementIndex, min=-1; i > min; i--) {
+            for (var i=info_.elementIndex-1, min=-1; i > min; i--) {
                 target_element_index_ = is_element_at_index_a_match(tag_,i);
                 if (target_element_index_ > -1) {
                     found_tag_instance_--;
@@ -1368,6 +1356,11 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
         }
     `;
     my $_response = $driver->execute_script($_script,$_anchor,$_anchor_instance,$_tag,$_tag_instance);
+
+    #print 'Located[debug]' . %{$_response}{message} . "\n  "
+    #                            . %{$_response}{element_signature}
+    #                            . "\n Element Text [" . %{$_response}{text} . "]"
+    #                            . "\n Element Value [" . %{$_response}{element_value} . "]\n";
 
     return $_response;
 }
@@ -1579,16 +1572,21 @@ sub _helper_javascript_functions {
                 for (var j = 0; j < _all_[i].attributes.length; j++) {
                     var attrib = _all_[i].attributes[j];
                     if (attrib.specified) {
-
-                        _textIndex = attrib.value.indexOf(_anchor);
-                        if (_textIndex != -1 && _textIndex < _depth) {
-                            _found_instance = _found_instance + 1;
-                            if (_instance === _found_instance) {
-                                _elementIndex = i;
-                                break;
-                            } else {
-                                continue;
+                        if (_depth === 0) {
+                            if (attrib.value === _anchor) {
+                                _found_instance = _found_instance +1;
                             }
+                        } else {
+                            _textIndex = attrib.value.indexOf(_anchor);
+                            if (_textIndex != -1 && _textIndex < _depth) {
+                                _found_instance = _found_instance + 1;
+                            }
+                        }
+                        if (_instance === _found_instance) {
+                            _elementIndex = i;
+                            break;
+                        } else {
+                            continue;
                         }
                     }
                 }
@@ -1618,8 +1616,6 @@ sub _helper_javascript_functions {
                         textIndex : _info.textIndex
                     }
                 }
-            }
-            for (var i=0; i < _depth.length; i++) {
                 _info = get_element_number_by_attribute(_anchor,_depth[i],_instance);
                 if (_info.elementIndex > -1) {
                     return {
@@ -1628,6 +1624,8 @@ sub _helper_javascript_functions {
                     }
                 }
             }
+            //for (var i=0; i < _depth.length; i++) {
+            //}
             return {
                 elementIndex : -1,
                 textIndex : -1
