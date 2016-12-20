@@ -1127,10 +1127,9 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     require Data::Dumper;
 
     my $_handles = $driver->get_window_handles;
-    print Data::Dumper::Dumper($_handles);
     my $_response =  $driver->switch_to_window($_handles->[$_window_number]);
 
-    return $_response;
+    return 'Handles:' . Data::Dumper::Dumper($_handles) . $_response;
 }
 
 sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
@@ -1739,21 +1738,6 @@ sub helper_is_checked { ## usage: helper_is_checked(Search Target, Locator);
     |;
 
     my $_response = $driver->execute_script($_script,$_element);
-    return $_response;
-}
-
-sub helper_js_click { ## usage: helper_js_click(id);
-                      ##        helper_js_click('btnSubmit');
-
-    my ($_id_to_click) = @_;
-
-    my $_script = q{
-        var arg1 = arguments[0];
-        var elem = window.document.getElementById(arg1).click();
-        return elem;
-    };
-    my $_response = $driver->execute_script($_script,$_id_to_click);
-
     return $_response;
 }
 
