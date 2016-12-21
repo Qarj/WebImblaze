@@ -1835,10 +1835,6 @@ sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
     my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
     $_anchor[1] //= 1;
 
-    my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
-
-    if (not $_element_details{element}) {return $_element_details{message};}
-
     $results_stdout .= "SEARCH VISIBLE: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
     my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
