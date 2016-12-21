@@ -1813,20 +1813,6 @@ sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(
 
 }
 
-sub helper_wait_for_element_visible { ## usage: helper_wait_for_element_visible(target,locator,timeout);
-                                      ##        helper_wait_for_element_visible('menu-search-icon','id',5);
-
-    my ($_target, $_locator, $_timeout) = @_;
-
-    $results_stdout .= "SEARCH TARGET VISIBLE[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
-
-    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator")->is_displayed();'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
-
-    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_target, $_locator);
-
-}
-
 sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
 
     my ($_anchor_parms,$_timeout) = @_;
