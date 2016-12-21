@@ -1224,7 +1224,7 @@ sub helper_get_element {
 
     $_element_details{element_value} //= '_NULL_';
     $_element_details{text} //= '_NULL_';
-    my $_basic_info = 'Located' . $_element_details{message} . "\n  "
+    my $_basic_info = 'Located' . $_element_details{message} . "\n "
                                 . $_element_details{element_signature}
                                 . "\n Element Text [" . $_element_details{text} . "]"
                                 . "\n Element Value [" . $_element_details{element_value} . "]";
@@ -1253,9 +1253,25 @@ sub helper_get_element {
             return _text;
         }
 
+        function elementSelection (el) {
+            if (el.tagName === 'SELECT') {
+                var _selectedValue = el.options[el.selectedIndex].value;
+                var _selectedText = el.options[el.selectedIndex].text;
+                return "[" + _selectedValue + "] " + _selectedText;
+            }
+            return '_NA_';
+        }
+
+        function isElementChecked (el) {
+            if (el.checked) { return 'true'; }
+            return 'false';
+        }
+
         var _element = arguments[0];
 
         return {
+            selection : elementSelection(_element),
+            isChecked : isElementChecked(_element),
             scrollTop : _element.scrollTop, 
             offsetHeight : _element.offsetHeight,
             offsetWidth : _element.offsetWidth,
@@ -1266,7 +1282,8 @@ sub helper_get_element {
     `;
     my %_element_extra = % { $driver->execute_script($_script,$_element_details{element}) };
 
-    my $_extra_info = "\n scrollTop[".$_element_extra{scrollTop}.
+    my $_extra_info = "\n Element Selection [".$_element_extra{selection}."] isChecked[".$_element_extra{isChecked}."]\n".
+                      " scrollTop[".$_element_extra{scrollTop}.
                       "] offsetWidth[".$_element_extra{offsetWidth}.
                       "] offsetHeight[".$_element_extra{offsetHeight}.
                       "] inViewport[".$_element_extra{inViewport}.
@@ -1716,78 +1733,6 @@ sub _helper_javascript_functions {
             return _signature;
         }
     `; 
-}
-
-sub helper_get_attribute { ## usage: helper_get_attribute(Search Target, Locator, Target Attribute);
-                           ##        helper_get_attribute(q|label[for='eligibilityUkYes']|,'css','class');
-
-    my ($_search_target, $_locator, $_attribute) = @_;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-
-    my $_script = q|
-        var _element = arguments[0];
-        var _attribute = arguments[1];
-        return _element.getAttribute(_attribute);
-    |;
-
-    my $_response = $driver->execute_script($_script,$_element,$_attribute);
-    return $_response;
-}
-
-sub helper_get_element_value { ## usage: helper_get_element_value(Search Target, Locator);
-                               ##        helper_get_element_value('currentJobTitle','id');
-
-    my ($_search_target, $_locator) = @_;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-
-    my $_script = q|
-        var _element = arguments[0];
-        return _element.value;
-    |;
-
-    my $_response = $driver->execute_script($_script,$_element);
-    return $_response;
-}
-
-sub helper_get_selection { ## usage: helper_get_selection(Search Target, Locator);
-                           ##        helper_get_selection(q|select[id='ddlEducation']|,'css');
-
-    my ($_search_target, $_locator) = @_;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-
-    my $_script = q|
-        var _element = arguments[0];
-        var _selectedValue = _element.options[_element.selectedIndex].value;
-        var _selectedText = _element.options[_element.selectedIndex].text;
-        return "[" + _selectedValue + "] " + _selectedText;
-    |;
-
-    my $_response = $driver->execute_script($_script,$_element);
-    return $_response;
-}
-
-sub helper_is_checked { ## usage: helper_is_checked(Search Target, Locator);
-
-    my ($_search_target, $_locator) = @_;
-
-    my $_element = $driver->find_element("$_search_target", "$_locator");
-
-    my $_script = q|
-        var _element = arguments[0];
-        var _return;
-        if (_element.checked) {
-            _return = 'Element is checked';
-        } else {
-            _return = 'Element is not checked';
-        }
-        return _return;
-    |;
-
-    my $_response = $driver->execute_script($_script,$_element);
-    return $_response;
 }
 
 sub helper_check_element_within_pixels {     ## usage: helper_check_element_within_pixels(searchTarget,id,xBase,yBase,pixelThreshold);
