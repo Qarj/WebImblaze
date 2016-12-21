@@ -1559,6 +1559,50 @@ sub _helper_javascript_functions {
             }
         }
 
+        function get_element_number_by_priority_attribute(_anchor,_depth,_instance)
+        {
+            var _textIndex = -1;
+            var _elementIndex = -1;
+            var _found_instance = 0;
+            for (var i=0, max=_all_.length; i < max; i++) {
+                if (_all_[i].getAttribute('type') === 'hidden') { 
+                    continue; // Ignore hidden elements
+                }
+
+                for (var j = 0; j < _all_[i].attributes.length; j++) {
+                    var attrib = _all_[i].attributes[j];
+                    if (attrib.specified && (attrib.name === 'value' || attrib.name === 'placeholder' || attrib.name === 'title') ) {
+                        if (_depth === 0) {
+                            if (attrib.value === _anchor) {
+                                _found_instance = _found_instance +1;
+                            }
+                        } else {
+                            _textIndex = attrib.value.indexOf(_anchor);
+                            if (_textIndex != -1 && _textIndex < _depth) {
+                                _found_instance = _found_instance + 1;
+                            }
+                        }
+                        if (_instance === _found_instance) {
+                            _elementIndex = i;
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+
+                if (_elementIndex > -1) {
+                    break;
+                }
+
+            }
+
+            return {
+                elementIndex : _elementIndex,
+                textIndex : _textIndex
+            }
+        }
+
         function get_element_number_by_attribute(_anchor,_depth,_instance)
         {
             var _textIndex = -1;
@@ -1616,6 +1660,15 @@ sub _helper_javascript_functions {
                         textIndex : _info.textIndex
                     }
                 }
+                _info = get_element_number_by_priority_attribute(_anchor,_depth[i],_instance);
+                if (_info.elementIndex > -1) {
+                    return {
+                        elementIndex : _info.elementIndex,
+                        textIndex : _info.textIndex
+                    }
+                }
+            }
+            for (var i=0; i < _depth.length; i++) {
                 _info = get_element_number_by_attribute(_anchor,_depth[i],_instance);
                 if (_info.elementIndex > -1) {
                     return {
@@ -1624,8 +1677,6 @@ sub _helper_javascript_functions {
                     }
                 }
             }
-            //for (var i=0; i < _depth.length; i++) {
-            //}
             return {
                 elementIndex : -1,
                 textIndex : -1
