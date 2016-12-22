@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.4.1
+# Manual for WebInject version 2.4.2
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
@@ -2059,32 +2059,12 @@ for the text `Sign in` to appear.
 
 Here is a full list of the helper functions.
 
-##### helper_select_by_text
-
-helper_select_by_text(`target`, `locator`, `label`);
-
-```
-command="$selresp = helper_select_by_text('candidateProfileDetails_ddlCurrentSalaryPeriod','id','Daily Rate');"
-```
-
 ##### helper_clear_and_send_keys
 
 helper_clear_and_send_keys(`target`, `locator`, `keys`);
 
 ```
 command="$selresp = helper_clear_and_send_keys('candidateProfileDetails_txtPostCode','id','WC1X 8TG');"
-```
-
-##### helper_mouse_move_to_location
-
-helper_mouse_move_to_location(`target`, `locator`, `xoffset`, `yoffset`);
-
-```
-command="$selresp = helper_mouse_move_to_location('closeBtn','id',3,4);"
-```
-
-```
-command="$selresp = helper_mouse_move_to_location('closeBtn','id'); # offsets are optional"
 ```
 
 ##### helper_switch_to_window
@@ -2095,36 +2075,42 @@ helper_switch_to_window(`window number`);
 command="$selresp = helper_switch_to_window(0);"
 ```
 
+##### helper_keys_to_element
+
+helper_keys_to_element(`anchor[|||instance]`,`keys`);
+
+Will look for some text in the page source, and enter a value to found element. In this example
+the element is found using the placeholder text.
+```
+command="$selresp = helper_keys_to_element('Job title, skill or company','WebDriver Jobs');"
+```
+
+Select "Contract" in the drop down with attribute "optJobType".
+```
+command="$selresp = helper_keys_to_element('optJobType','Contract','SELECT');"
+```
+
 ##### helper_keys_to_element_after
 
-helper_keys_to_input_after(`label`,`keys to put in input`,`OPTIONAL - tag name`);
+helper_keys_to_element_after(`anchor[|||instance]`,`keys`,[`tag[|||instance]`]);
 
 Will look for some text in the page source, and enter a value to the following INPUT tag.
 ```
 command="$selresp = helper_keys_to_element_after('What','WebDriver Jobs');"
 ```
 
-Select "Contract" in the "Job Type" drop down.
+Select "Contract" in the 2nd drop down after the element targeted by "Job Type".
 ```
-command="$selresp = helper_keys_to_element_after('Job Type','Contract','SELECT');"
+command="$selresp = helper_keys_to_element_after('Job Type','Contract','SELECT|||2');"
 ```
 
 ##### helper_keys_to_element_before
 
 Works just like `helper_keys_to_element_after` but will search for a matching element before the anchor text.
 
-##### helper_keys_to_element
-
-helper_keys_to_element(`text anchor`,`keys`);
-
-Targets an element by its text or attribute values. In this example, the element is targeted with place holder text.
-```
-command="$selresp = helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');"
-```
-
 ##### helper_click
 
-helper_click(`anchor`[,`instance`]);
+helper_click(`anchor[|||instance]`);
 
 Clicks the first element on the page with Yes in it somewhere. Exact matches are priortised over partial matches.
 Element text is prioritised over attribute values.
@@ -2137,83 +2123,23 @@ Clicks the second instance that matches `Yes`.
 command="$selresp = helper_click('Yes',2);"
 ```
 
-##### helper_click_before
+##### helper_click_after
 
-helper_click_before(`anchor`[,`element`,`instance`]);
+helper_click_after(`anchor[|||instance]`,[`tag[|||instance]`]);
 
-Will click the first element it finds before the text anchor, so long as it is one of INPUT, BUTTON, SELECT or A (i.e. link).
+Will click the first element it finds after the text anchor, so long as it is one of INPUT, BUTTON, SELECT or A (i.e. link).
 
-Clicks the first button before the second instance that matches `Yes`.
+Clicks the first button after the second instance that matches `Yes`.
 ```
-command="$selresp = helper_click_before('Yes','BUTTON',2);"
+command="$selresp = helper_click_after('Yes|||2','BUTTON');"
 ```
 
 Due to the heuristics, if there are two exact matches for `Yes` then only those will be counted. The other `Yes` matches will
 be ignored if they are considered to be of poorer quality.
 
-##### helper_click_after
+##### helper_click_before
 
-helper_click_after(`anchor`[,`element`,`instance`]);
-
-Works just like helper_click_before, except that it looks after the matching anchor text.
-
-##### helper_get_attribute 
-
-helper_get_attribute(`Search Target`, `Locator`, `Target Attribute`);
-
-Gets the value of the attribute (in this example `class`) for the target element.
-```
-command="$selresp = helper_get_attribute(q|label[for='eligibilityUkYes']|,'css','class');"
-```
-
-##### helper_get_element_value
-
-helper_get_element_value(`Search Target`, `Locator`);
-
-Gets the text value of the target element.
-```
-command="$selresp = helper_get_element_value('currentJobTitle','id');"
-```
-
-##### helper_get_selection
-
-helper_get_selection(`Search Target`, `Locator`);
-
-Gets the selection for the targeted drop down.
-```
-command="$selresp = helper_get_selection(q|select[id='ddlEducation']|,'css');"
-```
-
-##### helper_is_checked
-
-Indicates if the targeted checkbox is checked or not.
-```
-command="$selresp = helper_is_checked(Search Target, Locator);"
-```
-
-##### helper_js_click
-
-helper_js_click(`id`);
-
-```
-command="$selresp = helper_js_click('btnSubmit');"
-```
-
-##### helper_js_set_value
-
-helper_js_set_value(`id`, `value`);
-
-```
-command="$selresp = helper_js_set_value('cvProvider_filCVUploadFile','{CWD}\testdata\MyCV.doc');"
-```
-
-##### helper_js_make_field_visible_to_webdriver
-
-usage: helper_js_make_field_visible(`id`);
-
-```
-command="$selresp = helper_js_make_field_visible('cvProvider_filCVUploadFile');"
-```
+Works just like helper_click_after, except that it looks before the matching anchor text.
 
 ##### helper_check_element_within_pixels
 
@@ -2239,37 +2165,47 @@ helper_wait_for_text_visible(`search text`,`timeout`,`target`,`locator`);
 command="$selresp = helper_wait_for_text_visible('Job title', 10, 'body', 'tag_name');"
 ```
 
-##### helper_wait_for_element_present
+##### helper_wait_visible
 
-helper_wait_for_element_present(`target`, `locator`, `timeout`);
+helper_wait_visible(`anchor[|||instance]`[,timeout]);
 
+Waits for the element designated by the anchor to be visible in the current viewport. Default timeout is 5 seconds.
+
+Will wait up to 10 seconds for element with attribute `txtJobTitle` to become visible in the viewport.
 ```
-command="$selresp = helper_wait_for_element_present('menu-search-icon','id',5);"
-```
-
-##### helper_wait_for_element_visible
-
-helper_wait_for_element_visible(`target`, `locator`, `timeout`);
-
-```
-command="$selresp = helper_wait_for_element_visible('menu-search-icon','id',5);"
+command="$selresp = helper_wait_visible('txtJobTitle', 10);"
 ```
 
-##### helper_wait_for_text_not_present
+##### helper_wait_not_visible
 
-helper_wait_for_text_not_present(`search text`, `timeout`);
+Works like helper_wait_visible except that it waits until the element targeted by the anchor to be not visible in the current viewport.
 
+##### helper_scroll_to
+
+helper_scroll_to(`anchor[|||instance]`);
+
+Uses the JavaScript element.scrollIntoView method to scroll the element targeted by the anchor into view.
+
+##### helper_move_to
+
+helper_move_to(`anchor[|||instance]`,`x offset`,`y offset`);
+
+Moves the mouse to the element targeted by the anchor. 
+
+Moves to an x offset of 320 and a y offset of 200 from the 2nd element with anchor `Yes`.
 ```
-command="$selresp = helper_wait_for_text_not_present('Job title',10);
+command="$selresp = helper_move_to('Yes|||2',320,200);"
 ```
 
-##### helper_wait_for_text_not_visible
+##### helper_get_element
 
-helper_wait_for_text_not_visible(`search text`, `timeout`);
+helper_get_element(`anchor[|||instance]`);
 
-```
-command="$selresp = helper_wait_for_text_not_visible('This job has been emailed to',10);"
-```
+Gets various information about the element targeted by the anchor.
+
+The information includes the element attributes, the text, and if the element is in the current viewport.
+
+If applicable the currently selected drop down option is returned.
 
 
 <a name="fullexamp"></a>

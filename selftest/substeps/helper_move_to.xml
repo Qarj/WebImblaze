@@ -19,26 +19,32 @@
     command2="$selresp = helper_move_to('Register now');"
     command3="$selresp = helper_get_element('Register now');"
     verifytext="get_current_url"
+    verifypositive1="inViewport\[0]"
+    verifypositive2="inViewport\[1]"
 />
 
 <case
     id="30"
     description1="Move mouse to iPhone picture"
     method="selenium"
-    command1="$selresp = helper_get_element('Download the job app now');"
+    command1="$selresp = helper_get_element('Save jobs and searches');"
     command2="$selresp = helper_move_to('Download the job app now');"
-    command3="$selresp = helper_get_element('Download the job app now');"
+    command3="$selresp = helper_get_element('Save jobs and searches');"
     verifytext="get_current_url"
+    verifypositive1="inViewport\[0]"
+    verifypositive2="inViewport\[1]"
 />
 
 <case
     id="40"
     description1="Move mouse to bottom of page"
     method="selenium"
-    command1="$selresp = helper_get_element('Copyright and database rights');"
+    command1="$selresp = helper_get_element('Deutschland');"
     command2="$selresp = helper_move_to('Copyright and database rights');"
-    command3="$selresp = helper_get_element('Copyright and database rights');"
+    command3="$selresp = helper_get_element('Deutschland');"
     verifytext="get_current_url"
+    verifypositive1="inViewport\[0]"
+    verifypositive2="inViewport\[1]"
 />
 
 </testcases>

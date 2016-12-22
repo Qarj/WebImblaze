@@ -8,6 +8,10 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.4.2 - Dec 22, 2016
+* major tidy up of "Locators for Testers" and tweaks to heuristics
+* removed many helper functions no longer required
+
 ### Version 2.4.1 - Nov 22, 2016
 * optimised the "Locators for Testers" so they use a generic framework rather than copy and pasted code with slight variations
 * helper_send_keys_to_element[_after/_before] now uses Selenium to send the keys rather than setting value directly via JavaScript

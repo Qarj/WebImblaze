@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.4.1';
+$VERSION = '2.4.2';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -1132,7 +1132,7 @@ sub helper_switch_to_window { ## usage: helper_switch_to_window(window number);
     return 'Handles:' . Data::Dumper::Dumper($_handles) . $_response;
 }
 
-sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
+sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor|||instance,keys);
                              ##        helper_keys_to_element('E.g. Regional Manager','Test Automation Architect');
 
     my ($_anchor_parms,$_keys) = @_;
@@ -1142,7 +1142,7 @@ sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
     return _helper_keys_to_element($_anchor[0],$_anchor[1],'*',0,$_keys);
 }
 
-sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor,keys,tag);
+sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor|||instance,keys,tag|||instance);
                                    ##        helper_keys_to_element_after('Where','London');               # will default to 'INPUT'
                                    ##        helper_keys_to_element_after('Job Type','Contract','SELECT');
                                    ##        helper_keys_to_element_after('What|||1','Test Automation','INPUT|||2');
@@ -1176,7 +1176,7 @@ sub _unpack_tag {
     return @_tag;
 }
 
-sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
+sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor|||instance,keys,tag|||instance);
                                     ##        helper_keys_to_element_before('Where','London');               # will default tag to 'INPUT'
                                     ##        helper_keys_to_element_before('Job Type','Contract','SELECT');
                                     ##        helper_keys_to_element_before('Job Type|||2','Contract','SELECT|||2');
@@ -1302,7 +1302,7 @@ sub helper_get_element {
     return $_basic_info . $_extra_info;
 }
 
-sub _helper_get_element { ## internal use only: _helper_get_element(anchor,anchor_instance,tag,tag_instance);
+sub _helper_get_element { ## internal use only
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
     $_anchor_instance //= 1; ## 1 means first instance of anchor
@@ -1391,7 +1391,7 @@ sub _helper_get_element { ## internal use only: _helper_get_element(anchor,ancho
     return $_response;
 }
 
-sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,anchor_instance,tag,tag_instance);
+sub _helper_focus_element { ## internal use only
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
     $_anchor_instance //= 1; ## 1 means first instance of anchor
@@ -1417,7 +1417,7 @@ sub _helper_focus_element { ## internal use only: _helper_focus_element(anchor,a
     return \%_element_details;
 }
 
-sub _helper_click_element { ## internal use only: _helper_click_element(anchor,anchor_instance,tag,tag_instance);
+sub _helper_click_element { ## internal use only
 
     my ($_anchor,$_anchor_instance,$_tag,$_tag_instance) = @_;
     $_anchor_instance //= 1; ## 1 means first instance of anchor
@@ -1444,7 +1444,7 @@ sub _helper_click_element { ## internal use only: _helper_click_element(anchor,a
     return \%_element_details;
 }
 
-sub helper_move_to { ## usage: helper_move_to(anchor,x offset, y offset]);
+sub helper_move_to { ## usage: helper_move_to(anchor|||instance,x offset, y offset]);
                      ## usage: helper_move_to('Yes');
                      ## usage: helper_move_to('Yes|||2',320,200);
 
@@ -1464,7 +1464,7 @@ sub helper_move_to { ## usage: helper_move_to(anchor,x offset, y offset]);
     return 'Found' . $_element_details{message} . ' then moved mouse';
 }
 
-sub helper_scroll_to { ## usage: helper_scroll_to(anchor);
+sub helper_scroll_to { ## usage: helper_scroll_to(anchor|||instance);
                        ## usage: helper_scroll_to('Yes');
                        ## usage: helper_scroll_to('Yes|||2');
 
@@ -1488,7 +1488,7 @@ sub helper_scroll_to { ## usage: helper_scroll_to(anchor);
     return 'Found' . $_element_details{message} . ' then scrolled into view';
 }
 
-sub helper_click { ## usage: helper_click(anchor[,instance]);
+sub helper_click { ## usage: helper_click(anchor|||instance]);
                    ## usage: helper_click('Yes');
                    ## usage: helper_click('Yes|||2');
 
@@ -1499,7 +1499,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
     return %{_helper_click_element($_anchor[0],$_anchor[1],'*',0)}{message};
 }
 
-sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance]);
+sub helper_click_before { ## usage: helper_click_before(anchor|||instance);
 
     my ($_anchor_parms,$_tag_parms) = @_;
     $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
@@ -1512,7 +1512,7 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
     return %{_helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1])}{message};
 }
 
-sub helper_click_after { ## usage: helper_click_after(anchor[,element]);
+sub helper_click_after { ## usage: helper_click_after(anchor|||instance[,element|||instance]);
 
     my ($_anchor_parms,$_tag_parms) = @_;
     $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
@@ -1777,7 +1777,7 @@ sub helper_wait_for_text_present { ## usage: helper_wait_for_text_present('Searc
 }
 
 sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Search Text', timeout, 'target', 'locator');
-                                   ##         helper_wait_for_text_visible('Job title', 10, 'body', 'tag_name');
+                                   ##        helper_wait_for_text_visible('Job title', 10, 'body', 'tag_name');
                                    ##
                                    ## Waits for text to appear visible in the body text. This function can sometimes be very slow on some pages.
 
@@ -1795,7 +1795,7 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
 
 }
 
-sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
+sub helper_wait_visible { ## usage: helper_wait_visible(anchor|||instance,timeout);
 
     my ($_anchor_parms,$_timeout) = @_;
     $_timeout //= 5;
@@ -1846,7 +1846,7 @@ sub _wait_for_item_present {
     return $_message;
 }
 
-sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor,timeout);
+sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor|||instance,timeout);
 
     my ($_anchor_parms,$_timeout) = @_;
     $_timeout //= 5;
