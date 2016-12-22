@@ -1137,9 +1137,7 @@ sub helper_keys_to_element { ## usage: helper_keys_to_element(anchor,keys);
 
     my ($_anchor_parms,$_keys) = @_;
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-
-    $_anchor[1] //= 1;
+    my @_anchor = _unpack_anchor($_anchor_parms);
 
     return _helper_keys_to_element($_anchor[0],$_anchor[1],'*',0,$_keys);
 }
@@ -1150,16 +1148,32 @@ sub helper_keys_to_element_after { ## usage: helper_keys_to_element_after(anchor
                                    ##        helper_keys_to_element_after('What|||1','Test Automation','INPUT|||2');
 
     my ($_anchor_parms,$_keys,$_tag_parms) = @_;
-    $_tag_parms //= 'INPUT';
+
+    my @_anchor = _unpack_anchor($_anchor_parms);
+    my @_tag = _unpack_tag($_tag_parms);
+
+    return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
+}
+
+sub _unpack_anchor {
+
+    my ($_anchor_parms) = @_;
 
     my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
-
     $_anchor[1] //= 1;
+
+    return @_anchor;
+}
+
+sub _unpack_tag {
+
+    my ($_tag_parms) = @_;
+    $_tag_parms //= 'INPUT';
+
+    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
     $_tag[1] //= 1;
 
-    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why? Fixed by putting parseInt in JavaScript
-    return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
+    return @_tag;
 }
 
 sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anchor,keys,tag);
@@ -1168,16 +1182,12 @@ sub helper_keys_to_element_before { ## usage: helper_keys_to_element_before(anch
                                     ##        helper_keys_to_element_before('Job Type|||2','Contract','SELECT|||2');
 
     my ($_anchor_parms,$_keys,$_tag_parms) = @_;
-    $_tag_parms //= 'INPUT';
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+    my @_anchor = _unpack_anchor($_anchor_parms);
+    my @_tag = _unpack_tag($_tag_parms);
 
-    $_anchor[1] //= 1;
-    $_tag[1] //= 1;
     $_tag[1] = - abs $_tag[1];
 
-    #print " helperkeystoelement: $_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys\n"; ##If we print these variables, it causes a logic error, why? Fixed by putting parseInt in JavaScript
     return _helper_keys_to_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1],$_keys);
 }
 
@@ -1215,8 +1225,7 @@ sub helper_get_element {
 
     my ($_anchor_parms) = @_;
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-    $_anchor[1] //= 1;
+    my @_anchor = _unpack_anchor($_anchor_parms);
 
     my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
 
@@ -1444,9 +1453,7 @@ sub helper_move_to { ## usage: helper_move_to(anchor,x offset, y offset]);
     $_x_offset //= 0;
     $_y_offset //= 0;
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-
-    $_anchor[1] //= 1;
+    my @_anchor = _unpack_anchor($_anchor_parms);
 
     my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
 
@@ -1463,9 +1470,7 @@ sub helper_scroll_to { ## usage: helper_scroll_to(anchor);
 
     my ($_anchor_parms) = @_;
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-
-    $_anchor[1] //= 1;
+    my @_anchor = _unpack_anchor($_anchor_parms);
 
     my %_element_details = % { _helper_get_element($_anchor[0],$_anchor[1],'*',0) };
 
@@ -1489,9 +1494,7 @@ sub helper_click { ## usage: helper_click(anchor[,instance]);
 
     my ($_anchor_parms) = @_;
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-
-    $_anchor[1] //= 1;
+    my @_anchor = _unpack_anchor($_anchor_parms);
 
     return %{_helper_click_element($_anchor[0],$_anchor[1],'*',0)}{message};
 }
@@ -1501,14 +1504,11 @@ sub helper_click_before { ## usage: helper_click_before(anchor[,element,instance
     my ($_anchor_parms,$_tag_parms) = @_;
     $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+    my @_anchor = _unpack_anchor($_anchor_parms);
+    my @_tag = _unpack_tag($_tag_parms);
 
-    $_anchor[1] //= 1;
-    $_tag[1] //= 1;
     $_tag[1] = - abs $_tag[1];
 
-    #return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
     return %{_helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1])}{message};
 }
 
@@ -1517,13 +1517,9 @@ sub helper_click_after { ## usage: helper_click_after(anchor[,element]);
     my ($_anchor_parms,$_tag_parms) = @_;
     $_tag_parms //= 'INPUT|BUTTON|SELECT|A';
 
-    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
-    my @_tag = split /[|][|][|]/, $_tag_parms ; ## index 0 is tag, index 1 is instance number
+    my @_anchor = _unpack_anchor($_anchor_parms);
+    my @_tag = _unpack_tag($_tag_parms);
 
-    $_anchor[1] //= 1;
-    $_tag[1] //= 1;
-
-    #return _helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1]);
     return %{_helper_click_element($_anchor[0],$_anchor[1],$_tag[0],$_tag[1])}{message};
 }
 
@@ -1860,7 +1856,7 @@ sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor,timeout);
 
     $results_stdout .= "WAIT NOT VISIBLE IN VIEWPORT: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
-    my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
+    my $_search_expression = '@_response = % { _helper_get_element($_anchor,$_anchor_instance,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
     my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
     return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor[0], $_anchor[1]);
@@ -1869,7 +1865,7 @@ sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor,timeout);
 
 sub _wait_for_item_not_present {
 
-    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_target, $_locator) = @_;
+    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_anchor, $_anchor_instance) = @_;
 
     $results_stdout .= "TIMEOUT:$_timeout\n";
 
