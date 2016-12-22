@@ -1799,20 +1799,6 @@ sub helper_wait_for_text_visible { ## usage: helper_wait_for_text_visible('Searc
 
 }
 
-sub helper_wait_for_element_present { ## usage: helper_wait_for_element_present(target,locator,timeout);
-                                      ##        helper_wait_for_element_present('menu-search-icon','id',5);
-
-    my ($_target, $_locator, $_timeout) = @_;
-
-    $results_stdout .= "SEARCH TARGET[$_target], LOCATOR[$_locator], TIMEOUT[$_timeout]\n";
-
-    my $_search_expression = '@_response = $driver->find_element("$_target","$_locator");'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
-
-    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element', 'NA', $_target, $_locator);
-
-}
-
 sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
 
     my ($_anchor_parms,$_timeout) = @_;
@@ -1821,7 +1807,7 @@ sub helper_wait_visible { ## usage: helper_wait_visible(anchor,timeout);
     my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
     $_anchor[1] //= 1;
 
-    $results_stdout .= "SEARCH VISIBLE: [$_anchor_parms] TIMEOUT[$_timeout]\n";
+    $results_stdout .= "WAIT VISIBLE IN VIEWPORT: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
     my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
     my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
@@ -1864,35 +1850,20 @@ sub _wait_for_item_present {
     return $_message;
 }
 
-sub helper_wait_for_text_not_present { ## usage: helper_wait_for_text_not_present('Search Text',timeout);
-                                       ##        helper_wait_for_text_not_present('Job title',10);
-                                       ##
-                                       ## waits for text to disappear from page source
+sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor,timeout);
 
-    my ($_search_text, $_timeout) = @_;
+    my ($_anchor_parms,$_timeout) = @_;
+    $_timeout //= 5;
 
-    $results_stdout .= "DO NOT WANT TEXT:$_search_text\n";
+    my @_anchor = split /[|][|][|]/, $_anchor_parms ; ## index 0 is anchor, index 1 is instance number
+    $_anchor[1] //= 1;
 
-    my $_search_expression = '@_response = $driver->get_page_source();'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
+    $results_stdout .= "WAIT NOT VISIBLE IN VIEWPORT: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
-    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text in page source', $_search_text);
+    my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
-}
-
-sub helper_wait_for_text_not_visible { ## usage: helper_wait_for_text_not_visible('Search Text',timeout);
-                                       ##        helper_wait_for_text_not_visible('This job has been emailed to',10);
-                                       ##
-                                       ## waits for text to be not visible in the body text - e.g. closing a JavaScript popup
-
-    my ($_search_text, $_timeout) = @_;
-
-    $results_stdout .= "NOT VISIBLE SEARCH TEXT:$_search_text\n";
-
-    my $_search_expression = '@_response = $driver->find_element(q|body|,q|tag_name|)->get_text();'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response =~ m{$_search_text}si) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
-
-    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'text visible', $_search_text);
+    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor[0], $_anchor[1]);
 
 }
 
