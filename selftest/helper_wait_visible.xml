@@ -1,0 +1,14 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">helper_wait_visible</testvar>
+
+<include
+    id="10"
+    file="selftest\helpers\selenium_runner.xml"
+/>
+
+</testcases>

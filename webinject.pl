@@ -1805,10 +1805,10 @@ sub helper_wait_visible { ## usage: helper_wait_visible(anchor|||instance,timeou
 
     $results_stdout .= "WAIT VISIBLE IN VIEWPORT: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
-    my $_search_expression = '@_response = % { _helper_get_element($_target,$_locator,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
+    my $_search_expression = '@_response = helper_get_element($_target);'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m/inViewport\[1]/) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
-    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor[0], $_anchor[1]);
+    return _wait_for_item_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor_parms);
 
 }
 
@@ -1825,6 +1825,7 @@ sub _wait_for_item_present {
     while ( (($_timestart + $_timeout) > time) && (not $_found_it) ) {
         eval { eval "$_search_expression"; }; ## no critic(ProhibitStringyEval)
         foreach my $__response (@_response) {
+            #if ($_message_fragment eq 'element visible') { print "__response:$__response\n";}
             if (eval { eval "$_found_expression";} ) { ## no critic(ProhibitStringyEval)
                 $_found_it = 'true';
             }
@@ -1856,16 +1857,16 @@ sub helper_wait_not_visible { ## usage: helper_wait_not_visible(anchor|||instanc
 
     $results_stdout .= "WAIT NOT VISIBLE IN VIEWPORT: [$_anchor_parms] TIMEOUT[$_timeout]\n";
 
-    my $_search_expression = '@_response = % { _helper_get_element($_anchor,$_anchor_instance,q|*|,0) }{inViewport};'; ## no critic(RequireInterpolationOfMetachars)
-    my $_found_expression = 'if ($__response) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
+    my $_search_expression = '@_response = helper_get_element($_anchor_parms);'; ## no critic(RequireInterpolationOfMetachars)
+    my $_found_expression = 'if ($__response =~ m/inViewport\[1]/) { return q|true|; }  else { return; }'; ## no critic(RequireInterpolationOfMetachars)
 
-    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor[0], $_anchor[1]);
+    return _wait_for_item_not_present($_search_expression, $_found_expression, $_timeout, 'element visible', 'NA', $_anchor_parms);
 
 }
 
 sub _wait_for_item_not_present {
 
-    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_anchor, $_anchor_instance) = @_;
+    my ($_search_expression, $_found_expression, $_timeout, $_message_fragment, $_search_text, $_anchor_parms) = @_;
 
     $results_stdout .= "TIMEOUT:$_timeout\n";
 
@@ -1876,6 +1877,7 @@ sub _wait_for_item_not_present {
     while ( (($_timestart + $_timeout) > time) && ($_found_it) ) {
         eval { eval "$_search_expression"; }; ## no critic(ProhibitStringyEval)
         foreach my $__response (@_response) {
+            #if ($_message_fragment eq 'element visible') { print "__response:$__response\n";}
             if (not eval { eval "$_found_expression";} ) { ## no critic(ProhibitStringyEval)
                 undef $_found_it;
             }
