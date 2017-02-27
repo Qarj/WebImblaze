@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.4.3 - Feb 27, 2017
+* fix an issue with helper_wait_visible and helper_wait_not_visible finding elements that do not exist
+
 ### Version 2.4.2 - Dec 22, 2016
 * major tidy up of "Locators for Testers" and tweaks to heuristics
 * removed many helper functions no longer required

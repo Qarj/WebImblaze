@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.4.2
+# Manual for WebInject version 2.4.3
 
 Adapted from the original manual written by Corey Goldberg - find it at www.webinject.org
 
