@@ -38,7 +38,7 @@ use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
-use WebInjectSelenium;
+use plugins::WebInjectSelenium;
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -163,7 +163,6 @@ $current_case_filename = basename($current_case_file); ## with extension
 $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
-#start_session(); #starts, or restarts the webinject session - now started immediately before executing the test step if needed
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
@@ -282,6 +281,7 @@ WebInjectSelenium::shutdown_selenium_server($selenium_port);
 my $status = $case_failed_count cmp 0;
 exit $status;
 ## End main code
+
 
 #------------------------------------------------------------------
 #  SUBROUTINES
@@ -3260,6 +3260,7 @@ EOB
 
     return;
 }
+
 #------------------------------------------------------------------
 
 ## References
