@@ -3156,8 +3156,8 @@ sub start_session {     ## creates the webinject user agent
         #add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         #deref $elem to get the array elements.
         foreach my $_elem(@http_auth) {
-            #$results_stdout .= "adding credential: $_elem->[0]:$_elem->[1], $_elem->[2], $_elem->[3] => $_elem->[4]\n";
-            $useragent->credentials("$_elem->[0]:$_elem->[1]", "$_elem->[2]", "$_elem->[3]" => "$_elem->[4]");
+            #$results_stdout .= "adding credential: $_elem->[1]:$_elem->[2], $_elem->[3], $_elem->[4] => $_elem->[5]\n";
+            $useragent->credentials("$_elem->[1]:$_elem->[2]", "$_elem->[3]", "$_elem->[4]" => "$_elem->[5]");
         }
     }
 
