@@ -2554,6 +2554,7 @@ sub _get_random_string {
     my $_random;
     my $_last;
     my $_next;
+    my $_first;
     foreach my $_i (1..$_length) {
         $_next = _get_char($_rng->irand(), $_type);
 
@@ -2563,6 +2564,16 @@ sub _get_random_string {
             while ($_next eq $_last) {
                 $_next = _get_char($_rng->irand(), $_type);
             }
+        }
+
+        ## never generate 0 as the first character, leading zeros can be problematic
+        if (not defined $_first) {
+            print "_first not defined, _next is $_next\n"; ####debug
+            while ($_next eq '0') {
+                $_next = _get_char($_rng->irand(), $_type);
+            }
+            print "_next is now $_next\n"; ####debug
+            $_first = $_next;
         }
 
         $_last = $_next;

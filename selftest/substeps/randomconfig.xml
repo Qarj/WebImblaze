@@ -1,0 +1,10 @@
+<root>
+    <testcasefile>examples\simple.xml</testcasefile>
+    <globalretry>50</globalretry> <!-- Global limit for the number of retries for a test run --> 
+    <globaljumpbacks>50</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
+    <userdefined> 
+        <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
+        <ran>rimattest.azurewebsites.net</ran> <!-- RIMATTEST web site base url --> 
+    </userdefined> 
+    
+</root> 

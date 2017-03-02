@@ -32,4 +32,22 @@
     command="echo NOP"
 />
 
+<case
+    id="35"
+    description1="Info - checking that first random digit is never 0"
+    method="cmd"
+    command="REM NOP"
+/>
+
+<case
+    varFIRST="{RANDOM:1:NUMERIC}"
+    id="40"
+    description1="Loop {JUMPBACKS}:[{FIRST}] 1st numeric should never be a 0"
+    method="cmd"
+    command="echo On Loop {JUMPBACKS} got [{FIRST}]"
+    verifynegative="fail fast!\[0\]"
+    verifypositive="Loop 50"
+    retryfromstep="35"
+/>
+
 </testcases>

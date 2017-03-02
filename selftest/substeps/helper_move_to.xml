@@ -16,7 +16,7 @@
     description1="Move mouse to middle section"
     method="selenium"
     command1="$selresp = helper_get_element('Register now');"
-    command2="$selresp = helper_move_to('Register now');"
+    command2="$selresp = helper_move_to('Get instant');"
     command3="$selresp = helper_get_element('Register now');"
     verifytext="get_current_url"
     verifypositive1="inViewport\[0]"
