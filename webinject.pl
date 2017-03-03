@@ -237,6 +237,7 @@ foreach ($start .. $repeat) {
             execute_test_step();
             display_request_response();
 
+            decode_smtp();
             decode_quoted_printable();
 
             verify(); #verify result from http response
@@ -1721,6 +1722,18 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
         }
     }
     $response = HTTP::Response->parse($_combined_response); ## put the test response along with the command on error response back in the response
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub decode_smtp {
+
+	if ($case{decodesmtp}) {
+		 my $_decoded = $response->as_string;
+		 $_decoded =~ s/(^|\v)\.\./\1\./g; ## http://tools.ietf.org/html/rfc5321#section-4.5.2
+		 $response = HTTP::Response->parse($_decoded);
+	}
 
     return;
 }
