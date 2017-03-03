@@ -38,7 +38,6 @@ use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
-use plugins::WebInjectSelenium;
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -164,6 +163,13 @@ $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
 
+    my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
+    my $file_to_require = $module_to_import;
+    $file_to_require =~ s[::][/]g;
+    $file_to_require .= '.pm';
+    require $file_to_require;
+    $module_to_import->import;
+
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
 
@@ -275,8 +281,10 @@ $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg
 final_tasks();  #do return/cleanup tasks
 
 ## shut down the Selenium session and Selenium Server last - it is less important than closing the files
-WebInjectSelenium::shutdown_selenium();
-WebInjectSelenium::shutdown_selenium_server($selenium_port);
+if ($testfile_contains_selenium) {
+    WebInjectSelenium::shutdown_selenium();
+    WebInjectSelenium::shutdown_selenium_server($selenium_port);
+}
 
 my $status = $case_failed_count cmp 0;
 exit $status;
@@ -1733,7 +1741,7 @@ sub decode_quoted_printable {
 #------------------------------------------------------------------
 sub verify {  #do verification of http response and print status to HTML/XML/STDOUT/UI
 
-    WebInjectSelenium::searchimage(); ## search for images within actual screen or page grab
+    if ($testfile_contains_selenium) { WebInjectSelenium::searchimage(); } ## search for images within actual screen or page grab
 
     ## reset the global variables
     $assertion_skips = 0;
@@ -2451,7 +2459,7 @@ sub _does_testfile_contain_selenium {
         return 'true';
     }
 
-    return;
+    return 0;
 }
 
 #------------------------------------------------------------------
