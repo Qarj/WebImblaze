@@ -1731,7 +1731,7 @@ sub decode_smtp {
 
 	if ($case{decodesmtp}) {
 		 my $_decoded = $response->as_string;
-		 $_decoded =~ s/(^|\v)\.\./\1\./g; ## http://tools.ietf.org/html/rfc5321#section-4.5.2
+		 $_decoded =~ s/(^|\v)\.\./$1\./g; ## http://tools.ietf.org/html/rfc5321#section-4.5.2
 		 $response = HTTP::Response->parse($_decoded);
 	}
 
