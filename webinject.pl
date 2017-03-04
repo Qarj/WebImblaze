@@ -3271,7 +3271,6 @@ Usage: webinject.pl test_case_file <<options>>
 -c|--config config_file           -c config.xml
 -o|--output output_location       -o output/
 -a|--autocontroller               -a
--p|--port selenium_port           -p 8325
 -x|--proxy proxy_server           -x localhost:9222
 -d|--driver chrome|chromedriver   -d chrome
 -r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
