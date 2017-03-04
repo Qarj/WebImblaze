@@ -6,3 +6,4 @@ results.xml
 *.tmp
 output/
 temp/
+WebInjectSelenium.pm
