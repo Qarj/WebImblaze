@@ -19,7 +19,7 @@ WebInject is very easy to setup and run. An example is test included.
 
 That's it! You are now ready to run WebInject for the first time.
 
-### Linux
+### Linux / Mac
 
 1. Clone WebInject with git
     ```
@@ -42,7 +42,7 @@ That's it! You are now ready to run WebInject for the first time.
     perl webinject.pl --help
     ```
 
-Tested with Fedora 23, 24, Ubuntu 16.04 and Linux Mint 18 xfce.
+Tested with Fedora 23, 24, Ubuntu 16.04, Linux Mint 18 xfce, OS X El Capitan and macOS 10.12.
 
 ### Create your first WebInject test
 
