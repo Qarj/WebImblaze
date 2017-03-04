@@ -10,7 +10,7 @@ WebInject is very easy to setup and run. An example is test included.
 
 ### Windows
 
-1. Download WebInject from GitHub as a ZIP and extract it somewhere.
+1. Download WebInject from GitHub as a ZIP and extract it somewhere. For simplicity, extract it to C:\git\WebInject so that the file `C:\git\Webinject\webinject.pl` exists.
     * There is no need install it, or build or compile anything.
 
 2. Install Strawberry Perl.
@@ -42,7 +42,7 @@ That's it! You are now ready to run WebInject for the first time.
     perl webinject.pl --help
     ```
 
-Tested with Fedora 23, 24 and Ubuntu 16.04
+Tested with Fedora 23, 24, Ubuntu 16.04 and Linux Mint 18 xfce.
 
 ### Create your first WebInject test
 
@@ -86,8 +86,8 @@ Edit the file with your favourite text editor and copy paste the following then 
     * Type `cmd`
     * Right click on `cmd.exe` then select `Run as Administrator`
 
-2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called WebInject, then
-    * `CD C:\WebInject` then press 'Enter'
+2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called `C:\git\WebInject`, then
+    * `CD C:\git\WebInject` then press 'Enter'
 
 3. Now type `webinject.pl tests/hello.xml` and hit 'Enter'
 
@@ -174,7 +174,7 @@ Examples
 
 There are many working examples in the examples folder.
 
-For additional examples, study the self tests in the selftest\substeps folder.
+For additional examples, study the self tests in the `selftest\substeps` folder.
 
 
 WebInject Self Test

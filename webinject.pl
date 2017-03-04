@@ -2550,7 +2550,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     ##parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $_case_attribute ( sort keys %{parsedresult} ) {
        my $_parse_var = substr $_case_attribute, 13;
-       $_[0] =~ s/{$_parse_var}/$parsedresult{$_case_attribute}/g;
+       $_[0] =~ s/\{$_parse_var}/$parsedresult{$_case_attribute}/g;
     }
 
     $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
