@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<case
+    varTOTALJOBS_URL="https://www.totaljobs.com"
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="get"
+    url="{TOTALJOBS_URL}"
+    verifypositive1="Search for and be recommended"
+    verifypositive2="See all hiring companies"
+/>
+
+<case
+    id="20"
+    description1="Search for hello jobs"
+    description2="Expect to see at least 2 pages of hello jobs"
+    method="get"
+    url="{TOTALJOBS_URL}/jobs/hello"
+    verifypositive1="\d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs"
+    verifypositive2="page=2|||Should be at least two pages of results for keyword hello"
+    verifynegative1="Page not found"
+/>
+
+</testcases>

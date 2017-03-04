@@ -42,16 +42,44 @@ That's it! You are now ready to run WebInject for the first time.
     perl webinject.pl --help
     ```
 
-4. Optional - run the self test
-    ```
-    perl webinject.pl selftest/all.xml
-    ```
-
 Tested with Fedora 23, 24 and Ubuntu 16.04
 
-### Run the example WebInject test
+### Create your first WebInject test
 
 Note that these instructions are written with Windows in mind. 
+
+In the `tests` folder, create a file called `hello.xml`.
+
+Edit the file with your favourite text editor and copy paste the following then save the file.
+
+```xml
+<testcases repeat="1">
+
+<case
+    varTOTALJOBS_URL="https://www.totaljobs.com"
+    id="10"
+    description1="Get Totaljobs Home Page"
+    method="get"
+    url="{TOTALJOBS_URL}"
+    verifypositive1="Search for and be recommended"
+    verifypositive2="See all hiring companies"
+/>
+
+<case
+    id="20"
+    description1="Search for hello jobs"
+    description2="Expect to see at least 2 pages of hello jobs"
+    method="get"
+    url="{TOTALJOBS_URL}/jobs/hello"
+    verifypositive1="\d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs"
+    verifypositive2="page=2|||Should be at least two pages of results for keyword hello"
+    verifynegative1="Page not found"
+/>
+
+</testcases>
+```
+
+### Run your first WebInject test
 
 1. Open the Command Prompt up as an Administrator
     * Press the Windows Key
@@ -61,7 +89,7 @@ Note that these instructions are written with Windows in mind.
 2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called WebInject, then
     * `CD C:\WebInject` then press 'Enter'
 
-3. Now just type `webinject.pl` and hit 'Enter'
+3. Now type `webinject.pl tests/hello.xml` and hit 'Enter'
 
 If everything worked ok, then you'll see something like the following:
 
@@ -69,58 +97,69 @@ If everything worked ok, then you'll see something like the following:
 Starting WebInject Engine...
 
 -------------------------------------------------------
-Test:  examples\simple.xml - 10
+Test:  tests\hello.xml - 10
 Get Totaljobs Home Page
-Verify Positive: "Job Ads"
+Verify Positive: "Search for and be recommended"
+Verify Positive: "See all hiring companies"
 Passed Positive Verification
-Passed HTTP Response Code Verification (not in error range)
-TEST CASE PASSED
-Response Time = 0.805 sec
--------------------------------------------------------
-Test:  examples\simple.xml - 20
-Get Totaljobs Search Results
-Verify Positive: "Automation"
 Passed Positive Verification
-Passed HTTP Response Code Verification (not in error range)
+Passed HTTP Response Code Verification
 TEST CASE PASSED
-Response Time = 3.662 sec
+Response Time = 1.31 sec
 -------------------------------------------------------
+Test:  tests\hello.xml - 20
+Search for hello jobs
+Expect to see at least 2 pages of hello jobs
+Verify Negative: "Page not found"
+Verify Positive: "\d+./span.\s*.h1.Hello jobs"
+Verify Positive: "page=2"
+Passed Positive Verification
+Passed Positive Verification
+Passed Negative Verification
+Passed HTTP Response Code Verification
+TEST CASE PASSED
+Response Time = 0.335 sec
+-------------------------------------------------------
+Start Time: Sat 04 Mar 2017, 15:54:56
+Total Run Time: 2.944 seconds
 
-Start Time: Sun Nov 22 19:09:36 2015
-Total Run Time: 4.52 seconds
+Total Response Time: 1.645 seconds
 
 Test Cases Run: 2
 Test Cases Passed: 2
 Test Cases Failed: 0
-Verifications Passed: 6
+Verifications Passed: 9
 Verifications Failed: 0
-
-Total Response Time: 4.467 seconds
 
 Results at: output\results.html
 ```
 
 So what happened?
 
-Since you didn't specify any options when you started WebInject, WebInject read the config.xml file and discovered that there was a default testcasefile called `examples\simple.xml`.
+First WebInject read in the default config file called `config.xml` located in the root folder of the project.
 
-So WebInject just ran the tests in that file.
+Then it loaded `tests/hello.xml` and ran the two test steps in the file in numerical order.
 
-Three files were created in the folder called `output`:
+Five files were created in the default output folder called `output`:
 * results.html is a html version of the results you saw in the command prompt - with colour.
 * results.xml is an xml version of the results.
 * http.txt contains the response headers and the html that WebInject received.
-    * It is easy to find the html for step 20 - just search for ` - 20`
+* 10.html contains the http response for step 10
+* 20.html contains the http response for step 20
+
+If you double click on results.html to view in a browser, you will see hyperlinks to the indiviual results for steps 10 and 20.
+Click on the link for step 10 and you will see the web page that WebInject received rendered in the browser. You are able to
+expand the `Request Headers` and `Response Headers`. You can also click on `next` to see the next test step results.
+Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebInject-Framework project is needed to make them functional.)
 
 ### Creating your own tests
 
-If you examine `examples\simple.xml` in a text editor you'll see that it is pretty obvious how it works.
+Examine and run the examples in the `examples` folder.
 
-You can just change the url to the website you want to test.
+Also, if you examine the files in the `selftest\substeps` folder you will get a lot of additional examples for additional parameters.
 
-Then just change the verifypositive to look for something in the html on that website.
+Finally there is always the manual :)
 
-Save your changes then just run `webinject.pl` again. The three files in output will be overwitten with the results of the latest test.
 
 The Manual
 ----------
