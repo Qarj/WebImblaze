@@ -160,6 +160,13 @@ perl webinject.pl selftest/verifypositive.xml
 WebInject Plugins
 -----------------
 
+## WebInject-Framework
+Have multiple test environments? Hundreds of tests that are run many times a day?
+
+Then the WebInject-Framework project is for you! Provides config management and a way to neatly organise test execution and results.
+
+Find the project here: https://github.com/Qarj/WebInject-Framework
+
 ## WebInject-Selenium
 WebInject can also drive the Chrome browser using WebDriver Selenium.
 
