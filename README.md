@@ -157,3 +157,15 @@ Or you can run just one self test like this:
 perl webinject.pl selftest/verifypositive.xml
 ```
 
+WebInject Plugins
+-----------------
+
+## WebInject-Selenium
+WebInject can also drive the Chrome browser using WebDriver Selenium.
+
+Find the project here: https://github.com/Qarj/WebInject-Selenium
+
+## search-image
+A Chrome screenshot can be searched to see if it contains a specific (or approximate) sub-image.
+
+Find the project here: https://github.com/Qarj/search-image
