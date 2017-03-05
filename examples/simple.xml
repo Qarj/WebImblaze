@@ -5,7 +5,7 @@
     id="10"
     description1="Get Totaljobs Home Page"
     method="get"
-    url="http://www.totaljobs.com"
+    url="https://www.totaljobs.com"
     verifypositive="Job Ads"
 />
 
