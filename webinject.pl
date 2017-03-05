@@ -2468,7 +2468,7 @@ sub _include_file {
 sub _does_testfile_contain_selenium {
     my ($_text) = @_; # sub is passed reference to file contents in string
 
-    if (${$_text} =~ m/\$driver->/) {
+    if ( ${$_text} =~ m/(["'])selenium(['"])/ ) {
         return 'true';
     }
 
