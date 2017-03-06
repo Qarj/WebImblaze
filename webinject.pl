@@ -42,7 +42,6 @@ use File::Path qw(make_path remove_tree);
 local $| = 1; #don't buffer output to STDOUT
 
 ## Variable declarations
-our ($selenium_port);
 
 our ($request, $response);
 my ($useragent);
@@ -284,7 +283,6 @@ final_tasks();  #do return/cleanup tasks
 ## shut down the Selenium session and Selenium Server last - it is less important than closing the files
 if ($testfile_contains_selenium) {
     WebInjectSelenium::shutdown_selenium();
-    WebInjectSelenium::shutdown_selenium_server($selenium_port);
 }
 
 my $status = $case_failed_count cmp 0;
