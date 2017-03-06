@@ -8,6 +8,12 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.5.0 - Mar 6, 2017
+* to reduce confusion, the Selenium component of WebInject has been moved into its own project WebInject-Selenium and is now an optional plugin to WebInject
+* random parameter has been changed so it will never generate a 0 as the first character
+* fixed an issue with simple http auth
+* added a new decode parameter - decodesmtp - this will decoded double dot encoded text
+
 ### Version 2.4.3 - Feb 27, 2017
 * fix an issue with helper_wait_visible and helper_wait_not_visible finding elements that do not exist
 

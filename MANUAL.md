@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.4.3
+# Manual for WebInject version 2.5.0
 
 Adapted from the original manual written by Corey Goldberg.
 
@@ -135,6 +135,8 @@ Adapted from the original manual written by Corey Goldberg.
 #### [3.3.5 - Test Response Output Control Parameters](#output)
 
 [decodequotedprintable](#decodequotedprintable)
+
+[decodesmtp](#decodesmtp)
 
 [errormessage](#errmsg)
 
@@ -1668,6 +1670,18 @@ Note: This feature was added to deal with intermediate email files in quoted-pri
 <br />
 
 
+<a name="decodesmtp"></a>
+#### decodesmtp
+
+Decodes the so called double dot encoding (see RFC 5321 Section-4.5.2) used by SMTP.
+
+```
+    decodesmtp="true"
+```
+
+<br />
+
+
 <a name="errmsg"></a>
 #### errormessage
 If a test case fails, this custom 'errormessage' will be appended to the 'TEST CASE FAILED' line
@@ -2149,6 +2163,8 @@ created by means of a `parseresponse`.)
 #### Special note on random
 Due to the nature of the systems being tested by the author, the randomly generated strings will not
 contain two characters in a row that are the same.
+
+In addition, 0 will never be generated as the first character.
 
 The random generator used is seeded with the time from Time::HiRes on each use. See Math::Random::ISAAC on cpan for further
 information.
