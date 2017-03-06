@@ -47,7 +47,8 @@ our ($request, $response);
 my ($useragent);
 
 our ($latency, $verification_latency, $screenshot_latency);
-my ($timestamp, $testfilename);
+my $timestamp; ## for {TIMESTAMP} - global so all substitutions in a test step have same timestamp
+my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($total_response, $avg_response, $max_response, $min_response);
 my (%test_step_time); ## record in a hash the latency for every step for later use
@@ -73,9 +74,9 @@ my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
 my ($report_type); ## 'standard' and 'nagios' supported
 my ($return_message); ## error message to return to nagios
 
-our ($testnum);
-our ($testnum_display); ## individual step file html logging
-our ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
+my $testnum;
+our $testnum_display; ## individual step file html logging
+my ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print); ## retry failed tests
 my ($retry, $retries, $globalretries, $jumpbacks); ## retry failed tests
 my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
@@ -162,12 +163,13 @@ $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
 
-    my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
-    my $file_to_require = $module_to_import;
-    $file_to_require =~ s[::][/]g;
-    $file_to_require .= '.pm';
-    require $file_to_require;
-    $module_to_import->import;
+## only import WebInjectSelenium.pm package if test case file contains "selenium"
+my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
+my $file_to_require = $module_to_import;
+$file_to_require =~ s[::][/]g;
+$file_to_require .= '.pm';
+require $file_to_require;
+$module_to_import->import;
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
