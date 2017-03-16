@@ -66,7 +66,7 @@ my (%case_save);
 my (%parsedresult, %varvar);
 my (%config);
 
-our ($opt_port, $opt_proxy);
+our ($opt_proxy);
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_publish_full);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
@@ -276,16 +276,7 @@ foreach ($start .. $repeat) {
     $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
 } ## end of repeat loop
 
-$end_run_timer = time;
-$total_run_time = (int(1000 * ($end_run_timer - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
-$avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
-
 final_tasks();  #do return/cleanup tasks
-
-## shut down the Selenium session and Selenium Server last - it is less important than closing the files
-if ($testfile_contains_selenium) {
-    WebInjectSelenium::shutdown_selenium();
-}
 
 my $status = $case_failed_count cmp 0;
 exit $status;
@@ -2318,7 +2309,6 @@ sub process_config_file { #parse config file and grab values it sets
         }
     }
 
-
     my $_os;
     if ($is_windows) { $_os = 'windows'; }
     $_os //= 'linux';
@@ -3129,16 +3119,24 @@ sub _delayed_write_step_html {
 #------------------------------------------------------------------
 sub final_tasks {  #do ending tasks
 
+    if (not $total_run_count) {$total_run_count = 2}; ## prevent division by 0
+    $end_run_timer = time;
+    $total_run_time = (int(1000 * ($end_run_timer - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
+    $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
+
     # write out the html for the final test step, there is no new content to put in the buffer
     _delayed_write_step_html(undef, undef);
 
     $total_response = sprintf '%.3f', $total_response;
 
     write_final_html();  #write summary and closing tags for results file
-
     write_final_xml();  #write summary and closing tags for XML results file
-
     write_final_stdout();  #write summary and closing tags for STDOUT
+
+    ## shut down the Selenium session and Selenium Server last - it is less important than closing the files
+    if ($testfile_contains_selenium) {
+        WebInjectSelenium::shutdown_selenium();
+    }
 
     return;
 }
