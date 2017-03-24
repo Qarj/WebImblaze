@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.5.0';
+$VERSION = '2.6.0';
 
 #removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
 
@@ -78,7 +78,8 @@ my $testnum;
 our $testnum_display; ## individual step file html logging
 my ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print); ## retry failed tests
-my ($retry, $retries, $globalretries, $jumpbacks); ## retry failed tests
+my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry);
+my $attempts_since_last_success = 0;
 my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($xml_test_cases, $step_index, @test_steps);
 
@@ -419,6 +420,8 @@ sub substitute_variables {
 #------------------------------------------------------------------
 sub get_number_of_times_to_retry_this_test_step {
 
+    if (defined $case{autoretry}) { $auto_retry = $case{autoretry}; } ## we need to capture this value if it is present since it applies to subsequent steps
+
     $case{retryfromstep} = $xml_test_cases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
     if ($case{retryfromstep}) { ## retryfromstep parameter found
         return 0; ## we will not do a regular retry
@@ -439,11 +442,18 @@ sub get_number_of_times_to_retry_this_test_step {
         $results_stdout .= qq|Retry $_retry times\n|;
         return $_retry;
     }
-    else {
-        return 0; #no retry parameter found, don't retry this case
+
+    ## to get this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
+    if ( defined $auto_retry && not ($xml_test_cases->{case}->{$testnum}->{ignoreautoretry}) )  {
+        if ($attempts_since_last_success < $auto_retry) {
+            my $_max = $auto_retry - $attempts_since_last_success;
+            if ($_max > $auto_retry) {$_max = $auto_retry};
+            if ( ($_max < 0)  ) {$_max = 0};
+            return $_max;
+        }
     }
 
-    return; ## impossible to execute this statement
+    return 0;
 }
 
 #------------------------------------------------------------------
@@ -559,6 +569,8 @@ sub execute_test_step {
 #------------------------------------------------------------------
 sub pass_fail_or_retry {
 
+    $attempts_since_last_success++; ## assume failure, will be reset to 0 if that is not the case
+
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
     if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
@@ -632,6 +644,7 @@ sub pass_fail_or_retry {
         $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
         $case_passed_count++;
         $retry = 0; # no need to retry when test case passes
+        $attempts_since_last_success = 0; # reset attempts for autoretry
     }
 
     return;
@@ -2283,6 +2296,10 @@ sub process_config_file { #parse config file and grab values it sets
     if ($opt_ignoreretry) { ##
         $config{globalretry} = -1;
         $config{globaljumpbacks} = 0;
+    }
+
+    if (defined $config{autoretry}) {
+        $auto_retry = $config{autoretry};
     }
 
     # find the name of the output folder only i.e. not full path - OS safe

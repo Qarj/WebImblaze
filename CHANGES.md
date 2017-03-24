@@ -8,6 +8,9 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.6.0 - Mar 24, 2017
+* auto retry feature introduced with autoretry and ignoreautoretry parameters
+
 ### Version 2.5.0 - Mar 6, 2017
 * to reduce confusion, the Selenium component of WebInject has been moved into its own project WebInject-Selenium and is now an optional plugin to WebInject
 * random parameter has been changed so it will never generate a 0 as the first character

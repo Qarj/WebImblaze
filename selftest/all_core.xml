@@ -4,6 +4,7 @@
 Run all WebInject core self tests
 -->
 
+<!-- Step 10 turns off autoretry for the whole file, just in case it is turned on in config -->
 <case
     id="10"
     description1="verifypositive"
@@ -11,6 +12,7 @@ Run all WebInject core self tests
     command=".\webinject.pl -o selftest\output\verifypositive selftest\verifypositive.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
+    autoretry="0"
 />
 
 <case
@@ -108,6 +110,15 @@ Run all WebInject core self tests
     description1="retryfromstep"
     method="cmd"
     command=".\webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.xml"
+    verifypositive="TEST CASE PASSED"
+    verifynegative="TEST CASE FAILED"
+/>
+
+<case
+    id="130"
+    description1="autoretry"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\autoretry selftest\autoretry.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />

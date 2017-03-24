@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.5.0
+# Manual for WebInject version 2.6.0
 
 Adapted from the original manual written by Corey Goldberg.
 
@@ -25,6 +25,8 @@ Adapted from the original manual written by Corey Goldberg.
 [Global Retry (globalretry)](#globalretry)
 
 [Global Jumpbacks (globaljumpbacks)](#globaljumpbacks)
+
+[Auto Retry (autoretry)](#configautoretry)
 
 [Ports Variable (ports_variable)](#ports_variable)
 
@@ -120,6 +122,10 @@ Adapted from the original manual written by Corey Goldberg.
 
 
 #### [3.3.4 - Retry Failed Test Step Parameters](#retry)
+
+[autoretry](#autoretry)
+
+[ignoreautoretry](#ignoreautoretry)
 
 [retry](#retry)
 
@@ -383,6 +389,24 @@ badly, then there will be no more than 50 retry attempts rather than 120.
 Limits the number of times the retryfromstep parameter is followed. Stops tests potentially running forever.
 
 If not present, defaulted to 20.
+
+<br />
+
+
+<a name="configautoretry"></a>
+#### autoretry
+
+Sets how many times to automatically retry a failed test step.
+
+If a retry or retryfromstep paremeter is present, that will take preference.
+
+If not present, auto retry defaults to off.
+
+Note that autoretry can also be set in the test file.
+
+```xml
+<autoretry>5</autoretry>
+```
 
 <br />
 
@@ -1513,8 +1537,38 @@ Specifying this parameter allows us to ignore this verification.
 <br />
 
 
-<a name="retry"></a>
+<a name="autoretry"></a>
 ### 3.3.4 - Retry Failed Test Step Parameters
+
+<a name="autoretry"></a>
+#### autoretry
+
+See the description of [autoretry](#configautoretry) in the config file section for the full description of this feature.
+
+```
+    autoretry="5"
+```
+Sets auto retry to 5 from this step onwards.
+
+```
+    autoretry="0"
+```
+Turns off auto retry from this step onwards.
+
+<br />
+
+
+<a name="ignoreautoretry"></a>
+#### ignoreautoretry
+
+Ignores auto retry for this step only.
+
+```
+    ignoreautoretry="true"
+```
+
+<br />
+
 
 <a name="retry"></a>
 #### retry

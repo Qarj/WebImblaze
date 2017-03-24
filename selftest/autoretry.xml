@@ -1,0 +1,25 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">autoretry</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifynegative10=" 10\.1"
+    verifynegative20=" 20\.3"
+    verifypositive20=" 20\.2"
+    verifynegative30=" 30\.2"
+    verifypositive30=" 30\.1"
+    verifynegative40=" 40\.1"
+    verifynegative60=" 60\.6"
+    verifypositive60=" 60\.5"
+    verifynegative80=" 80\.1"
+    verifynegative90=" 90\.1"
+/>
+
+</testcases>
