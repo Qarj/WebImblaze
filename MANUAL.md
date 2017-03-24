@@ -123,7 +123,7 @@ Adapted from the original manual written by Corey Goldberg.
 
 #### [3.3.4 - Retry Failed Test Step Parameters](#retry)
 
-[autoretry](#autoretry)
+[autoretry](#autoretryparm)
 
 [ignoreautoretry](#ignoreautoretry)
 
@@ -1537,10 +1537,9 @@ Specifying this parameter allows us to ignore this verification.
 <br />
 
 
-<a name="autoretry"></a>
+<a name="autoretryparm"></a>
 ### 3.3.4 - Retry Failed Test Step Parameters
 
-<a name="autoretry"></a>
 #### autoretry
 
 See the description of [autoretry](#configautoretry) in the config file section for the full description of this feature.
