@@ -12,16 +12,11 @@ For example, if we had this section defined in the config file,
 then this asertion would not be run if this parameter is present on a test step.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject"
     ignoreautoassertions="true"
 />

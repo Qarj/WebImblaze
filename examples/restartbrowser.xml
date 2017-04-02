@@ -10,16 +10,11 @@ will occur before retrying.
 The restart will have the effect of dumping all cookies.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject"
     restartbrowser="true"
 />
@@ -28,7 +23,7 @@ The restart will have the effect of dumping all cookies.
     id="20"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject"
 />
 

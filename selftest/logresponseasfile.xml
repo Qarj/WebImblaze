@@ -14,10 +14,10 @@ Self test master file. All test steps in this file should pass.
 
 <case
     id="20"
-    description1="view RIMATTEST_Home_Page.html"
+    description1="view WEBINJECT-CHECK_Home_Page.html"
     method="cmd"
-    command1='perl -ne "print" selftest{SLASH}output{SLASH}RIMATTEST_Home_Page.html'
-    verifypositive="RimAttest is a web site for automated testing examples"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}WEBINJECT-CHECK_Home_Page.html'
+    verifypositive="aid in the self test of webinject"
     verifypositive1="html.*head.*body"
 />
 
@@ -33,10 +33,10 @@ Self test master file. All test steps in this file should pass.
 
 <case
     id="40"
-    description1="view RIMATTEST_Home_Page.html"
+    description1="view WEBINJECT-CHECK_Home_Page.html"
     method="cmd"
-    command1='perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}RIMATTEST_Home_Page.html'
-    verifypositive="RimAttest is a web site for automated testing examples"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBINJECT-CHECK_Home_Page.html'
+    verifypositive="aid in the self test of webinject"
     verifypositive1="html.*head.*body"
 />
 

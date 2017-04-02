@@ -9,7 +9,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Get the multipart upload page"
     method="get"
-    url="http://{RAN}/BulkUpload/Index"
+    url="http://{WIC}/BulkUpload/Index"
     verifypositive="Select File"
 />
 
@@ -18,9 +18,10 @@ Expected failures will be asserted by the master test file.
     description1="Post the csv file"
     method="post"
     posttype="multipart/form-data"
-    url="http://{RAN}/BulkUpload/Upload"
+    url="http://{WIC}/BulkUpload/Upload"
     postbody="( 'fileUpload' => ['selftest/testdata/searches.csv'] )"
-    verifypositive="/BulkUpload/Confirmation"
+    verifypositive1="File Upload Details"
+    verifypositive2="Carbonara"
 />
 
 

@@ -9,14 +9,14 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="log as text not used"
     method="get"
-    url="http://{RAN}"
+    url="http://{WIC}"
 />
 
 <case
     id="20"
     description1="log as text used"
     method="get"
-    url="http://{RAN}"
+    url="http://{WIC}"
     logastext="true"
 />
 

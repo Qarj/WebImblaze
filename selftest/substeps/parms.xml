@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     description1="Post the file substituting parameters"
     method="post"
     posttype="text/xml"
-    url="http://{RAN}/BulkUpload/XML"
+    url="http://{WIC}/BulkUpload/XML"
     postbody="file=>selftest\testdata\search_template.xml"
     parms="__name__=tartiflette&__cuisine__=French&__preptime__=75"
     verifypositive="/BulkUpload/Confirmation"

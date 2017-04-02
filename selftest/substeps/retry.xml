@@ -93,7 +93,7 @@ is present - there is no point retrying i.e. fail fast -->
     id="75"
     description1="Should retry even though we got 404"
     method="get"
-    url="http://{RAN}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
     verifypositive="This text will not be found"
     retry="2"
 />

@@ -4,7 +4,7 @@
     <globaljumpbacks>4</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
     <userdefined> 
         <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
-        <ran>rimattest.azurewebsites.net</ran> <!-- RIMATTEST web site base url --> 
+        <wic>webinject-check.azurewebsites.net</wic> <!-- WEBINJECT-CHECK web site base url --> 
     </userdefined> 
     
     <!-- 

@@ -9,8 +9,8 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="logresponse as file"
     method="get"
-    url="http://{RAN}"
-    logresponseasfile="RIMATTEST_Home_Page.html"
+    url="http://{WIC}"
+    logresponseasfile="WEBINJECT-CHECK_Home_Page.html"
 />
 
 </testcases>

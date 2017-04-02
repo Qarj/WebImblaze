@@ -9,16 +9,11 @@ To see that the command was executed, type output\http.log - you'll see the
 output of the command at the very end of the file.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive="text that will not be found"
     commandonerror="echo send_email_to_ops.bat"
 />

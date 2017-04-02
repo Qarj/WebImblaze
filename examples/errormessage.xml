@@ -4,16 +4,11 @@
 errormessage will write out a custom errormessage if the test case fails.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject Test Tool"
     errormessage="Perhaps somebody deployed the old version of the page again"
 />

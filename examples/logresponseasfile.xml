@@ -7,16 +7,11 @@ your choosing.
 In this example, you can type output\HomePage.html to see the file.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject"
     logresponseasfile="HomePage.html"
 />

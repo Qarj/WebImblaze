@@ -9,16 +9,11 @@ until the globaljumpbacks limit is met - set in the config.xml file
 Note how the {JUMPBACKS} variable increases each time retryfromstep is executed.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page - jumpbacks so far: {JUMPBACKS}"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject"
 />
 
@@ -26,7 +21,7 @@ Note how the {JUMPBACKS} variable increases each time retryfromstep is executed.
     id="20"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive1="WebInject Test Tool"
     retryfromstep="10"
 />

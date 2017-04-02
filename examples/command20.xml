@@ -12,9 +12,9 @@ They will run in the following order:
 -->
 
 <!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
+<testvar varname="WEBINJECT-CHECK">http://localhost:54822</testvar>
  -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
+<testvar varname="WEBINJECT-CHECK">http://webinject-check.azurewebsites.net</testvar>
 
 <case
     id="10"

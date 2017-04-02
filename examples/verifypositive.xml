@@ -12,16 +12,11 @@ This means when you get an html page as a response, the verification is against 
 and not the rendered version of the html you would see in a browser.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive="automated testing examples"
     verifypositive1="WebInject"
     verifypositiveHTML="h2.Getting started..h2"

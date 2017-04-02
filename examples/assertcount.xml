@@ -5,16 +5,11 @@ assertcount checks that the existence of a given regular expression appears the 
 number of times in the response.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     assertcount="example|||3"
 />
 
@@ -22,7 +17,7 @@ number of times in the response.
     id="20"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     assertcount="example|||2"
 />
 
@@ -30,7 +25,7 @@ number of times in the response.
     id="30"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     assertcount="example|||2|||The word example should appear 3 times in the html source"
 />
 

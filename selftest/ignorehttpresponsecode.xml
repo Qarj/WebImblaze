@@ -13,7 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 1"
     verifypositive1="Failed HTTP Response Code Verification"
     verifypositive2="Ignored HTTP Response Code Verification"
-    verifypositive3="Verifications Passed: 3"
+    verifypositive3="Verifications Passed: 2"
 />
 
 </testcases>

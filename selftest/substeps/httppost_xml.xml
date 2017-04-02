@@ -11,7 +11,7 @@ Expected failures will be asserted by the master test file.
     method="post"
     postbody="file=>selftest\testdata\searches.xml"
     posttype="text/xml"
-    url="http://{RAN}/BulkUpload/XML"
+    url="http://{WIC}/BulkUpload/XML"
     verifypositive="Confirmation"
 />
 

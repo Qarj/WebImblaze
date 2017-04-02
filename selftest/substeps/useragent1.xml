@@ -9,14 +9,14 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Get home page"
     method="get"
-    url="http://{RAN}"
+    url="http://{WIC}"
 />
 
 <case
     id="20"
     description1="Get home page"
     method="get"
-    url="http://{RAN}"
+    url="http://{WIC}"
     useragent="Chrome Browser"
 />
 

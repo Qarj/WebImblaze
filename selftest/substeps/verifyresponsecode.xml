@@ -26,7 +26,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="verifyresponsecode should pass"
     method="get"
-    url="http://{RAN}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
     verifyresponsecode="404"
 />
 
@@ -34,7 +34,7 @@ Expected failures will be asserted by the master test file.
     id="40"
     description1="verifyresponsecode should pass"
     method="get"
-    url="http://{RAN}"
+    url="http://{WIC}"
     verifyresponsecode="200"
 />
 

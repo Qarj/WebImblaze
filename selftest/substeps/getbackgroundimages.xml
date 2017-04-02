@@ -9,7 +9,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Get a background image"
     method="get"
-    url="http://{RAN}/Home/Pictures"
+    url="http://{WIC}/Home/Pictures"
     getbackgroundimages=".jpg"
 />
 

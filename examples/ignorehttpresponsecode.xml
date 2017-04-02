@@ -8,23 +8,18 @@ The ignorehttpresponsecode parameter tells WebInject not to do that assertion.
 In this example, Step 10 fails, but Step 20 passes since we ignore error codes (in this case 404).
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Non existant page"
     method="get"
-    url="${RIMATTEST}/pagedoesnotexist"
+    url="{WIC}/pagedoesnotexist"
 />
 
 <case
     id="20"
     description1="Get Non existant page"
     method="get"
-    url="${RIMATTEST}/pagedoesnotexist"
+    url="{WIC}/pagedoesnotexist"
     ignorehttpresponsecode="true"
 />
 

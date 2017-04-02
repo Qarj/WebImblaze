@@ -8,19 +8,19 @@ Expected failures will be asserted by the master test file.
 <!-- Note - method of cmd always generates a response code of 100 -->
 <case
     id="10"
-    description1="Get login page sets __RequestVerificationToken cookie"
+    description1="SearchForm sets .AspNetCore.Antiforgery cookie"
     method="get"
-    url="http://{RAN}/Account/Login"
-    verifypositive="Set-Cookie: __RequestVerificationToken"
+    url="http://{WIC}/Search/SearchForm"
+    verifypositive="Set-Cookie: .AspNetCore.Antiforgery"
 />
 
 <case
     id="20"
-    description1="Get login page again does not set the same cookie again - it is already set"
+    description1="Get SearchForm again does not set the same cookie again - it is already set"
     description2="Step will fail"
     method="get"
-    url="http://{RAN}/Account/Login"
-    verifypositive="Set-Cookie: __RequestVerificationToken"
+    url="http://{WIC}/Search/SearchForm"
+    verifypositive="Set-Cookie: .AspNetCore.Antiforgery"
 />
 
 <case
@@ -33,10 +33,10 @@ Expected failures will be asserted by the master test file.
 
 <case
     id="40"
-    description1="Get login page sets __RequestVerificationToken cookie since all cookies are gone"
+    description1="Get SearchForm sets .AspNetCore.Antiforgery cookie since all cookies are gone"
     method="get"
-    url="http://{RAN}/Account/Login"
-    verifypositive="Set-Cookie: __RequestVerificationToken"
+    url="http://{WIC}/Search/SearchForm"
+    verifypositive="Set-Cookie: .AspNetCore.Antiforgery"
 />
 
 </testcases>

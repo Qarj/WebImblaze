@@ -40,7 +40,7 @@ Expected failures will be asserted by the master test file.
     id="50"
     description1="Should not skip smartassertion"
     method="cmd"
-    command="echo Set-Cookie: "
+    command="echo Set-Cookies: "
 />
 
 <case

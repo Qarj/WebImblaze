@@ -9,7 +9,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Get an image source"
     method="get"
-    url="http://{RAN}/Home/Pictures"
+    url="http://{WIC}/Home/Pictures"
     getsrcs="brickwork.jpg"
 />
 
@@ -17,7 +17,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="Get a JavaScript source"
     method="get"
-    url="http://{RAN}/Home/JavaScript"
+    url="http://{WIC}/Home/JavaScript"
     getsrcs="element.js"
 />
 

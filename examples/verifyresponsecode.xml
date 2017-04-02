@@ -6,16 +6,11 @@ what response code you are expecting, and it matches, then the test will
 not fail.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get a page that does not exist"
     method="get"
-    url="${RIMATTEST}/pagedoesnotexist"
+    url="{WIC}/pagedoesnotexist"
     verifyresponsecode="404"
 />
 

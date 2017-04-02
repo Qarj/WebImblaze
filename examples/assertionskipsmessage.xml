@@ -8,16 +8,11 @@ will be written to the xml results.
 TODO: Output message to console and html file too.
 -->
 
-<!--
-<testvar varname="RIMATTEST">http://localhost:54822</testvar>
- -->
-<testvar varname="RIMATTEST">http://rimattest.azurewebsites.net</testvar>
-
 <case
     id="10"
     description1="Get Home page"
     method="get"
-    url="${RIMATTEST}"
+    url="{WIC}"
     verifypositive="automated testing examples|||Should find examples heading|||Windows 10 related bug"
     verifypositive1="WebInject"
     verifypositiveHTML="h2.Getting started..h2|||Should be an h2 heading present|||Windows 10 related bug"
