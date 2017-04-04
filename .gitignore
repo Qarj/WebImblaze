@@ -7,3 +7,4 @@ results.xml
 output/
 temp/
 WebInjectSelenium.pm
+tests/*.xml

@@ -14,7 +14,7 @@ Note that in this example, the website URL is defined with a local test variable
     id="10"
     description1="Get Search Form"
     method="get"
-    url="{WIC}/Search/SearchForm"
+    url="http://{WIC}/Search/SearchForm"
     verifypositive="Search Recipes"
 />
 
@@ -22,8 +22,8 @@ Note that in this example, the website URL is defined with a local test variable
     id="20"
     description1="Submit Search"
     method="post"
-    url="{WIC}/Search/SearchRecipes"
-    postbody="RecipeName=Sheperds%20Pie&Cuisine=British&MaxPrepTime=2&BtnSubmit=Search%20Recipes"
+    url="http://{WIC}/Search/SearchRecipes"
+    postbody="RecipeName=Sheperds%20Pie&Cuisine=British&MaxPrepTime=2&BtnSubmit=Search%20Recipes&__RequestVerificationToken={DATA}"
     verifypositive="Search Confirmation"
 />
 

@@ -1,21 +1,19 @@
 <testcases repeat="1">
 
-
 <case
     id="10"
-    description1="Get Totaljobs Home Page"
+    description1="Get webinject-check home page"
     method="get"
-    url="https://www.totaljobs.com"
-    verifypositive="Job Ads"
+    url="http://webinject-check.azurewebsites.net/"
+    verifypositive="WebInject is a powerful free automated test tool"
 />
 
 <case
     id="20"
-    description1="Get Totaljobs Search Results"
+    description1="Get Recipes Index"
     method="get"
-    url="https://www.totaljobs.com/jobs/webdriver"
-    verifypositive="Automation"
+    url="http://webinject-check.azurewebsites.net/Recipes"
+    verifypositive="Create New"
 />
-
 
 </testcases>
