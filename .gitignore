@@ -8,3 +8,4 @@ output/
 temp/
 WebInjectSelenium.pm
 tests/*.xml
+tests/*.csv

@@ -1,0 +1,22 @@
+<testcases repeat="1">
+
+<case
+    id="10"
+    description1="Get the multipart upload page"
+    method="get"
+    url="http://webinject-check.azurewebsites.net/BulkUpload/Index"
+    verifypositive="Select File"
+/>
+
+<case
+    id="20"
+    description1="Post the csv file"
+    method="post"
+    posttype="multipart/form-data"
+    url="http://webinject-check.azurewebsites.net/BulkUpload/Upload"
+    postbody="( 'fileUpload' => ['examples/multipart_post.csv'], 'name' => 'Upload' )"
+    verifypositive1="File Upload Details"
+    verifypositive2="Meat Balls"
+/>
+
+</testcases>
