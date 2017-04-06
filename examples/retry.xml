@@ -1,33 +1,40 @@
 <testcases repeat="1">
 
-<!--
-Step 10 shows retry in action. After the first 3 failed attempts, WebInject will slept 3 seconds.
-On the final failed attempt, since we are not retrying further, WebInject will not sleep.
-
-Step 20 passes on the first attempt, so the sleep parameter is ignored.
--->
-
 <case
     id="10"
-    description1="Get Home page"
-    description2="Will fail and sleep 2 seconds after each fail except the final fail"
+    description1="Get Recipe List"
     method="get"
-    url="{WIC}"
-    verifypositive1="WebInject Test Tool"
-    retry="3"
-    sleep="2"
+    url="http://webinject-check.azurewebsites.net/Recipes"
+    verifypositive1="Create New"
 />
 
 <case
     id="20"
-    description1="Get Home page"
-    description2="Test will pass on first attempt, sleep of 2 seconds will be ignored"
+    description1="Get create new recipe page"
     method="get"
-    url="{WIC}"
-    verifypositive1="WebInject"
-    retry="3"
-    sleep="2"
+    url="http://webinject-check.azurewebsites.net/Recipes/Create"
+    verifypositive1="Back to List"
 />
 
+<case
+    varROLL_TYPE="{RANDOM:3}"
+    id="30"
+    description1="Post new recipe details"
+    method="post"
+    url="http://webinject-check.azurewebsites.net/Recipes/Create"
+    postbody="Name=Chiko%20Roll%20type%20{ROLL_TYPE}&Cuisine=Australian&Serves=1.00&DelaySeconds={RANDOM:1:NUMERIC}&__RequestVerificationToken={DATA}&Vegetarian=false"
+    verifypositive1="302 Found"
+    parseresponseREDIRECT_URL="Location: |\n|decode"
+/>
+
+<case
+    id="40"
+    description1="Get create new recipe page"
+    method="get"
+    url="http://webinject-check.azurewebsites.net{REDIRECT_URL}"
+    verifypositive1="Chiko Roll type {ROLL_TYPE}"
+    retry="4"
+    sleep="3"
+/>
 
 </testcases>
