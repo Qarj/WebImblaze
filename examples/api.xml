@@ -1,0 +1,38 @@
+<testcases repeat="1">
+
+<case
+    id="10"
+    description1="View webinject-check API info"
+    method="get"
+    url="http://webinject-check.azurewebsites.net/api"
+    verifypositive='GetAllSearches'
+/>
+
+<case
+    id="20"
+    description1="Call GetSearch/3 with json header"
+    method="get"
+    url="http://webinject-check.azurewebsites.net/api/GetSearch/3"
+    addheader="Accept: application/json"
+    verifypositive='"recipeName":"Pesto"'
+/>
+
+<case
+    id="30"
+    description1="Call GetSearch/3 with xml header"
+    method="get"
+    url="http://webinject-check.azurewebsites.net/api/GetSearch/3"
+    addheader="Accept: application/xml"
+    verifypositive="<RecipeName>Pesto</RecipeName>"
+/>
+
+<case
+    id="40"
+    description1="Post 'id=2' to /api/PostSearch"
+    method="post"
+    url="http://webinject-check.azurewebsites.net/api/PostSearch"
+    postbody="id=2"
+    verifypositive="American"
+/>
+
+</testcases>
