@@ -154,6 +154,8 @@ Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebInject-Fra
 
 ### Creating your own tests
 
+There are some examples on the WebInject blog with detailed discussion: http://webinject.blogspot.co.uk/
+
 Examine and run the examples in the `examples` folder.
 
 Also, if you examine the files in the `selftest\substeps` folder you will get a lot of additional examples for additional parameters.
