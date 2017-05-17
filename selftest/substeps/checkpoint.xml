@@ -10,6 +10,7 @@ Expected failures will be asserted by the master test file.
     description1="Step 10"
     method="cmd"
     command="echo NOP"
+    checkpoint="true"
 />
 
 <case
@@ -20,7 +21,6 @@ Expected failures will be asserted by the master test file.
     verifypositive="one"
     verifynegative="two"
     assertcount="one|||6"
-    retryfromstep="10"
 />
 
 <!-- Failure of a verifynegative assertion indicates a known failure condition
@@ -34,7 +34,6 @@ is present - there is no point retrying i.e. fail fast -->
     verifypositive="one"
     verifynegative="fail fast!critical error"
     assertcount="one|||6"
-    retryfromstep="10"
 />
 
 <case
@@ -52,7 +51,6 @@ is present - there is no point retrying i.e. fail fast -->
     command1="echo six seven eight"
     verifypositive="one"
     parseresponseMYNUM="six|eight|"
-    retryfromstep="10"
     sleep="40"
 />
 
@@ -61,6 +59,7 @@ is present - there is no point retrying i.e. fail fast -->
     description1="Step 60"
     method="cmd"
     command="echo NOP"
+    checkpoint="true"
 />
 
 <case
@@ -69,7 +68,6 @@ is present - there is no point retrying i.e. fail fast -->
     method="cmd"
     command="echo attempt {JUMPBACKS}"
     verifypositive="attempt 2"
-    retryfromstep="60"
 />
 
 <case
@@ -77,6 +75,7 @@ is present - there is no point retrying i.e. fail fast -->
     description1="Info - mynum variable is {MYNUM}"
     method="cmd"
     command="echo NOP"
+    checkpoint="true"
 />
 
 <case
@@ -89,7 +88,6 @@ is present - there is no point retrying i.e. fail fast -->
     command2="echo mynum:{MYNUM}, retry:{JUMPBACKS}"
     verifypositive="two"
     parseresponseMYNUM="three|five|"
-    retryfromstep="80"
 />
 
 <case
@@ -97,6 +95,7 @@ is present - there is no point retrying i.e. fail fast -->
     description1="Info - mynum variable at this point is {MYNUM}"
     method="cmd"
     command="echo NOP"
+    checkpoint="true"
 />
 
 
@@ -106,7 +105,6 @@ is present - there is no point retrying i.e. fail fast -->
     method="cmd"
     command="echo one one one"
     verifypositive="two"
-    retryfromstep="100"
 />
 
 

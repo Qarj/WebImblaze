@@ -1,0 +1,55 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<!--
+
+Here we mix checkpoint, retryfromstep and retry in the same file.
+
+Note that checkpoint/retryfromstep and retry have their own sub numbering systems
+so it is possible to tell the two apart and give every attempt a unique
+number.
+
+-->
+
+<case
+    id="5"
+    description1="Step 5"
+    method="cmd"
+    command="echo NOP"
+    checkpoint="true"
+/>
+
+<case
+    id="10"
+    description1="Step 10"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<!-- Fails last time around, since it never makes it up to retry attempt 3 - globalretry is exhausted so checkpoint jump back kicks in -->
+<case
+    id="20"
+    description1="Retry 5 times, pass on attempt three"
+    description2="Will not get to a regular retry attempt three - will eventually pass"
+    method="cmd"
+    command1="echo step 20 attempt {RETRY}"
+    command2="echo step 20 jumpbacks {JUMPBACKS}"
+    verifypositive="step 20 attempt 3|step 20 jumpbacks 5"
+    retry="5"
+/>
+
+<case
+    id="30"
+    description1="Jumpback up to globaljumpbacks limit, pass on attempt two"
+    description2="retryfromstep takes priority over checkpoint - so will jump back to 10, not 5"
+    method="cmd"
+    command="echo step 30 jumpbacks {JUMPBACKS}"
+    verifypositive="step 30 jumpbacks 5"
+    retryfromstep="10"
+/>
+
+</testcases>

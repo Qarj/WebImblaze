@@ -78,7 +78,7 @@ my $testnum;
 our $testnum_display; ## individual step file html logging
 my ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print); ## retry failed tests
-my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry);
+my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry, $checkpoint);
 my $attempts_since_last_success = 0;
 my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($xml_test_cases, $step_index, @test_steps);
@@ -225,13 +225,15 @@ foreach ($start .. $repeat) {
             set_retry_to_zero_if_global_limit_exceeded();
 
             $is_failure = 0;
-            $fast_fail_invoked = 'false';
+            $fast_fail_invoked = ''; # false
             $retry_passed_count = 0;
             $retry_failed_count = 0;
 
             if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record, skip it (this is a hack for test case files with only one step)
                 next;
             }
+
+            check_for_checkpoint();
 
             output_test_step_description();
             output_assertions();
@@ -424,6 +426,7 @@ sub get_number_of_times_to_retry_this_test_step {
 
     $case{retryfromstep} = $xml_test_cases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
     if ($case{retryfromstep}) { ## retryfromstep parameter found
+        $results_stdout .= qq|Retry from step $case{retryfromstep}\n|;
         return 0; ## we will not do a regular retry
     }
 
@@ -444,13 +447,21 @@ sub get_number_of_times_to_retry_this_test_step {
     }
 
     ## to get this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
-    if ( defined $auto_retry && not ($xml_test_cases->{case}->{$testnum}->{ignoreautoretry}) )  {
+    if ( defined $auto_retry && not ($xml_test_cases->{case}->{$testnum}->{ignoreautoretry}) ) {
         if ($attempts_since_last_success < $auto_retry) {
             my $_max = $auto_retry - $attempts_since_last_success;
             if ($_max > $auto_retry) {$_max = $auto_retry};
             if ( ($_max < 0)  ) {$_max = 0};
+            $results_stdout .= qq|Auto Retry $_max times|;
+            if ($attempts_since_last_success > 0) {
+                $results_stdout .=  " :: attempts_since_last_success[$attempts_since_last_success]";
+            }
+            $results_stdout .= "\n";
             return $_max;
+        } else {
+            $results_stdout .=  "DEBUG: Auto retry value set to $auto_retry BUT attempts_since_last_success is $attempts_since_last_success\n";
         }
+        
     }
 
     return 0;
@@ -477,6 +488,28 @@ sub set_retry_to_zero_if_global_limit_exceeded {
         if ($globalretries >= $config{globalretry}) {
             $retry = 0; ## globalretries value exceeded - not retrying any more this run
         }
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub check_for_checkpoint {
+
+    if ($case{checkpoint} && lc $case{checkpoint} eq 'false') {
+        ## checkpoint cleared - will not automatically jump back from this step onwards
+        $results_html .= qq|--- CHECKPOINT CLEARED --- <br />\n|;
+        $results_stdout .= qq|--- CHECKPOINT CLEARED --- \n|;
+        $checkpoint = '';
+
+        return;
+    }
+
+    if ($case{checkpoint}) {
+        ## checkpoint reached - record where we are up to
+        $results_html .= qq|--- CHECKPOINT --- <br />\n|;
+        $results_stdout .= qq|--- CHECKPOINT --- \n|;
+        $checkpoint = $testnum;
     }
 
     return;
@@ -571,8 +604,10 @@ sub pass_fail_or_retry {
 
     $attempts_since_last_success++; ## assume failure, will be reset to 0 if that is not the case
 
+
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
+    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
+    if ( ($is_failure && !( retry_available() || retry_from_step_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         ## however if a verifynegative fails then the case is always a failure
         $results_xml .= qq|            <success>false</success>\n|;
@@ -607,12 +642,18 @@ sub pass_fail_or_retry {
         $passed_count = $passed_count - $retry_passed_count;
         $failed_count = $failed_count - $retry_failed_count;
     }
-    elsif (($is_failure > 0) && $case{retryfromstep}) {#Output message if we will retry the test case from step
+    elsif ( $is_failure && ($case{retryfromstep} || $checkpoint) ) {#Output message if we will retry the test case from step
+        my $_jump_back_to_step;
+        if ($case{retryfromstep}) {
+            $_jump_back_to_step = $case{retryfromstep};
+        } else {
+            $_jump_back_to_step = $checkpoint;
+        }
         my $_jump_backs_left = $config{globaljumpbacks} - $jumpbacks;
-        $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $case{retryfromstep} ... $_jump_backs_left tries left</span></b><br />\n|;
-        $results_stdout .= qq|RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left\n|;
+        $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $_jump_back_to_step ... $_jump_backs_left tries left</span></b><br />\n|;
+        $results_stdout .= qq|RETRYING FROM STEP $_jump_back_to_step ...  $_jump_backs_left tries left\n|;
         $results_xml .= qq|            <success>false</success>\n|;
-        $results_xml .= qq|            <result-message>RETRYING FROM STEP $case{retryfromstep} ...  $_jump_backs_left tries left</result-message>\n|;
+        $results_xml .= qq|            <result-message>RETRYING FROM STEP $_jump_back_to_step ...  $_jump_backs_left tries left</result-message>\n|;
         $jumpbacks++; ## increment number of times we have jumped back - i.e. used retryfromstep
         $jumpbacks_print = "-$jumpbacks";
         $globalretries++;
@@ -623,14 +664,14 @@ sub pass_fail_or_retry {
         $step_index = 0;
         my $_found_index = 'false';
         foreach (@test_steps) {
-            if ($test_steps[$step_index] eq $case{retryfromstep}) {
+            if ($test_steps[$step_index] eq $_jump_back_to_step) {
                 $_found_index = 'true';
                 last;
             }
             $step_index++
         }
         if ($_found_index eq 'false') {
-            $results_stdout .= qq|ERROR - COULD NOT FIND STEP $case{retryfromstep} - TESTING STOPS \n|;
+            $results_stdout .= qq|ERROR - COULD NOT FIND STEP $_jump_back_to_step - TESTING STOPS \n|;
         }
         else
         {
@@ -648,6 +689,18 @@ sub pass_fail_or_retry {
     }
 
     return;
+}
+
+sub retry_available {
+    return ( ($retry > 0) && !($case{retryfromstep}) ); # retryfromstep ignored if a retry parameter is present
+}
+
+sub retry_from_step_available {
+    return $case{retryfromstep} && ( $jumpbacks < $config{globaljumpbacks} ); # retryfromstep takes priority over checkpoint
+}
+
+sub jump_back_to_checkpoint_available {
+    return $checkpoint && ( $jumpbacks < $config{globaljumpbacks} );
 }
 
 #------------------------------------------------------------------
@@ -693,7 +746,7 @@ sub output_test_step_results {
 sub increment_run_count {
 
     if ( ( ($is_failure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
-         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && ($fast_fail_invoked eq 'false') )
+         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && !$fast_fail_invoked )
        ) {
         ## do not count this in run count if we are retrying
     }
@@ -736,9 +789,9 @@ sub restart_browser {
 #------------------------------------------------------------------
 sub sleep_before_next_step {
 
-    if ( (($is_failure < 1) && ($case{retry})) || (($is_failure < 1) && ($case{retryfromstep})) )
+    if ( (($is_failure < 1) && ($case{retry})) || (($is_failure < 1) && ($case{retryfromstep})) || (($is_failure < 1) && $checkpoint) )
     {
-        ## ignore the sleep if the test case worked and it is a retry test case
+        ## ignore the sleep if the test case worked and it is a retry test case (including active checkpoint)
     }
     else
     {
@@ -2269,7 +2322,7 @@ sub process_config_file { #parse config file and grab values it sets
         $current_case_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
-    #grab values for constants in config file:
+    #grab values for constants in config file: # This is tech debt - we just need to use $user_config-> everywhere
     for my $_config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
         if ($user_config->{$_config_const}) {
             $config{$_config_const} = $user_config->{$_config_const};
@@ -2289,8 +2342,10 @@ sub process_config_file { #parse config file and grab values it sets
         }
     }
 
-    if (not defined $config{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
-        $config{globaljumpbacks} = 20;
+    if (defined $user_config->{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
+        $config{globaljumpbacks} = $user_config->{globaljumpbacks};
+    } else {
+        $config{globaljumpbacks} = 5;
     }
 
     if ($opt_ignoreretry) { ##
@@ -2298,8 +2353,8 @@ sub process_config_file { #parse config file and grab values it sets
         $config{globaljumpbacks} = 0;
     }
 
-    if (defined $config{autoretry}) {
-        $auto_retry = $config{autoretry};
+    if (defined $user_config->{autoretry}) {
+        $auto_retry = $user_config->{autoretry};
     }
 
     # find the name of the output folder only i.e. not full path - OS safe
