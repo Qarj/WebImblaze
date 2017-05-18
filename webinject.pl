@@ -648,6 +648,8 @@ sub pass_fail_or_retry {
             $_jump_back_to_step = $case{retryfromstep};
         } else {
             $_jump_back_to_step = $checkpoint;
+            $results_stdout .= qq|RESTARTING SESSION BEFORE JUMPING BACK TO CHECKPOINT ... \n|;
+            start_session();
         }
         my $_jump_backs_left = $config{globaljumpbacks} - $jumpbacks;
         $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $_jump_back_to_step ... $_jump_backs_left tries left</span></b><br />\n|;
