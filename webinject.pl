@@ -257,14 +257,14 @@ foreach ($start .. $repeat) {
             pass_fail_or_retry();
 
             output_test_step_latency();
-            output_test_step_results();
-
             increment_run_count();
             update_latency_statistics();
 
             restart_browser();
 
             sleep_before_next_step();
+
+            output_test_step_results();
 
             $retry = $retry - 1;
         } ## end of retry loop
@@ -459,7 +459,7 @@ sub get_number_of_times_to_retry_this_test_step {
             $results_stdout .= "\n";
             return $_max;
         } else {
-            $results_stdout .=  "DEBUG: Auto retry value set to $auto_retry BUT attempts_since_last_success is $attempts_since_last_success\n";
+            $results_stdout .=  "Will not auto retry - auto retry set to $auto_retry BUT $attempts_since_last_success attempts since last success\n";
         }
         
     }
@@ -806,6 +806,8 @@ sub sleep_before_next_step {
             else
             {
                 ## if a sleep value is set in the test case, sleep that amount
+                $results_html .= qq|INVOKED SLEEP of $case{sleep} seconds<br />\n|;
+                $results_stdout .= qq|INVOKED SLEEP of $case{sleep} seconds\n|;
                 sleep $case{sleep};
             }
         }
