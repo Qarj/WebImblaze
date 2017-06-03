@@ -389,6 +389,9 @@ sub get_test_step_skip_message {
         }
     }
 
+    if (defined $xml_test_cases->{case}->{$testnum}->{runif} && not $xml_test_cases->{case}->{$testnum}->{runif}) { ## evaluate content - truthy or falsy
+        return 'runif evaluated as falsy';
+    }
     return;
 }
 

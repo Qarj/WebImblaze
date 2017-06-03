@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Will be run - truthy"
+    method="cmd"
+    command="echo NOP"
+    runif="abcd"
+/>
+
+<case
+    id="20"
+    description1="Will not be run - falsy"
+    method="cmd"
+    command="echo NOP"
+    runif=""
+/>
+
+</testcases>
