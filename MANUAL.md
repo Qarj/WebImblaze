@@ -98,13 +98,16 @@ Adapted from the original manual written by Corey Goldberg.
 
 [addheader](#addheader)
 
-[parms](#parms)
-
-[useragent](#useragentparameter)
+[include] (#include)
 
 [maxredirect](#maxredirect)
 
-[include] (#include)
+[parms](#parms)
+
+[setcookie](#setcookie)
+
+[useragent](#useragentparameter)
+
 
 #### [3.3.3 - Additional Assertion Parameters](#asserts)
 
@@ -163,11 +166,15 @@ Adapted from the original manual written by Corey Goldberg.
 [section](#section)
 
 
-#### [3.3.6 - Parameters to skip test steps depending on target environment](#skip)
-
-[runon](#runon)
+#### [3.3.6 - Parameters to conditionally skip test steps](#skip)
 
 [autocontrolleronly](#autocontrolleronly)
+
+[donotrunon](#donorunon)
+
+[runif](#runif)
+
+[runon](#runon)
 
 
 #### [3.3.7 - Parameters to end execution early due to assertion failures](#sanity)
@@ -279,11 +286,10 @@ You can also do proxy authentication like this:
 <proxy>http://username:password@127.0.0.1:8080</proxy>
 ```
 
-<a name="useragent"></a>
-
 <br />
 
 
+<a name="useragent"></a>
 #### useragent
 Specifies a User-Agent string to be sent in outgoing HTTP headers.  If this setting is not used, the default
 User-Agent string sent is "WebInject".  A User-Agent string is how each request identifies itself to the web server.
@@ -1323,7 +1329,9 @@ Will run the specified command only if the test step fails for some reason.
 #### addcookie
 
 This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
-The cookie will be added for the current step only.
+
+The cookie will be added for the current step only - for that reason this parameter is deprecated. Use the
+`setcookie` parameter instead.
 
 ```
     addcookie="LASTVIEWEDJOB_COOKIE=4830075"
@@ -1401,6 +1409,24 @@ testdata\AddJob.xml might look like:
 
 When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swapped with
 20000 and 35000 respectively.
+
+<br />
+
+
+<a name="setcookie"></a>
+#### setcookie
+Sets a new cookie for the url domain and port. The cookie will be retained for subsequent steps.
+
+```
+    setcookie="MyCookieName: value_of_cookie"
+```
+
+Seperate multiple cookies with a semicolon:
+```
+   setcookie="MyFirstCookie: cookie_value; MySecondCookie: another_value"
+```
+
+Note that leading and trailing whitespace is removed. Cookie values cannot contain a colon or semicolin.
 
 <br />
 
@@ -1878,24 +1904,31 @@ Use in your Test Automation Framework when displaying the results.xml with a sty
 
 
 <a name="skip"></a>
-### 3.3.6 - Parameters to skip test steps depending on target environment
+### 3.3.6 - Parameters to conditionally skip test steps
 
-<a name="runon"></a>
-#### runon
+<a name="autocontrolleronly"></a>
+#### autocontrolleronly
 
-You can specify that selected test cases are skipped depending on the environment defined in the
-config file. See the environment section of the configuration file section for information on how to configure the config file.
+You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
+a command line option to indicate you are invoking it from the automation controller. Webinject will
+then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
 
 ```
-    runon="PAT|PROD"
+    autocontrolleronly="true"
 ```
 
-In your config.xml, if you had the following, then the test step would be skipped:
+It is probably quite rare that you would have a need for this feature. One example is that you may have a
+website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
+this works, you might have a test case that uploads a document containing an industry standard test virus.
+However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
+immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
+controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
+the virus checking test cases on your automation controller. This is a real example of how this feature is used.
 
-```xml
-    <wif>
-        <environment>DEV</environment>
-    </wif>
+When you start WebInject, you will need to specify the -a parameter, otherwise test steps with the autocontrolleronly
+parameter will be skipped:
+```
+webinject.pl -a
 ```
 
 <br />
@@ -1921,29 +1954,51 @@ In your config.xml, if you had the following, then the test step would be skippe
 <br />
 
 
-<a name="autocontrolleronly"></a>
-#### autocontrolleronly
+<a name="runif"></a>
+#### runif
 
-You can flag test cases as being "autocontrolleronly". Then when you invoke webinject, specify
-a command line option to indicate you are invoking it from the automation controller. Webinject will
-then run test cases flagged as being "autocontrolleronly", which will otherwise be skipped.
+Conditionally skip a test step - if this parameter is present, the step will only be run
+if the parameter is 'truthy'.
+
+This test step is run, since 'abcd' is truthy.
+```
+    runif="abcd"
+```
+
+This test step is not run, since '' is falsy.
+```
+    runif=""
+```
+
+This test step is not run, since '0' is falsy.
+```
+    runif="0"
+```
+
+In practice, you would use this parameter with a variable:
+```
+    runif="{SOME_VARIABLE}"
+```
+
+<br />
+
+
+<a name="runon"></a>
+#### runon
+
+You can specify that selected test cases are skipped depending on the environment defined in the
+config file. See the environment section of the configuration file section for information on how to configure the config file.
 
 ```
-    autocontrolleronly="true"
+    runon="PAT|PROD"
 ```
 
-It is probably quite rare that you would have a need for this feature. One example is that you may have a
-website that accepts document uploads. Your webserver may check the uploaded documents for viruses. To test that
-this works, you might have a test case that uploads a document containing an industry standard test virus.
-However your organisation may have stringent virus checking that deletes any file suspected of containing a virus
-immediately. You might be able to negotiate an exemption to virus checking for a particular file on your automation
-controller. So with this feature you can skip the test cases in your regression pack on your workstations, but still run
-the virus checking test cases on your automation controller. This is a real example of how this feature is used.
+In your config.xml, if you had the following, then the test step would be skipped:
 
-When you start WebInject, you will need to specify the -a parameter, otherwise test steps with the autocontrolleronly
-parameter will be skipped:
-```
-webinject.pl -a
+```xml
+    <wif>
+        <environment>DEV</environment>
+    </wif>
 ```
 
 <br />

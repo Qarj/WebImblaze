@@ -1072,6 +1072,27 @@ sub _run_this_step {
 
 
 #------------------------------------------------------------------
+sub setcookie {
+    if ($case{setcookie}) {
+        require URI;
+        my $_uri = URI->new($request->uri);
+
+        my @_cookies = split /;/, $case{setcookie};
+        foreach my $_cookie (@_cookies) {
+            my ($_key, $_value) = split /:/, $_cookie;
+            $_key = trim($_key);
+            $_value = trim($_value);
+            $results_stdout .= " Set cookie -> $_key: $_value\n";
+            $cookie_jar->set_cookie( 0, $_key, $_value, '/', $_uri->host, $_uri->port, 0, 0, 86400, 0 )
+        }
+    }
+
+    return;
+}
+sub trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
+
+#------------------------------------------------------------------
+# function addcookie is deprecated since it only adds the cookie for the current step
 sub addcookie { ## add a cookie like JBM_COOKIE=4830075
     if ($case{addcookie}) { ## inject in an additional cookie for this test step only if specified
         my $_cookies = $request->header('Cookie');
@@ -1489,7 +1510,7 @@ sub httpget {  #send http request and read response
 
     $request = HTTP::Request->new('GET',"$case{url}");
 
-    #1.42 Moved cookie management up above addheader as per httppost_form_data
+    setcookie ();
     $cookie_jar->add_cookie_header($request);
 
     addcookie (); ## append additional cookies rather than overwriting with add header
@@ -1569,10 +1590,9 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
 
     $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}");
-    #$request->content("$case{postbody}");
     $request->content("$_substituted_postbody");
 
-    ## moved cookie management up above addheader as per httppost_form_data
+    setcookie ();
     $cookie_jar->add_cookie_header($request);
 
     addcookie (); ## append to additional cookies rather than overwriting with add header
@@ -1583,7 +1603,6 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
             $_ =~ m{(.*): (.*)};
             if ($1) {$request->header($1 => $2);}  #using HTTP::Headers Class
         }
-        #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
     $start_timer = time;
@@ -1703,6 +1722,7 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
     } else {
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
+    setcookie ();
     $cookie_jar->add_cookie_header($request);
 
     addcookie (); ## append additional cookies rather than overwriting with add header
