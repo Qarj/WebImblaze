@@ -205,15 +205,15 @@ foreach ($start .. $repeat) {
         $retries = 1; ## we increment retries after writing to the log
         $retries_print = q{}; ## the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
 
+        # populate variables with values from testcase file, do substitutions, and revert converted values back
+        substitute_variables();
+
         my $skip_message = get_test_step_skip_message();
         if ( $skip_message ) {
             $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
             $results_stdout .= qq|------------------------------------------------------- \n|;
             next TESTCASE; ## skip running this test step
         }
-
-        # populate variables with values from testcase file, do substitutions, and revert converted values back
-        substitute_variables();
 
         $retry = get_number_of_times_to_retry_this_test_step(); # 0 means do not retry this step
 
@@ -392,7 +392,8 @@ sub get_test_step_skip_message {
         }
     }
 
-    if (defined $xml_test_cases->{case}->{$testnum}->{runif} && not $xml_test_cases->{case}->{$testnum}->{runif}) { ## evaluate content - truthy or falsy
+    #if (defined $case{runif}) { print "runif:[$case{runif}]\n"; }
+    if (defined $case{runif} && not $case{runif}) { ## evaluate content - truthy or falsy
         return 'runif evaluated as falsy';
     }
     return;
@@ -421,6 +422,7 @@ sub substitute_variables {
         convert_back_xml($case{$_case_attribute});
         $case_save{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
     }
+    substitute_var_variables();
 
     return;
 }
@@ -465,7 +467,9 @@ sub get_number_of_times_to_retry_this_test_step {
             $results_stdout .= "\n";
             return $_max;
         } else {
-            $results_stdout .=  "Will not auto retry - auto retry set to $auto_retry BUT $attempts_since_last_success attempts since last success\n";
+            if ($auto_retry) {
+                $results_stdout .=  "Will not auto retry - auto retry set to $auto_retry BUT $attempts_since_last_success attempts since last success\n";
+            }
         }
         
     }
@@ -2252,7 +2256,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
 
             $_left_boundary = $_parse_args[0]; $_right_boundary = $_parse_args[1]; $_escape = $_parse_args[2];
 
-            $parsedresult{$_case_attribute} = undef; ## clear out any old value first
+            $parsedresult{$_case_attribute} = ''; ## clear out any old value first
 
             $_response_to_parse = $response->as_string;
 
@@ -2296,7 +2300,7 @@ sub write_shared_variable {
     if ($case{writesharedvar}) {
         _initialise_shared_variables();
         my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
-        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'_'.$HOUR.$MINUTE.$SECOND.'.txt');
+        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'___'.$HOUR.$MINUTE.$SECOND.'.txt');
         write_file ( $_file_full, $_var_value);
         $results_stdout .= " Wrote $_file_full\n";
     }
@@ -2308,7 +2312,7 @@ sub read_shared_variable {
 
     if ($case{readsharedvar}) {
         _initialise_shared_variables();
-        my @_vars = glob(slash_me($shared_folder_full.'/'.$case{readsharedvar}.'_*'));
+        my @_vars = glob(slash_me($shared_folder_full.'/'.$case{readsharedvar}.'___*'));
     
         my @_sorted_vars = sort { -C $a <=> -C $b } @_vars; ## -C is created, -M for modified
 
