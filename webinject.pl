@@ -99,6 +99,7 @@ my $assertion_skips_message = q{}; ## support tagging an assertion as disabled w
 my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my $session_started; ## only start up http sesion if http is being used
 my ($testfile_contains_selenium); ## so we know if Selenium Browser Session needs to be started
+my $shared_folder_full;
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -219,6 +220,7 @@ foreach ($start .. $repeat) {
         do ## retry loop
         {
             substitute_retry_variables(); ## for each retry, there are a few substitutions that we need to redo - like the retry number
+            read_shared_variable();
             set_var_variables(); ## finally set any variables after doing all the static and dynamic substitutions
             substitute_var_variables();
 
@@ -251,6 +253,7 @@ foreach ($start .. $repeat) {
             getbackgroundimages(); ## get specified web page src assets
 
             parseresponse();  #grab string from response to send later
+            write_shared_variable();
 
             httplog();  #write to http.txt file
 
@@ -2234,6 +2237,7 @@ sub _verify_assertcount {
 
     return;
 }
+
 #------------------------------------------------------------------
 sub parseresponse {  #parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
 
@@ -2282,6 +2286,54 @@ sub parseresponse {  #parse values from responses for use in future request (for
             #print "\n\nParsed String: $parsedresult{$_}\n\n";
         }
     }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub write_shared_variable {
+
+    if ($case{writesharedvar}) {
+        _initialise_shared_variables();
+        my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
+        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'_'.$HOUR.$MINUTE.$SECOND.'.txt');
+        write_file ( $_file_full, $_var_value);
+        $results_stdout .= " Wrote $_file_full\n";
+    }
+
+    return;
+}
+
+sub read_shared_variable {
+
+    if ($case{readsharedvar}) {
+        _initialise_shared_variables();
+        my @_vars = glob(slash_me($shared_folder_full.'/'.$case{readsharedvar}.'_*'));
+    
+        my @_sorted_vars = sort { -C $a <=> -C $b } @_vars; ## -C is created, -M for modified
+
+        if ($_sorted_vars[0]) { ## only the most recent variable value is relevant
+            $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0]);
+            $results_stdout .= " Read  $_sorted_vars[0]\n";
+        } else {
+            $varvar{'var'.$case{readsharedvar}} = ''; ## set variable to null if it does not exist
+            $results_stdout .= " Set  {$case{readsharedvar}} to null\n";
+        }
+    }
+
+    return;
+}
+
+sub _initialise_shared_variables {
+
+    $shared_folder_full = '/tmp';
+    if ($is_windows) {
+        $shared_folder_full = $ENV{TEMP};
+    }
+
+    $shared_folder_full .= '/WebInjectSharedVariables/';
+    $shared_folder_full .= $YEAR . $MONTHS[$MONTH] . $DAYOFMONTH;
+    File::Path::make_path ( slash_me($shared_folder_full) );
 
     return;
 }
