@@ -2,33 +2,52 @@
 
 <testvar varname="TOTALJOBS_HOST">www.totaljobs.com</testvar>
 
+
 <case
+    varKEY="{RANDOM:5}"
     section="SETUP - Ensure that login does not run concurrently"
-    readsharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED"
     id="1"
-    description1="Info - Read shared lock variable for jobseeker_test_account@mailinator.com"
+    description1="Info - Set unique key to {KEY}"
     method="cmd"
-    command1="REM lock_state[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    command1="REM {KEY}"
 />
 
 <case
     readsharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED"
     id="2"
-    description1="Info - Locked - wait up to 40 seconds"
+    description1="Info - Read shared lock variable for jobseeker_test_account [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    method="cmd"
+    command1="REM lock_state[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    checkpoint="true"
+/>
+
+<case
+    readsharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED"
+    id="3"
+    description1="Info - Locked - wait up to 60 seconds - [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     method="cmd"
     command1="REM lock[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
-    retry="20"
-    sleep="2"
+    retry="60"
+    sleep="1"
     verifypositive="lock\[]|||Still locked"
     runif="{JOBSEEKER_TEST_ACCOUNT_LOCKED}"
 />
 
 <case
-    id="3"
-    description1="Info - Write lock"
+    id="4"
+    description1="Write lock [locked_{KEY}]"
     method="cmd"
     command1="REM Write lock"
-    writesharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED|locked"
+    writesharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED|locked_{KEY}"
+/>
+
+<case
+    readsharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED"
+    id="5"
+    description1="Read lock back [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    method="cmd"
+    command1="REM [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    verifypositive="locked_{KEY}|||This is not our lock, return to checkpoint!"
 />
 
 <case
@@ -38,6 +57,7 @@
     description1="Info - Read shared variable for jobseeker_test_account@mailinator.com"
     method="cmd"
     command1="REM session cookies[{JOBSEEKER_TEST_ACCOUNT}]"
+    checkpoint="false"
 />
 
 <case

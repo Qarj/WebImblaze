@@ -2300,7 +2300,8 @@ sub write_shared_variable {
     if ($case{writesharedvar}) {
         _initialise_shared_variables();
         my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
-        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'___'.$HOUR.$MINUTE.$SECOND.'.txt');
+        my ($_day, $_month, $_year, $_hour, $_minute, $_second) = get_current_time();
+        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
         write_file ( $_file_full, $_var_value);
         $results_stdout .= " Wrote $_file_full\n";
     }
@@ -2314,7 +2315,7 @@ sub read_shared_variable {
         _initialise_shared_variables();
         my @_vars = glob(slash_me($shared_folder_full.'/'.$case{readsharedvar}.'___*'));
     
-        my @_sorted_vars = sort { -C $a <=> -C $b } @_vars; ## -C is created, -M for modified
+        my @_sorted_vars = sort { -M $a <=> -M $b } @_vars; ## -C is created, -M for modified
 
         if ($_sorted_vars[0]) { ## only the most recent variable value is relevant
             $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0]);
@@ -2807,19 +2808,24 @@ sub convert_back_xml_dynamic {## some values need to be updated after each retry
     $_[0] =~ s/{ELAPSED_SECONDS}/$_elapsed_seconds_so_far/g; ## always rounded up
     $_[0] =~ s/{ELAPSED_MINUTES}/$_elapsed_minutes_so_far/g; ## always rounded up
 
-    ## put the current date and time into variables
-    my ($_dynamic_second, $_dynamic_minute, $_dynamic_hour, $_dynamic_day_of_month, $_dynamic_month, $_dynamic_year_offset, $_dynamic_day_of_week, $_dynamic_day_of_year, $_dynamic_daylight_savings) = localtime;
-    my $_dynamic_year = 1900 + $_dynamic_year_offset;
-    $_dynamic_month = $MONTHS[$_dynamic_month];
-    my $_dynamic_day = sprintf '%02d', $_dynamic_day_of_month;
-    $_dynamic_hour = sprintf '%02d', $_dynamic_hour; #put in up to 2 leading zeros
-    $_dynamic_minute = sprintf '%02d', $_dynamic_minute;
-    $_dynamic_second = sprintf '%02d', $_dynamic_second;
-
+    my ($_day, $_month, $_year, $_hour, $_minute, $_second) = get_current_time();
     my $_underscore = '_';
-    $_[0] =~ s{{NOW}}{$_dynamic_day\/$_dynamic_month\/$_dynamic_year$_underscore$_dynamic_hour:$_dynamic_minute:$_dynamic_second}g;
+    $_[0] =~ s{{NOW}}{$_day\/$_month\/$_year$_underscore$_hour:$_minute:$_second}g;
 
     return;
+}
+
+#------------------------------------------------------------------
+sub get_current_time {
+    my ($_second, $_minute, $_hour, $_day_of_month, $_month, $_year_offset, $_day_of_week, $_day_of_year, $_daylight_savings) = localtime;
+    my $_year = 1900 + $_year_offset;
+    $_month = $MONTHS[$_month];
+    my $_day = sprintf '%02d', $_day_of_month;
+    $_hour = sprintf '%02d', $_hour; #put in up to 2 leading zeros
+    $_minute = sprintf '%02d', $_minute;
+    $_second = sprintf '%02d', $_second;
+    
+    return $_day, $_month, $_year, $_hour, $_minute, $_second;
 }
 
 #------------------------------------------------------------------
