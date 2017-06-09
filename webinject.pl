@@ -96,7 +96,8 @@ my (@page_update_times); ## last time the page was updated in the cache
 
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
-my (@hrefs, @srcs, @bg_images); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
+my (@hrefs, @srcs, @bg_images, %asset); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
+my ($getallsrcs, $getallhrefs, %href_path, %src_path);
 my $session_started; ## only start up http sesion if http is being used
 my ($testfile_contains_selenium); ## so we know if Selenium Browser Session needs to be started
 my $shared_folder_full;
@@ -248,9 +249,7 @@ foreach ($start .. $repeat) {
 
             verify(); #verify result from http response
 
-            gethrefs(); ## get specified web page href assets
-            getsrcs(); ## get specified web page src assets
-            getbackgroundimages(); ## get specified web page src assets
+            getresources();
 
             parseresponse();  #grab string from response to send later
             write_shared_variable();
@@ -1119,6 +1118,73 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
 }
 
 #------------------------------------------------------------------
+sub getresources {
+
+    getallhrefs(); ## get href assets for this step and all following steps
+    getallsrcs(); ## get src assets for this step and all following steps
+    #gethrefs(); ## get specified web page href assets
+    #getsrcs(); ## get specified web page src assets
+    getbackgroundimages(); ## get specified web page src assets
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub getallhrefs {
+
+    if ($case{getallhrefs}) {
+        $getallhrefs = $case{getallhrefs};
+    }
+
+    if (not defined $getallhrefs) {
+        return;
+    }
+
+    require URI;
+    my $_uri = URI->new($request->uri);
+    my $_path = $_uri->path;
+
+    if (defined $href_path{$_path}) {
+        return;
+    }
+    $href_path{$_path} = 1; # true
+    #print "   NEW PATH ---> $_path\n";
+
+    my $_match = 'href=';
+    my $_delim = q{"}; #"
+    get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs');
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub getallsrcs {
+
+    if ($case{getallsrcs}) {
+        $getallsrcs = $case{getallsrcs};
+    }
+
+    if (not defined $getallsrcs) {
+        return;
+    }
+
+    require URI;
+    my $_uri = URI->new($request->uri);
+    my $_path = $_uri->path;
+
+    if (defined $src_path{$_path}) {
+        return;
+    }
+    $src_path{$_path} = 1; # true
+
+    my $_match = 'src=';
+    my $_delim = q{"}; #"
+    get_assets ($_match,$_delim,$_delim,$getallsrcs, 'srcs');
+
+    return;
+}
+
+#------------------------------------------------------------------
 sub gethrefs { ## get page href assets matching a list of ending patterns, separate multiple with |
                ## gethrefs=".less|.css"
     if ($case{gethrefs}) {
@@ -1173,7 +1239,7 @@ sub get_assets { ## get page assets matching a list for a reference type
     foreach my $_extension (@_extensions) {
 
         #while ($_page =~ m{$assettype="([^"]*$_extension)["\?]}g) ##" Iterate over all the matches to this extension
-        print "\n $_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim\?] \n";
+        #print "\n $_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim\?] \n";
         while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) ##" Iterate over all the matches to this extension
         {
             $_start_asset_request = time;
@@ -1186,6 +1252,12 @@ sub get_assets { ## get page assets matching a list for a reference type
             #print "$_asset_url\n\n";
             $_path = $_asset_url->path; ## get the path portion of the asset location
             $_filename = basename($_path); ## get the filename from the path
+
+            if (defined $asset{$_filename}) {
+                next; ##since all assets are stored in the same folder, there is no point getting an asset with the same filename even if different
+            }
+            $asset{$_filename} = 1;
+
             $results_stdout .= "  GET Asset [$_filename] ...";
 
             $_asset_request = HTTP::Request->new('GET',"$_asset_url");
@@ -3005,7 +3077,7 @@ sub _write_step_html {
 
     _add_email_link(\$_html);
 
-    if (defined $_response_base) {
+    if (defined $user_config->{relativetoabsolute} && defined $_response_base) {
         _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
     }
 
