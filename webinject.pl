@@ -407,7 +407,7 @@ sub substitute_variables {
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
     ## "verifyresponsetime", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
     ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "formatxml", "formatjson",
-    ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "gethrefs", "getsrcs", "getbackgroundimages",
+    ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "getallhrefs", "getallsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
 
     $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
@@ -470,7 +470,6 @@ sub get_number_of_times_to_retry_this_test_step {
                 $results_stdout .=  "Will not auto retry - auto retry set to $auto_retry BUT $attempts_since_last_success attempts since last success\n";
             }
         }
-        
     }
 
     return 0;
@@ -1122,15 +1121,14 @@ sub getresources {
 
     getallhrefs(); ## get href assets for this step and all following steps
     getallsrcs(); ## get src assets for this step and all following steps
-    #gethrefs(); ## get specified web page href assets
-    #getsrcs(); ## get specified web page src assets
     getbackgroundimages(); ## get specified web page src assets
 
     return;
 }
 
 #------------------------------------------------------------------
-sub getallhrefs {
+sub getallhrefs { ## getallhrefs=".less|.css"
+                  ## get page href assets matching a list of ending patterns, separate multiple with |
 
     if ($case{getallhrefs}) {
         $getallhrefs = $case{getallhrefs};
@@ -1148,7 +1146,6 @@ sub getallhrefs {
         return;
     }
     $href_path{$_path} = 1; # true
-    #print "   NEW PATH ---> $_path\n";
 
     my $_match = 'href=';
     my $_delim = q{"}; #"
@@ -1158,7 +1155,8 @@ sub getallhrefs {
 }
 
 #------------------------------------------------------------------
-sub getallsrcs {
+sub getallsrcs { ## getallsrcs=".js|.png|.jpg|.gif"
+                 ## get page src assets matching a list of ending patterns, separate multiple with |
 
     if ($case{getallsrcs}) {
         $getallsrcs = $case{getallsrcs};
@@ -1180,30 +1178,6 @@ sub getallsrcs {
     my $_match = 'src=';
     my $_delim = q{"}; #"
     get_assets ($_match,$_delim,$_delim,$getallsrcs, 'srcs');
-
-    return;
-}
-
-#------------------------------------------------------------------
-sub gethrefs { ## get page href assets matching a list of ending patterns, separate multiple with |
-               ## gethrefs=".less|.css"
-    if ($case{gethrefs}) {
-        my $_match = 'href=';
-        my $_delim = q{"}; #"
-        get_assets ($_match,$_delim,$_delim,$case{gethrefs}, 'hrefs');
-    }
-
-    return;
-}
-
-#------------------------------------------------------------------
-sub getsrcs { ## get page src assets matching a list of ending patterns, separate multiple with |
-              ## getsrcs=".js|.png|.jpg|.gif"
-    if ($case{getsrcs}) {
-        my $_match = 'src=';
-        my $_delim = q{"}; #"
-        get_assets ($_match, $_delim, $_delim, $case{getsrcs}, 'srcs');
-    }
 
     return;
 }
@@ -1238,25 +1212,21 @@ sub get_assets { ## get page assets matching a list for a reference type
 
     foreach my $_extension (@_extensions) {
 
-        #while ($_page =~ m{$assettype="([^"]*$_extension)["\?]}g) ##" Iterate over all the matches to this extension
-        #print "\n $_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim\?] \n";
         while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) ##" Iterate over all the matches to this extension
         {
             $_start_asset_request = time;
 
             $_asset_ref = $1;
-            #print "$_extension: $_asset_ref\n";
 
             $_ur_url = URI::URL->new($_asset_ref, $case{url}); ## join the current page url together with the href of the asset
             $_asset_url = $_ur_url->abs; ## determine the absolute address of the asset
-            #print "$_asset_url\n\n";
             $_path = $_asset_url->path; ## get the path portion of the asset location
             $_filename = basename($_path); ## get the filename from the path
 
             if (defined $asset{$_filename}) {
-                next; ##since all assets are stored in the same folder, there is no point getting an asset with the same filename even if different
+                next; ## since all assets are stored in the same folder, there is no point getting an asset again with the same filename
             }
-            $asset{$_filename} = 1;
+            $asset{$_filename} = 1; # true
 
             $results_stdout .= "  GET Asset [$_filename] ...";
 
@@ -1265,10 +1235,7 @@ sub get_assets { ## get page assets matching a list for a reference type
 
             $_asset_response = $useragent->request($_asset_request);
 
-            open my $_RESPONSE_AS_FILE, '>', "$output_folder/$_filename" or die "\nCould not open asset file $output_folder/$_filename for writing\n"; #open in clobber mode
-            binmode $_RESPONSE_AS_FILE; ## set binary mode
-            print {$_RESPONSE_AS_FILE} $_asset_response->content, q{}; ## content just outputs the content, whereas as_string includes the response header
-            close $_RESPONSE_AS_FILE or die "\nCould not close asset file\n";
+            write_file( "$output_folder/$_filename", {binmode => ':raw'}, $_asset_response->content );
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
