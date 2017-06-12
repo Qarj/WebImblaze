@@ -340,7 +340,6 @@ sub set_max_redirect {
 #------------------------------------------------------------------
 sub get_test_step_skip_message {
 
-    $case{runon} = $xml_test_cases->{case}->{$testnum}->{runon}; ## skip test cases not flagged for this environment
     if ($case{runon}) { ## is this test step conditional on the target environment?
         if ( _run_this_step($case{runon}) ) {
             ## run this test case as normal since it is allowed
@@ -350,7 +349,6 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{donotrunon} = $xml_test_cases->{case}->{$testnum}->{donotrunon}; ## skip test cases flagged not to run on this environment
     if ($case{donotrunon}) { ## is this test step conditional on the target environment?
         if ( not _run_this_step($case{donotrunon}) ) {
             ## run this test case as normal since it is allowed
@@ -360,7 +358,6 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{autocontrolleronly} = $xml_test_cases->{case}->{$testnum}->{autocontrolleronly}; ## only run this test case on the automation controller, e.g. test case may involve a test virus which cannot be run on a regular corporate desktop
     if ($case{autocontrolleronly}) { ## is the autocontrolleronly value set for this testcase?
         if ($opt_autocontroller) { ## if so, was the auto controller option specified?
             ## run this test case as normal since it is allowed
@@ -370,7 +367,6 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{firstlooponly} = $xml_test_cases->{case}->{$testnum}->{firstlooponly}; ## only run this test case on the first loop
     if ($case{firstlooponly}) { ## is the firstlooponly value set for this testcase?
         if ($counter == 1) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
@@ -380,7 +376,6 @@ sub get_test_step_skip_message {
         }
     }
 
-    $case{lastlooponly} = $xml_test_cases->{case}->{$testnum}->{lastlooponly}; ## only run this test case on the last loop
     if ($case{lastlooponly}) { ## is the lastlooponly value set for this testcase?
         if ($counter == $repeat) { ## counter keeps track of what loop number we are on
             ## run this test case as normal since it is the first pass
@@ -390,10 +385,10 @@ sub get_test_step_skip_message {
         }
     }
 
-    #if (defined $case{runif}) { print "runif:[$case{runif}]\n"; }
     if (defined $case{runif} && not $case{runif}) { ## evaluate content - truthy or falsy
         return 'runif evaluated as falsy';
     }
+
     return;
 }
 
@@ -430,14 +425,12 @@ sub get_number_of_times_to_retry_this_test_step {
 
     if (defined $case{autoretry}) { $auto_retry = $case{autoretry}; } ## we need to capture this value if it is present since it applies to subsequent steps
 
-    $case{retryfromstep} = $xml_test_cases->{case}->{$testnum}->{retryfromstep}; ## retry from a [previous] step
     if ($case{retryfromstep}) { ## retryfromstep parameter found
         $results_stdout .= qq|Retry from step $case{retryfromstep}\n|;
         return 0; ## we will not do a regular retry
     }
 
     my $_retry;
-    $case{retry} = $xml_test_cases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
     if ($case{retry}) { ## retry parameter found
         $_retry = $case{retry}; ## assume we can retry as many times as specified
         if ($config->{globalretry}) { ## ensure that the global retry limit won't be exceeded
@@ -453,7 +446,7 @@ sub get_number_of_times_to_retry_this_test_step {
     }
 
     ## to get this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
-    if ( defined $auto_retry && not ($xml_test_cases->{case}->{$testnum}->{ignoreautoretry}) ) {
+    if ( defined $auto_retry && not $case{ignoreautoretry} ) {
         if ($attempts_since_last_success < $auto_retry) {
             my $_max = $auto_retry - $attempts_since_last_success;
             if ($_max > $auto_retry) {$_max = $auto_retry};
@@ -477,7 +470,7 @@ sub get_number_of_times_to_retry_this_test_step {
 #------------------------------------------------------------------
 sub substitute_retry_variables {
 
-    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( keys %case ) {
         if (defined $case_save{$_case_attribute}) ## defaulted parameters like posttype may not have a saved value on a subsequent loop
         {
             $case{$_case_attribute} = $case_save{$_case_attribute}; ## need to restore to the original partially substituted parameter
@@ -547,7 +540,7 @@ sub output_assertions {
     ## display and log the verifications to do to stdout and html - xml output is done with the verification itself
     ## verifypositive, verifypositive1, ..., verifypositive9999 (or even higher)
     ## verifynegative, verifynegative2, ..., verifynegative9999 (or even higher)
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' || (substr $_case_attribute, 0, 14) eq 'verifynegative') {
             my $_verifytype = substr $_case_attribute, 6, 8; ## so we get the word positive or negative
             $_verifytype = ucfirst $_verifytype; ## change to Positive or Negative
@@ -590,8 +583,8 @@ sub execute_test_step {
         if ($case{method} eq 'selenium') { WebInjectSelenium::selenium(); return; }
     }
 
-    set_useragent($xml_test_cases->{case}->{$testnum}->{useragent});
-    set_max_redirect($xml_test_cases->{case}->{$testnum}->{maxredirect});
+    set_useragent($case{useragent});
+    set_max_redirect($case{maxredirect});
 
     if ($case{method}) {
         if ($case{method} eq 'get') { httpget(); return;}
@@ -2105,7 +2098,7 @@ sub _verify_smartassertion {
 
 sub _verify_verifypositive {
 
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^verifypositive//g; ## remove verifypositive from string
@@ -2159,7 +2152,7 @@ sub _verify_verifypositive {
 
 sub _verify_verifynegative {
 
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
         if ( (substr $_case_attribute, 0, 14) eq 'verifynegative' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
@@ -2225,7 +2218,7 @@ sub _is_fail_fast {
 
 sub _verify_assertcount {
 
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
         if ( (substr $_case_attribute, 0, 11) eq 'assertcount' ) {
             my $_verify_number = $_case_attribute; ## determine index verifypositive index
             #$results_stdout .= "$_case_attribute\n"; ##DEBUG
@@ -2286,7 +2279,7 @@ sub parseresponse {  #parse values from responses for use in future request (for
     my ($_response_to_parse, @_parse_args);
     my ($_left_boundary, $_right_boundary, $_escape);
 
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
 
         if ( (substr $_case_attribute, 0, 13) eq 'parseresponse' ) {
 
@@ -2869,7 +2862,7 @@ sub convert_back_var_variables { ## e.g. postbody="time={RUNSTART}"
 ## use critic
 #------------------------------------------------------------------
 sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
-    foreach my $_case_attribute ( sort keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+    foreach my $_case_attribute ( sort keys %case ) {
        if ( (substr $_case_attribute, 0, 3) eq 'var' ) {
             $varvar{$_case_attribute} = $case{$_case_attribute}; ## assign the variable
         }
@@ -2881,7 +2874,7 @@ sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 #------------------------------------------------------------------
 sub substitute_var_variables {
 
-    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) { ## then substitute them in
+    foreach my $_case_attribute ( keys %case ) { ## then substitute them in
         convert_back_var_variables($case{$_case_attribute});
     }
 
