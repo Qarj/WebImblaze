@@ -85,7 +85,7 @@ my ($xml_test_cases, $step_index, @test_steps);
 our ($output, $output_folder); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
-my ($user_config); ## support arbirtary user defined config
+my ($config); ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
@@ -440,9 +440,9 @@ sub get_number_of_times_to_retry_this_test_step {
     $case{retry} = $xml_test_cases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
     if ($case{retry}) { ## retry parameter found
         $_retry = $case{retry}; ## assume we can retry as many times as specified
-        if ($user_config->{globalretry}) { ## ensure that the global retry limit won't be exceeded
-            if ($_retry > ($user_config->{globalretry} - $globalretries)) { ## we can't retry that many times
-                $_retry =  $user_config->{globalretry} - $globalretries; ## this is the most we can retry
+        if ($config->{globalretry}) { ## ensure that the global retry limit won't be exceeded
+            if ($_retry > ($config->{globalretry} - $globalretries)) { ## we can't retry that many times
+                $_retry =  $config->{globalretry} - $globalretries; ## this is the most we can retry
                 if ($_retry < 0) {
                     return 0; ## if less than 0 then make 0
                 }
@@ -491,8 +491,8 @@ sub substitute_retry_variables {
 #------------------------------------------------------------------
 sub set_retry_to_zero_if_global_limit_exceeded {
 
-    if ($user_config->{globalretry}) {
-        if ($globalretries >= $user_config->{globalretry}) {
+    if ($config->{globalretry}) {
+        if ($globalretries >= $config->{globalretry}) {
             $retry = 0; ## globalretries value exceeded - not retrying any more this run
         }
     }
@@ -613,7 +613,7 @@ sub pass_fail_or_retry {
 
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($user_config->{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
+    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config->{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
     if ( ($is_failure && !( retry_available() || retry_from_step_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         ## however if a verifynegative fails then the case is always a failure
@@ -658,7 +658,7 @@ sub pass_fail_or_retry {
             $results_stdout .= qq|RESTARTING SESSION BEFORE JUMPING BACK TO CHECKPOINT ... \n|;
             start_session();
         }
-        my $_jump_backs_left = $user_config->{globaljumpbacks} - $jumpbacks;
+        my $_jump_backs_left = $config->{globaljumpbacks} - $jumpbacks;
         $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $_jump_back_to_step ... $_jump_backs_left tries left</span></b><br />\n|;
         $results_stdout .= qq|RETRYING FROM STEP $_jump_back_to_step ...  $_jump_backs_left tries left\n|;
         $results_xml .= qq|            <success>false</success>\n|;
@@ -705,11 +705,11 @@ sub retry_available {
 }
 
 sub retry_from_step_available {
-    return $case{retryfromstep} && ( $jumpbacks < $user_config->{globaljumpbacks} ); # retryfromstep takes priority over checkpoint
+    return $case{retryfromstep} && ( $jumpbacks < $config->{globaljumpbacks} ); # retryfromstep takes priority over checkpoint
 }
 
 sub jump_back_to_checkpoint_available {
-    return $checkpoint && ( $jumpbacks < $user_config->{globaljumpbacks} );
+    return $checkpoint && ( $jumpbacks < $config->{globaljumpbacks} );
 }
 
 #------------------------------------------------------------------
@@ -755,7 +755,7 @@ sub output_test_step_results {
 sub increment_run_count {
 
     if ( ( ($is_failure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
-         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $user_config->{globaljumpbacks} ) && !$fast_fail_invoked )
+         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config->{globaljumpbacks} ) && !$fast_fail_invoked )
        ) {
         ## do not count this in run count if we are retrying
     }
@@ -806,7 +806,7 @@ sub sleep_before_next_step {
     {
         if ($case{sleep})
         {
-            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($user_config->{globaljumpbacks}-1))) )
+            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($config->{globaljumpbacks}-1))) )
             {
                 ## do not sleep if the test case failed and we have run out of retries or jumpbacks
             }
@@ -877,14 +877,14 @@ sub write_initial_xml {  #write opening tags for results file
     $_results_xml .= '<?xml-stylesheet type="text/xsl" href="../../../../../../../content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
-    if ( defined $user_config->{wif}->{dd} && defined $user_config->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
-        $results_xml_file_name = 'results_'.$user_config->{wif}->{run_number}.'.xml';
+    if ( defined $config->{wif}->{dd} && defined $config->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
+        $results_xml_file_name = 'results_'.$config->{wif}->{run_number}.'.xml';
         $_results_xml .= "    <wif>\n";
-        $_results_xml .= "        <environment>$user_config->{wif}->{environment}</environment>\n";
-        $_results_xml .= "        <yyyy>$user_config->{wif}->{yyyy}</yyyy>\n";
-        $_results_xml .= "        <mm>$user_config->{wif}->{mm}</mm>\n";
-        $_results_xml .= "        <dd>$user_config->{wif}->{dd}</dd>\n";
-        $_results_xml .= "        <batch>$user_config->{wif}->{batch}</batch>\n";
+        $_results_xml .= "        <environment>$config->{wif}->{environment}</environment>\n";
+        $_results_xml .= "        <yyyy>$config->{wif}->{yyyy}</yyyy>\n";
+        $_results_xml .= "        <mm>$config->{wif}->{mm}</mm>\n";
+        $_results_xml .= "        <dd>$config->{wif}->{dd}</dd>\n";
+        $_results_xml .= "        <batch>$config->{wif}->{batch}</batch>\n";
         $_results_xml .= "    </wif>\n";
     }
 
@@ -1033,14 +1033,14 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
                             'WARNING' , 1,
                             'CRITICAL', 2,);
 
-	    my $_end = defined $user_config->{globaltimeout} ? "$user_config->{globaltimeout};;0" : ';;0';
+	    my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
             if ($case_failed_count > 0) {
 	        print "WebInject CRITICAL - $return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
-            elsif ( ($user_config->{globaltimeout}) && ($total_response > $user_config->{globaltimeout}) ) {
-                print "WebInject WARNING - All tests passed successfully but global timeout ($user_config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
+            elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {
+                print "WebInject WARNING - All tests passed successfully but global timeout ($config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
                 exit $_exit_codes{'WARNING'};
             }
             else {
@@ -1064,8 +1064,8 @@ sub _run_this_step {
 
     my @_run_on = split /[|]/, $_runon_parm; ## get the list of environments that this test step can be run on
     foreach (@_run_on) {
-        if (defined $user_config->{wif}->{environment}) {
-            if ( $_ eq $user_config->{wif}->{environment} ) {
+        if (defined $config->{wif}->{environment}) {
+            if ( $_ eq $config->{wif}->{environment} ) {
                 return 'true';
             }
         }
@@ -1999,12 +1999,12 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
 
 sub _verify_autoassertion {
 
-    foreach my $_config_attribute ( sort keys %{ $user_config->{autoassertions} } ) {
+    foreach my $_config_attribute ( sort keys %{ $config->{autoassertions} } ) {
         if ( (substr $_config_attribute, 0, 13) eq 'autoassertion' ) {
             my $_verify_number = $_config_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^autoassertion//g; ## remove autoassertion from string
             if (!$_verify_number) {$_verify_number = '0';} #In case of autoassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $user_config->{autoassertions}{$_config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
+            my @_verifyparms = split /[|][|][|]/, $config->{autoassertions}{$_config_attribute} ; #index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($_verifyparms[2]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Auto Assertion $_verify_number - $_verifyparms[2]</span><br />\n|;
                 $results_stdout .= "Skipped Auto Assertion $_verify_number - $_verifyparms[2] \n";
@@ -2053,12 +2053,12 @@ sub _verify_autoassertion {
 
 sub _verify_smartassertion {
 
-    foreach my $_config_attribute ( sort keys %{ $user_config->{smartassertions} } ) {
+    foreach my $_config_attribute ( sort keys %{ $config->{smartassertions} } ) {
         if ( (substr $_config_attribute, 0, 14) eq 'smartassertion' ) {
             my $_verify_number = $_config_attribute; ## determine index verifypositive index
             $_verify_number =~ s/^smartassertion//g; ## remove smartassertion from string
             if (!$_verify_number) {$_verify_number = '0';} #In case of smartassertion, need to treat as 0
-            my @_verifyparms = split /[|][|][|]/, $user_config->{smartassertions}{$_config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
+            my @_verifyparms = split /[|][|][|]/, $config->{smartassertions}{$_config_attribute} ; #index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
             if ($_verifyparms[3]) { ## assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Smart Assertion $_verify_number - $_verifyparms[3]</span><br />\n|;
                 $results_stdout .= "Skipped Smart Assertion $_verify_number - $_verifyparms[2] \n";
@@ -2419,7 +2419,7 @@ sub process_config_file { #parse config file and grab values it sets
     }
 
     if (-e "$_config_file_path") {  #if we have a config file, use it
-        $user_config = XMLin("$_config_file_path"); ## Parse as XML for the user defined config
+        $config = XMLin("$_config_file_path"); ## Parse as XML for the user defined config
     } else {
         die "\nNo config file specified and no config.xml found in current working directory\n\n";
     }
@@ -2431,8 +2431,8 @@ sub process_config_file { #parse config file and grab values it sets
     if (($#ARGV + 1) < 1) {  #no command line args were passed
         #if testcase filename is not passed on the command line, use files in config.xml
 
-        if ($user_config->{testcasefile}) {
-            $current_case_file = slash_me($user_config->{testcasefile});
+        if ($config->{testcasefile}) {
+            $current_case_file = slash_me($config->{testcasefile});
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
         }
@@ -2444,29 +2444,29 @@ sub process_config_file { #parse config file and grab values it sets
         $current_case_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
-    if ($user_config->{httpauth}) {
-        if ( ref($user_config->{httpauth}) eq 'ARRAY') {
+    if ($config->{httpauth}) {
+        if ( ref($config->{httpauth}) eq 'ARRAY') {
             #print "We have an array of httpauths\n";
-            for my $_auth ( @{ $user_config->{httpauth} } ) { ## $user_config->{httpauth} is an array
+            for my $_auth ( @{ $config->{httpauth} } ) { ## $config->{httpauth} is an array
                 _push_httpauth ($_auth);
             }
         } else {
             #print "Not an array - we just have one httpauth\n";
-            _push_httpauth ($user_config->{httpauth});
+            _push_httpauth ($config->{httpauth});
         }
     }
 
-    if (not defined $user_config->{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
-        $user_config->{globaljumpbacks} = 5;
+    if (not defined $config->{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
+        $config->{globaljumpbacks} = 5;
     }
 
     if ($opt_ignoreretry) { ##
-        $user_config->{globalretry} = -1;
-        $user_config->{globaljumpbacks} = 0;
+        $config->{globalretry} = -1;
+        $config->{globaljumpbacks} = 0;
     }
 
-    if (defined $user_config->{autoretry}) {
-        $auto_retry = $user_config->{autoretry};
+    if (defined $config->{autoretry}) {
+        $auto_retry = $config->{autoretry};
     }
 
     # find the name of the output folder only i.e. not full path - OS safe
@@ -2476,18 +2476,18 @@ sub process_config_file { #parse config file and grab values it sets
     $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
 
-    if (defined $user_config->{ports_variable}) {
-        if ($user_config->{ports_variable} eq 'convert_back') {
+    if (defined $config->{ports_variable}) {
+        if ($config->{ports_variable} eq 'convert_back') {
             $convert_back_ports = 'true';
         }
 
-        if ($user_config->{ports_variable} eq 'null') {
+        if ($config->{ports_variable} eq 'null') {
             $convert_back_ports_null = 'true';
         }
     }
 
-    if (defined $user_config->{reporttype}) {
-        $report_type = lc $user_config->{reporttype};
+    if (defined $config->{reporttype}) {
+        $report_type = lc $config->{reporttype};
         if ($report_type ne 'standard') {
             $opt_no_output = 'true'; ## no standard output for plugins like nagios
         }
@@ -2497,12 +2497,12 @@ sub process_config_file { #parse config file and grab values it sets
     if ($is_windows) { $_os = 'windows'; }
     $_os //= 'linux';
     
-    if (defined $user_config->{$_os}->{'chromedriver-binary'}) {
-        $opt_chromedriver_binary //= $user_config->{$_os}->{'chromedriver-binary'}; # default to value from config file if present
+    if (defined $config->{$_os}->{'chromedriver-binary'}) {
+        $opt_chromedriver_binary //= $config->{$_os}->{'chromedriver-binary'}; # default to value from config file if present
     }
 
-    if (defined $user_config->{$_os}->{'selenium-binary'}) {
-        $opt_selenium_binary //= $user_config->{$_os}->{'selenium-binary'};
+    if (defined $config->{$_os}->{'selenium-binary'}) {
+        $opt_selenium_binary //= $config->{$_os}->{'selenium-binary'};
     }
 
     return;
@@ -2655,8 +2655,8 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 
 ## perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
     my ($_value, $_KEY);
-    foreach my $_key (keys %{ $user_config->{userdefined} } ) {
-        $_value = $user_config->{userdefined}{$_key};
+    foreach my $_key (keys %{ $config->{userdefined} } ) {
+        $_value = $config->{userdefined}{$_key};
         if (ref($_value) eq 'HASH') { ## if we found a HASH, we treat it as blank
             $_value = q{};
         }
@@ -2727,9 +2727,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
        $_[0] =~ s/\{$_parse_var}/$parsedresult{$_case_attribute}/g;
     }
 
-    $_[0] =~ s/{BASEURL}/$user_config->{baseurl}/g;
-    $_[0] =~ s/{BASEURL1}/$user_config->{baseurl1}/g;
-    $_[0] =~ s/{BASEURL2}/$user_config->{baseurl2}/g;
+    $_[0] =~ s/{BASEURL}/$config->{baseurl}/g;
+    $_[0] =~ s/{BASEURL1}/$config->{baseurl1}/g;
+    $_[0] =~ s/{BASEURL2}/$config->{baseurl2}/g;
 
     $_[0] =~ s/\[\[\[\|(.{1,80})\|\]\]\]/pack('H*',$1)/eg;
 
@@ -2992,9 +2992,9 @@ sub _write_step_html {
     my $_display_as_text = _should_display_as_text($_response_content_ref);
 
     my ($_wif_batch, $_wif_run_number);
-    if (defined $user_config->{wif}->{batch} ) {
-        $_wif_batch = $user_config->{wif}->{batch};
-        $_wif_run_number = $user_config->{wif}->{run_number};
+    if (defined $config->{wif}->{batch} ) {
+        $_wif_batch = $config->{wif}->{batch};
+        $_wif_run_number = $config->{wif}->{run_number};
     } else {
         $_wif_batch = 'needs_webinject_framework';
         $_wif_run_number = 'needs_webinject_framework';
@@ -3033,7 +3033,7 @@ sub _write_step_html {
 
     _add_email_link(\$_html);
 
-    if (defined $user_config->{relativetoabsolute} && defined $_response_base) {
+    if (defined $config->{relativetoabsolute} && defined $_response_base) {
         _replace_relative_urls_with_absolute($_response_content_ref, $_response_base);
     }
 
@@ -3164,9 +3164,9 @@ sub _add_email_link {
 sub _response_content_substitutions {
     my ($_response_content_ref) = @_;
 
-    foreach my $_sub ( keys %{ $user_config->{content_subs} } ) {
-        #print "_sub:$_sub:$user_config->{content_subs}{$_sub}\n";
-        my @_regex = split /[|][|][|]/, $user_config->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+    foreach my $_sub ( keys %{ $config->{content_subs} } ) {
+        #print "_sub:$_sub:$config->{content_subs}{$_sub}\n";
+        my @_regex = split /[|][|][|]/, $config->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
     }
 
@@ -3232,10 +3232,10 @@ sub _replace_relative_urls_with_absolute {
     my ($_response_content_ref, $_response_base) = @_;
 
     # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
-    foreach my $_sub ( keys %{ $user_config->{baseurl_subs} } ) {
-        #print "_sub:$_sub:$user_config->{baseurl_subs}{$_sub}\n";
+    foreach my $_sub ( keys %{ $config->{baseurl_subs} } ) {
+        #print "_sub:$_sub:$config->{baseurl_subs}{$_sub}\n";
         #print "orig _response_base:$_response_base\n";
-        my @_regex = split /[|][|][|]/, $user_config->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
+        my @_regex = split /[|][|][|]/, $config->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         $_response_base =~ s{$_regex[0]}{$_regex[1]}ee;
         #print "new _response_base:$_response_base\n";
     }
@@ -3353,8 +3353,8 @@ sub start_session {     ## creates the webinject user agent
     };
 
     #add proxy support if it is set in config.xml
-    if ($user_config->{proxy}) {
-        $useragent->proxy(['http', 'https'], "$user_config->{proxy}")
+    if ($config->{proxy}) {
+        $useragent->proxy(['http', 'https'], "$config->{proxy}")
     }
 
     #add http basic authentication support
@@ -3370,13 +3370,13 @@ sub start_session {     ## creates the webinject user agent
     }
 
     #change response delay timeout in seconds if it is set in config.xml
-    if ($user_config->{timeout}) {
-        $useragent->timeout("$user_config->{timeout}");  #default LWP timeout is 180 secs.
+    if ($config->{timeout}) {
+        $useragent->timeout("$config->{timeout}");  #default LWP timeout is 180 secs.
     }
 
     my $_set_user_agent;
-    if ($user_config->{useragent}) {
-        $_set_user_agent = $user_config->{useragent};
+    if ($config->{useragent}) {
+        $_set_user_agent = $config->{useragent};
         if ($_set_user_agent) { #http useragent that will show up in webserver logs
             $useragent->agent($_set_user_agent);
         }
