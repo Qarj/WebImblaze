@@ -64,7 +64,6 @@ my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked)
 our (%case);
 my (%case_save);
 my (%parsedresult, %varvar);
-my (%config);
 
 our ($opt_proxy);
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_publish_full);
@@ -441,9 +440,9 @@ sub get_number_of_times_to_retry_this_test_step {
     $case{retry} = $xml_test_cases->{case}->{$testnum}->{retry}; ## optional retry of a failed test case
     if ($case{retry}) { ## retry parameter found
         $_retry = $case{retry}; ## assume we can retry as many times as specified
-        if ($config{globalretry}) { ## ensure that the global retry limit won't be exceeded
-            if ($_retry > ($config{globalretry} - $globalretries)) { ## we can't retry that many times
-                $_retry =  $config{globalretry} - $globalretries; ## this is the most we can retry
+        if ($user_config->{globalretry}) { ## ensure that the global retry limit won't be exceeded
+            if ($_retry > ($user_config->{globalretry} - $globalretries)) { ## we can't retry that many times
+                $_retry =  $user_config->{globalretry} - $globalretries; ## this is the most we can retry
                 if ($_retry < 0) {
                     return 0; ## if less than 0 then make 0
                 }
@@ -492,8 +491,8 @@ sub substitute_retry_variables {
 #------------------------------------------------------------------
 sub set_retry_to_zero_if_global_limit_exceeded {
 
-    if ($config{globalretry}) {
-        if ($globalretries >= $config{globalretry}) {
+    if ($user_config->{globalretry}) {
+        if ($globalretries >= $user_config->{globalretry}) {
             $retry = 0; ## globalretries value exceeded - not retrying any more this run
         }
     }
@@ -614,7 +613,7 @@ sub pass_fail_or_retry {
 
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
+    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($user_config->{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
     if ( ($is_failure && !( retry_available() || retry_from_step_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         ## however if a verifynegative fails then the case is always a failure
@@ -659,7 +658,7 @@ sub pass_fail_or_retry {
             $results_stdout .= qq|RESTARTING SESSION BEFORE JUMPING BACK TO CHECKPOINT ... \n|;
             start_session();
         }
-        my $_jump_backs_left = $config{globaljumpbacks} - $jumpbacks;
+        my $_jump_backs_left = $user_config->{globaljumpbacks} - $jumpbacks;
         $results_html .= qq|<b><span class="pass">RETRYING FROM STEP $_jump_back_to_step ... $_jump_backs_left tries left</span></b><br />\n|;
         $results_stdout .= qq|RETRYING FROM STEP $_jump_back_to_step ...  $_jump_backs_left tries left\n|;
         $results_xml .= qq|            <success>false</success>\n|;
@@ -706,11 +705,11 @@ sub retry_available {
 }
 
 sub retry_from_step_available {
-    return $case{retryfromstep} && ( $jumpbacks < $config{globaljumpbacks} ); # retryfromstep takes priority over checkpoint
+    return $case{retryfromstep} && ( $jumpbacks < $user_config->{globaljumpbacks} ); # retryfromstep takes priority over checkpoint
 }
 
 sub jump_back_to_checkpoint_available {
-    return $checkpoint && ( $jumpbacks < $config{globaljumpbacks} );
+    return $checkpoint && ( $jumpbacks < $user_config->{globaljumpbacks} );
 }
 
 #------------------------------------------------------------------
@@ -756,7 +755,7 @@ sub output_test_step_results {
 sub increment_run_count {
 
     if ( ( ($is_failure > 0) && ($retry > 0) && !($case{retryfromstep}) ) ||
-         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $config{globaljumpbacks} ) && !$fast_fail_invoked )
+         ( ($is_failure > 0) && $case{retryfromstep} && ($jumpbacks < $user_config->{globaljumpbacks} ) && !$fast_fail_invoked )
        ) {
         ## do not count this in run count if we are retrying
     }
@@ -807,7 +806,7 @@ sub sleep_before_next_step {
     {
         if ($case{sleep})
         {
-            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($config{globaljumpbacks}-1))) )
+            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($user_config->{globaljumpbacks}-1))) )
             {
                 ## do not sleep if the test case failed and we have run out of retries or jumpbacks
             }
@@ -2445,14 +2444,6 @@ sub process_config_file { #parse config file and grab values it sets
         $current_case_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
-    #grab values for constants in config file: # This is tech debt - we just need to use $user_config-> everywhere
-    for my $_config_const (qw/baseurl baseurl1 baseurl2 proxy timeout globalretry globaljumpbacks autocontrolleronly/) {
-        if ($user_config->{$_config_const}) {
-            $config{$_config_const} = $user_config->{$_config_const};
-            #print "\n$_ : $config{$_} \n\n";
-        }
-    }
-
     if ($user_config->{httpauth}) {
         if ( ref($user_config->{httpauth}) eq 'ARRAY') {
             #print "We have an array of httpauths\n";
@@ -2465,15 +2456,13 @@ sub process_config_file { #parse config file and grab values it sets
         }
     }
 
-    if (defined $user_config->{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
-        $config{globaljumpbacks} = $user_config->{globaljumpbacks};
-    } else {
-        $config{globaljumpbacks} = 5;
+    if (not defined $user_config->{globaljumpbacks}) { ## default the globaljumpbacks if it isn't in the config file
+        $user_config->{globaljumpbacks} = 5;
     }
 
     if ($opt_ignoreretry) { ##
-        $config{globalretry} = -1;
-        $config{globaljumpbacks} = 0;
+        $user_config->{globalretry} = -1;
+        $user_config->{globaljumpbacks} = 0;
     }
 
     if (defined $user_config->{autoretry}) {
@@ -2738,9 +2727,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
        $_[0] =~ s/\{$_parse_var}/$parsedresult{$_case_attribute}/g;
     }
 
-    $_[0] =~ s/{BASEURL}/$config{baseurl}/g;
-    $_[0] =~ s/{BASEURL1}/$config{baseurl1}/g;
-    $_[0] =~ s/{BASEURL2}/$config{baseurl2}/g;
+    $_[0] =~ s/{BASEURL}/$user_config->{baseurl}/g;
+    $_[0] =~ s/{BASEURL1}/$user_config->{baseurl1}/g;
+    $_[0] =~ s/{BASEURL2}/$user_config->{baseurl2}/g;
 
     $_[0] =~ s/\[\[\[\|(.{1,80})\|\]\]\]/pack('H*',$1)/eg;
 
@@ -3364,8 +3353,8 @@ sub start_session {     ## creates the webinject user agent
     };
 
     #add proxy support if it is set in config.xml
-    if ($config{proxy}) {
-        $useragent->proxy(['http', 'https'], "$config{proxy}")
+    if ($user_config->{proxy}) {
+        $useragent->proxy(['http', 'https'], "$user_config->{proxy}")
     }
 
     #add http basic authentication support
@@ -3381,8 +3370,8 @@ sub start_session {     ## creates the webinject user agent
     }
 
     #change response delay timeout in seconds if it is set in config.xml
-    if ($config{timeout}) {
-        $useragent->timeout("$config{timeout}");  #default LWP timeout is 180 secs.
+    if ($user_config->{timeout}) {
+        $useragent->timeout("$user_config->{timeout}");  #default LWP timeout is 180 secs.
     }
 
     my $_set_user_agent;
