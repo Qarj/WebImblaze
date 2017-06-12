@@ -4,13 +4,14 @@
 Self test master file. All test steps in this file should pass.
 -->
 
-<testvar varname="feature">gethrefs</testvar>
+<testvar varname="feature">getallsrcs</testvar>
 
 <case
     id="10"
     description1="${feature}"
     method="cmd"
-    command1="if exist selftest\output\special.css del selftest\output\special.css"
+    command1="if exist selftest\output\small_brickwork.jpg del selftest\output\small_brickwork.jpg"
+    command2="if exist selftest\output\append_element.js del selftest\output\append_element.js"
 />
 
 <case
@@ -19,7 +20,8 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 0"
-    verifypositive1="GET Asset .special.css"
+    verifypositive1="GET Asset .small_brickwork.jpg"
+    verifypositive2="GET Asset .append_element.js"
 />
 
 <case
@@ -28,7 +30,8 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command1="dir selftest\output\"
     command2="ls selftest/output/"
-    verifypositive1="special.css"
+    verifypositive1="small_brickwork.jpg"
+    verifypositive2="append_element.js"
 />
 
 </testcases>

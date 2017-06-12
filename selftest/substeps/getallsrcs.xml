@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     description1="Get an image source"
     method="get"
     url="http://{WIC}/Home/Pictures"
-    getsrcs="brickwork.jpg"
+    getallsrcs="brickwork.jpg"
 />
 
 <case
@@ -18,7 +18,7 @@ Expected failures will be asserted by the master test file.
     description1="Get a JavaScript source"
     method="get"
     url="http://{WIC}/Home/JavaScript"
-    getsrcs="element.js"
+    getallsrcs="element.js"
 />
 
 </testcases>

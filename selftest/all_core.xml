@@ -312,7 +312,7 @@ Run all WebInject core self tests
 />
 
 <case
-    varFEATURE="getsrcs"
+    varFEATURE="getallsrcs"
     id="350"
     description1="{FEATURE}"
     method="cmd"
@@ -342,7 +342,7 @@ Run all WebInject core self tests
 />
 
 <case
-    varFEATURE="gethrefs"
+    varFEATURE="getallhrefs"
     id="380"
     description1="{FEATURE}"
     method="cmd"

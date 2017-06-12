@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     description1="Get a css file"
     method="get"
     url="http://{WIC}/Home/Special"
-    gethrefs="ial.css"
+    getallhrefs="ial.css"
 />
 
 </testcases>
