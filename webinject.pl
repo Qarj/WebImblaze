@@ -867,7 +867,7 @@ sub write_initial_xml {  #write opening tags for results file
 
     # put a reference to the stylesheet in the results file
     my $_results_xml = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n";
-    $_results_xml .= '<?xml-stylesheet type="text/xsl" href="../../../../../../../content/Results.xsl"?>'."\n";
+    $_results_xml .= '<?xml-stylesheet type="text/xsl" href="/content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
     if ( defined $config->{wif}->{dd} && defined $config->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
