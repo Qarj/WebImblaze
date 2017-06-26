@@ -33,7 +33,7 @@ use File::Slurp;
 use LWP;
 use HTTP::Request::Common;
 use XML::Simple;
-use Time::HiRes 'time','sleep';
+use Time::HiRes qw( time sleep gettimeofday );
 use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
@@ -47,7 +47,7 @@ our ($request, $response);
 my ($useragent);
 
 our ($latency, $verification_latency, $screenshot_latency);
-my $timestamp; ## for {TIMESTAMP} - global so all substitutions in a test step have same timestamp
+my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP} - global so all substitutions in a test step have same timestamp
 my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
 my ($current_date_time, $total_run_time, $start_timer, $end_timer);
 my ($total_response, $avg_response, $max_response, $min_response);
@@ -405,7 +405,7 @@ sub substitute_variables {
     ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "getallhrefs", "getallsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
 
-    $timestamp = time;  #used to replace parsed {timestamp} with real timestamp value
+    ($epoch_seconds, $epoch_split) = gettimeofday;
 
     undef %case_save; ## we need a clean array for each test case
     undef %case; ## do not allow values from previous test cases to bleed over
@@ -2674,7 +2674,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{AMPERSAND}/&/g;
     $_[0] =~ s/{LESSTHAN}/</g;
     $_[0] =~ s/{SINGLEQUOTE}/'/g; #'
-    $_[0] =~ s/{TIMESTAMP}/$timestamp/g;
+    $_[0] =~ s/{TIMESTAMP}/$epoch_seconds.$epoch_split/g;
+    $_[0] =~ s/{EPOCHSECONDS}/$epoch_seconds/g;
+    $_[0] =~ s/{EPOCHSPLIT}/$epoch_split/g;
     $_[0] =~ s/{STARTTIME}/$start_time/g;
     $_[0] =~ s/{OPT_PROXY}/$opt_proxy/g;
 
