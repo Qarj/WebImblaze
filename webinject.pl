@@ -49,7 +49,7 @@ my ($useragent);
 our ($latency, $verification_latency, $screenshot_latency);
 my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP} - global so all substitutions in a test step have same timestamp
 my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
-my ($current_date_time, $total_run_time, $start_timer, $end_timer);
+my ($current_date_time, $total_run_time);
 my ($total_response, $avg_response, $max_response, $min_response);
 my (%test_step_time); ## record in a hash the latency for every step for later use
 my ($start_time); ## to store a copy of $start_run_timer in a global variable
