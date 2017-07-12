@@ -1562,11 +1562,9 @@ sub httpget {  #send http request and read response
         }
     }
 
-
-    $start_timer = time;
+    my $_start_timer = time;
     $response = $useragent->request($request);
-    $end_timer = time;
-    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
+    $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -1644,10 +1642,9 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
         }
     }
 
-    $start_timer = time;
+    my $_start_timer = time;
     $response = $useragent->request($request);
-    $end_timer = time;
-    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
+    $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -1734,10 +1731,9 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
         #$case{addheader} = q{}; ## why is this line here? Fails with retry, so commented out
     }
 
-    $start_timer = time;
+    my $_start_timer = time;
     $response = $useragent->request($request);
-    $end_timer = time;
-    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
+    $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
@@ -1774,10 +1770,9 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
         }
     }
 
-    $start_timer = time;
+    my $_start_timer = time;
     $response = $useragent->request($request);
-    $end_timer = time;
-    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  #elapsed time rounded to thousandths
+    $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
 
@@ -1789,7 +1784,7 @@ sub cmd {  ## send terminal command and read response
 
     my $_combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
-    $start_timer = time;
+    my $_start_timer = time;
 
     for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
         if ($case{$_}) {#perform command
@@ -1803,10 +1798,17 @@ sub cmd {  ## send terminal command and read response
     }
     $_combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse($_combined_response); ## pretend the response is a http response - inject it into the object
-    $end_timer = time;
-    $latency = (int(1000 * ($end_timer - $start_timer)) / 1000);  ## elapsed time rounded to thousandths
+    $latency = _get_latency_since($_start_timer);
 
     return;
+}
+
+#------------------------------------------------------------------
+sub _get_latency_since {
+    my ($_start_timer) = @_;
+
+    return (int(1000 * (time - $_start_timer )) / 1000);  ## elapsed time rounded to thousandths
+
 }
 
 #------------------------------------------------------------------
