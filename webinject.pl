@@ -62,7 +62,7 @@ my ($run_count, $total_run_count, $case_passed_count);
 my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
 
 our (%case);
-my (%case_save);
+my (%case_save); ## when we retry, we need to re-substitute some variables
 my (%parsedresult, %varvar);
 
 our ($opt_proxy);
@@ -174,10 +174,10 @@ require $file_to_require;
 $module_to_import->import;
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
-if (!$repeat) { $repeat = 1; }  #set to 1 in case it is not defined in test case file
+$repeat //= 1;  #set to 1 in case it is not defined in test case file
 
 $start = $xml_test_cases->{start};  #grab the start for repeating (for restart)
-if (!$start) { $start = 1; }  #set to 1 in case it is not defined in test case file
+$start //= 1;  #set to 1 in case it is not defined in test case file
 
 $counter = $start - 1; #so starting position and counter are aligned
 
@@ -220,8 +220,8 @@ foreach ($start .. $repeat) {
         do ## retry loop
         {
             substitute_retry_variables(); ## for each retry, there are a few substitutions that we need to redo - like the retry number
-            read_shared_variable();
-            set_var_variables(); ## finally set any variables after doing all the static and dynamic substitutions
+            read_shared_variable();  ## read in a variable from another instance of WebInject that is running concurrently
+            set_var_variables(); ## set any variables after doing all the static and dynamic substitutions
             substitute_var_variables();
 
             set_retry_to_zero_if_global_limit_exceeded();
@@ -246,12 +246,12 @@ foreach ($start .. $repeat) {
             decode_smtp();
             decode_quoted_printable();
 
-            verify(); #verify result from http response
+            verify(); ## check the assertions against the actual result
 
-            getresources();
+            getresources(); ## get JavaScript, CSS, GIF, JPG and other resources
 
             parseresponse();  #grab string from response to send later
-            set_eval_variables();
+            set_eval_variables(); ## perform simple true / false statement evaluations - or math expressions
             write_shared_variable();
 
             httplog();  #write to http.txt file
@@ -446,7 +446,8 @@ sub get_number_of_times_to_retry_this_test_step {
         return $_retry;
     }
 
-    ## to get this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
+    ## getting this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
+    ## to prevent excessive retries when there are severe errors, auto retry will turn itself off until it sees a test step pass
     if ( defined $auto_retry && not $case{ignoreautoretry} ) {
         if ($attempts_since_last_success < $auto_retry) {
             my $_max = $auto_retry - $attempts_since_last_success;
@@ -497,6 +498,7 @@ sub set_retry_to_zero_if_global_limit_exceeded {
 #------------------------------------------------------------------
 sub check_for_checkpoint {
 
+    ## checkpoint concept is like in a game - if you die (test step fails), you start again from the checkpoint
     if ($case{checkpoint} && lc $case{checkpoint} eq 'false') {
         ## checkpoint cleared - will not automatically jump back from this step onwards
         $results_html .= qq|--- CHECKPOINT CLEARED --- <br />\n|;
@@ -603,14 +605,11 @@ sub execute_test_step {
 #------------------------------------------------------------------
 sub pass_fail_or_retry {
 
-    $attempts_since_last_success++; ## assume failure, will be reset to 0 if that is not the case
-
+    $attempts_since_last_success++; ## assume failure, will be reset to 0 if that is not the case (used by auto retry)
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
-    #if ( (($is_failure > 0) && ($retry < 1) && !($case{retryfromstep})) || (($is_failure > 0) && ($case{retryfromstep}) && ($jumpbacks > ($config->{globaljumpbacks}-1) )) || ($fast_fail_invoked eq 'true')) {
     if ( ($is_failure && !( retry_available() || retry_from_step_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
         ## if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
-        ## however if a verifynegative fails then the case is always a failure
         $results_xml .= qq|            <success>false</success>\n|;
         if ($case{errormessage}) { #Add defined error message to the output
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
@@ -688,7 +687,7 @@ sub pass_fail_or_retry {
         $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
         $case_passed_count++;
         $retry = 0; # no need to retry when test case passes
-        $attempts_since_last_success = 0; # reset attempts for autoretry
+        $attempts_since_last_success = 0; # reset attempts for auto retry
     }
 
     return;
