@@ -47,7 +47,7 @@ our ($request, $response);
 my ($useragent);
 
 our ($latency, $verification_latency, $screenshot_latency);
-my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP} - global so all substitutions in a test step have same timestamp
+my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP}, {EPOCHSECONDS} - global so all substitutions in a test step have same timestamp
 my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
 my ($current_date_time, $total_run_time);
 my ($total_response, $avg_response, $max_response, $min_response);
@@ -127,7 +127,7 @@ my $concurrency = 'null'; ## current working directory - not full path
 
 our ($results_stdout, $results_html, $results_xml);
 my ($results_xml_file_name);
-my ($start_run_timer, $end_run_timer, $repeat, $start);
+my ($start_run_timer, $repeat, $start);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -3323,8 +3323,7 @@ sub _delayed_write_step_html {
 sub final_tasks {  #do ending tasks
 
     if (not $total_run_count) {$total_run_count = 2}; ## prevent division by 0
-    $end_run_timer = time;
-    $total_run_time = (int(1000 * ($end_run_timer - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
+    $total_run_time = (int(1000 * (time - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
     $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
 
     # write out the html for the final test step, there is no new content to put in the buffer
