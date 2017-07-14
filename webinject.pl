@@ -893,11 +893,7 @@ sub write_initial_xml {  #write opening tags for results file
 sub _write_xml {
     my ($_xml) = @_;
 
-    if (not $opt_no_output) {
-        open my $_RESULTS_XML, '>>', "$opt_publish_full".$results_xml_file_name or die "\nERROR: Failed to open results.xml file\n\n";
-        print {$_RESULTS_XML} ${$_xml};
-        close $_RESULTS_XML or die "\nCould not close xml results file\n\n";
-    }
+    write_file("$opt_publish_full".$results_xml_file_name, {append => 1}, $_xml); ## $_xml is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -906,11 +902,7 @@ sub _write_xml {
 sub _write_html {
     my ($_html) = @_;
 
-    if (not $opt_no_output) {
-        open my $_RESULTS_HTML, '>>', $opt_publish_full.'results.html' or die "\nERROR: Failed to open results.html file\n\n";
-        print {$_RESULTS_HTML} ${$_html};
-        close $_RESULTS_HTML or die "\nCould not close html results file\n\n";
-    }
+    write_file($opt_publish_full.'results.html', {append => 1}, $_html); ## $_html is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -2914,10 +2906,7 @@ sub httplog {  # write requests and responses to http.txt file
     ## save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
         my $_response_folder_name = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        open my $_RESPONSE_AS_FILE, '>', "$_response_folder_name/$case{logresponseasfile}" or die "\nCould not open file for response as file\n\n";  #open in clobber mode
-        binmode $_RESPONSE_AS_FILE; ## set binary mode
-        print {$_RESPONSE_AS_FILE} $response->content, q{}; #content just outputs the content, whereas as_string includes the response header
-        close $_RESPONSE_AS_FILE or die "\nCould not close file for response as file\n\n";
+        write_file( "$_response_folder_name/$case{logresponseasfile}", {binmode => ':raw'}, $response->content ); #content just outputs the content, whereas as_string includes the response header
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
