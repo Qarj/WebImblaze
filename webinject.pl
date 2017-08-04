@@ -66,7 +66,7 @@ my (%case_save); ## when we retry, we need to re-substitute some variables
 my (%parsedresult, %varvar);
 
 our ($opt_proxy);
-our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_publish_full);
+our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
 
@@ -3402,6 +3402,8 @@ sub get_options {  #shell options
         'd|driver=s'   => \$opt_driver,
         'r|chromedriver-binary=s'   => \$opt_chromedriver_binary,
         's|selenium-binary=s'   => \$opt_selenium_binary,
+        't|selenium-host=s'   => \$opt_selenium_host,
+        'p|selenium-port=s'   => \$opt_selenium_port,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'n|no-output'   => \$opt_no_output,
         'e|verbose'   => \$opt_verbose,
@@ -3463,6 +3465,8 @@ Usage: webinject.pl test_case_file <<options>>
 -d|--driver chrome|chromedriver   -d chrome
 -r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
 -s|--selenium-binary              -s C:\selenium-server\selenium-server-standalone-2.53.1.jar
+-t|--selenium-host                -t 10.44.1.2
+-p|--selenium-port                -p 4444
 -i|--ignoreretry                  -i
 -n|--no-output                    -n
 -e|--verbose                      -e
