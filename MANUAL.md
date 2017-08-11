@@ -98,8 +98,6 @@ Adapted from the original manual written by Corey Goldberg.
 
 [addheader](#addheader)
 
-[include] (#include)
-
 [maxredirect](#maxredirect)
 
 [parms](#parms)
@@ -128,6 +126,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 [autoretry](#autoretryparm)
 
+[checkpoint](#checkpoint)
+
 [ignoreautoretry](#ignoreautoretry)
 
 [retry](#retry)
@@ -153,9 +153,9 @@ Adapted from the original manual written by Corey Goldberg.
 
 [formatxml](#formatxml)
 
-[gethrefs](#gethrefs)
+[getallhrefs](#getallhrefs)
 
-[getsrcs](#getsrcs)
+[getallsrcs](#getallsrcs)
 
 [getbackgroundimages](#getbackgroundimages)
 
@@ -172,6 +172,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 [donotrunon](#donorunon)
 
+[eval](#eval)
+
 [runif](#runif)
 
 [runon](#runon)
@@ -185,6 +187,13 @@ Adapted from the original manual written by Corey Goldberg.
 #### [3.3.9 - Test step re-use](#reuse)
 
 [include](#include)
+
+
+#### [3.3.10 - Advanced parameters](#advanced)
+
+[readsharedvar](#readsharedvar)
+
+[writesharedvar](#writesharedvar)
 
 
 ### [3.4 - Full Examples](#fullexamp)
@@ -723,6 +732,8 @@ The command line options are:
 -d|--driver chrome|chromedriver   -d chrome
 -r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
 -s|--selenium-binary              -s C:\selenium-server\selenium-server-standalone-2.53.1.jar
+-t|--selenium-host                -t 10.44.1.2
+-p|--selenium-port                -p 4444
 -i|--ignoreretry                  -i
 -n|--no-output                    -n
 -e|--verbose                      -e
@@ -801,6 +812,14 @@ Location of chromedriver executatble, e.g. `--chromedriver-binary C:\selenium-se
 `-s` or `--selenium-binary`
 
 Location of Selenium Server Standalone JAR file, e.g. `--selenium-binary C:\selenium-server\selenium-server-standalone-2.53.1.jar`
+
+`-t` or `--selenium-host`
+
+Location of Selenium (Grid) Server, e.g. `10.44.1.2`
+
+`-p` or `--selenium-port`
+
+Port of Selenium (Grid) Server, e.g. `4444`
 
 `-i` or `--ignoreretry`
 
@@ -1583,6 +1602,35 @@ Turns off auto retry from this step onwards.
 <br />
 
 
+<a name="checkpoint"></a>
+### 3.3.4 - Return to checkpoint on the event of a test step failure
+
+#### checkpoint
+
+In a video game when you fail, you are often returned to the last checkpoint to try again.
+
+This is the same concept. You set a checkpoint as follows:
+```
+    checkpoint="true"
+```
+No when a subsequent test step fails, instead of failing the test, testing resumes from the checkpoint so we can try again.
+
+This gives us a great way of dealing with a flaky, unstable or overloaded environment (like many development environments!).
+Instead of failing immediately, we try a few more times before giving up.
+
+The maximum number of attempts is governed by the `globaljumpbacks` configuration element.
+
+Note that the session will be restarted before jumping back to the checkpoint. This means you need to think carefully about
+at what points checkpoints are placed in the workflow.
+
+To turn checkpoints off for subsequent steps, set the checkpoint parameter to `false`:
+```
+    checkpoint="false"
+```
+
+<br />
+
+
 <a name="ignoreautoretry"></a>
 #### ignoreautoretry
 
@@ -1805,30 +1853,44 @@ Specifying this parameter puts a carriage return between every >< found in the r
 <br />
 
 
-<a name="gethrefs"></a>
-#### gethrefs
+<a name="getallhrefs"></a>
+#### getallhrefs
 
 Gets the hrefs referred to in the html response, and writes them to the output folder.
 
 Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
 ```
-	gethrefs=".css|.less"
+	getallhrefs=".css|.less"
 ```
+From this step onwards, grab all resources ending with `.css` or `.less`.
+
+WebInject will modify the individual step html to refer to these grabbed resources instead of the web server.
+
+This means when you look at the actual result html rendered, it will look very similar to the actual website. HTML
+without the resource files being available is often unreadable when trying to understand a test failure, so by having
+the actual assets available, it makes it much easier to interpret the results.
+
+WebInject will remember the names of resources it has grabbed, and will not grab a resource with the same name a second time
+during test execution. This means grabbing the resources will add very little overhead - most pages in a workflow will share the same CSS
+and other assets.
+
 
 <br />
 
 
-<a name="getsrcs"></a>
-#### getsrcs
+<a name="getallsrcs"></a>
+#### getallsrcs
 
 Gets the srcs referred to in the html response, and writes them to the output folder.
 
 Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
 ```
-	getsrcs=".jpg|.png|.js"
+	getallsrcs=".jpg|.png|.js|.gif"
 ```
+
+Works in the same way as getallhrefs.
 
 <br />
 
@@ -1849,6 +1911,8 @@ This will match css background images that look like this in the html source:
 ```
 <div style="background-image: url(/site-assets/teacup.jpg);" class="product-image item active"></div>
 ```
+
+Only gets background images for the current step.
 
 <br />
 
@@ -1950,6 +2014,24 @@ In your config.xml, if you had the following, then the test step would be skippe
         <environment>PROD</environment>
     </wif>
 ```
+
+<br />
+
+
+<a name="eval"></a>
+#### eval
+
+The `eval` parameter is designed to be used in conjunction with `runif`.
+
+```
+    evalRESULT="5*3"
+```
+{RESULT} will be 15.
+
+```
+    evalOLD_DATA="48-50>6"
+```
+{OLD_DATA} will be falsy.
 
 <br />
 
@@ -2062,6 +2144,37 @@ supported for the include step.**
 * The id also must use double quotes, not single (see example above)
 * The steps within the referenced file must not have the `<testcases>` and `</testcases>` tags. That is because the entire
 file is substituted for the include step.
+
+<br />
+
+
+<a name="advanced"></a>
+### 3.3.10 - Advanced parameters
+
+<a name="readsharedvar"></a>
+#### readsharedvar
+
+Will read a variable created by a previous instance of `webinject.pl`, or indeed, even one running concurrently.
+
+```
+    readsharedvar="SESSION_COOKIE"
+```
+In this example, the contents of the shared variable named SESSION_COOKIE will be read into a local variable called SESSION_COOKIE.
+If there is no shared variable called SESSION_COOKIE, then the local variable of the same name will have no value.
+
+
+<br />
+
+
+<a name="writesharedvar"></a>
+#### writesharedvar
+
+Will write a shared variable to the file system. Another instance of `webinject.pl` running under the same account will be able to read it.
+
+```
+    writesharedvar="SESSION_COOKIE|SessionID: {PARSED_COOKIE};"
+```
+Will create a shared variable called `SESSION_COOKIE` with the contents after the pipe parameter.
 
 <br />
 
@@ -2251,6 +2364,8 @@ between retries while a test case is being run.
 Variable | Description
 :------- | :----------
 **{TIMESTAMP}** | Current timestamp (floating seconds since the epoch, accurate to microseconds)
+**{EPOCHSECONDS}** | Integer seconds since the epoch
+**{EPOCHSPLIT}** | Microseconds split component of {TIMESTAMP} - i.e. after the decimal point
 **{TESTNUM}** | Id number of the current test step
 **{LENGTH}** | Length of the response for the previous test step
 **{TESTSTEPTIME:510}** | Latency for test step number 510
@@ -2259,6 +2374,7 @@ Variable | Description
 **{RANDOM:15:ALPHANUMERIC}** | Random string of 15 alphanumeric characters
 **{COUNTER}** | What loop number we are on - corresponding to the `repeat="5"` (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
+**[[[|68656c6c6f|]]]** | Packs 68656c6c6f - which coverts to the string `hello`. You can unpack a string (i.e. mask it to the casual observer) with the following Perl code `print unpack('H*','hello');`
 **{}** | Result of the response parsing from a `parseresponse` test case parameter
 **{1}** | Result of the response parsing from a `parseresponse1` test case parameter
 **{5000}** | Result of the response parsing from a `parseresponse5000` test case parameter

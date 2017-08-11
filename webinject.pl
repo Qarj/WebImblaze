@@ -1185,7 +1185,7 @@ sub get_assets { ## get page assets matching a list for a reference type
 
     my ($_match, $_left_delim, $_right_delim, $assetlist, $_type) = @_;
 
-    require URI::URL; ## So gethrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
+    require URI::URL; ## So getallhrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
     my ($_start_asset_request, $_end_asset_request, $_asset_latency);
     my ($_asset_ref, $_ur_url, $_asset_url, $_path, $_filename, $_asset_request, $_asset_response);
