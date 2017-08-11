@@ -2374,7 +2374,7 @@ Variable | Description
 **{RANDOM:15:ALPHANUMERIC}** | Random string of 15 alphanumeric characters
 **{COUNTER}** | What loop number we are on - corresponding to the `repeat="5"` (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `retryfromstep` parameter
-**[[[|68656c6c6f|]]]** | Packs 68656c6c6f - which coverts to the string `hello`. You can unpack a string (i.e. mask it to the casual observer) with the following Perl code `print unpack('H*','hello');`
+**\[\[\[\|68656c6c6f\|\]\]\]** | Packs 68656c6c6f - which coverts to the string `hello`. You can unpack a string (i.e. mask it to the casual observer) with the following Perl code `print unpack('H*','hello');`
 **{}** | Result of the response parsing from a `parseresponse` test case parameter
 **{1}** | Result of the response parsing from a `parseresponse1` test case parameter
 **{5000}** | Result of the response parsing from a `parseresponse5000` test case parameter
