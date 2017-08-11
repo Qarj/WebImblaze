@@ -8,6 +8,23 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.7.0 - Aug 11, 2017
+* included the Python 3 project search-image.py (finds a subimage within a screenshot)
+* many of the WebInject self tests now refer to webinject-check.azurewebsites.net
+* experimental checkpoint parameter added, if successful it will replace retryfromstep 
+* unconditional SLEEPs are bad and ignored by WebInject - now however WebInject will output to STDOUT and html when a sleep is invoked
+* support masked strings (for config files)
+* runif parameter added to only run a step if the parameter evaluates to truthy
+* added setcookie feature and deprecated addcookie, setcookie will permanently set a cookie for the rest of the session
+* added writesharedvar and readsharedvar for advanced use, see manual
+* replaced gethrefs and getsrcs with getallhrefs and getallsrcs - the new parameters have a scope of all subsequent steps
+* removed some redundant code and standardised the config code
+* the Results.xsl is now domain relative
+* added an eval parameter to evaluate simple expressions
+* added {EPOCHSECONDS} and {EPOCHSPLIT} to give more fine grained control as compared to {TIMESTAMP}
+* $start_timer and $end_timer do not need to be global variables
+* Selenium Grid is now supported (when using the WebInjectSelenium.pm plugin - separate project)
+
 ### Version 2.6.0 - Mar 24, 2017
 * auto retry feature introduced with autoretry and ignoreautoretry parameters
 
