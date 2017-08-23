@@ -66,7 +66,7 @@ my (%case_save); ## when we retry, we need to re-substitute some variables
 my (%parsedresult, %varvar);
 
 our ($opt_proxy);
-our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full);
+our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
 
@@ -3406,6 +3406,7 @@ sub get_options {  #shell options
         'p|selenium-port=s'   => \$opt_selenium_port,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'n|no-output'   => \$opt_no_output,
+        'l|headless'   => \$opt_headless,
         'e|verbose'   => \$opt_verbose,
         'u|publish-to=s' => \$opt_publish_full,
         )
@@ -3455,22 +3456,23 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-Usage: webinject.pl test_case_file <<options>>
+Usage: webinject.pl tests.xml <<options>>
 
-                                     examples/simple.xml
--c|--config config_file           -c config.xml
--o|--output output_location       -o output/
--a|--autocontroller               -a
--x|--proxy proxy_server           -x localhost:9222
--d|--driver chrome|chromedriver   -d chrome
--r|--chromedriver-binary          -r C:\selenium-server\chromedriver.exe
--s|--selenium-binary              -s C:\selenium-server\selenium-server-standalone-2.53.1.jar
--t|--selenium-host                -t 10.44.1.2
--p|--selenium-port                -p 4444
--i|--ignoreretry                  -i
--n|--no-output                    -n
--e|--verbose                      -e
--u|--publish-to                   -u C:\inetpub\wwwroot\this_run_home
+                                  examples/simple.xml
+-c|--config config_file           --config config.xml
+-o|--output output_location       --output output/
+-a|--autocontroller               --autocontroller
+-x|--proxy proxy_server           --proxy localhost:9222
+-d|--driver chrome|chromedriver   --driver chrome
+-r|--chromedriver-binary          --chromedriver-binary C:\selenium-server\chromedriver.exe
+-s|--selenium-binary              --selenium-binary C:\selenium-server\selenium-server-standalone-2.53.1.jar
+-t|--selenium-host                --selenium-host 10.44.1.2
+-p|--selenium-port                --selenium-port 4444
+-i|--ignoreretry                  --ignore-retry
+-n|--no-output                    --no-output
+-l|--headless                     --headless
+-e|--verbose                      --verbose
+-u|--publish-to                   --publish-to C:\inetpub\wwwroot\this_run_home
 
 or
 
