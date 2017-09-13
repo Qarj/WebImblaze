@@ -226,9 +226,9 @@ Run all WebInject core self tests
 
 <case
     id="260"
-    description1="sanitycheck"
+    description1="abort"
     method="cmd"
-    command=".\webinject.pl -o selftest\output\sanitycheck selftest\sanitycheck.xml"
+    command=".\webinject.pl -o selftest\output\sanitycheck selftest\abort.xml"
     verifypositive="TEST CASE PASSED"
     verifynegative="TEST CASE FAILED"
 />

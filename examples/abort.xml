@@ -1,8 +1,8 @@
 <testcases repeat="1">
 
 <!--
-When the sanitycheck="true" is present on a test step, then execution will be halted if
-any verification on that test step, or any verification on any previous test step has failed.
+When the abort="true" parameter is present on a test step, then execution will be halted if
+any verification on that test step has failed (after all retries have been exhausted).
 
 The idea is that it allows you to stop test execution if there is a serious problem.
 
@@ -16,7 +16,7 @@ complicated workflow.
     method="get"
     url="{WIC}"
     verifypositive="text that will not be found"
-    sanitycheck="true"
+    abort="true"
 />
 
 <case

@@ -7,24 +7,33 @@ Expected failures will be asserted by the master test file.
 
 <case
     id="10"
+    description1="Step fails"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="fail fast!NO OPERATION"
+/>
+
+<!-- The fact that the previous step failed will not cause execution to abort on step 20 -->
+<case
+    id="20"
     description1="Step passes"
     method="cmd"
     command="echo NOP"
     verifypositive="NOP"
-    sanitycheck="true"
-/>
-
-<case
-    id="20"
-    description1="Step fails - execution will be aborted"
-    method="cmd"
-    command="echo NOP"
-    verifypositive="No Operation"
-    sanitycheck="true"
+    abort="true"
 />
 
 <case
     id="30"
+    description1="Step fails - execution will be aborted"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="No Operation"
+    abort="true"
+/>
+
+<case
+    id="40"
     description1="Test step will not be run"
     method="cmd"
     command="echo Will not be seen"

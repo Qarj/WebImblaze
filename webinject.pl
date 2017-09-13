@@ -58,7 +58,7 @@ my ($cookie_jar, @http_auth);
 
 our ($case_failed_count, $passed_count, $failed_count);
 our ($is_failure);
-my ($run_count, $total_run_count, $case_passed_count);
+my ($run_count, $total_run_count, $case_passed_count, $case_failed);
 my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
 
 our (%case);
@@ -79,7 +79,6 @@ my ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step 
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print); ## retry failed tests
 my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry, $checkpoint);
 my $attempts_since_last_success = 0;
-my ($sanity_result); ## if a sanity check fails, execution will stop (as soon as all retries are exhausted on the current test case)
 my ($xml_test_cases, $step_index, @test_steps);
 
 our ($output, $output_folder); ## output path including possible filename prefix, output path without filename prefix, output prefix only
@@ -272,8 +271,8 @@ foreach ($start .. $repeat) {
         } ## end of retry loop
         until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
 
-        if ($case{sanitycheck} && ($case_failed_count > 0)) { ## if sanitycheck fails (i.e. we have had any error at all after retries exhausted), then execution is aborted
-            $results_stdout .= qq|SANITY CHECK FAILED ... Aborting \n|;
+        if ($case{abort} && $case_failed) { ## if abort (i.e. this case (test step) failed all after retries exhausted), then execution is aborted
+            $results_stdout .= qq|EXECUTION ABORTED!!! \n|;
             last;
         }
     } ## end of test case loop
@@ -401,7 +400,7 @@ sub substitute_variables {
     ## "verifynegative", "verifynegative1", ... "verifynegative9999",
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
     ## "verifyresponsetime", "sleep", "errormessage", "ignorehttpresponsecode", "ignoreautoassertions", "ignoresmartassertions",
-    ## "retry", "sanitycheck", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "formatxml", "formatjson",
+    ## "retry", "abort", "logastext", "section", "assertcount", "searchimage", ... "searchimage5", "formatxml", "formatjson",
     ## "logresponseasfile", "addcookie", "restartbrowseronfail", "restartbrowser", "commandonerror", "getallhrefs", "getallsrcs", "getbackgroundimages",
     ## "firstlooponly", "lastlooponly", "decodequotedprintable"
 
@@ -606,6 +605,7 @@ sub execute_test_step {
 sub pass_fail_or_retry {
 
     $attempts_since_last_success++; ## assume failure, will be reset to 0 if that is not the case (used by auto retry)
+    $case_failed = 0; ## assume this case passed (for abort parameter logic)
 
     ## check max jumpbacks - globaljumpbacks - i.e. retryfromstep usages before we give up - otherwise we risk an infinite loop
     if ( ($is_failure && !( retry_available() || retry_from_step_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
@@ -627,6 +627,7 @@ sub pass_fail_or_retry {
                 $return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
             }
         }
+        $case_failed = 1; ## for abort paramter logic
         $case_failed_count++;
     }
     elsif (($is_failure > 0) && ($retry > 0)) {#Output message if we will retry the test case
@@ -949,11 +950,9 @@ sub write_final_html {  #write summary and closing tags for results file
 #------------------------------------------------------------------
 sub write_final_xml {  #write summary and closing tags for XML results file
 
-    if ($case{sanitycheck} && ($case_failed_count > 0)) { ## sanitycheck
-        $sanity_result = 'false';
-    }
-    else {
-        $sanity_result = 'true';
+    my $_execution_aborted = 'false';
+    if ($case{abort} && ($case_failed_count > 0)) {
+        $_execution_aborted = 'true';
     }
 
     $results_xml .= qq|    </testcases>\n\n|;
@@ -974,7 +973,7 @@ sub write_final_xml {  #write summary and closing tags for XML results file
     $results_xml .= qq|        <average-response-time>$avg_response</average-response-time>\n|;
     $results_xml .= qq|        <max-response-time>$max_response</max-response-time>\n|;
     $results_xml .= qq|        <min-response-time>$min_response</min-response-time>\n|;
-    $results_xml .= qq|        <sanity-check-passed>$sanity_result</sanity-check-passed>\n|;
+    $results_xml .= qq|        <execution-aborted>$_execution_aborted</execution-aborted>\n|;
     $results_xml .= qq|        <test-file-name>$testfilename</test-file-name>\n|;
     $results_xml .= qq|    </test-summary>\n\n|;
 

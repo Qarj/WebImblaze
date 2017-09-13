@@ -179,9 +179,9 @@ Adapted from the original manual written by Corey Goldberg.
 [runon](#runon)
 
 
-#### [3.3.7 - Parameters to end execution early due to assertion failures](#sanity)
+#### [3.3.7 - Parameters to end execution early due to assertion failures](#abort)
 
-[sanitycheck](#sanitycheck)
+[abort](#abort)
 
 
 #### [3.3.9 - Test step re-use](#reuse)
@@ -2086,20 +2086,20 @@ In your config.xml, if you had the following, then the test step would be skippe
 <br />
 
 
-<a name="sanity"></a>
+<a name="abort"></a>
 ### 3.3.7 - Parameters to halt execution early if assertions have failed
 
-<a name="sanitycheck"></a>
-#### sanitycheck
+<a name="abort"></a>
+#### abort
 
-Used to fail a test run early. If you specify the sanitycheck parameter on a test case, and the
-test case fails, or any previous test has failed, then the test run is aborted.
+Used to abort a test run early. If you specify the abort parameter on a test case, and the
+test case fails (after all retries have been exhausted), then the test run is aborted.
 
 This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
 like getting the home page, fails, then there little point running the rest of the tests.
 
 ```
-    sanitycheck="true"
+    abort="true"
 ```
 
 <br />
