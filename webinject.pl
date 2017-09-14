@@ -3450,11 +3450,19 @@ sub get_options {  #shell options
 sub print_version {
     print "\nWebInject version $VERSION\nFor more info: https://github.com/Qarj/WebInject\n\n";
 
+    if (-e 'plugins/WebInjectSelenium.pm') {
+        require 'plugins/WebInjectSelenium.pm';
+        WebInjectSelenium::print_version();
+    }
+
     return;
 }
 
 sub print_usage {
         print <<'EOB'
+webinject.pl -v|--version
+webinject.pl -h|--help
+
 Usage: webinject.pl tests.xml <<options>>
 
                                   examples/simple.xml
@@ -3462,23 +3470,16 @@ Usage: webinject.pl tests.xml <<options>>
 -o|--output output_location       --output output/
 -a|--autocontroller               --autocontroller
 -x|--proxy proxy_server           --proxy localhost:9222
--d|--driver chrome|chromedriver   --driver chrome
--r|--chromedriver-binary          --chromedriver-binary C:\selenium-server\chromedriver.exe
--s|--selenium-binary              --selenium-binary C:\selenium-server\selenium-server-standalone-2.53.1.jar
--t|--selenium-host                --selenium-host 10.44.1.2
--p|--selenium-port                --selenium-port 4444
 -i|--ignoreretry                  --ignore-retry
 -n|--no-output                    --no-output
--l|--headless                     --headless
 -e|--verbose                      --verbose
 -u|--publish-to                   --publish-to C:\inetpub\wwwroot\this_run_home
-
-or
-
-webinject.pl --version|-v
-webinject.pl --help|-h
 EOB
     ;
+
+    if (-e 'plugins/WebInjectSelenium.pm') {
+        WebInjectSelenium::print_usage();
+    }
 
     return;
 }
