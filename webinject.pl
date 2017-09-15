@@ -97,8 +97,13 @@ my $assertion_skips_message = q{}; ## support tagging an assertion as disabled w
 my (@hrefs, @srcs, @bg_images, %asset); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my ($getallsrcs, $getallhrefs, %href_path, %src_path);
 my $session_started; ## only start up http sesion if http is being used
-my ($testfile_contains_selenium); ## so we know if Selenium Browser Session needs to be started
 my $shared_folder_full;
+
+my ($testfile_contains_selenium, $selenium_plugin_present); ## so we know if Selenium Browser Session needs to be started
+if (-e 'plugins/WebInjectSelenium.pm') {
+    require 'plugins/WebInjectSelenium.pm';
+    $selenium_plugin_present = 1;
+}
 
 ## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
 my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
@@ -165,12 +170,12 @@ $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 read_test_case_file();
 
 ## only import WebInjectSelenium.pm package if test case file contains "selenium"
-my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
-my $file_to_require = $module_to_import;
-$file_to_require =~ s[::][/]g;
-$file_to_require .= '.pm';
-require $file_to_require;
-$module_to_import->import;
+#my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
+#my $file_to_require = $module_to_import;
+#$file_to_require =~ s[::][/]g;
+#$file_to_require .= '.pm';
+#require $file_to_require;
+#$module_to_import->import;
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 $repeat //= 1;  #set to 1 in case it is not defined in test case file
@@ -3398,16 +3403,16 @@ sub get_options {  #shell options
         'o|output=s'    => \$opt_output,
         'a|autocontroller'    => \$opt_autocontroller,
         'x|proxy=s'   => \$opt_proxy,
-        'd|driver=s'   => \$opt_driver,
+        'i|ignoreretry'   => \$opt_ignoreretry,
+        'n|no-output'   => \$opt_no_output,
+        'e|verbose'   => \$opt_verbose,
+        'u|publish-to=s' => \$opt_publish_full,
+        'd|driver=s'   => \$opt_driver, ## Selenium plugin options start here
         'r|chromedriver-binary=s'   => \$opt_chromedriver_binary,
         's|selenium-binary=s'   => \$opt_selenium_binary,
         't|selenium-host=s'   => \$opt_selenium_host,
         'p|selenium-port=s'   => \$opt_selenium_port,
-        'i|ignoreretry'   => \$opt_ignoreretry,
-        'n|no-output'   => \$opt_no_output,
         'l|headless'   => \$opt_headless,
-        'e|verbose'   => \$opt_verbose,
-        'u|publish-to=s' => \$opt_publish_full,
         )
         or do {
             print_usage();
@@ -3450,10 +3455,7 @@ sub get_options {  #shell options
 sub print_version {
     print "\nWebInject version $VERSION\nFor more info: https://github.com/Qarj/WebInject\n\n";
 
-    if (-e 'plugins/WebInjectSelenium.pm') {
-        require 'plugins/WebInjectSelenium.pm';
-        WebInjectSelenium::print_version();
-    }
+    if ($selenium_plugin_present) { WebInjectSelenium::print_version(); }
 
     return;
 }
@@ -3477,9 +3479,7 @@ Usage: webinject.pl tests.xml <<options>>
 EOB
     ;
 
-    if (-e 'plugins/WebInjectSelenium.pm') {
-        WebInjectSelenium::print_usage();
-    }
+    if ($selenium_plugin_present) { WebInjectSelenium::print_usage(); }
 
     return;
 }
