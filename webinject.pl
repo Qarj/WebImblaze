@@ -66,7 +66,7 @@ my (%case_save); ## when we retry, we need to re-substitute some variables
 my (%parsedresult, %varvar);
 
 our ($opt_proxy);
-our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless);
+our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
 
@@ -3413,6 +3413,8 @@ sub get_options {  #shell options
         't|selenium-host=s'   => \$opt_selenium_host,
         'p|selenium-port=s'   => \$opt_selenium_port,
         'l|headless'   => \$opt_headless,
+        'k|keep-session'   => \$opt_keep_session,
+        'm|resume-session'   => \$opt_resume_session,
         )
         or do {
             print_usage();
