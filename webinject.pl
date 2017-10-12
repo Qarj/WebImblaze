@@ -1818,7 +1818,7 @@ sub _shell_adjust {
     } else {
         ${$_parm} =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
         ${$_parm} =~ s/{SLASH}/\//g;
-        ${$_parm} =~ s{^.\\}{perl ./}; ## for running perl scripts from within webinject using perlbrew
+        ${$_parm} =~ s{^[.][/\\]}{perl ./}; ## for running perl scripts from within webinject using perlbrew
         ${$_parm} =~ s/{SHELL_ESCAPE}/\\/g;
     }
 
