@@ -1812,11 +1812,11 @@ sub _shell_adjust {
 
     # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
     if ($is_windows) {
-        ${$_parm} =~ s{^[.]/}{perl .\\}; ## for running perl scripts from within webinject using perlbrew
+        ${$_parm} =~ s{^[.]/}{.\\};
         ${$_parm} =~ s/{SLASH}/\\/g;
         ${$_parm} =~ s/{SHELL_ESCAPE}/\^/g;
     } else {
-        ${$_parm} =~ s{^.\\}{./};
+        ${$_parm} =~ s{^.\\}{perl ./}; ## for running perl scripts from within webinject using perlbrew
         ${$_parm} =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
         ${$_parm} =~ s/{SLASH}/\//g;
         ${$_parm} =~ s/{SHELL_ESCAPE}/\\/g;
