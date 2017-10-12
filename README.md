@@ -35,7 +35,7 @@ That's it! You are now ready to run WebInject for the first time.
     sudo cpan File::Slurp
     sudo cpan XML::Simple
     sudo cpan Math::Random::ISAAC
-    sudo cpan LWP::Protocol:https
+    sudo cpan LWP::Protocol::https
     ```
 
 3. Check that you can see the WebInject help info
@@ -43,7 +43,7 @@ That's it! You are now ready to run WebInject for the first time.
     perl webinject.pl --help
     ```
 
-Tested with Fedora 23, 24, Ubuntu 16.04, Linux Mint 18 xfce, OS X El Capitan and macOS 10.12.
+Tested with Fedora 26, Ubuntu 16.04, Linux Mint 18 and 18.1, OS X El Capitan and macOS 10.12.
 
 ### Create your first WebInject test
 

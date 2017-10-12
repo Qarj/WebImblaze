@@ -1812,7 +1812,7 @@ sub _shell_adjust {
 
     # {SLASH} will be a back slash if running on Windows, otherwise a forward slash
     if ($is_windows) {
-        ${$_parm} =~ s{^[.]/}{.\\};
+        ${$_parm} =~ s{^[.]/}{perl .\\}; ## for running perl scripts from within webinject using perlbrew
         ${$_parm} =~ s/{SLASH}/\\/g;
         ${$_parm} =~ s/{SHELL_ESCAPE}/\^/g;
     } else {

@@ -10,7 +10,7 @@ Expected failures will be asserted by the master test file.
     description1="Get page over SSL"
     method="get"
     url="https://www.totaljobs.com"
-    errormessage="Could not get www.totaljobs.com over SSL, maybe need to LWP::Protocol:https"
+    errormessage="Could not get www.totaljobs.com over SSL, maybe need to cpan LWP::Protocol::https"
 />
 
 <case
@@ -22,7 +22,7 @@ Expected failures will be asserted by the master test file.
     posttype="application/json"
     addheader="Content-Type	application/x-www-form-urlencoded; charset=UTF-8"
     verifypositive="admin_county"
-    errormessage="Could not post json to api.postcodes.io over SSL, maybe need to cpan LWP::Protocol:https"
+    errormessage="Could not post json to api.postcodes.io over SSL, maybe need to cpan LWP::Protocol::https"
     formatjson="true"
 />
 
