@@ -35,6 +35,7 @@ That's it! You are now ready to run WebInject for the first time.
     sudo cpan File::Slurp
     sudo cpan XML::Simple
     sudo cpan Math::Random::ISAAC
+    sudo cpan LWP::Protocol:https
     ```
 
 3. Check that you can see the WebInject help info
