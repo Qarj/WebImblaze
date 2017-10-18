@@ -9,3 +9,4 @@ temp/
 WebInjectSelenium.pm
 tests/*.xml
 tests/*.csv
+session.config

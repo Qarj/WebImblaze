@@ -238,6 +238,10 @@ Adapted from the original manual written by Corey Goldberg.
 
 ### [7.1 - Parallel Execution](#parallel)
 
+### [7.2 - Advanced Assertions](#advancedassertions)
+
+#### [7.2.1 Advanced assertion - at least n occurences](#atleastn)
+
 <a name="archsoft"></a>
 ## 1 - Software Architecture
 
@@ -2752,3 +2756,57 @@ Will be sent to the server as:
 
 WebInject can be run in parallel / concurrently with no problem. The only thing to keep in mind is to be sure to
 specify different output locations for each instance of WebInject.
+
+
+<a name="advancedassertions"></a>
+### 7.2 Advanced Assertions
+
+Since WebInject uses regular expressions for the verifypositive and verifynegative assertions, it is possible
+to concoct advanced assertions. Unfortunately regular expressions are a complicated topic, so this section
+contains some patterns that are easy to apply to your test suites.
+
+<a name="atleastn"></a>
+#### 7.2.1 Advanced assertion - at least n occurences
+
+Imagine we have a dashboard that contains statistics on jobs processed per day. Say data returned looks like this:
+
+```
+01/01/2018 00:35 00:52 67945 589 2
+02/01/2018 00:35 00:52 98231 129 9
+03/01/2018 00:35 00:52 88331 381 0
+04/01/2018 00:35 00:52 76235 239 35
+
+...
+```
+
+Statistics for the last 20 days are shown. Note the last 3 numbers for each row, the first number is the number
+of jobs processed per day, the second is the number of matches, and the third is the number of failures.
+
+As a bare minimum, in production, there should be at least 10000 jobs processed per day. At least 100 matches
+should be made, and there will be 0 or more exceptions. 
+
+We can make a regular expression to match the first row like this: `\d{5,} \d{3,} \d{1,}`
+
+If we want to ensure that there are 20 rows that match this pattern, you could use this test step:
+
+```xml
+<case
+    varREGEX_THAT_GRABS_FIRST_MATCH='\d{5,} \d{3,} \d{1,}'
+    varMINIMUM_OCCURRENCES="20"
+    varFAILURE_MESSAGE="Should at {MINIMUM_OCCURRENCES} of at least 10000 jobs processed per day"
+    id="10"
+    description1="Check job processing dashboard statistics"
+    method="get"
+    url="http://example.com/JobProcessingDashboard"
+	verifypositive1="Job Match Dashboard"
+    verifypositive2='(?:.*?(?>{REGEX_THAT_GRABS_FIRST_MATCH})){{MINIMUM_OCCURRENCES},}?|||{FAILURE_MESSAGE}'
+/>
+```
+
+All you need to do is change the three `var` values.
+
+Note that in this example that back tracking is turned off by the `?>` to prevent catastrophic back tracking.
+
+If your regular expression requires back tracking, then you should remove the `?>`. If you do this you should
+modify your target regular expression so that it is more exact, otherwise WebInject will hang if it can't find
+all occurrences. https://www.regular-expressions.info/catastrophic.html
