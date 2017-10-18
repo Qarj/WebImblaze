@@ -2408,16 +2408,6 @@ Constant | Description
 **{AMPERSAND}** | Gives you a &
 **{LESSTHAN}** | Gives you a <
 **{SINGLEQUOTE}** | Gives you a '
-**{DAY}** | The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
-**{MONTH}** | The month number of the year at run start with leading 0, e.g. 05 [denoting May]
-**{YEAR}** | The year at run start as 4 digits, e.g. 2016
-**{YY}** | The year at run start as 2 digits, e.g. 16
-**{HH}** | The run start hour in 24hr time with leading 0, e.g. 15
-**{MM}** | The run start minute with leading 0, e.g. 09
-**{SS}** | The run start second with leading 0
-**{WEEKOFMONTH}** | The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
-**{DATETIME}** | The run start date and time without formatting - yearmonthdayhourminutesecond
-**{FORMATDATETIME}** | The run start date and time with formatting - day/month/year_hour:minute:second
 **{CWD}** | Current working directory
 **{OUTPUT}** | WebInject output directory name, or "no output" if output is suppressed
 **{HOSTNAME}** | Name of the computer currently running WebInject
@@ -2447,6 +2437,49 @@ You can then rewrite the test case parameter as:
 ```
 
 This is helpful if you want to point your tests at different environments by changing a single setting.
+
+<br />
+
+Variables related to date are also set at execution start time.
+
+Date Variable | Description
+:------- | :----------
+**{DAY}** | The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
+**{MONTH}** | The month number of the year at run start with leading 0, e.g. 05 [denoting May]
+**{YEAR}** | The year at run start as 4 digits, e.g. 2016
+**{YY}** | The year at run start as 2 digits, e.g. 16
+**{HH}** | The run start hour in 24hr time with leading 0, e.g. 15
+**{MM}** | The run start minute with leading 0, e.g. 09
+**{SS}** | The run start second with leading 0
+**{WEEKOFMONTH}** | The run start week number of month with leading 0 e.g. 05 [fifth week of the month]
+**{DATETIME}** | The run start date and time without formatting - yearmonthdayhourminutesecond
+**{FORMATDATETIME}** | The run start date and time with formatting - day/month/year_hour:minute:second
+
+However they can be modified on a case by case basis to generate different dates.
+
+```xml
+    description1="{DATE:::-2*3}Day_Month_Year: {DAY}_{MONTH}_{YEAR}"
+```
+In this example, 6 days are substracted from the test run start date - for the description1 parameter only.
+
+```xml
+    command="REM Hello World {DATE:::+1/24}Hour_Minute_Second: {HH}_{MM}_{SS}"
+```
+In this example, 1 hour is added to the test run start date.
+
+It does not matter where you put the `{DATE:::expression}` modifier in the parameter. It will be removed
+(so long as the expression is valid) and the date variables will be modified accordingly. The date modification
+is valid only for that parameter.
+
+The expression can contain the digits 0 to 9 and the operators + - * /.
+
+Consider this final example:
+```xml
+    verifypositive1="{DAY}/{MONTH}/{YEAR}"
+    verifypositive2="{DATE:::1}{DAY}/{MONTH}/{YEAR}"
+    verifypositive3="{DATE:::2}{DAY}/{MONTH}/{YEAR}"
+```
+If today is 31/10/2017 then 31/10/2017, 01/11/2017 and 02/11/2017 will be asserted.
 
 <br />
 
@@ -2798,7 +2831,7 @@ If we want to ensure that there are 20 rows that match this pattern, you could u
     description1="Check job processing dashboard statistics"
     method="get"
     url="http://example.com/JobProcessingDashboard"
-	verifypositive1="Job Match Dashboard"
+    verifypositive1="Job Match Dashboard"
     verifypositive2='(?:.*?(?>{REGEX_THAT_GRABS_FIRST_MATCH})){{MINIMUM_OCCURRENCES},}?|||{FAILURE_MESSAGE}'
 />
 ```

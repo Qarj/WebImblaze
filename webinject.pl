@@ -49,7 +49,7 @@ my ($useragent);
 our ($latency, $verification_latency, $screenshot_latency);
 my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP}, {EPOCHSECONDS} - global so all substitutions in a test step have same timestamp
 my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
-my ($current_date_time, $total_run_time);
+my ($start_date_time, $total_run_time);
 my ($total_response, $avg_response, $max_response, $min_response);
 my (%test_step_time); ## record in a hash the latency for every step for later use
 my ($start_time); ## to store a copy of $start_run_timer in a global variable
@@ -120,7 +120,7 @@ $MINUTE = sprintf '%02d', $MINUTE; #put in up to 2 leading zeros
 $SECOND = sprintf '%02d', $SECOND;
 $HOUR = sprintf '%02d', $HOUR;
 my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
-$current_date_time = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
+$start_date_time = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
 my $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
@@ -927,7 +927,7 @@ sub write_final_html {  #write summary and closing tags for results file
 
     $results_html .= qq|<br /><hr /><br />\n|;
     $results_html .= qq|<b>\n|;
-    $results_html .= qq|Start Time: $current_date_time <br />\n|;
+    $results_html .= qq|Start Time: $start_date_time <br />\n|;
     $results_html .= qq|Total Run Time: $total_run_time seconds <br />\n|;
     $results_html .= qq|Total Response Time: $total_response seconds <br />\n|;
     $results_html .= qq|<br />\n|;
@@ -963,7 +963,7 @@ sub write_final_xml {  #write summary and closing tags for XML results file
     $results_xml .= qq|    </testcases>\n\n|;
 
     $results_xml .= qq|    <test-summary>\n|;
-    $results_xml .= qq|        <start-time>$current_date_time</start-time>\n|;
+    $results_xml .= qq|        <start-time>$start_date_time</start-time>\n|;
     $results_xml .= qq|        <start-seconds>$TIMESECONDS</start-seconds>\n|;
     $results_xml .= qq|        <start-date-time>$STARTDATE|;
     $results_xml .= qq|T$HOUR:$MINUTE:$SECOND</start-date-time>\n|;
@@ -993,7 +993,7 @@ sub write_final_xml {  #write summary and closing tags for XML results file
 #------------------------------------------------------------------
 sub write_final_stdout {  #write summary and closing text for STDOUT
 
-    $results_stdout .= qq|Start Time: $current_date_time\n|;
+    $results_stdout .= qq|Start Time: $start_date_time\n|;
     $results_stdout .= qq|Total Run Time: $total_run_time seconds\n\n|;
     $results_stdout .= qq|Total Response Time: $total_response seconds\n\n|;
 
@@ -2644,6 +2644,40 @@ sub _does_testfile_contain_selenium {
 ## no critic (RequireArgUnpacking)
 sub convert_back_xml {  #converts replaced xml with substitutions
 
+## perform substitution modifiers first
+
+    my $_YEAR = $YEAR;
+    my $_YY = $YY;
+    my $_MONTH = $MONTH;
+    my $_MONTH_TEXT = $MONTH_TEXT;
+    my $_DAYOFMONTH = $DAYOFMONTH;
+    my $_WEEKOFMONTH = $WEEKOFMONTH;
+    my $_STARTDATE = $STARTDATE;
+    my $_MINUTE = $MINUTE;
+    my $_SECOND = $SECOND;
+    my $_HOUR = $HOUR;
+
+    if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
+
+        my $_DAYLIGHTSAVINGS;
+        my $_YEAROFFSET;
+        my $_DAYOFWEEK;
+        my $_DAYOFYEAR;
+        
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime($start_time + (eval($1)*86400));
+
+        $_YEAR = 1900 + $_YEAROFFSET;
+        $_YY = substr $_YEAR, 2; #year as 2 digits
+        $_MONTH_TEXT = $MONTHS_TEXT[$_MONTH];
+        $_DAYOFMONTH = sprintf '%02d', $_DAYOFMONTH;
+        $_WEEKOFMONTH = int(($_DAYOFMONTH-1)/7)+1;
+        $_STARTDATE = "$_YEAR-$MONTHS[$_MONTH]-$_DAYOFMONTH";
+        $_MINUTE = sprintf '%02d', $_MINUTE; #put in up to 2 leading zeros
+        $_SECOND = sprintf '%02d', $_SECOND;
+        $_HOUR = sprintf '%02d', $_HOUR;
+
+    }
+
 ## perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
     my ($_value, $_KEY);
     foreach my $_key (keys %{ $config->{userdefined} } ) {
@@ -2692,24 +2726,24 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     }
 
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
-    $_[0] =~ s/{DAY}/$DAYOFMONTH/g;
-    $_[0] =~ s/{MONTH}/$MONTHS[$MONTH]/g;
-    $_[0] =~ s/{YEAR}/$YEAR/g; #4 digit year
-    $_[0] =~ s/{YY}/$YY/g; #2 digit year
-    $_[0] =~ s/{HH}/$HOUR/g;
-    $_[0] =~ s/{MM}/$MINUTE/g;
-    $_[0] =~ s/{SS}/$SECOND/g;
-    $_[0] =~ s/{WEEKOFMONTH}/$WEEKOFMONTH/g;
-    $_[0] =~ s/{DATETIME}/$YEAR$MONTHS[$MONTH]$DAYOFMONTH$HOUR$MINUTE$SECOND/g;
+    $_[0] =~ s/{DAY}/$_DAYOFMONTH/g;
+    $_[0] =~ s/{MONTH}/$MONTHS[$_MONTH]/g;
+    $_[0] =~ s/{YEAR}/$_YEAR/g; #4 digit year
+    $_[0] =~ s/{YY}/$_YY/g; #2 digit year
+    $_[0] =~ s/{HH}/$_HOUR/g;
+    $_[0] =~ s/{MM}/$_MINUTE/g;
+    $_[0] =~ s/{SS}/$_SECOND/g;
+    $_[0] =~ s/{WEEKOFMONTH}/$_WEEKOFMONTH/g;
+    $_[0] =~ s/{DATETIME}/$_YEAR$MONTHS[$_MONTH]$_DAYOFMONTH$_HOUR$_MINUTE$_SECOND/g;
     my $_underscore = '_';
-    $_[0] =~ s{{FORMATDATETIME}}{$DAYOFMONTH\/$MONTHS[$MONTH]\/$YEAR$_underscore$HOUR:$MINUTE:$SECOND}g;
+    $_[0] =~ s{{FORMATDATETIME}}{$_DAYOFMONTH\/$MONTHS[$_MONTH]\/$_YEAR$_underscore$_HOUR:$_MINUTE:$_SECOND}g;
+
     $_[0] =~ s/{COUNTER}/$counter/g;
-    $_[0] =~ s/{CONCURRENCY}/$concurrency/g; #name of the temporary folder being used - not full path
+    $_[0] =~ s/{CONCURRENCY}/$concurrency/g; ## name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$output/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;
-## CWD Current Working Directory
-    $_[0] =~ s/{CWD}/$this_script_folder_full/g;
+    $_[0] =~ s/{CWD}/$this_script_folder_full/g; ## CWD Current Working Directory
 
 ## parsedresults moved before config so you can have a parsedresult of {BASEURL2} say that in turn gets turned into the actual value
 
