@@ -282,6 +282,8 @@ foreach ($start .. $repeat) {
         }
     } ## end of test case loop
 
+    if ($case{abort} && $case_failed) { last; } ## get out of repeat loop too
+
     $testnum = 1;  #reset testcase counter so it will reprocess test case file if repeat is set
 } ## end of repeat loop
 
