@@ -1072,7 +1072,7 @@ sub setcookie {
 
         my @_cookies = split /;/, $case{setcookie};
         foreach my $_cookie (@_cookies) {
-            my ($_key, $_value) = split /:/, $_cookie;
+            my ($_key, $_value) = split /:/, $_cookie, 2;
             $_key = trim($_key);
             $_value = trim($_value);
             $results_stdout .= " Set cookie -> $_key: $_value\n";
