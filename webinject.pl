@@ -31,6 +31,7 @@ use File::Basename;
 use File::Spec;
 use File::Slurp;
 use LWP;
+use LWP::Protocol::http;
 use HTTP::Request::Common;
 use XML::Simple;
 use Time::HiRes qw( time sleep gettimeofday );
@@ -3377,6 +3378,8 @@ sub start_session {     ## creates the webinject user agent
     require IO::Socket::SSL;
     #require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
     require HTTP::Cookies;
+
+    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0); ## to prevent: Header line too long (limit is 8192)
 
     #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
