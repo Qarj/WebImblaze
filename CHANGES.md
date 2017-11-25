@@ -8,6 +8,17 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.8.0 - Nov 25, 2017
+* renamed the sanitycheck parameter to abort, and changed the way that it works, including a bug fix
+* command line options for WebInject-Selenium plugin are now shown by the plugin, for a cleaner display if plugin is not installed
+* removed logic that only loaded the WebInject-Selenium plugin if Selenium tests are detected - simpflies logic for only a slight startup time hit
+* added a selftest for SSL, updated installation instructions for Linux to ensure LWP::Protocol::https is installed
+* updated instructions for use of perlbrew with a Mac, and fixed a bug so the self tests can run on a Mac
+* added an advanced assertion examples section to the manual
+* now support so called substitution modifiers to alter the date (which is NOW by default)
+* setcookie now supports the colon character in a cookie
+* removed 8192 character line limit size in headers
+
 ### Version 2.7.0 - Aug 11, 2017
 * included the Python 3 project search-image.py (finds a subimage within a screenshot)
 * many of the WebInject self tests now refer to webinject-check.azurewebsites.net

@@ -1,0 +1,24 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Unmask a string - [[[|68656c6c6f|]]] world"
+    method="cmd"
+    command="REM [[[|68656c6c6f|]]] there"
+    verifypositive="hello there"
+/>
+
+<case
+    id="20"
+    description1="Mask a string"
+    method="cmd"
+    command='perl -e "print unpack(q|H*|, q|hello|)"'
+    verifypositive="68656c6c6f"
+/>
+
+</testcases>
