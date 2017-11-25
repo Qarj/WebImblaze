@@ -10,10 +10,21 @@ WebInject is very easy to setup and run. An example is test included.
 
 ### Windows
 
-1. Download WebInject from GitHub as a ZIP and extract it somewhere. For simplicity, extract it to C:\git\WebInject so that the file `C:\git\Webinject\webinject.pl` exists.
-    * There is no need install it, or build or compile anything.
+1. It doesn't matter where you put WebInject, for simplicity, put it in `C:\git`
+    ```
+    mkdir C:\git
+    ```
 
-2. Install Strawberry Perl.
+2. If you have git installed, then just clone the repository
+    ```
+    cd /D C:\git
+    git clone https://github.com/Qarj/WebInject.git
+    ```
+    
+    If you don't have git, then download WebInject from GitHub as a ZIP and extract it somewhere.
+    To better follow the examples, extract it to C:\git\WebInject so that the file `C:\git\Webinject\webinject.pl` exists.
+
+3. Install Strawberry Perl.
     * Navigate to http://strawberryperl.com/
     * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
@@ -82,15 +93,15 @@ Edit the file with your favourite text editor and copy paste the following then 
 
 ### Run your first WebInject test
 
-1. Open the Command Prompt up as an Administrator
+1. Open the Command Prompt
     * Press the Windows Key
     * Type `cmd`
-    * Right click on `cmd.exe` then select `Run as Administrator`
+    * Press Enter
 
 2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called `C:\git\WebInject`, then
-    * `CD C:\git\WebInject` then press 'Enter'
+    * `cd C:\git\WebInject` then press 'Enter'
 
-3. Now type `webinject.pl tests/hello.xml` and hit 'Enter'
+3. Now type `perl webinject.pl tests/hello.xml` and hit 'Enter'
 
 If everything worked ok, then you'll see something like the following:
 
