@@ -10,12 +10,16 @@ WebInject is very easy to setup and run. An example is test included.
 
 ### Windows
 
-1. It doesn't matter where you put WebInject, for simplicity, put it in `C:\git`
+1. Install Strawberry Perl.
+    * Navigate to http://strawberryperl.com/
+    * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+
+2. It doesn't matter where you put WebInject, for simplicity, put it in `C:\git`
     ```
     mkdir C:\git
     ```
 
-2. If you have git installed, then just clone the repository
+3. If you have git installed, then just clone the repository
     ```
     cd /D C:\git
     git clone https://github.com/Qarj/WebInject.git
@@ -24,9 +28,6 @@ WebInject is very easy to setup and run. An example is test included.
     If you don't have git, then download WebInject from GitHub as a ZIP and extract it somewhere.
     To better follow the examples, extract it to C:\git\WebInject so that the file `C:\git\Webinject\webinject.pl` exists.
 
-3. Install Strawberry Perl.
-    * Navigate to http://strawberryperl.com/
-    * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
 That's it! You are now ready to run WebInject for the first time.
 

@@ -8,7 +8,7 @@ After execution of step 10, WebInject waits 2 seconds.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive1="WebInject"
     sleep="2"
 />
@@ -17,7 +17,7 @@ After execution of step 10, WebInject waits 2 seconds.
     id="20"
     description1="Get Home page again"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive1="WebInject"
 />
 

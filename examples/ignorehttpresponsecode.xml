@@ -12,14 +12,14 @@ In this example, Step 10 fails, but Step 20 passes since we ignore error codes (
     id="10"
     description1="Get Non existant page"
     method="get"
-    url="{WIC}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
 />
 
 <case
     id="20"
     description1="Get Non existant page"
     method="get"
-    url="{WIC}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
     ignorehttpresponsecode="true"
 />
 

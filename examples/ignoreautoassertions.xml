@@ -16,7 +16,7 @@ then this asertion would not be run if this parameter is present on a test step.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive1="WebInject"
     ignoreautoassertions="true"
 />

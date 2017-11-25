@@ -10,7 +10,7 @@ not fail.
     id="10"
     description1="Get a page that does not exist"
     method="get"
-    url="{WIC}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
     verifyresponsecode="404"
 />
 

@@ -13,7 +13,7 @@ Note how the {JUMPBACKS} variable increases each time retryfromstep is executed.
     id="10"
     description1="Get Home page - jumpbacks so far: {JUMPBACKS}"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive1="WebInject"
 />
 
@@ -21,7 +21,7 @@ Note how the {JUMPBACKS} variable increases each time retryfromstep is executed.
     id="20"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive1="WebInject Test Tool"
     retryfromstep="10"
 />

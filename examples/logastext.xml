@@ -12,7 +12,7 @@ as raw text, rather than as html markup.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive="automated testing examples"
     logastext="true"
 />

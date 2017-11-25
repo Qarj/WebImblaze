@@ -13,7 +13,7 @@ output of the command at the very end of the file.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive="text that will not be found"
     commandonerror="echo send_email_to_ops.bat"
 />

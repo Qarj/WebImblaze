@@ -14,7 +14,7 @@ complicated workflow.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive="text that will not be found"
     abort="true"
 />
@@ -23,7 +23,7 @@ complicated workflow.
     id="20"
     description1="Get Search Form"
     method="get"
-    url="{WIC}/Search/SearchForm"
+    url="http://{WIC}/Search/SearchForm"
     verifypositive="Search Recipes"
 />
 

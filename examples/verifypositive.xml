@@ -16,7 +16,7 @@ and not the rendered version of the html you would see in a browser.
     id="10"
     description1="Get Home page"
     method="get"
-    url="{WIC}"
+    url="http://{WIC}"
     verifypositive="automated testing examples"
     verifypositive1="WebInject"
     verifypositiveHTML="h2.Getting started..h2"

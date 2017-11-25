@@ -12,7 +12,7 @@ will not come into existence.
     id="10"
     description1="Get a page that does not exist"
     method="get"
-    url="{WIC}/pagedoesnotexist"
+    url="http://{WIC}/pagedoesnotexist"
     verifypositive="text that will not be found"
     retryresponsecode="404"
     retry="3"
