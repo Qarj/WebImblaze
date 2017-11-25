@@ -93,10 +93,10 @@ Edit the file with your favourite text editor and copy paste the following then 
 
 ### Run your first WebInject test
 
-    ```
-    cd C:\git\WebInject
-    perl webinject.pl tests/hello.xml
-    ``` 
+```
+cd C:\git\WebInject
+perl webinject.pl tests/hello.xml
+```
 
 If everything worked ok, then you'll see something like the following:
 
