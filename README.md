@@ -93,15 +93,10 @@ Edit the file with your favourite text editor and copy paste the following then 
 
 ### Run your first WebInject test
 
-1. Open the Command Prompt
-    * Press the Windows Key
-    * Type `cmd`
-    * Press Enter
-
-2. Change to the folder where you extracted the webinject.pl file too. For example, if webinject.pl is in a folder called `C:\git\WebInject`, then
-    * `cd C:\git\WebInject` then press 'Enter'
-
-3. Now type `perl webinject.pl tests/hello.xml` and hit 'Enter'
+    ```
+    cd C:\git\WebInject
+    perl webinject.pl tests/hello.xml
+    ``` 
 
 If everything worked ok, then you'll see something like the following:
 
