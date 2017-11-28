@@ -34,6 +34,7 @@ use LWP;
 use LWP::Protocol::http;
 use HTTP::Request::Common;
 use XML::Simple;
+use JSON::PP;
 use Time::HiRes qw( time sleep gettimeofday );
 use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
@@ -248,6 +249,7 @@ foreach ($start .. $repeat) {
             execute_test_step();
             display_request_response();
 
+            dump_json();
             decode_smtp();
             decode_quoted_printable();
 
@@ -1845,6 +1847,18 @@ sub commandonerror {  ## command only gets run on error - it does not count as p
         }
     }
     $response = HTTP::Response->parse($_combined_response); ## put the test response along with the command on error response back in the response
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub dump_json {
+    require Data::Dumper;
+
+	if ($case{dumpjson}) {
+		 my $_dumped = eval { Data::Dumper::Dumper(decode_json $response->content) };
+		 $response->content($_dumped); ## overwrite the existing content with the json dumped content
+	}
 
     return;
 }

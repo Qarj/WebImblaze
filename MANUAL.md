@@ -147,6 +147,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 [decodesmtp](#decodesmtp)
 
+[dumpjson](#dumpjson)
+
 [errormessage](#errmsg)
 
 [formatjson](#formatjson)
@@ -1809,6 +1811,27 @@ Decodes the so called double dot encoding (see RFC 5321 Section-4.5.2) used by S
 ```
     decodesmtp="true"
 ```
+
+<br />
+
+
+<a name="dumpjson"></a>
+#### dumpjson
+
+If you have a JSON response, dumpjson will parse the JSON into a hash, then replace result
+content with the dumped JSON.
+
+This is useful in cases where your raw JSON contains a lot of encoded/escaped content, for example an email.
+
+In the example of your JSON containing an email that is also quoted printable, if you chain this with
+`decodequotedprintable`, it will be possible to see the rendered HTML email when viewing the test step
+result in a browser.
+
+```
+    dumpjson="true"
+```
+
+Note that if you use this parameter with a non JSON response content, you will get a blank result.
 
 <br />
 
