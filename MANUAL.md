@@ -1898,7 +1898,11 @@ This means when you look at the actual result html rendered, it will look very s
 without the resource files being available is often unreadable when trying to understand a test failure, so by having
 the actual assets available, it makes it much easier to interpret the results.
 
-WebInject will remember the names of resources it has grabbed, and will not grab a resource with the same name a second time
+If you specify `getallhrefs` a second time in a later test step, WebInject will look for a new version of that resource.
+This means that if a resource file name has different content, you will be able to get it again. This is useful in the situation
+where you have a common platform serving up many brands.
+
+WebInject will remember the names of resources it has grabbed, and will not grab a resource with the same name and version a second time
 during test execution. This means grabbing the resources will add very little overhead - most pages in a workflow will share the same CSS
 and other assets.
 

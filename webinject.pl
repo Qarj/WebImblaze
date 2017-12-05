@@ -97,7 +97,8 @@ my (@page_update_times); ## last time the page was updated in the cache
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
 my (@hrefs, @srcs, @bg_images, %asset); ## keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
-my ($getallsrcs, $getallhrefs, %href_path, %src_path);
+my ($getallsrcs, $getallhrefs);
+my ($hrefs_version, $srcs_version) = 0;
 my $session_started; ## only start up http sesion if http is being used
 my $shared_folder_full;
 
@@ -1125,24 +1126,17 @@ sub getallhrefs { ## getallhrefs=".less|.css"
 
     if ($case{getallhrefs}) {
         $getallhrefs = $case{getallhrefs};
+        $hrefs_version = $testnum;
+        undef @hrefs;
     }
 
     if (not defined $getallhrefs) {
         return;
     }
 
-    require URI;
-    my $_uri = URI->new($request->uri);
-    my $_path = $_uri->path;
-
-    if (defined $href_path{$_path}) {
-        return;
-    }
-    $href_path{$_path} = 1; # true
-
     my $_match = 'href=';
     my $_delim = q{"}; #"
-    get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs');
+    get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
 
     return;
 }
@@ -1153,24 +1147,17 @@ sub getallsrcs { ## getallsrcs=".js|.png|.jpg|.gif"
 
     if ($case{getallsrcs}) {
         $getallsrcs = $case{getallsrcs};
+        $srcs_version = $testnum;
+        undef @srcs;
     }
 
     if (not defined $getallsrcs) {
         return;
     }
 
-    require URI;
-    my $_uri = URI->new($request->uri);
-    my $_path = $_uri->path;
-
-    if (defined $src_path{$_path}) {
-        return;
-    }
-    $src_path{$_path} = 1; # true
-
     my $_match = 'src=';
     my $_delim = q{"}; #"
-    get_assets ($_match,$_delim,$_delim,$getallsrcs, 'srcs');
+    get_assets ($_match, $_delim, $_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
 
     return;
 }
@@ -1182,7 +1169,7 @@ sub getbackgroundimages { ## style="background-image: url( )"
         my $_match = 'style="background-image: url';
         my $_left_delim = '\(';
         my $_right_delim = '\)';
-        get_assets ($_match,$_left_delim,$_right_delim,$case{getbackgroundimages}, 'bg-images');
+        get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
 
     return;
@@ -1192,7 +1179,7 @@ sub getbackgroundimages { ## style="background-image: url( )"
 sub get_assets { ## get page assets matching a list for a reference type
                 ## get_assets ('href',q{"},q{"},'.less|.css')
 
-    my ($_match, $_left_delim, $_right_delim, $assetlist, $_type) = @_;
+    my ($_match, $_left_delim, $_right_delim, $assetlist, $_type, $_version) = @_;
 
     require URI::URL; ## So getallhrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
@@ -1216,19 +1203,19 @@ sub get_assets { ## get page assets matching a list for a reference type
             $_path = $_asset_url->path; ## get the path portion of the asset location
             $_filename = basename($_path); ## get the filename from the path
 
-            if (defined $asset{$_filename}) {
+            if (defined $asset{$_version . $_filename}) {
                 next; ## since all assets are stored in the same folder, there is no point getting an asset again with the same filename
             }
-            $asset{$_filename} = 1; # true
+            $asset{$_version . $_filename} = 1; # true
 
-            $results_stdout .= "  GET Asset [$_filename] ...";
+            $results_stdout .= "  GET Asset [$_version$_filename] ...";
 
             $_asset_request = HTTP::Request->new('GET',"$_asset_url");
             $cookie_jar->add_cookie_header($_asset_request); ## session cookies will be needed
 
             $_asset_response = $useragent->request($_asset_request);
 
-            write_file( "$output_folder/$_filename", {binmode => ':raw'}, $_asset_response->content );
+            write_file( "$output_folder/$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
@@ -3246,7 +3233,7 @@ sub _grabbed_href {
 
     foreach (@hrefs) {
         if ($_href =~ m/$_/) {
-            return 'href="'.$_;
+            return 'href="'.'version'.$hrefs_version.'_'.$_;
         }
     }
 
@@ -3260,7 +3247,7 @@ sub _grabbed_src {
 
     foreach (@srcs) {
         if ($_src =~ m/$_/) {
-            return 'src="'.$_;
+            return 'src="'.'version'.$srcs_version.'_'.$_;
         }
     }
 
@@ -3274,12 +3261,12 @@ sub _grabbed_background_image {
 
     foreach (@bg_images) {
         if ($_bg_image =~ m/$_/) {
-            return 'style="background-image: url\('.$_;
+            return 'style="background-image: url('.'version1_'.$_;
         }
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'style="background-image: url\('.$1; ##no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return 'style="background-image: url('.$1; ##no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
