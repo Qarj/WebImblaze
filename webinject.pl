@@ -40,6 +40,7 @@ use Getopt::Long;
 local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
+use Encode qw(encode decode);
 
 local $| = 1; #don't buffer output to STDOUT
 
@@ -3142,6 +3143,7 @@ sub _add_html_head {
 
     ${$_html} .= qq|\n<html>\n    <wi_body style="padding:25px 0 0 35px; background: #ecf0f1; display:block; margin:0; border:0; font-size: 100%; vertical-align: baseline; text-align: left;">\n|;
     ${$_html} .= qq|        <head>\n|;
+    ${$_html} .= qq|            <meta charset="utf-8"/>\n|;
     ${$_html} .= qq|            <style>\n|;
     ${$_html} .= qq|                .wi_hover_item { text-decoration: none; }\n|;
     ${$_html} .= qq|                .wi_hover_item:hover { text-decoration: underline; }\n|;
@@ -3337,8 +3339,8 @@ sub _delayed_write_step_html {
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         if (not $opt_no_output) {
-            open my $_FILE, '>', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
-            print {$_FILE} $delayed_html;
+            open my $_FILE, '>:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
+            print {$_FILE} decode('utf-8', $delayed_html);
             close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
         }
     }
