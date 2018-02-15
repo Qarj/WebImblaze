@@ -13,4 +13,13 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 0"
 />
 
+<case
+    id="20"
+    description1="view auto substitutions"
+    method="cmd"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}sub20.html'
+    logastext="true"
+    verifypositive="MaxPrepTime=20"
+/>
+
 </testcases>
