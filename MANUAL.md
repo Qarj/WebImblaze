@@ -208,6 +208,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 ### [3.8 - Variables and Constants](#varconst)
 
+### [3.9 - Auto Substitutions](#autosub)
+
 ## [4 - Pass/Fail Criteria](#passfailcrit)
 
 ### [4.1 - Verifications](#passfailverf)
@@ -2542,6 +2544,60 @@ The following example of a test case file shows how you can use them:
 ```
 
 <br />
+
+<a name="autosub"></a>
+### 3.9 - Auto Substitutions
+
+In the postbody, two special parameters are available - `{NAME}` and `{DATA}`.
+
+#### `{NAME}`
+
+If you ever have to deal with postbody fields that are frequently renamed for one reason or another,
+then `{NAME}` may help you. Typically these fields will have a component that is static, and another
+component that changes.
+
+For example, if you use a content management system like SiteCore, you might
+have a field with a name like `ctl00$CentralPanel$txtUsername`. Later the name might change to
+`ctl01$BottomPanel$txtUsername`. Normally you would have to update your automated tests. If you use
+the `{NAME}` auto substitution, WebInject will work out the missing component for you.
+
+So you can have a postbody like:
+
+```
+    postbody="{NAME}txtUsername=TestUser&{NAME}txtPassword=secure&{NAME}BtnSubmit=Submit"
+```
+
+instead of:
+
+```
+    postbody="ctl01$CentralPanel$txtUsername=TestUser&ctl01$CentralPanel$txtPassword=secure&ctl02$BottomPanel$BtnSubmit=Submit"
+```
+
+#### `{DATA}`
+
+Sometimes you need to post hidden fields on a form back to the server. WebInject can take care of this
+automatically if you use the `{DATA}` auto substitution. Let WebInject find and parse the necessary data values
+for you!
+
+Typical examples include when you have to deal with `__VIEWSTATE`, `__EVENTVALIDATION` or even
+`__RequestVerificationToken`.
+
+This means you can write a postbody like this:
+
+```
+    postbody="RecipeName=Pesto&Cuisine=Italian&PrepTime=20&__RequestVerificationToken={DATA}&SomeOtherHiddenField={DATA}&BtnSubmit=Search+Recipes"
+```
+
+#### How the `{NAME}` and `{DATA}` auto substitutions work
+
+WebInject remembers the html content of the last 5 or so pages you visited. Normally you get the page first with a form,
+then post the completed form. The form field names and hidden data can be found on the page with the form.
+
+Pages with forms will have a `method="post" action="Some/Destination"` in the html. This helps WebInject identify
+which page in its cache to get the appropriate information from.
+
+You can enable the debug output of this feature by doing a replace all on webinject.pl: Replace `#autosub_debug `
+with nothing or just spaces.
 
 <a name="passfailcrit"></a>
 ## 4 - Pass/Fail Criteria
