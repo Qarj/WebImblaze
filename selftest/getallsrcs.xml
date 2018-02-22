@@ -20,8 +20,8 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 0"
-    verifypositive1="GET Asset .small_brickwork.jpg"
-    verifypositive2="GET Asset .append_element.js"
+    verifypositive1="GET Asset \[version10_small_brickwork.jpg]"
+    verifypositive2="GET Asset \[version20_append_element.js]"
 />
 
 <case

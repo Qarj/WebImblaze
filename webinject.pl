@@ -10,10 +10,8 @@ use vars qw/ $VERSION /;
 
 $VERSION = '2.8.0';
 
-#removed the -w parameter from the first line so that warnings will not be displayed for code in the packages
-
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
-#    Extensive updates 2015-2016 Tim Buckland
+#    Extensive updates 2015-2018 Tim Buckland
 #
 #    This file is part of WebInject.
 #
@@ -66,7 +64,7 @@ my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked)
 
 our (%case);
 my (%case_save); ## when we retry, we need to re-substitute some variables
-my (%parsedresult, %varvar);
+my (%parsedresult, %varvar, %late_sub);
 
 our ($opt_proxy);
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
@@ -215,7 +213,6 @@ foreach ($start .. $repeat) {
 
         # populate variables with values from testcase file, do substitutions, and revert converted values back
         substitute_variables();
-
         my $skip_message = get_test_step_skip_message();
         if ( $skip_message ) {
             $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
@@ -230,7 +227,7 @@ foreach ($start .. $repeat) {
             substitute_retry_variables(); ## for each retry, there are a few substitutions that we need to redo - like the retry number
             read_shared_variable();  ## read in a variable from another instance of WebInject that is running concurrently
             set_var_variables(); ## set any variables after doing all the static and dynamic substitutions
-            substitute_var_variables();
+            late_substitute_var_variables(); ## allow var variables set in this test step to be used immediately
 
             set_retry_to_zero_if_global_limit_exceeded();
 
@@ -420,14 +417,21 @@ sub substitute_variables {
 
     undef %case_save; ## we need a clean array for each test case
     undef %case; ## do not allow values from previous test cases to bleed over
+    undef %late_sub; ## do not substitute vars set this step with previous value
+
     foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) {
+        $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
+    }
+    set_late_var_list();
+
+    foreach my $_case_attribute (  keys %case  ) {
         #print "DEBUG: $_case_attribute", ": ", $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         #print "\n";
         $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
+        convert_back_var_variables($case{$_case_attribute});
         $case_save{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
     }
-    substitute_var_variables();
 
     return;
 }
@@ -2889,7 +2893,20 @@ sub get_current_time {
 }
 
 #------------------------------------------------------------------
-sub convert_back_var_variables { ## e.g. postbody="time={RUNSTART}"
+sub convert_back_var_variables {
+    foreach my $_case_attribute ( sort keys %{varvar} ) {
+       if ($late_sub{$_case_attribute}) {
+           next;
+       }
+       my $_sub_var = substr $_case_attribute, 3;
+       $_[0] =~ s/{$_sub_var}/$varvar{$_case_attribute}/g;
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub late_convert_back_var_variables {
     foreach my $_case_attribute ( sort keys %{varvar} ) {
        my $_sub_var = substr $_case_attribute, 3;
        $_[0] =~ s/{$_sub_var}/$varvar{$_case_attribute}/g;
@@ -2911,10 +2928,24 @@ sub set_var_variables { ## e.g. varRUNSTART="{HH}{MM}{SS}"
 }
 
 #------------------------------------------------------------------
-sub substitute_var_variables {
+sub late_substitute_var_variables {
 
-    foreach my $_case_attribute ( keys %case ) { ## then substitute them in
-        convert_back_var_variables($case{$_case_attribute});
+    foreach my $_case_attribute ( keys %case ) {
+        late_convert_back_var_variables($case{$_case_attribute});
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub set_late_var_list {
+    foreach my $_case_attribute ( sort keys %case ) {
+       if ( (substr $_case_attribute, 0, 3) eq 'var' ) {
+            $late_sub{$_case_attribute} = 1;
+        }
+    }
+    if ($case{readsharedvar}) {
+        $late_sub{'var'.$case{readsharedvar}} = 1;
     }
 
     return;
@@ -2926,8 +2957,8 @@ sub set_eval_variables { ## e.g. evalDIFF="10-5"
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
             $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## assign the variable
             my $_debug = $varvar{'var'.substr $_case_attribute, 4};
-            print 'var'.substr $_case_attribute, 4;
-            print " -> (eval) is [$_debug]\n";
+            #print 'var'.substr $_case_attribute, 4;
+            #print " -> (eval) is [$_debug]\n";
         }
     }
 

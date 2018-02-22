@@ -18,4 +18,13 @@ Self test master file. All test steps in this file should pass.
     assertcount3="testemail_2_2_0_|||1"
 />
 
+<case
+    id="20"
+    description1="${feature}1"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}1sub selftest\substeps\${feature}1.xml"
+    verifypositive="Test Cases Failed: 0"
+    verifypositive1="Test Cases Run: 3"
+/>
+
 </testcases>

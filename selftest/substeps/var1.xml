@@ -1,0 +1,35 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    varNEW="My New Var"
+    id="10"
+    description1="Set a var"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    varCOPY="{NEW}"
+    id="20"
+    description1="View copied vars {COPY}"
+    method="cmd"
+    command1="REM"
+/>
+
+<case
+    varXCOPY="{NEW}"
+    id="30"
+    description1="View copied vars {COPY} {XCOPY}"
+    method="cmd"
+    command1="REM _COPY_IS_{COPY}"
+    command2="REM _XCOPY_IS_{XCOPY}"
+    verifypositive1="_COPY_IS_My New Var"
+    verifypositive2="_XCOPY_IS_My New Var"
+/>
+
+</testcases>
