@@ -213,12 +213,6 @@ foreach ($start .. $repeat) {
 
         # populate variables with values from testcase file, do substitutions, and revert converted values back
         substitute_variables();
-        my $skip_message = get_test_step_skip_message();
-        if ( $skip_message ) {
-            $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
-            $results_stdout .= qq|------------------------------------------------------- \n|;
-            next TESTCASE; ## skip running this test step
-        }
 
         $retry = get_number_of_times_to_retry_this_test_step(); # 0 means do not retry this step
 
@@ -228,6 +222,13 @@ foreach ($start .. $repeat) {
             read_shared_variable();  ## read in a variable from another instance of WebInject that is running concurrently
             set_var_variables(); ## set any variables after doing all the static and dynamic substitutions
             late_substitute_var_variables(); ## allow var variables set in this test step to be used immediately
+
+            my $skip_message = get_test_step_skip_message();
+            if ( $skip_message ) {
+                $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
+                $results_stdout .= qq|------------------------------------------------------- \n|;
+                next TESTCASE; ## skip running this test step
+            }
 
             set_retry_to_zero_if_global_limit_exceeded();
 
@@ -394,6 +395,9 @@ sub get_test_step_skip_message {
         }
     }
 
+    if (defined $case{runif}) {
+        print"runif:[$case{runif}]\n";
+    }
     if (defined $case{runif} && not $case{runif}) { ## evaluate content - truthy or falsy
         return 'runif evaluated as falsy';
     }

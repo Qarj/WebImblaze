@@ -20,7 +20,7 @@ Self test master file. All test steps in this file should pass.
     description1="view xml results.xml file"
     method="cmd"
     command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subresults.xml'
-    verifypositive1="[{]AMPERSAND[}]"
+    verifypositive1="&amp;"
     verifypositive2="[{]LESSTHAN[}]"
     verifypositive3="[{]GREATERTHAN[}]"
 />
