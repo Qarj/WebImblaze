@@ -2530,7 +2530,9 @@ sub _push_httpauth {
 sub _sub_xml_special {
     my ($_clean) = @_;
 
-    $_clean =~ s/&/{AMPERSAND}/g;
+    $_clean =~ s/&amp;/{{A}}/g;
+    $_clean =~ s/&/&amp;/g;
+    $_clean =~ s/[{][{]A}}/&amp;/g;
     $_clean =~ s/</{LESSTHAN}/g;
     $_clean =~ s/>/{GREATERTHAN}/g;
 
