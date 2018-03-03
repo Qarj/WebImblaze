@@ -21,4 +21,14 @@ Expected failures will be asserted by the master test file.
     runif=""
 />
 
+<case
+    varFALSE=""
+    id="30"
+    description1="Will not be run - falsy"
+    description2="var Variable will be substituted before evaluating runif"
+    method="cmd"
+    command="echo NOP"
+    runif="{FALSE}"
+/>
+
 </testcases>

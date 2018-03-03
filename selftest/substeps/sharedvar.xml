@@ -49,4 +49,14 @@ Expected failures will be asserted by the master test file.
     verifypositive="value of \[]"
 />
 
+<case
+    readsharedvar="WILL_NOT_BE_FOUND"
+    id="60"
+    description1="Read a shared var - value is [{WILL_NOT_BE_FOUND}]"
+    method="cmd"
+    command="REM value of [{WILL_NOT_BE_FOUND}]"
+    verifypostive="This step will not run, so it will not fail"
+    runif="{WILL_NOT_BE_FOUND}"
+/>
+
 </testcases>
