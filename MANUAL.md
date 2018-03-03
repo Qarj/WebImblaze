@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.8.0
+# Manual for WebInject version 2.9.0
 
 Adapted from the original manual written by Corey Goldberg.
 
@@ -1688,7 +1688,7 @@ things are going badly, the global limit will be enforced preventing your test r
 <br />
 
 <a name="retryfromstep"></a>
-#### retryfromstep
+#### retryfromstep (DEPRECATED in favour of checkpoint)
 Works in much the same way as the `retry` paramater, however execution will continue from the specified step
 rather than the current step.
 

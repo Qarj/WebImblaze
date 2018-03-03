@@ -8,6 +8,16 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.9.0 - Mar 3, 2018
+* new dumpjson parameter for decoding emails sent to test email management systems like mailhog and inbucket
+* improved getallhrefs and getallsrcs feature - see manual
+* html actual result now written as UTF-8
+* auto substitutions feature has existed for a long time, now documented in the manual
+* fixed edge cases for var assignment in conjunction with retry and repeat
+* ampersands will now be correctly encoded in the xml results rather than changed to the literal {AMPERSAND}
+* logic has been adjusted for decision to run or skip test step - now done after all variable substitutions
+* examples now point to webinject-check website
+
 ### Version 2.8.0 - Nov 25, 2017
 * renamed the sanitycheck parameter to abort, and changed the way that it works, including a bug fix
 * command line options for WebInject-Selenium plugin are now shown by the plugin, for a cleaner display if plugin is not installed
@@ -132,7 +142,7 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 * {RANDOM:10} was meant to produce 10 random alphanumeric characters but did not do anything - fixed
 * in certain circumstances `<`, `>` and `&` was being written within results.xml tags - now substituted with {LESSTHAN}, {GREATERTHAN} and {AMPERSAND} respectively
 * there is now no need to escape `<` when used in test case attributes
-* stopped Response.pm croacking webinject.pl when the request url is empty
+* stopped Response.pm croaking webinject.pl when the request url is empty
 * renamed image_in_image.py to search-image.py (and separated it to its own project on GitHub)
 
 ### Version 1.94 - May 21, 2016
@@ -187,7 +197,7 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 * some code tidy up
 
 ### Version 1.82 - Feb 23, 2016
-* removed a feature - specifiying multiple test case files to process in the config (classic example of overengineering)
+* removed a feature - specifying multiple test case files to process in the config (classic example of overengineering)
 * more code tidy up
 
 ### Version 1.81 - Feb 14, 2016
@@ -380,7 +390,7 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 * Added verifyresponsetime parameter
 * Added retryresponsecode parameter - retry if a particular http response code is found, e.g. 500
 * Added {ELAPSED_SECONDS} and {ELAPSED_MINUTES} substitutions (updated with every retry)
-* Added helper subroutines for Selenium WebDriver to do common tasks e.g. peform a click using JavaScript, the subroutines are
+* Added helper subroutines for Selenium WebDriver to do common tasks e.g. perform a click using JavaScript, the subroutines are
     * custom_select_by_text
     * custom_clear_and_send_keys
     * custom_mouse_move_to_location
@@ -448,7 +458,7 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 * No longer forced to have test cases in strict incremental numbered order
 * Source code compiles with the "use strict" pragma
 * Ability to run engine from a different directory using alternate test case and config files
-* Comments allowed in config file using <commment></comment> tags
+* Comments allowed in config file using <comment></comment> tags
 * Other config.xml options are still used when you pass a test case filename as a command line argument
 * New config option to change response delay timeout <timeout></timeout>
 * New test case parameter to add a custom error message
