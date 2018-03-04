@@ -39,6 +39,7 @@ local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
 use Encode qw(encode decode);
+use lib '.';
 
 local $| = 1; #don't buffer output to STDOUT
 
