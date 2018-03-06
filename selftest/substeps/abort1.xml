@@ -1,0 +1,59 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Step passes"
+    method="cmd"
+    command="REM NOP"
+    verifypositive="NOP"
+/>
+
+<!-- The fact that the previous step failed will not cause execution to abort on step 20 -->
+<case
+    id="20"
+    description1="Step fails"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="No Operation"
+    abort="100"
+/>
+
+<case
+    id="30"
+    description1="Step not executed"
+    method="cmd"
+    command="echo NOP"
+    verifypositive="Will definitely fail if run"
+/>
+
+<case
+    id="40"
+    description1="Step also not executed"
+    method="cmd"
+    command="echo Will not be seen"
+    verifypositive="Will also definitely fail if run"
+/>
+
+<case
+    section="TEARDOWN"
+    id="100"
+    description1="Get close account page"
+    method="cmd"
+    command="REM Get account close page"
+    verifypositive="Get account close page"
+/>
+
+<case
+    id="110"
+    description1="Confirm account close"
+    method="cmd"
+    command="REM Your account has been closed"
+    verifypositive="Your account has been closed"
+/>
+
+</testcases>

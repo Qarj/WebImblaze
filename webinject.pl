@@ -188,7 +188,7 @@ $start //= 1;  #set to 1 in case it is not defined in test case file
 
 $counter = $start - 1; #so starting position and counter are aligned
 
-$results_stdout .= "-------------------------------------------------------\n";
+write_stdout_dashes_separator();
 
 ## Repeat Loop
 foreach ($start .. $repeat) {
@@ -227,7 +227,7 @@ foreach ($start .. $repeat) {
             my $skip_message = get_test_step_skip_message();
             if ( $skip_message ) {
                 $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
-                $results_stdout .= qq|------------------------------------------------------- \n|;
+                write_stdout_dashes_separator();
                 next TESTCASE; ## skip running this test step
             }
 
@@ -282,7 +282,12 @@ foreach ($start .. $repeat) {
 
         if ($case{abort} && $case_failed) { ## if abort (i.e. this case (test step) failed all after retries exhausted), then execution is aborted
             $results_stdout .= qq|EXECUTION ABORTED!!! \n|;
-            last;
+            if (set_step_index_for_test_step_to_jump_to($case{abort})) {
+                $results_stdout .= qq|JUMPING TO TEARDOWN FROM STEP $case{abort}\n|;
+                write_stdout_dashes_separator();
+            } else {
+                last;
+            }
         }
     } ## end of test case loop
 
@@ -684,23 +689,7 @@ sub pass_fail_or_retry {
         $passed_count = $passed_count - $retry_passed_count;
         $failed_count = $failed_count - $retry_failed_count;
 
-        ## find the index for the test step we are retrying from
-        $step_index = 0;
-        my $_found_index = 'false';
-        foreach (@test_steps) {
-            if ($test_steps[$step_index] eq $_jump_back_to_step) {
-                $_found_index = 'true';
-                last;
-            }
-            $step_index++
-        }
-        if ($_found_index eq 'false') {
-            $results_stdout .= qq|ERROR - COULD NOT FIND STEP $_jump_back_to_step - TESTING STOPS \n|;
-        }
-        else
-        {
-            $step_index--; ## since we increment it at the start of the next loop / end of this loop
-        }
+        set_step_index_for_test_step_to_jump_to($_jump_back_to_step);
     }
     else {
         $results_html .= qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
@@ -713,6 +702,28 @@ sub pass_fail_or_retry {
     }
 
     return;
+}
+
+sub set_step_index_for_test_step_to_jump_to {
+    my ($_target_test_step) = @_;
+
+    $step_index = 0;
+    my $_found_index = 'false';
+    foreach (@test_steps) {
+        if ($test_steps[$step_index] eq $_target_test_step) {
+            $_found_index = 'true';
+            last;
+        }
+        $step_index++
+    }
+    if ($_found_index eq 'false') {
+        $results_stdout .= qq|ERROR - COULD NOT FIND STEP $_target_test_step - TESTING STOPS\n\n|;
+        return 0;
+    }
+    else {
+        $step_index--; ## since we increment it at the start of the next loop / end of this loop
+    }
+    return 1;
 }
 
 sub retry_available {
@@ -755,15 +766,23 @@ sub output_test_step_results {
     _write_xml (\$results_xml);
     undef $results_xml;
 
-    $results_html .= qq|<br />\n------------------------------------------------------- <br />\n\n|;
+    write_html_dashes_separator();
     _write_html (\$results_html);
     undef $results_html;
 
-    $results_stdout .= qq|------------------------------------------------------- \n|;
+    write_stdout_dashes_separator();
     if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
     undef $results_stdout;
 
     return;
+}
+
+sub write_html_dashes_separator {
+    $results_html .= qq|<br />\n------------------------------------------------------- <br />\n\n|;
+}
+
+sub write_stdout_dashes_separator {
+    $results_stdout .= qq|------------------------------------------------------- \n|;
 }
 
 #------------------------------------------------------------------
@@ -868,7 +887,7 @@ sub write_initial_html {  #write opening tags for results file
     $results_html .= qq|</head>\n|;
     $results_html .= qq|<body>\n|;
     $results_html .= qq|<hr />\n|;
-    $results_html .= qq|-------------------------------------------------------<br />\n\n|;
+    write_html_dashes_separator();
 
     return;
 }

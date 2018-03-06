@@ -2135,6 +2135,12 @@ like getting the home page, fails, then there little point running the rest of t
     abort="true"
 ```
 
+You can also jump to the tear down section of your tests so you can do any necessary data clean up.
+
+```
+    abort="1000"
+```
+
 <br />
 
 

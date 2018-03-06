@@ -1,0 +1,32 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="Step 10"
+    method="cmd"
+    command="echo NOP"
+/>
+
+<case
+    id="20"
+    description1="Retry from a step that does not exist"
+    method="cmd"
+    command="REM NOP"
+    verifypositive="Jaffa Cakes"
+    retryfromstep="15"
+/>
+
+<case
+    id="30"
+    description1="Final step"
+    method="cmd"
+    command="REM NOP"
+/>
+
+
+</testcases>

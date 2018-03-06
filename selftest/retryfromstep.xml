@@ -41,4 +41,14 @@ Self test master file. All test steps in this file should pass.
     verifynegative3="retryfromstep1.xml - 20-2.3"
 />
 
+<case
+    id="30"
+    description1="${feature}2"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}2sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}2.xml"
+    verifypositive10="Test Cases Passed: 1"
+    verifypositive11="Test Cases Failed: 0"
+    verifypositive12="COULD NOT FIND STEP 15"
+/>
+
 </testcases>

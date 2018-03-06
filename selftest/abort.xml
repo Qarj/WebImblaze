@@ -15,4 +15,15 @@ Self test master file. All test steps in this file should pass.
     verifypositive2="EXECUTION ABORTED"
 />
 
+<case
+    id="20"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}1sub selftest\substeps\${feature}1.xml"
+    verifypositive="Test Cases Failed: 1"
+    verifypositive1="Test Cases Run: 4"
+    verifypositive2="EXECUTION ABORTED"
+    verifypositive3="JUMPING TO TEARDOWN"
+/>
+
 </testcases>
