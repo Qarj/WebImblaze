@@ -82,6 +82,7 @@ our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print)
 my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry, $checkpoint);
 my $attempts_since_last_success = 0;
 my ($xml_test_cases, $step_index, @test_steps);
+my $execution_aborted = 'false';
 
 our ($output, $output_folder); ## output path including possible filename prefix, output path without filename prefix, output prefix only
 my ($output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
@@ -282,6 +283,7 @@ foreach ($start .. $repeat) {
 
         if ($case{abort} && $case_failed) { ## if abort (i.e. this case (test step) failed all after retries exhausted), then execution is aborted
             $results_stdout .= qq|EXECUTION ABORTED!!! \n|;
+            $execution_aborted = 'true';
             if (set_step_index_for_test_step_to_jump_to($case{abort})) {
                 $results_stdout .= qq|JUMPING TO TEARDOWN FROM STEP $case{abort}\n|;
                 write_stdout_dashes_separator();
@@ -990,11 +992,6 @@ sub write_final_html {  #write summary and closing tags for results file
 #------------------------------------------------------------------
 sub write_final_xml {  #write summary and closing tags for XML results file
 
-    my $_execution_aborted = 'false';
-    if ($case{abort} && ($case_failed_count > 0)) {
-        $_execution_aborted = 'true';
-    }
-
     $results_xml .= qq|    </testcases>\n\n|;
 
     $results_xml .= qq|    <test-summary>\n|;
@@ -1013,7 +1010,7 @@ sub write_final_xml {  #write summary and closing tags for XML results file
     $results_xml .= qq|        <average-response-time>$avg_response</average-response-time>\n|;
     $results_xml .= qq|        <max-response-time>$max_response</max-response-time>\n|;
     $results_xml .= qq|        <min-response-time>$min_response</min-response-time>\n|;
-    $results_xml .= qq|        <execution-aborted>$_execution_aborted</execution-aborted>\n|;
+    $results_xml .= qq|        <execution-aborted>$execution_aborted</execution-aborted>\n|;
     $results_xml .= qq|        <test-file-name>$testfilename</test-file-name>\n|;
     $results_xml .= qq|    </test-summary>\n\n|;
 

@@ -19,11 +19,13 @@ Self test master file. All test steps in this file should pass.
     id="20"
     description1="${feature}"
     method="cmd"
-    command=".\webinject.pl -o selftest\output\${feature}1sub selftest\substeps\${feature}1.xml"
+    command1=".\webinject.pl -o selftest\output\${feature}1sub selftest\substeps\${feature}1.xml"
+    command2='perl -ne "print" selftest{SLASH}output{SLASH}${feature}1subresults.xml'
     verifypositive="Test Cases Failed: 1"
     verifypositive1="Test Cases Run: 4"
     verifypositive2="EXECUTION ABORTED"
     verifypositive3="JUMPING TO TEARDOWN"
+    verifypositive4="execution-aborted.true"
 />
 
 </testcases>
