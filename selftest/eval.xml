@@ -1,0 +1,17 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">eval</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
+    verifypositive="Test Cases Failed: 0"
+    verifypositive1="Test Cases Run: 8"
+/>
+
+</testcases>
