@@ -1265,7 +1265,7 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
     my $_page_index; ## where to save the page in the cache (array of pages)
 
     ## decide if we want to save this page - needs a method post action
-    if ( ($response->as_string =~ m{method="post" action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)" method="post"}s) ) { ## look for the method post action
+    if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) { ## look for the method post action
         $_page_action = $1;
         #autosub_debug $results_stdout .= qq|\n ACTION $_page_action\n|;
     } else {
@@ -1389,7 +1389,7 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
-    #my $_start_loop_timer = time;
+    #autosub_debug my $_start_loop_timer = time;
 
     ## time for substitutions
     if (defined $_page_id) { ## did we find match?
