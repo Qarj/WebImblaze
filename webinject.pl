@@ -1272,6 +1272,14 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
         #autosub_debug $results_stdout .= qq|\n ACTION none\n\n|;
     }
 
+    if (defined $_page_action) {
+        if (not $_page_action) {
+            #autosub_debug $results_stdout .= qq| ACTION IS NULL!\n|;
+            $_page_action = _url_path($case{url});
+            #autosub_debug $results_stdout .= qq| ACTION IS NOW $_page_action\n|;
+        }
+    }
+
     if (defined $_page_action) { ## ok, so we save this page
 
         #autosub_debug $results_stdout .= qq| SAVING $_page_action (BEFORE)\n|;
@@ -1314,6 +1322,16 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
     } # end if - action found
 
     return;
+}
+
+sub _url_path { #https://example.com/search/form?terms=cheapest becomes /search/form
+        my ($_url) = @_;
+
+        $_url =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
+        $_url =~ s{http.?://}{}si; ## remove http:// and https://
+        $_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+
+        return $_url;
 }
 
 sub _find_oldest_page_in_cache {
@@ -1362,10 +1380,7 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
     }
 
     ## work out pagename to use for matching purposes
-    $_post_url =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-    $_post_url =~ s{http.?://}{}si; ## remove http:// and https://
-    $_post_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
-    #autosub_debug $results_stdout .= qq| POSTURL $_post_url \n|; #debug
+    $_post_url = _url_path($_post_url);
 
     my $_page_id = _find_page_in_cache($_post_url.q{$});
     if (not defined $_page_id) {
