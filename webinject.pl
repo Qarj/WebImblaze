@@ -143,6 +143,7 @@ $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
 ## Startup
+return 1 unless $0 eq __FILE__;
 get_options();  #get command line options
 process_config_file();
 write_initial_stdout();  #write opening tags for STDOUT.
