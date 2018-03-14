@@ -42,6 +42,7 @@ use Encode qw(encode decode);
 use lib '.';
 
 local $| = 1; #don't buffer output to STDOUT
+our $EXTRA_VERBOSE = 0; ## Set to 1 for additional std out messages, also used by the unit tests
 
 ## Variable declarations
 
@@ -1268,9 +1269,9 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
     ## decide if we want to save this page - needs a method post action
     if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) { ## look for the method post action
         $_page_action = $1;
-        #autosub_debug $results_stdout .= qq|\n ACTION $_page_action\n|;
+        $results_stdout .= qq|\n ACTION $_page_action\n| if $EXTRA_VERBOSE;
     } else {
-        #autosub_debug $results_stdout .= qq|\n ACTION none\n\n|;
+        $results_stdout .= qq|\n ACTION none\n\n| if $EXTRA_VERBOSE;
     }
 
     if (defined $_page_action) {
