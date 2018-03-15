@@ -246,6 +246,11 @@ Adapted from the original manual written by Corey Goldberg.
 
 #### [7.2.1 Advanced assertion - at least n occurences](#atleastn)
 
+## [8 - Hints and tips](#tips)
+### [Modify a variable using regular expressions](#tips)
+### [Post a message to a Slack Channel](#slack)
+### [Conditionally run a test step based on multiple criteria](#conditionally_run)
+
 <a name="archsoft"></a>
 ## 1 - Software Architecture
 
@@ -1262,6 +1267,13 @@ Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
 ```
     parseresponse="[a-z0-9\-]{36,36}?|regex|"
 ```
+
+Example - match third occurence
+```
+    varREGEX_THAT_GRABS_FIRST_MATCH='"Result_Id":(\d*)'
+    parseresponseSEARCH_RESULT_ID_3='(?:.*?{REGEX_THAT_GRABS_FIRST_MATCH}){3,3}|regex|'
+```
+Note here that the {3,3} is much safer than {3} since WebInject might have a variable called {3} that takes preference
 
 **Referencing the results of a parseresponse in later test steps**
 
@@ -2932,3 +2944,67 @@ Note that in this example that back tracking is turned off by the `?>` to preven
 If your regular expression requires back tracking, then you should remove the `?>`. If you do this you should
 modify your target regular expression so that it is more exact, otherwise WebInject will hang if it can't find
 all occurrences. https://www.regular-expressions.info/catastrophic.html
+
+<br />
+
+<a name="tips"></a>
+## 8 - Hints and tips
+
+### Modify a variable using regular expressions
+
+You can use a Perl one-liner by executing a shell command through WebInject.
+
+Here is an example using Windows (Linux syntax is likely slightly different).
+
+```
+<case
+    id="100"
+    description1="Remove commas from {NUMBER}"
+    method="cmd"
+    command1='echo NUMBER[{NUMBER}] | perl -pe "s/,//g;"'
+    parseresponseNUMBER_WITHOUT_COMMAS="NUMBER\[(\d+)]|regex|"
+/>
+```
+
+<br />
+
+<a name="slack"></a>
+### Post a message to a Slack Channel
+
+```
+<case
+    id="100"
+    description1="Post result to Slack Channel"
+    method="post"
+    url="https://hooks.slack.com/services/J91AC2JRL/C8RAJAZZQ/iR3q4C19XKmgjggrSuuZxCJ2"
+    postbody='{"text": "Total Searches Yesterday\n www.example.com: {WEBSITE_VISITS}]"}'
+    posttype="application/json"
+    formatjson="true"
+    runif="{HAVE_BOTH_STATS}"
+/>
+```
+
+<br />
+
+<a name="conditionally_run"></a>
+### Conditionally run a test step based on multiple criteria
+
+```
+<case
+    id="100"
+    description1="Check we have all statistics"
+    method="cmd"
+    evalHAVE_ALL_STATS="{SEARCHES}&&{BOUNCES}"
+    command1="REM NOP"
+/>
+
+<case
+    id="110"
+    description1="Write stats to text file"
+    method="cmd"
+    command1="mkdir C:\STATS"
+    command2="echo date[{YEAR}{MONTH}{DAY}] searches[{SEARCHES}] bounces[{BOUNCES}] >> C:\STATS\key_website_stats.txt"
+    runif="{HAVE_ALL_STATS}"
+/>
+```
+
