@@ -2977,10 +2977,9 @@ Here is an example using Windows (Linux syntax is likely slightly different).
     description1="Post result to Slack Channel"
     method="post"
     url="https://hooks.slack.com/services/J91AC2JRL/C8RAJAZZQ/iR3q4C19XKmgjggrSuuZxCJ2"
-    postbody='{"text": "Total Searches Yesterday\n www.example.com: {WEBSITE_VISITS}]"}'
+    postbody='{"text": "Total Searches Yesterday\n www.example.com: {WEBSITE_SEARCHES}]"}'
     posttype="application/json"
     formatjson="true"
-    runif="{HAVE_BOTH_STATS}"
 />
 ```
 
