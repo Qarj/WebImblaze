@@ -52,10 +52,9 @@ my ($useragent);
 our ($latency, $verification_latency, $screenshot_latency);
 my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP}, {EPOCHSECONDS} - global so all substitutions in a test step have same timestamp
 my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
-my ($start_date_time, $total_run_time);
+my $total_run_time;
 my ($total_response, $avg_response, $max_response, $min_response);
 my (%test_step_time); ## record in a hash the latency for every step for later use
-my ($start_time); ## to store a copy of $start_run_timer in a global variable
 
 my ($cookie_jar, @http_auth);
 
@@ -110,23 +109,9 @@ if (-e 'plugins/WebInjectSelenium.pm') {
     $selenium_plugin_present = 1;
 }
 
-## put the current date and time into variables - startdatetime - for recording the start time in a format an xsl stylesheet can process
-my @MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
-my @MONTHS_TEXT = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-my @WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
-my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYOFYEAR, $DAYLIGHTSAVINGS) = localtime;
-my $YEAR = 1900 + $YEAROFFSET;
-my $YY = substr $YEAR, 2; #year as 2 digits
-my $MONTH_TEXT = $MONTHS_TEXT[$MONTH];
-my $DAY_TEXT = $WEEKDAYS[$DAYOFWEEK];
-$DAYOFMONTH = sprintf '%02d', $DAYOFMONTH;
-my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
-my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
-$MINUTE = sprintf '%02d', $MINUTE; #put in up to 2 leading zeros
-$SECOND = sprintf '%02d', $SECOND;
-$HOUR = sprintf '%02d', $HOUR;
-my $TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
-$start_date_time = "$WEEKDAYS[$DAYOFWEEK] $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
+my $start_time = time;  #timer for entire test run
+my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $DAY_TEXT, $WEEKOFMONTH, $MONTH, $MONTH_TEXT, $YEAR, $YY) = get_formatted_datetime_for_seconds_since_epoch($start_time);
+my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
 my $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
@@ -137,7 +122,7 @@ my $concurrency = 'null'; ## current working directory - not full path
 
 our ($results_stdout, $results_html, $results_xml);
 my ($results_xml_file_name);
-my ($start_run_timer, $repeat, $start);
+my ($repeat, $start);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; ## strip out any rogue linefeeds or carriage returns
@@ -168,21 +153,10 @@ $min_response = 10_000_000; #set to large value so first minresponse will be les
 
 $globalretries=0; ## total number of retries for this run across all test cases
 
-$start_run_timer = time;  #timer for entire test run
-$start_time = $start_run_timer; ## need a global variable to make a copy of the start run timer
-
 $current_case_filename = basename($current_case_file); ## with extension
 $testfilename = fileparse($current_case_file, '.xml'); ## without extension
 
 read_test_case_file();
-
-## only import WebInjectSelenium.pm package if test case file contains "selenium"
-#my $module_to_import = $testfile_contains_selenium ? "plugins::WebInjectSelenium" : "plugins::WebInjectSeleniumDummy";
-#my $file_to_require = $module_to_import;
-#$file_to_require =~ s[::][/]g;
-#$file_to_require .= '.pm';
-#require $file_to_require;
-#$module_to_import->import;
 
 $repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
 $repeat //= 1;  #set to 1 in case it is not defined in test case file
@@ -311,6 +285,26 @@ exit $status;
 #------------------------------------------------------------------
 #  SUBROUTINES
 #------------------------------------------------------------------
+
+sub get_formatted_datetime_for_seconds_since_epoch {
+    my ($_seconds_since_epoch) = @_;
+
+    my @_MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
+    my @_MONTHS_TEXT = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+    my @_WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
+    my ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime($_seconds_since_epoch);
+    my $_YEAR = 1900 + $_YEAROFFSET;
+    my $_YY = substr $_YEAR, 2;
+    my $_MONTH_TEXT = $_MONTHS_TEXT[$_MONTH];
+    my $_DAY_TEXT = $_WEEKDAYS[$_DAYOFWEEK];
+    $_DAYOFMONTH = sprintf '%02d', $_DAYOFMONTH;
+    my $_WEEKOFMONTH = int(($_DAYOFMONTH-1)/7)+1;
+    $_MINUTE = sprintf '%02d', $_MINUTE; #put in up to 2 leading zeros
+    $_SECOND = sprintf '%02d', $_SECOND;
+    $_HOUR = sprintf '%02d', $_HOUR;
+    
+    return $_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTHS[$_MONTH], $_MONTH_TEXT, $_YEAR, $_YY;
+}
 
 sub display_request_response {
 
@@ -997,10 +991,13 @@ sub write_final_xml {  #write summary and closing tags for XML results file
 
     $results_xml .= qq|    </testcases>\n\n|;
 
+    my $_TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
+    my $_STARTDATE = "$YEAR-$MONTH-$DAYOFMONTH";
+
     $results_xml .= qq|    <test-summary>\n|;
     $results_xml .= qq|        <start-time>$start_date_time</start-time>\n|;
-    $results_xml .= qq|        <start-seconds>$TIMESECONDS</start-seconds>\n|;
-    $results_xml .= qq|        <start-date-time>$STARTDATE|;
+    $results_xml .= qq|        <start-seconds>$_TIMESECONDS</start-seconds>\n|;
+    $results_xml .= qq|        <start-date-time>$_STARTDATE|;
     $results_xml .= qq|T$HOUR:$MINUTE:$SECOND</start-date-time>\n|;
     $results_xml .= qq|        <total-run-time>$total_run_time</total-run-time>\n|;
     $results_xml .= qq|        <total-response-time>$total_response</total-response-time>\n|;
@@ -2377,7 +2374,7 @@ sub write_shared_variable {
     if ($case{writesharedvar}) {
         _initialise_shared_variables();
         my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
-        my ($_day, $_month, $_year, $_hour, $_minute, $_second) = get_current_time();
+        my ($_second, $_minute, $_hour, undef, undef, undef, undef, undef, undef, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
         my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
         write_file ( $_file_full, $_var_value);
         $results_stdout .= " Wrote $_file_full\n";
@@ -2414,7 +2411,7 @@ sub _initialise_shared_variables {
     }
 
     $shared_folder_full .= '/WebInjectSharedVariables/';
-    $shared_folder_full .= $YEAR . $MONTHS[$MONTH] . $DAYOFMONTH;
+    $shared_folder_full .= $YEAR . $MONTH . $DAYOFMONTH;
     File::Path::make_path ( slash_me($shared_folder_full) );
 
     return;
@@ -2703,31 +2700,12 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_DAY_TEXT = $DAY_TEXT;
     my $_DAYOFMONTH = $DAYOFMONTH;
     my $_WEEKOFMONTH = $WEEKOFMONTH;
-    my $_STARTDATE = $STARTDATE;
     my $_MINUTE = $MINUTE;
     my $_SECOND = $SECOND;
     my $_HOUR = $HOUR;
 
     if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
-
-        my $_DAYLIGHTSAVINGS;
-        my $_YEAROFFSET;
-        my $_DAYOFWEEK;
-        my $_DAYOFYEAR;
-        
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime($start_time + (eval($1)*86400));
-
-        $_YEAR = 1900 + $_YEAROFFSET;
-        $_YY = substr $_YEAR, 2; #year as 2 digits
-        $_MONTH_TEXT = $MONTHS_TEXT[$_MONTH];
-        $_DAY_TEXT = $WEEKDAYS[$_DAYOFWEEK];
-        $_DAYOFMONTH = sprintf '%02d', $_DAYOFMONTH;
-        $_WEEKOFMONTH = int(($_DAYOFMONTH-1)/7)+1;
-        $_STARTDATE = "$_YEAR-$MONTHS[$_MONTH]-$_DAYOFMONTH";
-        $_MINUTE = sprintf '%02d', $_MINUTE; #put in up to 2 leading zeros
-        $_SECOND = sprintf '%02d', $_SECOND;
-        $_HOUR = sprintf '%02d', $_HOUR;
-
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval($1)*86400));
     }
 
 ## perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
@@ -2780,7 +2758,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
     $_[0] =~ s/{DAY}/$_DAYOFMONTH/g;
     $_[0] =~ s/{DAYTEXT}/$_DAY_TEXT/g;
-    $_[0] =~ s/{MONTH}/$MONTHS[$_MONTH]/g;
+    $_[0] =~ s/{MONTH}/$_MONTH/g;
     $_[0] =~ s/{MONTHTEXT}/$_MONTH_TEXT/g;
     $_[0] =~ s/{YEAR}/$_YEAR/g; #4 digit year
     $_[0] =~ s/{YY}/$_YY/g; #2 digit year
@@ -2788,9 +2766,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{MM}/$_MINUTE/g;
     $_[0] =~ s/{SS}/$_SECOND/g;
     $_[0] =~ s/{WEEKOFMONTH}/$_WEEKOFMONTH/g;
-    $_[0] =~ s/{DATETIME}/$_YEAR$MONTHS[$_MONTH]$_DAYOFMONTH$_HOUR$_MINUTE$_SECOND/g;
+    $_[0] =~ s/{DATETIME}/$_YEAR$_MONTH$_DAYOFMONTH$_HOUR$_MINUTE$_SECOND/g;
     my $_underscore = '_';
-    $_[0] =~ s{{FORMATDATETIME}}{$_DAYOFMONTH\/$MONTHS[$_MONTH]\/$_YEAR$_underscore$_HOUR:$_MINUTE:$_SECOND}g;
+    $_[0] =~ s{{FORMATDATETIME}}{$_DAYOFMONTH\/$_MONTH\/$_YEAR$_underscore$_HOUR:$_MINUTE:$_SECOND}g;
 
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; ## name of the temporary folder being used - not full path
@@ -2917,24 +2895,11 @@ sub convert_back_xml_dynamic {## some values need to be updated after each retry
     $_[0] =~ s/{ELAPSED_SECONDS}/$_elapsed_seconds_so_far/g; ## always rounded up
     $_[0] =~ s/{ELAPSED_MINUTES}/$_elapsed_minutes_so_far/g; ## always rounded up
 
-    my ($_day, $_month, $_year, $_hour, $_minute, $_second) = get_current_time();
+    my ($_second, $_minute, $_hour, $_dayofmonth, undef, undef, $_month, undef, $_year, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
     my $_underscore = '_';
-    $_[0] =~ s{{NOW}}{$_day\/$_month\/$_year$_underscore$_hour:$_minute:$_second}g;
+    $_[0] =~ s{{NOW}}{$_dayofmonth\/$_month\/$_year$_underscore$_hour:$_minute:$_second}g;
 
     return;
-}
-
-#------------------------------------------------------------------
-sub get_current_time {
-    my ($_second, $_minute, $_hour, $_day_of_month, $_month, $_year_offset, $_day_of_week, $_day_of_year, $_daylight_savings) = localtime;
-    my $_year = 1900 + $_year_offset;
-    $_month = $MONTHS[$_month];
-    my $_day = sprintf '%02d', $_day_of_month;
-    $_hour = sprintf '%02d', $_hour; #put in up to 2 leading zeros
-    $_minute = sprintf '%02d', $_minute;
-    $_second = sprintf '%02d', $_second;
-    
-    return $_day, $_month, $_year, $_hour, $_minute, $_second;
 }
 
 #------------------------------------------------------------------
@@ -3030,7 +2995,6 @@ sub httplog {  # write requests and responses to http.txt file
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
 
-    ## log descrption1 and description2
     $_step_info .=  $case{description1};
     if (defined $case{description2}) {
        $_step_info .= ' ['.$case{description2}.']';
@@ -3050,8 +3014,6 @@ sub httplog {  # write requests and responses to http.txt file
         $_request_headers .= 'Request Content Length: '.$_request_content_length." bytes\n";
     }
 
-    #$textrequest =~ s/%20/ /g; #Replace %20 with a single space for clarity in the log file
-
     my $_core_info = "\n".$response->status_line( )."\n";
 
     my $_response_base;
@@ -3060,13 +3022,6 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Base for relative URLs: '.$_response_base."\n";
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
-
-    #my $_age = $response->current_age( );
-    #my $_days  = int($_age/86400);       $_age -= $_days * 86400;
-    #my $_hours = int($_age/3600);        $_age -= $_hours * 3600;
-    #my $_mins  = int($_age/60);          $_age -= $_mins    * 60;
-    #my $_secs  = $_age;
-    #$_core_info .= "The document is $_days days, $_hours hours, $_mins minutes, and $_secs seconds old.\n";
 
     my $_response_content_ref = $response->content_ref( );
     my $_response_headers = $response->headers_as_string;
@@ -3431,7 +3386,7 @@ sub _delayed_write_step_html {
 sub final_tasks {  #do ending tasks
 
     if (not $total_run_count) {$total_run_count = 2}; ## prevent division by 0
-    $total_run_time = (int(1000 * (time - $start_run_timer)) / 1000);  #elapsed time rounded to thousandths
+    $total_run_time = (int(1000 * (time - $start_time)) / 1000);  #elapsed time rounded to thousandths
     $avg_response = (int(1000 * ($total_response / $total_run_count)) / 1000);  #avg response rounded to thousandths
 
     # write out the html for the final test step, there is no new content to put in the buffer

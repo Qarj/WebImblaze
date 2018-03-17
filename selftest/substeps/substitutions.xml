@@ -253,4 +253,13 @@ If convert_back was set to null, {:8080} would be converted to null
     verifypositive="_:8080_"
 />
 
+<case
+    id="270"
+    description1="Date Modifier - Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}"
+    method="cmd"
+    command="echo Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}"
+    verifypositive="Yesterday  \d{4}-\d{2}-\d{2}"
+    verifynegative=" 1900-"
+/>
+
 </testcases>
