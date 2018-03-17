@@ -118,6 +118,7 @@ my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $MONTH, $YEAROFFSET, $DAYOFWEEK, $DAYO
 my $YEAR = 1900 + $YEAROFFSET;
 my $YY = substr $YEAR, 2; #year as 2 digits
 my $MONTH_TEXT = $MONTHS_TEXT[$MONTH];
+my $DAY_TEXT = $WEEKDAYS[$DAYOFWEEK];
 $DAYOFMONTH = sprintf '%02d', $DAYOFMONTH;
 my $WEEKOFMONTH = int(($DAYOFMONTH-1)/7)+1;
 my $STARTDATE = "$YEAR-$MONTHS[$MONTH]-$DAYOFMONTH";
@@ -2699,6 +2700,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_YY = $YY;
     my $_MONTH = $MONTH;
     my $_MONTH_TEXT = $MONTH_TEXT;
+    my $_DAY_TEXT = $DAY_TEXT;
     my $_DAYOFMONTH = $DAYOFMONTH;
     my $_WEEKOFMONTH = $WEEKOFMONTH;
     my $_STARTDATE = $STARTDATE;
@@ -2718,6 +2720,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
         $_YEAR = 1900 + $_YEAROFFSET;
         $_YY = substr $_YEAR, 2; #year as 2 digits
         $_MONTH_TEXT = $MONTHS_TEXT[$_MONTH];
+        $_DAY_TEXT = $WEEKDAYS[$_DAYOFWEEK];
         $_DAYOFMONTH = sprintf '%02d', $_DAYOFMONTH;
         $_WEEKOFMONTH = int(($_DAYOFMONTH-1)/7)+1;
         $_STARTDATE = "$_YEAR-$MONTHS[$_MONTH]-$_DAYOFMONTH";
@@ -2776,7 +2779,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 
 ## day month year constant support #+{DAY}.{MONTH}.{YEAR}+{HH}:{MM}:{SS}+ - when execution started
     $_[0] =~ s/{DAY}/$_DAYOFMONTH/g;
+    $_[0] =~ s/{DAYTEXT}/$_DAY_TEXT/g;
     $_[0] =~ s/{MONTH}/$MONTHS[$_MONTH]/g;
+    $_[0] =~ s/{MONTHTEXT}/$_MONTH_TEXT/g;
     $_[0] =~ s/{YEAR}/$_YEAR/g; #4 digit year
     $_[0] =~ s/{YY}/$_YY/g; #2 digit year
     $_[0] =~ s/{HH}/$_HOUR/g;

@@ -106,6 +106,15 @@ Expected failures will be asserted by the master test file.
 />
 
 <case
+    varSUB="_{DAYTEXT}_{MONTHTEXT}_"
+    id="115"
+    description1="DAYTEXT MONTHTEXT is {SUB}"
+    method="cmd"
+    command="echo {SUB}"
+    verifypositive="_[a-zA-Z]{3,3}_[a-zA-Z]{3,3}_"
+/>
+
+<case
     varSUB="_{HH}{MM}{SS}_"
     id="120"
     description1="HH MM SS is {SUB}"

@@ -2492,7 +2492,9 @@ Variables related to date are also set at execution start time.
 Date Variable | Description
 :------- | :----------
 **{DAY}** | The day of the month at run start with leading 0, e.g. 06 [denoting the 6th]
+**{DAYTEXT}** | The three letter day of the week, e.g. Sat
 **{MONTH}** | The month number of the year at run start with leading 0, e.g. 05 [denoting May]
+**{MONTHTEXT}** | The three letter month of the year, e.g. Mar
 **{YEAR}** | The year at run start as 4 digits, e.g. 2016
 **{YY}** | The year at run start as 2 digits, e.g. 16
 **{HH}** | The run start hour in 24hr time with leading 0, e.g. 15
