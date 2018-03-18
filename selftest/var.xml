@@ -12,6 +12,7 @@ Self test master file. All test steps in this file should pass.
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Failed: 0"
     verifypositive1="Test Cases Run: 10"
+    verifynegative="uninitialized value"
     assertcount="testemail_1_0_0_|||2"
     assertcount1="testemail_1_0_1_|||1"
     assertcount2="testemail_2_0_1_|||1"
@@ -25,6 +26,7 @@ Self test master file. All test steps in this file should pass.
     command=".\webinject.pl -o selftest\output\${feature}1sub selftest\substeps\${feature}1.xml"
     verifypositive="Test Cases Failed: 0"
     verifypositive1="Test Cases Run: 3"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

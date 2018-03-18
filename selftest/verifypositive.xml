@@ -14,6 +14,7 @@ Self test master file. All test steps in this file should pass.
     assertcount2="Failed Positive Verification|||6|||Should be failed positive verifications in steps 20 and 30"
     verifypositive="Should find text but did not"
     verifypositive1="Skipped Positive Verification 0 - Production Bug"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

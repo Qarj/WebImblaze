@@ -18,7 +18,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive6="TEST CASE PASSED"
     verifypositive7="Verifications Passed"
     verifypositive8="Verifications Failed"
-    verifynegative1="uninitialized value"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

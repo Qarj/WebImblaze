@@ -22,6 +22,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive7="mynum variable at this point is  four"
     verifypositive9="checkpoint.xml - 110-10"
     verifynegative9="checkpoint.xml - 110-11"
+    verifynegative="uninitialized value"
     assertcount="and also mynum variable  four  will be|||8"
     verifyresponsetime="39"
 />
@@ -40,6 +41,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive3="checkpoint1.xml - 20-2\.2"
     verifynegative3="checkpoint1.xml - 20-2\.3"
     verifypositive4="RETRYING FROM STEP 5 ...  6 tries left"
+    verifynegative="uninitialized value"
     assertcount="--- CHECKPOINT ---|||4"
 />
 

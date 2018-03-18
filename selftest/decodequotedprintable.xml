@@ -13,6 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 0"
     verifypositive1="found: scale=1.0 in response step 10"
     verifypositive2="found:  in response step 30"
+    verifynegative="uninitialized value"
     assertcount="TEST CASE PASSED|||4"
 />
 

@@ -39,7 +39,7 @@ local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
 use Encode qw(encode decode);
-use lib '.';
+use lib '.'; ## Current folder is not @INC from Perl 5.26
 
 local $| = 1; #don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; ## Set to 1 for additional std out messages, also used by the unit tests
@@ -47,53 +47,53 @@ our $EXTRA_VERBOSE = 0; ## Set to 1 for additional std out messages, also used b
 ## Variable declarations
 
 our ($request, $response);
-my ($useragent);
+my $useragent;
 
 our ($latency, $verification_latency, $screenshot_latency);
 my ($epoch_seconds, $epoch_split); ## for {TIMESTAMP}, {EPOCHSECONDS} - global so all substitutions in a test step have same timestamp
-my $testfilename; ## for {TESTFILENAME} - file name only, without .xml extension
+my $test_file_base_name;
 my $total_run_time;
 my ($total_response, $avg_response, $max_response, $min_response);
-my (%test_step_time); ## record in a hash the latency for every step for later use
+my %test_step_time; ## record latency for use by substitutions
 
 my ($cookie_jar, @http_auth);
 
 our ($case_failed_count, $passed_count, $failed_count);
-our ($is_failure);
+our $is_failure;
 my ($run_count, $total_run_count, $case_passed_count, $case_failed);
 my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
 
-our (%case);
-my (%case_save); ## when we retry, we need to re-substitute some variables
+our %case;
+my %case_save; ## when we retry, we need to re-substitute some variables
 my (%parsedresult, %varvar, %late_sub);
 
-our ($opt_proxy);
+our $opt_proxy;
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
 
-my ($report_type); ## 'standard' and 'nagios' supported
-my ($return_message); ## error message to return to nagios
+my $report_type; ## 'standard' and 'nagios' supported
+my $nagios_return_message;
 
 my $testnum;
-our $testnum_display; ## individual step file html logging
-my ($previous_test_step, $delayed_file_full, $delayed_html); ## individual step file html logging
-our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print); ## retry failed tests
+our $testnum_display;
+my ($previous_test_step, $delayed_file_full, $delayed_html);
+our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print);
 my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry, $checkpoint);
 my $attempts_since_last_success = 0;
 my ($xml_test_cases, $step_index, @test_steps);
 my $execution_aborted = 'false';
 
 our ($output, $output_folder); ## output path including possible filename prefix, output path without filename prefix, output prefix only
-my ($output_prefix); ## output path including possible filename prefix, output path without filename prefix, output prefix only
-my ($outsum); ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
-my ($config); ## contents of config.xml
+my $output_prefix; ## output path including possible filename prefix, output path without filename prefix, output prefix only
+my $outsum; ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
+my $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
-my (@visited_pages); ## page source of previously visited pages
-my (@visited_page_names); ## page name of previously visited pages
-my (@page_update_times); ## last time the page was updated in the cache
+my @visited_pages; ## page source of previously visited pages
+my @visited_page_names; ## page name of previously visited pages
+my @page_update_times; ## last time the page was updated in the cache
 
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
@@ -121,7 +121,7 @@ my $counter = 0; ## keeping track of the loop we are up to
 my $concurrency = 'null'; ## current working directory - not full path
 
 our ($results_stdout, $results_html, $results_xml);
-my ($results_xml_file_name);
+my $results_xml_file_name;
 my ($repeat, $start);
 
 my $hostname = `hostname`; ##no critic(ProhibitBacktickOperators) ## hostname should work on Linux and Windows
@@ -154,7 +154,7 @@ $min_response = 10_000_000; #set to large value so first minresponse will be les
 $globalretries=0; ## total number of retries for this run across all test cases
 
 $current_case_filename = basename($current_case_file); ## with extension
-$testfilename = fileparse($current_case_file, '.xml'); ## without extension
+$test_file_base_name = fileparse($current_case_file, '.xml');
 
 read_test_case_file();
 
@@ -640,16 +640,16 @@ sub pass_fail_or_retry {
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
             $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
             $results_stdout .= qq|TEST CASE FAILED : $case{errormessage}\n|;
-            if (not $return_message) {
-                $return_message = $case{errormessage}; ## only return the first error message to nagios
+            if (not $nagios_return_message) {
+                $nagios_return_message = $case{errormessage}; ## only return the first error message to nagios
             }
         }
         else { #print regular error output
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
             $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
             $results_stdout .= qq|TEST CASE FAILED\n|;
-            if (not $return_message) {
-                $return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
+            if (not $nagios_return_message) {
+                $nagios_return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
             }
         }
         $case_failed = 1; ## for abort paramter logic
@@ -1011,7 +1011,7 @@ sub write_final_xml {  #write summary and closing tags for XML results file
     $results_xml .= qq|        <max-response-time>$max_response</max-response-time>\n|;
     $results_xml .= qq|        <min-response-time>$min_response</min-response-time>\n|;
     $results_xml .= qq|        <execution-aborted>$execution_aborted</execution-aborted>\n|;
-    $results_xml .= qq|        <test-file-name>$testfilename</test-file-name>\n|;
+    $results_xml .= qq|        <test-file-name>$test_file_base_name</test-file-name>\n|;
     $results_xml .= qq|    </test-summary>\n\n|;
 
     $results_xml .= qq|</results>\n|;
@@ -1057,7 +1057,7 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
 	    my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
             if ($case_failed_count > 0) {
-	        print "WebInject CRITICAL - $return_message |time=$total_response;$_end\n";
+	        print "WebInject CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {
@@ -2730,7 +2730,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 ## hostname, testnum, concurrency, teststeptime
     $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running webinject
     $_[0] =~ s/{TESTNUM}/$testnum_display/g;
-    $_[0] =~ s/{TESTFILENAME}/$testfilename/g;
+    $_[0] =~ s/{TESTFILENAME}/$test_file_base_name/g;
     $_[0] =~ s/{LENGTH}/$_my_length/g; #length of the previous test step response
     $_[0] =~ s/{AMPERSAND}/&/g;
     $_[0] =~ s/{LESSTHAN}/</g;
@@ -2740,13 +2740,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{EPOCHSPLIT}/$epoch_split/g;
     $_[0] =~ s/{STARTTIME}/$start_time/g;
     $_[0] =~ s/{OPT_PROXY}/$opt_proxy/g;
-
-    $_[0] =~ m/{TESTSTEPTIME:(\d+)}/s;
-    if ($1)
-    {
-     $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$test_step_time{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
-    }
-
+    $_[0] =~ s/{TESTSTEPTIME:(\d+)}/$test_step_time{$1}/g; #latency for test step number; example usage: {TESTSTEPTIME:5012}
     $_[0] =~ s/{RANDOM:(\d+)(:*[[:alpha:]]*)}/_get_random_string($1, $2)/eg;
 
     if (defined $convert_back_ports) {
@@ -3524,6 +3518,8 @@ sub get_options {  #shell options
         $opt_publish_full = slash_me($opt_publish_full);
     }
 
+    print "output:$output\n";
+    print "output_folder:$output_folder\n";
     return;
 }
 

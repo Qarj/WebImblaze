@@ -11,6 +11,7 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subhttp.txt'
+    verifynegative="uninitialized value"
     assertcount="User-Agent: WebInject|||1"
     assertcount1="User-Agent: My Special Browser|||2"
     assertcount2="User-Agent: Firefox Browser|||1"
@@ -22,6 +23,7 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl -o selftest\output\${feature}1sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}1.xml"
     command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}1subhttp.txt'
+    verifynegative="uninitialized value"
     assertcount="User-Agent: WebInject|||0"
     assertcount1="User-Agent: HTTP Test Tool|||1"
     assertcount2="User-Agent: Chrome Browser|||1"

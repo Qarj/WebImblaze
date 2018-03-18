@@ -14,6 +14,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive2="MyFirstCookie: cookie_value"
     verifypositive3="MySecondCookie: another_value"
     verifypositive4="MyThirdCookie: value_of_third_cookie"
+    verifynegative="uninitialized value"
 />
 
 <case
@@ -21,6 +22,7 @@ Self test master file. All test steps in this file should pass.
     description1="view http.txt"
     method="cmd"
     command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subhttp.txt'
+    verifynegative="uninitialized value"
     assertcount1="MyFirstCookie=cookie_value|||2"
     assertcount2="MySecondCookie=another_value|||2"
     assertcount3="MyThirdCookie=value_of_third_cookie|||1"

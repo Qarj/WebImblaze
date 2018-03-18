@@ -21,6 +21,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive9="100.10"
     verifynegative1="200.00"
     verifynegative2="210.00"
+    verifynegative3="uninitialized value"
 />
 
 </testcases>

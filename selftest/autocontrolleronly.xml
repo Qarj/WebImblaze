@@ -11,6 +11,7 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command=".\webinject.pl --autocontroller -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Run: 2"
+    verifynegative="uninitialized value"
 />
 
 <case
@@ -21,6 +22,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Run: 1"
     verifypositive1="Skipping Test Case 20"
     verifypositive2="This is not the automation controller"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

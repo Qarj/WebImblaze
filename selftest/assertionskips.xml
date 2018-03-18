@@ -17,6 +17,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive4="Skipped Assertion Count ASSERTCOUNT - Expected count of 4"
     verifypositive5="Skipped Assertion Count ONE - Expected count of 4"
     verifypositive6="Test Cases Passed: 3"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

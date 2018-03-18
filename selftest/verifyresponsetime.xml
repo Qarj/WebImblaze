@@ -13,6 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 1"
     verifypositive1="Passed Response Time Verification"
     verifypositive2="Failed Response Time Verification - should be at most 1"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

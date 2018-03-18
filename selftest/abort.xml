@@ -13,6 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Failed: 2"
     verifypositive1="Test Cases Run: 3"
     verifypositive2="EXECUTION ABORTED"
+    verifynegative="uninitialized value"
 />
 
 <case
@@ -26,6 +27,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive2="EXECUTION ABORTED"
     verifypositive3="JUMPING TO TEARDOWN"
     verifypositive4="execution-aborted.true"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

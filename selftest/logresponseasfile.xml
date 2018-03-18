@@ -19,6 +19,7 @@ Self test master file. All test steps in this file should pass.
     command1='perl -ne "print" selftest{SLASH}output{SLASH}WEBINJECT-CHECK_Home_Page.html'
     verifypositive="aid in the self test of webinject"
     verifypositive1="html.*head.*body"
+    verifynegative="uninitialized value"
 />
 
 <!-- command1 should work for Windows, command2 for Linux -->

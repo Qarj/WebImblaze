@@ -12,6 +12,7 @@ Self test master file. All test steps in this file should pass.
     command="perl webinject.pl -o selftest{SLASH}output{SLASH}${feature}sub selftest{SLASH}substeps{SLASH}${feature}.xml"
     verifypositive1="Test Cases Run: 2"
     verifypositive2="Test Cases Passed: 2"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

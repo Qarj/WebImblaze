@@ -12,6 +12,7 @@ Self test master file. All test steps in this file should pass.
     command=".\webinject.pl -c selftest\substeps\runon_config_DEV.xml -o selftest\output\${feature}sub selftest\substeps\${feature}.xml"
     verifypositive="Test Cases Run: 4"
     verifypositive1="Skipping Test Case 50... \(do not run on DEV|PAT\)"
+    verifynegative="uninitialized value"
 />
 
 <case
@@ -22,6 +23,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Run: 3"
     verifypositive1="Skipping Test Case 30... \(do not run on PAT|PROD\)"
     verifypositive2="Skipping Test Case 50... \(do not run on DEV|PAT\)"
+    verifynegative="uninitialized value"
 />
 
 <case
@@ -32,6 +34,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive="Test Cases Run: 3"
     verifypositive1="Skipping Test Case 30... \(do not run on PAT|PROD\)"
     verifypositive2="Skipping Test Case 40... \(do not run on PROD\)"
+    verifynegative="uninitialized value"
 />
 
 </testcases>

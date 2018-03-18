@@ -13,6 +13,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive1="Test Cases Run: 1"
     verifypositive2="Skipping Test Case 20"
     verifypositive3="runif evaluated as falsy"
+    verifynegative1="uninitialized value"
 />
 
 </testcases>

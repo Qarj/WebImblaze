@@ -17,6 +17,7 @@ Self test master file. All test steps in this file should pass.
     verifypositive4="loop number 3"
     verifypositive5="loop number 4"
     verifypositive6="loop number 5"
+    verifynegative="uninitialized value"
     assertcount="0020.1|||4"
     assertcount1="0020.2|||4"
     assertcount2="- 100|||4"
