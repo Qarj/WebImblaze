@@ -84,8 +84,8 @@ my $attempts_since_last_success = 0;
 my ($xml_test_cases, $step_index, @test_steps);
 my $execution_aborted = 'false';
 
-our ($output, $output_folder); ## output path including possible filename prefix, output path without filename prefix, output prefix only
-my $output_prefix; ## output path including possible filename prefix, output path without filename prefix, output prefix only
+our $results_output_folder; ## output relative path e.g. 'output/'
+my $results_filename_prefix; ## prefix for results file names e.g. 'run1'
 my $outsum; ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
 my $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
@@ -545,7 +545,7 @@ sub check_for_checkpoint {
 #------------------------------------------------------------------
 sub output_test_step_description {
 
-    $results_html .= qq|<b>Test:  $current_case_file - <a href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
+    $results_html .= qq|<b>Test:  $current_case_file - <a href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
     $results_stdout .= qq|Test:  $current_case_file - $testnum_display$jumpbacks_print$retries_print \n|;
     $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
@@ -1035,7 +1035,7 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
     $results_stdout .= qq|Verifications Passed: $passed_count\n|;
     $results_stdout .= qq|Verifications Failed: $failed_count\n\n|;
 
-    if ($opt_publish_full eq $output) {
+    if ($opt_publish_full eq $results_output_folder) {
         $results_stdout .= qq|Results at: $opt_publish_full|.'results.html'.qq|\n|;
     }
 
@@ -1241,7 +1241,7 @@ sub get_assets { ## get page assets matching a list for a reference type
 
             $_asset_response = $useragent->request($_asset_request);
 
-            write_file( "$output_folder/$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
+            write_file( "$results_output_folder$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
@@ -2506,10 +2506,10 @@ sub process_config_file { #parse config file and grab values it sets
     }
 
     # find the name of the output folder only i.e. not full path - OS safe
-    my $_abs_output_full = File::Spec->rel2abs( $output );
+    my $_abs_output_full = File::Spec->rel2abs( $results_output_folder ) . '/dummy';
     $concurrency =  basename ( dirname($_abs_output_full) );
 
-    $outsum = unpack '%32C*', $output; ## checksum of output directory name - for concurrency
+    $outsum = unpack '%32C*', $results_output_folder; ## checksum of output directory name - for concurrency
     #print "outsum $outsum \n";
 
     if (defined $config->{ports_variable}) {
@@ -2627,10 +2627,7 @@ sub read_test_case_file {
 sub _write_failed_xml {
     my ($_xml) = @_;
 
-    ## output location might include a prefix that we do not want
-    my $_output_folder = dirname($output.'dummy');
-
-    my $_path = slash_me ($_output_folder.'/parse_error');
+    my $_path = slash_me ($results_output_folder.'parse_error');
 
     File::Path::make_path ( $_path );
 
@@ -2669,7 +2666,7 @@ sub _include_file {
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
     $_include =~ s{\n(\s*)retryfromstep[\s]*=[\s]*"}{"\n".$1.'retryfromstep="'.$_id.'.'}eg; #'
 
-    #open my $_INCLUDE, '>', "$output".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
+    #open my $_INCLUDE, '>', "$results_output_folder".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
     #print {$_INCLUDE} $_include;
     #close $_INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
 
@@ -2766,7 +2763,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{CONCURRENCY}/$concurrency/g; ## name of the temporary folder being used - not full path
-    $_[0] =~ s/{OUTPUT}/$output/g;
+    $_[0] =~ s/{OUTPUT}/$results_output_folder/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;
     $_[0] =~ s/{CWD}/$this_script_folder_full/g; ## CWD Current Working Directory
@@ -2983,8 +2980,7 @@ sub httplog {  # write requests and responses to http.txt file
 
     ## save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
-        my $_response_folder_name = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-        write_file( "$_response_folder_name/$case{logresponseasfile}", {binmode => ':raw'}, $response->content ); #content just outputs the content, whereas as_string includes the response header
+        write_file( "$results_output_folder$case{logresponseasfile}", {binmode => ':raw'}, $response->content ); #content just outputs the content, whereas as_string includes the response header
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
@@ -3080,7 +3076,7 @@ sub _write_step_html {
     $_html .= qq|            <h2 style="font-size:1.2em !important; font-family: Verdana, sans-serif !important; margin-bottom:0.3em !important; text-align: left;">\n|;
     $_html .= qq|                <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder !important;" href="../../../All_Batches/Summary.xml"> Summary </a> -&gt; <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="../../../All_Batches/$_wif_batch.xml"> Batch Summary </a> -&gt; <a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="results_$_wif_run_number.xml"> Run Results </a> -&gt; Step\n|;
     if (defined $previous_test_step) {
-        $_html .= qq|                &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$previous_test_step.html"> prev </a>]\n|;
+        $_html .= qq|                &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$previous_test_step.html"> prev </a>]\n|;
     }
     $_html .= qq|            </h2>\n|;
     $_html .= qq|        </div>\n|;
@@ -3195,7 +3191,7 @@ sub _add_selenium_screenshot {
 
     # if we have a Selenium WebDriver screenshot, link to it
     if (-e "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.png" ) {
-        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacks_print$retries_print" src="$output_prefix$testnum_display$jumpbacks_print$retries_print.png"><br />|;
+        ${$_html} .= qq|<br /><img style="position: relative; left: 50%; transform: translateX(-50%);" alt="screenshot of test step $testnum_display$jumpbacks_print$retries_print" src="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.png"><br />|;
     }
 
     return;
@@ -3223,7 +3219,7 @@ sub _add_email_link {
 
     # if we have grabbed an email file, link to it
     if (-e "$opt_publish_full$testnum_display$jumpbacks_print$retries_print.eml" ) {
-        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
+        ${$_html} .= qq|<br /><A style="font-family: Verdana; font-size:2.5em;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.eml">&nbsp; Link to actual eMail file &nbsp;</A><br /><br />|;
     }
 
     return;
@@ -3361,7 +3357,7 @@ sub _delayed_write_step_html {
     if (defined $delayed_file_full) { # will not be defined on very first call, since it is only written to by this sub
         if (defined $_html) { # will not be defined on very last call - sub finaltaks passes undef
             # substitute in the next test step number now that we know what it is
-            $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$output_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
+            $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         if (not $opt_no_output) {
             open my $_FILE, '>:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
@@ -3500,26 +3496,27 @@ sub get_options {  #shell options
     }
 
     if ($opt_output) {  #use output location if it is passed from the command line
-        $output = $opt_output;
+        $results_output_folder = dirname($opt_output.'dummy') . '/'; ## remove any prefix passed from command line e.g. --output output\run1 becomes output/
     }
     else {
-        $output = 'output/'; ## default to the output folder under the current folder
+        $results_output_folder = 'output/'; ## default to the output folder under the current folder
     }
-    $output = slash_me($output);
-    $output_folder = dirname($output.'dummy'); ## output folder supplied by command line might include a filename prefix that needs to be discarded, dummy text needed due to behaviour of dirname function
-    File::Path::make_path ( $output_folder );
-    $output_prefix = $output;
-    $output_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
+    $results_output_folder = slash_me($results_output_folder);
+    File::Path::make_path ( $results_output_folder );
+
+    $results_filename_prefix = '';
+    if ($opt_output) {
+        $results_filename_prefix = $opt_output;
+        $results_filename_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
+    }
 
     # default the publish to location for the individual html step files
     if (not defined $opt_publish_full) {
-        $opt_publish_full = $output;
+        $opt_publish_full = $results_output_folder.$results_filename_prefix;
     } else {
         $opt_publish_full = slash_me($opt_publish_full);
     }
 
-    print "output:$output\n";
-    print "output_folder:$output_folder\n";
     return;
 }
 
