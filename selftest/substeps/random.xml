@@ -36,7 +36,7 @@
     id="35"
     description1="Info - checking that first random digit is never 0"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 <case

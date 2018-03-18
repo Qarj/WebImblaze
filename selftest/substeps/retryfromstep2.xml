@@ -16,7 +16,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="Retry from a step that does not exist"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
     verifypositive="Jaffa Cakes"
     retryfromstep="15"
 />
@@ -25,7 +25,7 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="Final step"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 

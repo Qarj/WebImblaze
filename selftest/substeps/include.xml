@@ -11,7 +11,7 @@ Expected failures will be asserted by the master test file.
     id="1"
     description1="Setup variables"
     method="cmd"
-    command="NOP"
+    command="echo NOP"
 />
 
 <include

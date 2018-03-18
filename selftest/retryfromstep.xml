@@ -47,7 +47,7 @@ Self test master file. All test steps in this file should pass.
     id="30"
     description1="${feature}2"
     method="cmd"
-    command=".\webinject.pl -o selftest\output\${feature}2sub -c selftest\substeps\${feature}config.xml selftest\substeps\${feature}2.xml"
+    command=".\webinject.pl -o selftest/output/${feature}2sub -c selftest/substeps/${feature}config.xml selftest/substeps/${feature}2.xml"
     verifynegative="uninitialized value"
     verifypositive10="Test Cases Passed: 1"
     verifypositive11="Test Cases Failed: 0"

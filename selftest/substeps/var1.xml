@@ -18,7 +18,7 @@ Expected failures will be asserted by the master test file.
     id="20"
     description1="View copied vars {COPY}"
     method="cmd"
-    command1="REM"
+    command1="echo"
 />
 
 <case
@@ -26,8 +26,8 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="View copied vars {COPY} {XCOPY}"
     method="cmd"
-    command1="REM _COPY_IS_{COPY}"
-    command2="REM _XCOPY_IS_{XCOPY}"
+    command1="echo _COPY_IS_{COPY}"
+    command2="echo _XCOPY_IS_{XCOPY}"
     verifypositive1="_COPY_IS_My New Var"
     verifypositive2="_XCOPY_IS_My New Var"
 />

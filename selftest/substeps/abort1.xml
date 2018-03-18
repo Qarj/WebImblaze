@@ -9,7 +9,7 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Step passes"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
     verifypositive="NOP"
 />
 
@@ -44,7 +44,7 @@ Expected failures will be asserted by the master test file.
     id="100"
     description1="Get close account page"
     method="cmd"
-    command="REM Get account close page"
+    command="echo Get account close page"
     verifypositive="Get account close page"
 />
 
@@ -52,7 +52,7 @@ Expected failures will be asserted by the master test file.
     id="110"
     description1="Confirm account close"
     method="cmd"
-    command="REM Your account has been closed"
+    command="echo Your account has been closed"
     verifypositive="Your account has been closed"
 />
 

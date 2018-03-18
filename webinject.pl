@@ -3495,20 +3495,14 @@ sub get_options {  #shell options
         exit;
     }
 
-    if ($opt_output) {  #use output location if it is passed from the command line
-        $results_output_folder = dirname($opt_output.'dummy') . '/'; ## remove any prefix passed from command line e.g. --output output\run1 becomes output/
-    }
-    else {
-        $results_output_folder = 'output/'; ## default to the output folder under the current folder
-    }
-    $results_output_folder = slash_me($results_output_folder);
+    $opt_output //= 'output/';
+    $opt_output = slash_me($opt_output);
+
+    $results_output_folder = slash_me(dirname($opt_output.'dummy') . '/'); ## remove any prefix passed from command line e.g. --output output\run1 becomes output/
     File::Path::make_path ( $results_output_folder );
 
-    $results_filename_prefix = '';
-    if ($opt_output) {
-        $results_filename_prefix = $opt_output;
-        $results_filename_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
-    }
+    $results_filename_prefix = $opt_output;
+    $results_filename_prefix =~ s{.*[/\\]}{}g; ## if there is an output prefix, grab it
 
     # default the publish to location for the individual html step files
     if (not defined $opt_publish_full) {
@@ -3516,6 +3510,10 @@ sub get_options {  #shell options
     } else {
         $opt_publish_full = slash_me($opt_publish_full);
     }
+
+    print "results_output_folder:$results_output_folder\n";
+    print "results_filename_prefix:$results_filename_prefix\n";
+    print "opt_publish_full:$opt_publish_full\n";
 
     return;
 }

@@ -13,15 +13,15 @@ Expected failures will be asserted by the master test file.
     id="10"
     description1="Perform simple evals"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 <case
     id="20"
     description1="Check eval true, false results: _{EXPECT_TRUE}_, _{EXPECT_FALSE}_"
     method="cmd"
-    command1="REM Should be true _{EXPECT_TRUE}_"
-    command2="REM Should be false _{EXPECT_FALSE}_"
+    command1="echo Should be true _{EXPECT_TRUE}_"
+    command2="echo Should be false _{EXPECT_FALSE}_"
     verifypositive1="Should be true _1_"
     verifypositive2="Should be false __"
 />
@@ -30,8 +30,8 @@ Expected failures will be asserted by the master test file.
     id="30"
     description1="Check eval math: _{EXPECT_TEN}_, _{EXPECT_24}_"
     method="cmd"
-    command1="REM Should be 10 _{EXPECT_TEN}_"
-    command2="REM Should be 24 _{EXPECT_24}_"
+    command1="echo Should be 10 _{EXPECT_TEN}_"
+    command2="echo Should be 24 _{EXPECT_24}_"
     verifypositive1="Should be 10 _10_"
     verifypositive2="Should be 24 _24_"
 />
@@ -42,7 +42,7 @@ Expected failures will be asserted by the master test file.
     id="100"
     description1="Perform evals with other variables"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 <case
@@ -50,14 +50,14 @@ Expected failures will be asserted by the master test file.
     id="110"
     description1="Perform evals with other variables"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 <case
     id="120"
     description1="Check hundred: _{EXPECT_HUNDRED}_"
     method="cmd"
-    command1="REM Should be hundred _{EXPECT_HUNDRED}_"
+    command1="echo Should be hundred _{EXPECT_HUNDRED}_"
     verifypositive1="Should be hundred _100_"
 />
 
@@ -66,14 +66,14 @@ Expected failures will be asserted by the master test file.
     id="200"
     description1="Perform evals with octal number - leading 0"
     method="cmd"
-    command="REM NOP"
+    command="echo NOP"
 />
 
 <case
     id="210"
     description1="Check leading zero treated as Octal"
     method="cmd"
-    command1="REM Should be eight _{EXPECT_EIGHT}_"
+    command1="echo Should be eight _{EXPECT_EIGHT}_"
     verifypositive1="Should be eight _8_"
 />
 
