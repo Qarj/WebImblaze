@@ -1263,56 +1263,43 @@ sub get_assets { ## get page assets matching a list for a reference type
 sub save_page {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
     my $_page_action;
-    my $_page_index; ## where to save the page in the cache (array of pages)
 
-    ## decide if we want to save this page - needs a method post action
-    if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) { ## look for the method post action
+    ## if we have a method="post" and action="something" then save the page in the cache
+    if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) {
         $_page_action = $1;
         $results_stdout .= qq|\n ACTION $_page_action\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq|\n ACTION none\n\n| if $EXTRA_VERBOSE;
+        return;
     }
 
-    if (defined $_page_action) {
-        if (not $_page_action) {
-            $results_stdout .= qq| ACTION IS NULL - will use test step url path\n| if $EXTRA_VERBOSE;
-            $_page_action = $case{url};
-        }
+    if (not $_page_action) {
+        $results_stdout .= qq| ACTION IS NULL - will use test step url path\n| if $EXTRA_VERBOSE;
+        $_page_action = $case{url};
     }
 
-    if (defined $_page_action) { ## ok, so we save this page
+    my $_normalised_page_action = _url_path($_page_action);
+    $results_stdout .= qq| SAVING $_normalised_page_action\n| if $EXTRA_VERBOSE;
 
-        my $_normalised_page_action = _url_path($_page_action);
-        $results_stdout .= qq| SAVING $_normalised_page_action\n| if $EXTRA_VERBOSE;
+    my $_page_index_to_write = _find_page_in_cache($_normalised_page_action);
 
-        ## check to see if we already have this page in the cache, if so, just overwrite it
-        $_page_index = _find_page_in_cache($_normalised_page_action);
+    if (not defined $_page_index_to_write) {
+        $_page_index_to_write = _find_free_index_or_oldest_index();
+    }
 
-        ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
-        if (not defined $_page_index) { ## the page is not in the cache
-            if ($#visited_page_names == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
-                $_page_index = _find_oldest_page_in_cache();
-                #autosub_debug $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index\n\n|; #debug
-            } else {
-                $_page_index = $#visited_page_names + 1;
-                #autosub_debug $results_stdout .= qq| Index $_page_index available \n\n|;
-            }
-        }
+    ## update the cache
+    $page_update_times[$_page_index_to_write] = time;
+    $visited_page_names[$_page_index_to_write] = $_normalised_page_action;
+    $visited_pages[$_page_index_to_write] = $response->as_string;
 
-        ## update the global variables
-        $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
-        $visited_page_names[$_page_index] = $_normalised_page_action; ## save page name
-        $visited_pages[$_page_index] = $response->as_string; ## save page source
+    #autosub_debug $results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
 
-        #autosub_debug $results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
+    ## debug - write out the contents of the cache
+    #autosub_debug for my $i (0 .. $#visited_page_names) {
+    #autosub_debug     $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
+    #autosub_debug }
+    #autosub_debug $results_stdout .= "\n";
 
-        ## debug - write out the contents of the cache
-        #autosub_debug for my $i (0 .. $#visited_page_names) {
-        #autosub_debug     $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
-        #autosub_debug }
-        #autosub_debug $results_stdout .= "\n";
-
-    } # end if - action found
 
     return;
 }
@@ -1346,6 +1333,20 @@ sub _find_page_in_cache {
     }
 
     return;
+}
+
+sub _find_free_index_or_oldest_index {
+
+    my $_page_index_to_write;
+    if ($#visited_page_names == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
+        $_page_index_to_write = _find_oldest_page_in_cache();
+        $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index_to_write\n\n| if $EXTRA_VERBOSE;
+    } else {
+        $_page_index_to_write = $#visited_page_names + 1;
+        $results_stdout .= qq| Index $_page_index_to_write is free \n\n| if $EXTRA_VERBOSE;
+    }
+
+    return $_page_index_to_write;
 }
 
 sub _find_oldest_page_in_cache {

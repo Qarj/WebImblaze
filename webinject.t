@@ -82,6 +82,77 @@ save_page();
 save_page();
 assert_stdout_contains('MATCH at position 1', 'save_page: MATCH at position 1');
 
+before_test();
+$main::response = HTTP::Response->parse('action="submit.aspx" method="post"');
+save_page();
+$main::response = HTTP::Response->parse('action="query.aspx" method="post"');
+save_page();
+$main::response = HTTP::Response->parse('action="/register.cgi" method="post"');
+save_page();
+assert_stdout_contains('NO MATCH on 0:submit.aspx', 'save_page: NO MATCH on 0:submit.aspx');
+assert_stdout_contains('NO MATCH on 1:query.aspx', 'save_page: NO MATCH on 1:query.aspx');
+assert_stdout_contains('NO MATCHES FOUND IN CACHE', 'save_page: NO MATCHES FOUND IN CACHE - different action');
+save_page();
+assert_stdout_contains('MATCH at position 2', 'save_page: MATCH at position 2');
+$main::response = HTTP::Response->parse('action="/submit.aspx" method="post"');
+save_page();
+assert_stdout_contains('NO MATCHES FOUND IN CACHE', 'save_page: NO MATCHES FOUND IN CACHE - slightly different action');
+save_page();
+assert_stdout_contains('MATCH at position 3', 'save_page: MATCH at position 3 - slightly different action saved again');
+
+
+
+before_test();
+$main::response = HTTP::Response->parse('action="index_0" method="post"');
+save_page();
+assert_stdout_contains('Index 0 is free', 'save_page: Index 0 is free');
+
+$main::response = HTTP::Response->parse('action="index_1" method="post"');
+save_page();
+assert_stdout_contains('Index 1 is free', 'save_page: Index 1 is free');
+
+$main::response = HTTP::Response->parse('action="index_2" method="post"');
+save_page();
+assert_stdout_contains('Index 2 is free', 'save_page: Index 2 is free');
+
+$main::response = HTTP::Response->parse('action="index_3" method="post"');
+save_page();
+assert_stdout_contains('Index 3 is free', 'save_page: Index 3 is free');
+
+$main::response = HTTP::Response->parse('action="index_4" method="post"');
+save_page();
+assert_stdout_contains('Index 4 is free', 'save_page: Index 4 is free');
+
+$main::response = HTTP::Response->parse('action="index_5" method="post"');
+save_page();
+assert_stdout_contains('Index 5 is free', 'save_page: Index 5 is free');
+
+$main::response = HTTP::Response->parse('action="page_7" method="post"');
+clear_stdout();
+save_page();
+assert_stdout_contains('Overwriting - Oldest Page Index: 0', 'save_page: Overwrite oldest page in cache - index 0');
+
+$main::response = HTTP::Response->parse('action="page_8" method="post"');
+clear_stdout();
+save_page();
+assert_stdout_contains('Overwriting - Oldest Page Index: 1', 'save_page: Overwrite oldest page in cache - index 1');
+
+$main::response = HTTP::Response->parse('action="page_9" method="post"');
+clear_stdout();
+save_page();
+assert_stdout_contains('Overwriting - Oldest Page Index: 2', 'save_page: Overwrite oldest page in cache - index 2');
+
+clear_stdout();
+save_page();
+assert_stdout_contains('MATCH at position 2', 'save_page: MATCH at position 2 - save overwritten page again');
+
+$main::response = HTTP::Response->parse('action="page_8" method="post"');
+clear_stdout();
+save_page();
+assert_stdout_contains('MATCH at position 1', 'save_page: MATCH at position 1 - save older overwritten page again');
+
+
+
 #
 # GLOBAL HELPER SUBS
 #
@@ -103,6 +174,10 @@ sub assert_stdout_contains {
     } else {
         is($main::results_stdout, $_must_contain, $_test_description);
     }
+}
+
+sub clear_stdout {
+    $main::results_stdout = '';
 }
 
 sub before_test {
