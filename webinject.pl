@@ -91,9 +91,10 @@ my $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
-my @visited_pages; ## page source of previously visited pages
-my @visited_page_names; ## page name of previously visited pages
-my @page_update_times; ## last time the page was updated in the cache
+our @visited_pages; ## page source of previously visited pages
+our @visited_page_names; ## page name of previously visited pages
+our @page_update_times; ## last time the page was updated in the cache
+my $MAX_CACHE_SIZE = 5; ## maximum size of the cache
 
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
@@ -1274,30 +1275,22 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
 
     if (defined $_page_action) {
         if (not $_page_action) {
-            #autosub_debug $results_stdout .= qq| ACTION IS NULL!\n|;
-            $_page_action = _url_path($case{url});
-            #autosub_debug $results_stdout .= qq| ACTION IS NOW $_page_action\n|;
+            $results_stdout .= qq| ACTION IS NULL - will use test step url path\n| if $EXTRA_VERBOSE;
+            $_page_action = $case{url};
         }
     }
 
     if (defined $_page_action) { ## ok, so we save this page
 
-        #autosub_debug $results_stdout .= qq| SAVING $_page_action (BEFORE)\n|;
-        $_page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-        $_page_action =~ s{http.?://}{}si; ## remove http:// and https://
-        #autosub_debug $results_stdout .= qq| SAVING $_page_action (AFTER)\n\n|;
-
-        ## we want to overwrite any page with the same name in the cache to prevent weird errors
-        my $_match_url = $_page_action;
-        $_match_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+        my $_normalised_page_action = _url_path($_page_action);
+        $results_stdout .= qq| SAVING $_normalised_page_action\n| if $EXTRA_VERBOSE;
 
         ## check to see if we already have this page in the cache, if so, just overwrite it
-        $_page_index = _find_page_in_cache($_match_url);
+        $_page_index = _find_page_in_cache($_normalised_page_action);
 
-        my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
         ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
         if (not defined $_page_index) { ## the page is not in the cache
-            if ($#visited_page_names == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
+            if ($#visited_page_names == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
                 $_page_index = _find_oldest_page_in_cache();
                 #autosub_debug $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index\n\n|; #debug
             } else {
@@ -1308,7 +1301,7 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
 
         ## update the global variables
         $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
-        $visited_page_names[$_page_index] = $_page_action; ## save page name
+        $visited_page_names[$_page_index] = $_normalised_page_action; ## save page name
         $visited_pages[$_page_index] = $response->as_string; ## save page source
 
         #autosub_debug $results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
@@ -1332,6 +1325,27 @@ sub _url_path { #https://example.com/search/form?terms=cheapest becomes /search/
         $_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
 
         return $_url;
+}
+
+sub _find_page_in_cache {
+
+    my ($_normalised_page_action) = @_;
+
+    if ($visited_page_names[0]) { ## does the array contain at least one entry?
+        for my $_i (0 .. $#visited_page_names) {
+            if ($visited_page_names[$_i] =~ m/$_normalised_page_action/si) { ## can we find the post url within the current saved action url?
+                $results_stdout .= qq| MATCH at position $_i\n| if $EXTRA_VERBOSE;
+                return $_i;
+            } else {
+                $results_stdout .= qq| NO MATCH on $_i:$visited_page_names[$_i]\n| if $EXTRA_VERBOSE;
+            }
+        }
+        $results_stdout .= qq| NO MATCHES FOUND IN CACHE!\n| if $EXTRA_VERBOSE;
+    } else {
+        $results_stdout .= qq| NO CACHED PAGES!\n| if $EXTRA_VERBOSE;
+    }
+
+    return;
 }
 
 sub _find_oldest_page_in_cache {
@@ -1552,26 +1566,6 @@ sub _substitute_data {
     return $_post_field;
 }
 
-sub _find_page_in_cache {
-
-    my ($_post_url) = @_;
-
-    ## see if we have stored this page
-    if ($visited_page_names[0]) { ## does the array contain at least one entry?
-        for my $_i (0 .. $#visited_page_names) {
-            if ($visited_page_names[$_i] =~ m/$_post_url/si) { ## can we find the post url within the current saved action url?
-            #autosub_debug $results_stdout .= qq| MATCH at position $_i\n|; #debug
-            return $_i;
-            } else {
-                #autosub_debug $results_stdout .= qq| NO MATCH on $_i:$visited_page_names[$_i]\n|; #debug
-            }
-        }
-    } else {
-        #autosub_debug $results_stdout .= qq| NO CACHED PAGES! \n|; #debug
-    }
-
-    return;
-}
 #------------------------------------------------------------------
 sub httpget {  #send http request and read response
 
