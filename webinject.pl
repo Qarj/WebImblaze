@@ -91,9 +91,9 @@ my $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
-our @visited_pages; ## page source of previously visited pages
-our @visited_page_names; ## page name of previously visited pages
-our @page_update_times; ## last time the page was updated in the cache
+our @cached_pages; ## page source of previously visited pages
+our @cached_page_actions; ## page name of previously visited pages
+our @cached_page_update_times; ## last time the page was updated in the cache
 my $MAX_CACHE_SIZE = 5; ## maximum size of the cache
 
 my $assertion_skips = 0;
@@ -1260,7 +1260,7 @@ sub get_assets { ## get page assets matching a list for a reference type
 }
 
 #------------------------------------------------------------------
-sub save_page {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
+sub save_page_when_method_post_and_has_action {## to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
     my $_page_action;
 
@@ -1287,19 +1287,18 @@ sub save_page {## save the page in a cache to enable auto substitution of hidden
         $_page_index_to_write = _find_free_index_or_oldest_index();
     }
 
-    ## update the cache
-    $page_update_times[$_page_index_to_write] = time;
-    $visited_page_names[$_page_index_to_write] = $_normalised_page_action;
-    $visited_pages[$_page_index_to_write] = $response->as_string;
+    $cached_page_update_times[$_page_index_to_write] = time;
+    $cached_page_actions[$_page_index_to_write] = $_normalised_page_action;
+    $cached_pages[$_page_index_to_write] = $response->as_string;
 
-    #autosub_debug $results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
+    $results_stdout .= " Saved $cached_page_update_times[$_page_index_to_write]:$cached_page_actions[$_page_index_to_write] \n\n" if $EXTRA_VERBOSE;
 
-    ## debug - write out the contents of the cache
-    #autosub_debug for my $i (0 .. $#visited_page_names) {
-    #autosub_debug     $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
-    #autosub_debug }
-    #autosub_debug $results_stdout .= "\n";
-
+    if ($EXTRA_VERBOSE) {
+        for my $_i (0 .. $#cached_page_actions) {
+             $results_stdout .= " Cache $_i:$cached_page_actions[$_i]:$cached_page_update_times[$_i] \n";
+         }
+        $results_stdout .= "\n";
+    }
 
     return;
 }
@@ -1318,13 +1317,13 @@ sub _find_page_in_cache {
 
     my ($_normalised_page_action) = @_;
 
-    if ($visited_page_names[0]) { ## does the array contain at least one entry?
-        for my $_i (0 .. $#visited_page_names) {
-            if ($visited_page_names[$_i] =~ m/$_normalised_page_action/si) { ## can we find the post url within the current saved action url?
+    if ($cached_page_actions[0]) { ## does the array contain at least one entry?
+        for my $_i (0 .. $#cached_page_actions) {
+            if ($cached_page_actions[$_i] =~ m/$_normalised_page_action/si) { ## can we find the post url within the current saved action url?
                 $results_stdout .= qq| MATCH at position $_i\n| if $EXTRA_VERBOSE;
                 return $_i;
             } else {
-                $results_stdout .= qq| NO MATCH on $_i:$visited_page_names[$_i]\n| if $EXTRA_VERBOSE;
+                $results_stdout .= qq| NO MATCH on $_i:$cached_page_actions[$_i]\n| if $EXTRA_VERBOSE;
             }
         }
         $results_stdout .= qq| NO MATCHES FOUND IN CACHE!\n| if $EXTRA_VERBOSE;
@@ -1338,11 +1337,11 @@ sub _find_page_in_cache {
 sub _find_free_index_or_oldest_index {
 
     my $_page_index_to_write;
-    if ($#visited_page_names == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
+    if ($#cached_page_actions == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
         $_page_index_to_write = _find_oldest_page_in_cache();
         $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index_to_write\n\n| if $EXTRA_VERBOSE;
     } else {
-        $_page_index_to_write = $#visited_page_names + 1;
+        $_page_index_to_write = $#cached_page_actions + 1;
         $results_stdout .= qq| Index $_page_index_to_write is free \n\n| if $EXTRA_VERBOSE;
     }
 
@@ -1353,11 +1352,11 @@ sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
     my $_oldest_index = 0;
-    my $_oldest_page_time = $page_update_times[0];
+    my $_oldest_page_time = $cached_page_update_times[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#page_update_times) {
-        if ($page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $page_update_times[$i]; }
+    for my $i (0 .. $#cached_page_update_times) {
+        if ($cached_page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $cached_page_update_times[$i]; }
     }
 
     return $_oldest_index;
@@ -1490,7 +1489,7 @@ sub _substitute_name {
         ## saved page source will contain something like
         ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-        if ($visited_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
+        if ($cached_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
             my $_name = $1;
             #autosub_debug $results_stdout .= qq| NAME is $_name \n|;
 
@@ -1546,7 +1545,7 @@ sub _substitute_data {
     if (defined $_target_field) {
         $_target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
         $_target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
-        if ($visited_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
+        if ($cached_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
             my $_data = $1;
             #autosub_debug $results_stdout .= qq| DATA is $_data \n|; #debug
 
@@ -1592,7 +1591,7 @@ sub httpget {  #send http request and read response
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
 
-    save_page (); ## save page in the cache for the auto substitutions
+    save_page_when_method_post_and_has_action ();
 
     return;
 }
@@ -1636,7 +1635,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
         httpsend_form_urlencoded($_verb);  #use "x-www-form-urlencoded" if no encoding is specified
     }
 
-    save_page (); ## for auto substitutions
+    save_page_when_method_post_and_has_action ();
 
     return;
 }
