@@ -3511,10 +3511,6 @@ sub get_options {  #shell options
         $opt_publish_full = slash_me($opt_publish_full);
     }
 
-    print "results_output_folder:$results_output_folder\n";
-    print "results_filename_prefix:$results_filename_prefix\n";
-    print "opt_publish_full:$opt_publish_full\n";
-
     return;
 }
 
