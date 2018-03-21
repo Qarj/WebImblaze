@@ -13,7 +13,9 @@ do './webinject.pl';
 before_test();
 
 #
+#
 # get_testnum_display
+#
 #
 
 is(get_testnum_display(5,1), '5', 'get_testnum_display: Standard');
@@ -27,13 +29,17 @@ $main::case{runon}='PAT';
 is(get_test_step_skip_message(), 'run on PAT', 'get_test_step_skip_message: run on PAT');
 
 #
+#
 # _url_path
+#
 #
 
 is(_url_path('https://example.com/search/form?terms=cheapest'), '/search/form', '_url_path: Full url with query string');
 
 #
+#
 # save_page_when_method_post_and_has_action 
+#
 #
 
 before_test();
@@ -164,6 +170,51 @@ $main::response = HTTP::Response->parse('action="submit.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Saved [\d\.]+:submit.aspx', 'save_page_when_method_post_and_has_action : confirmation page is saved');
 
+#
+#
+# auto_sub
+#
+#
+
+before_test();
+auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com');
+assert_stdout_contains('There are 3 fields in the postbody', 'auto_sub : normal post has 3 fields');
+
+before_test();
+auto_sub('', 'normalpost', 'http://example.com');
+assert_stdout_contains('There are 0 fields in the postbody', 'auto_sub : normal post has 0 fields');
+
+before_test();
+auto_sub('a=b', 'normalpost', 'http://example.com');
+assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : normal post has 1 field');
+
+before_test();
+auto_sub("( 'name' => 'Upload' )", 'multipost', 'http://example.com');
+assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : multi post has 1 field');
+
+before_test();
+auto_sub("( 'fileUpload' => ['examples/multipart_post.csv'], 'name' => 'Upload' )", 'multipost', 'http://example.com');
+assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : multi post has 2 fields');
+
+before_test();
+auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com');
+assert_stdout_contains('Field 1: a=b', 'auto_sub : field 1 display');
+assert_stdout_contains('Field 2: c=d', 'auto_sub : field 2 display');
+assert_stdout_contains('Field 3: e=f', 'auto_sub : field 3 display');
+
+before_test();
+is(auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com'), 'a=b&c=d&e=f', 'auto_sub : no change - no cached pages');
+assert_stdout_contains('TRY WITH PAGE NAME ONLY', 'auto_sub : try with page name only');
+assert_stdout_contains('REMOVE PATH', 'auto_sub : remove path');
+assert_stdout_contains('REMOVE LEADING /', 'auto_sub : remove leading /');
+assert_stdout_contains('DESPERATE MODE - NO ANCHOR', 'auto_sub : desperate mode - no anchor');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post"');
+save_page_when_method_post_and_has_action ();
+auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('MATCH at position 0', 'auto_sub : exact action match - assert 1');
+assert_stdout_does_not_contain('PAGE NAME ONLY', 'auto_sub : exact action match - assert 2');
 
 
 #
@@ -186,6 +237,16 @@ sub assert_stdout_contains {
         is(1, 1, $_test_description);
     } else {
         is($main::results_stdout, $_must_contain, $_test_description);
+    }
+}
+
+sub assert_stdout_does_not_contain {
+    my ($_must_not_contain, $_test_description) = @_;
+    if ($main::results_stdout =~ m/$_must_not_contain/s) {
+        isnt($main::results_stdout, $main::results_stdout, $_test_description);
+        print '# not expected: '.$_must_not_contain."\n";
+    } else {
+        is(1, 1, $_test_description);
     }
 }
 

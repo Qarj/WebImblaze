@@ -1387,10 +1387,11 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
         @_post_fields = split /\'\,/, $_post_body ; #separate the fields
     }
 
-    ## debug - print the array
-    #autosub_debug $results_stdout .= " \n There are ".($#_post_fields+1)." fields in the postbody: \n"; #debug
-    for my $_i (0 .. $#_post_fields) {
-        #autosub_debug $results_stdout .= ' Field '.($_i+1).": $_post_fields[$_i] \n";
+    if ($EXTRA_VERBOSE) {
+        $results_stdout .= " \n There are ".($#_post_fields+1)." fields in the postbody: \n";
+        for my $_i (0 .. $#_post_fields) {
+            $results_stdout .= '  Field '.($_i+1).": $_post_fields[$_i] \n";
+        }
     }
 
     ## work out pagename to use for matching purposes
@@ -1399,21 +1400,21 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
     my $_page_id = _find_page_in_cache($_post_url.q{$});
     if (not defined $_page_id) {
         $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #autosub_debug $results_stdout .= " TRY WITH PAGE NAME ONLY    : $_post_url".'$'."\n";
+        $results_stdout .= " TRY WITH PAGE NAME ONLY    : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
     if (not defined $_page_id) {
         $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
-        #autosub_debug $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n";
+        $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
     if (not defined $_page_id) {
         $_post_url =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        #autosub_debug $results_stdout .= " REMOVE LEADING /           : $_post_url".'$'."\n";
+        $results_stdout .= " REMOVE LEADING /           : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
     if (not defined $_page_id) {
-        #autosub_debug $results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n";
+        $results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n" if $EXTRA_VERBOSE;
         _find_page_in_cache($_post_url);
     }
 
