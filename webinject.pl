@@ -91,9 +91,10 @@ my $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
-my @visited_pages; ## page source of previously visited pages
-my @visited_page_names; ## page name of previously visited pages
-my @page_update_times; ## last time the page was updated in the cache
+our @cached_pages; ## page source of previously visited pages
+our @cached_page_actions; ## page name of previously visited pages
+our @cached_page_update_times; ## last time the page was updated in the cache
+my $MAX_CACHE_SIZE = 5; ## maximum size of the cache
 
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; ## support tagging an assertion as disabled with a message
@@ -1259,67 +1260,45 @@ sub get_assets { ## get page assets matching a list for a reference type
 }
 
 #------------------------------------------------------------------
-sub save_page {## save the page in a cache to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
+sub save_page_when_method_post_and_has_action {## to enable auto substitution of hidden fields like __VIEWSTATE and the dynamic component of variable names
 
     my $_page_action;
-    my $_page_index; ## where to save the page in the cache (array of pages)
 
-    ## decide if we want to save this page - needs a method post action
-    if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) { ## look for the method post action
+    ## if we have a method="post" and action="something" then save the page in the cache
+    if ( ($response->as_string =~ m{method="post"[^>]+action="([^"]*)"}s) || ($response->as_string =~ m{action="([^"]*)"[^>]+method="post"}s) ) {
         $_page_action = $1;
         $results_stdout .= qq|\n ACTION $_page_action\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq|\n ACTION none\n\n| if $EXTRA_VERBOSE;
+        return;
     }
 
-    if (defined $_page_action) {
-        if (not $_page_action) {
-            #autosub_debug $results_stdout .= qq| ACTION IS NULL!\n|;
-            $_page_action = _url_path($case{url});
-            #autosub_debug $results_stdout .= qq| ACTION IS NOW $_page_action\n|;
-        }
+    if (not $_page_action) {
+        $results_stdout .= qq| ACTION IS NULL - will use test step url path\n| if $EXTRA_VERBOSE;
+        $_page_action = $case{url};
     }
 
-    if (defined $_page_action) { ## ok, so we save this page
+    my $_normalised_page_action = _url_path($_page_action);
+    $results_stdout .= qq| SAVING $_normalised_page_action\n| if $EXTRA_VERBOSE;
 
-        #autosub_debug $results_stdout .= qq| SAVING $_page_action (BEFORE)\n|;
-        $_page_action =~ s{[?].*}{}si; ## we only want everything to the left of the ? mark
-        $_page_action =~ s{http.?://}{}si; ## remove http:// and https://
-        #autosub_debug $results_stdout .= qq| SAVING $_page_action (AFTER)\n\n|;
+    my $_page_index_to_write = _find_page_in_cache($_normalised_page_action);
 
-        ## we want to overwrite any page with the same name in the cache to prevent weird errors
-        my $_match_url = $_page_action;
-        $_match_url =~ s{^.*?/}{/}s; ## remove everything to the left of the first / in the path
+    if (not defined $_page_index_to_write) {
+        $_page_index_to_write = _find_free_index_or_oldest_index();
+    }
 
-        ## check to see if we already have this page in the cache, if so, just overwrite it
-        $_page_index = _find_page_in_cache($_match_url);
+    $cached_page_update_times[$_page_index_to_write] = time;
+    $cached_page_actions[$_page_index_to_write] = $_normalised_page_action;
+    $cached_pages[$_page_index_to_write] = $response->as_string;
 
-        my $max_cache_size = 5; ## maximum size of the cache (counting starts at 0)
-        ## decide if we need a new cache entry, or we must overwrite the oldest page in the cache
-        if (not defined $_page_index) { ## the page is not in the cache
-            if ($#visited_page_names == $max_cache_size) {## the cache is full - so we need to overwrite the oldest page in the cache
-                $_page_index = _find_oldest_page_in_cache();
-                #autosub_debug $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index\n\n|; #debug
-            } else {
-                $_page_index = $#visited_page_names + 1;
-                #autosub_debug $results_stdout .= qq| Index $_page_index available \n\n|;
-            }
-        }
+    $results_stdout .= " Saved $cached_page_update_times[$_page_index_to_write]:$cached_page_actions[$_page_index_to_write] \n\n" if $EXTRA_VERBOSE;
 
-        ## update the global variables
-        $page_update_times[$_page_index] = time; ## save time so we overwrite oldest when cache is full
-        $visited_page_names[$_page_index] = $_page_action; ## save page name
-        $visited_pages[$_page_index] = $response->as_string; ## save page source
-
-        #autosub_debug $results_stdout .= " Saved $page_update_times[$_page_index]:$visited_page_names[$_page_index] \n\n";
-
-        ## debug - write out the contents of the cache
-        #autosub_debug for my $i (0 .. $#visited_page_names) {
-        #autosub_debug     $results_stdout .= " $i:$page_update_times[$i]:$visited_page_names[$i] \n"; #debug
-        #autosub_debug }
-        #autosub_debug $results_stdout .= "\n";
-
-    } # end if - action found
+    if ($EXTRA_VERBOSE) {
+        for my $_i (0 .. $#cached_page_actions) {
+             $results_stdout .= " Cache $_i:$cached_page_actions[$_i]:$cached_page_update_times[$_i] \n";
+         }
+        $results_stdout .= "\n";
+    }
 
     return;
 }
@@ -1334,15 +1313,50 @@ sub _url_path { #https://example.com/search/form?terms=cheapest becomes /search/
         return $_url;
 }
 
+sub _find_page_in_cache {
+
+    my ($_normalised_page_action) = @_;
+
+    if ($cached_page_actions[0]) { ## does the array contain at least one entry?
+        for my $_i (0 .. $#cached_page_actions) {
+            if ($cached_page_actions[$_i] =~ m/$_normalised_page_action/si) { ## can we find the post url within the current saved action url?
+                $results_stdout .= qq| MATCH at position $_i\n| if $EXTRA_VERBOSE;
+                return $_i;
+            } else {
+                $results_stdout .= qq| NO MATCH on $_i:$cached_page_actions[$_i]\n| if $EXTRA_VERBOSE;
+            }
+        }
+        $results_stdout .= qq| NO MATCHES FOUND IN CACHE!\n| if $EXTRA_VERBOSE;
+    } else {
+        $results_stdout .= qq| NO CACHED PAGES!\n| if $EXTRA_VERBOSE;
+    }
+
+    return;
+}
+
+sub _find_free_index_or_oldest_index {
+
+    my $_page_index_to_write;
+    if ($#cached_page_actions == $MAX_CACHE_SIZE) {## the cache is full - so we need to overwrite the oldest page in the cache
+        $_page_index_to_write = _find_oldest_page_in_cache();
+        $results_stdout .= qq|\n Overwriting - Oldest Page Index: $_page_index_to_write\n\n| if $EXTRA_VERBOSE;
+    } else {
+        $_page_index_to_write = $#cached_page_actions + 1;
+        $results_stdout .= qq| Index $_page_index_to_write is free \n\n| if $EXTRA_VERBOSE;
+    }
+
+    return $_page_index_to_write;
+}
+
 sub _find_oldest_page_in_cache {
 
     ## assume the first page in the cache is the oldest
     my $_oldest_index = 0;
-    my $_oldest_page_time = $page_update_times[0];
+    my $_oldest_page_time = $cached_page_update_times[0];
 
     ## if we find an older updated time, use that instead
-    for my $i (0 .. $#page_update_times) {
-        if ($page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $page_update_times[$i]; }
+    for my $i (0 .. $#cached_page_update_times) {
+        if ($cached_page_update_times[$i] < $_oldest_page_time) { $_oldest_index = $i; $_oldest_page_time = $cached_page_update_times[$i]; }
     }
 
     return $_oldest_index;
@@ -1373,10 +1387,11 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
         @_post_fields = split /\'\,/, $_post_body ; #separate the fields
     }
 
-    ## debug - print the array
-    #autosub_debug $results_stdout .= " \n There are ".($#_post_fields+1)." fields in the postbody: \n"; #debug
-    for my $_i (0 .. $#_post_fields) {
-        #autosub_debug $results_stdout .= ' Field '.($_i+1).": $_post_fields[$_i] \n";
+    if ($EXTRA_VERBOSE) {
+        $results_stdout .= " \n There are ".($#_post_fields+1)." fields in the postbody: \n";
+        for my $_i (0 .. $#_post_fields) {
+            $results_stdout .= '  Field '.($_i+1).": $_post_fields[$_i] \n";
+        }
     }
 
     ## work out pagename to use for matching purposes
@@ -1384,37 +1399,43 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
 
     my $_page_id = _find_page_in_cache($_post_url.q{$});
     if (not defined $_page_id) {
-        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        #autosub_debug $results_stdout .= " TRY WITH PAGE NAME ONLY    : $_post_url".'$'."\n";
-        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
-    }
-    if (not defined $_page_id) {
-        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
-        #autosub_debug $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n";
-        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
-    }
-    if (not defined $_page_id) {
         $_post_url =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        #autosub_debug $results_stdout .= " REMOVE LEADING /           : $_post_url".'$'."\n";
+        $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
     if (not defined $_page_id) {
-        #autosub_debug $results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n";
-        _find_page_in_cache($_post_url);
+        $results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n" if $EXTRA_VERBOSE;
+        $_page_id = _find_page_in_cache($_post_url);
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
-    #autosub_debug my $_start_loop_timer = time;
+    my $_start_loop_timer = time if $EXTRA_VERBOSE;
 
     ## time for substitutions
     if (defined $_page_id) { ## did we find match?
-        #autosub_debug $results_stdout .= " ID MATCH $_page_id \n";
+        $results_stdout .= " ID MATCH $_page_id \n" if $EXTRA_VERBOSE;
         for my $_i (0 .. $#_post_fields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
+
+            my $_dot_x_found;
+            my $_dot_y_found;
+
+            ($_dot_x_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'x');
+            ($_dot_y_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'y');
+    
             $_post_fields[$_i] = _substitute_name($_post_fields[$_i], $_page_id, $_post_type);
 
             ## substitute {DATA} for actual
             $_post_fields[$_i] = _substitute_data($_post_fields[$_i], $_page_id, $_post_type);
+
+            if ($_dot_x_found) {
+                $_post_fields[$_i] = _restore_dot_letter_to_field_name($_post_fields[$_i], $_post_type, 'x');
+            }
+
+            if ($_dot_y_found) {
+                $_post_fields[$_i] = _restore_dot_letter_to_field_name($_post_fields[$_i], $_post_type, 'y');
+            }
+    
         }
     }
 
@@ -1427,34 +1448,42 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
         ##   1. subsitute out blank space first between the field separators
         $_post_body = join q{',}, @_post_fields; #'
     }
-    #autosub_debug  $results_stdout .= qq|\n\n POSTBODY is $_post_body \n|;
+    $results_stdout .= qq|\n\n POSTBODY is $_post_body \n| if $EXTRA_VERBOSE;
 
-    #autosub_debug my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000);  ## elapsed time rounded to thousandths
-    #autosub_debug # debug - make sure all the regular expressions are efficient
-    #autosub_debug $results_stdout .= qq| Looping took $_loop_latency \n|; #debug
+    my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000) if $EXTRA_VERBOSE;
+    $results_stdout .= qq| Auto substitution latency was $_loop_latency \n| if $EXTRA_VERBOSE;
 
     return $_post_body;
 }
 
+sub _remove_dot_letter_from_field_name_if_present {
+    my ($_post_field, $_dot_letter) = @_;
+
+    ## does the field name end in .x or .y e.g. btnSubmit.x? The .x bit won't be in the saved page
+    if ( $_post_field =~ m{[.]$_dot_letter[=']} ) { ## does it end in .x or .y? #'
+        $results_stdout .= qq| DOT$_dot_letter found in $_post_field \n| if $EXTRA_VERBOSE;
+        $_post_field =~ s{[.]$_dot_letter}{}; ## remove first occurence only - so value not affected
+        return 1, $_post_field;
+    }
+
+    return 0, $_post_field;
+}    
+
+sub _restore_dot_letter_to_field_name {
+    my ($_post_field, $_post_type, $_post_letter) = @_;
+
+    if ($_post_type eq 'normalpost') {
+        $_post_field =~ s{[=]}{\.$_post_letter\=};
+    } else {
+        $_post_field =~ s{['][ ]?\=}{\.$_post_letter\' \=}; #[ ]? means match 0 or 1 space #'
+    }
+    $results_stdout .= qq| DOT$_post_letter restored to $_post_field \n| if $EXTRA_VERBOSE;
+
+    return $_post_field;
+}
+
 sub _substitute_name {
     my ($_post_field, $_page_id, $_post_type) = @_;
-
-    my $_dot_x;
-    my $_dot_y;
-
-    ## does the field name end in .x e.g. btnSubmit.x? The .x bit won't be in the saved page
-    if ( $_post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
-        #autosub_debug $results_stdout .= qq| DOTX found in $_post_field \n|;
-        $_dot_x = 'true';
-        $_post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
-    }
-
-    ## does the field name end in .y e.g. btnSubmit.y? The .y bit won't be in the saved page
-    if ( $_post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-        #autosub_debug $results_stdout .= qq| DOTY found in $_post_field \n|;
-        $_dot_y = 'true';
-        $_post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
-    }
 
     ## look for characters to the left and right of {NAME} and save them
     if ( $_post_field =~ m/([^'"]{0,70}?)[{]NAME[}]([^='"]{0,70})/s ) { ## '" was *?, {0,70}? much quicker
@@ -1463,46 +1492,26 @@ sub _substitute_name {
 
         $_lhs_name =~ s{\$}{\\\$}g; ## protect $ with \$
         $_lhs_name =~ s{[.]}{\\\.}g; ## protect . with \.
-        #autosub_debug $results_stdout .= qq| LHS of {NAME}: [$_lhs_name] \n|;
+        $results_stdout .= qq| LHS of {NAME}: [$_lhs_name] \n| if $EXTRA_VERBOSE;
 
         $_rhs_name =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
         $_rhs_name =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
         $_rhs_name =~ s{[.]}{\\\.}g; ## same for the .
-        #autosub_debug $results_stdout .= qq| RHS of {NAME}: [$_rhs_name] \n|;
+        $results_stdout .= qq| RHS of {NAME}: [$_rhs_name] \n| if $EXTRA_VERBOSE;
 
         ## find out what to substitute it with, then do the substitution
         ##
         ## saved page source will contain something like
         ##    <input name="pagebody_3$left_7$txtUsername" id="pagebody_3_left_7_txtUsername" />
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
-        if ($visited_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
+        if ($cached_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
             my $_name = $1;
-            #autosub_debug $results_stdout .= qq| NAME is $_name \n|;
+            $results_stdout .= qq| NAME is $_name \n| if $EXTRA_VERBOSE;
 
             ## substitute {NAME} for the actual (dynamic) value
             $_post_field =~ s/{NAME}/$_name/;
-            #autosub_debug $results_stdout .= qq| SUBBED_NAME is $_post_field \n|;
+            $results_stdout .= qq| SUBBED NAME is $_post_field \n| if $EXTRA_VERBOSE;
         }
-    }
-
-    ## did we take out the .x? we need to put it back
-    if (defined $_dot_x) {
-        if ($_post_type eq 'normalpost') {
-            $_post_field =~ s{[=]}{\.x\=};
-        } else {
-            $_post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
-        }
-        #autosub_debug $results_stdout .= qq| DOTX restored to $_post_field \n|;
-    }
-
-    ## did we take out the .y? we need to put it back
-    if (defined $_dot_y) {
-     if ($_post_type eq 'normalpost') {
-        $_post_field =~ s{[=]}{\.y\=};
-     } else {
-        $_post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
-     }
-        #autosub_debug $results_stdout .= qq| DOTY restored to $_post_field \n|;
     }
 
     return $_post_field;
@@ -1516,14 +1525,14 @@ sub _substitute_data {
     if ($_post_type eq 'normalpost') {
         if ($_post_field =~ m/(.{0,70}?)=[{]DATA}/s) {
             $_target_field = $1;
-            #autosub_debug $results_stdout .= qq| Normal Field $_target_field has {DATA} \n|; #debug
+            $results_stdout .= qq| Normal field $_target_field has {DATA} \n| if $EXTRA_VERBOSE;
         }
     }
 
     if ($_post_type eq 'multipost') {
         if ($_post_field =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
             $_target_field = $1;
-            #autosub_debug $results_stdout .= qq| Multi Field $_target_field has {DATA} \n|; #debug
+            $results_stdout .= qq| Multi field $_target_field has {DATA} \n| if $EXTRA_VERBOSE;
         }
     }
 
@@ -1531,19 +1540,19 @@ sub _substitute_data {
     if (defined $_target_field) {
         $_target_field =~ s{\$}{\\\$}; ## protect $ with \$ for final substitution
         $_target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
-        if ($visited_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
+        if ($cached_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
             my $_data = $1;
-            #autosub_debug $results_stdout .= qq| DATA is $_data \n|; #debug
+            $results_stdout .= qq| DATA is $_data \n| if $EXTRA_VERBOSE;
 
             ## normal post must be escaped
             if ($_post_type eq 'normalpost') {
                 $_data = uri_escape($_data);
-                #autosub_debug $results_stdout .= qq| URLESCAPE!! \n|; #debug
+                $results_stdout .= qq| URLESCAPE!! \n| if $EXTRA_VERBOSE;
             }
 
             ## substitute in the data
             if ($_post_field =~ s/{DATA}/$_data/) {
-                #autosub_debug $results_stdout .= qq| SUBBED_FIELD is $_post_field \n|; #debug
+                $results_stdout .= qq| SUBBED FIELD is $_post_field \n| if $EXTRA_VERBOSE;
             }
 
         }
@@ -1552,26 +1561,6 @@ sub _substitute_data {
     return $_post_field;
 }
 
-sub _find_page_in_cache {
-
-    my ($_post_url) = @_;
-
-    ## see if we have stored this page
-    if ($visited_page_names[0]) { ## does the array contain at least one entry?
-        for my $_i (0 .. $#visited_page_names) {
-            if ($visited_page_names[$_i] =~ m/$_post_url/si) { ## can we find the post url within the current saved action url?
-            #autosub_debug $results_stdout .= qq| MATCH at position $_i\n|; #debug
-            return $_i;
-            } else {
-                #autosub_debug $results_stdout .= qq| NO MATCH on $_i:$visited_page_names[$_i]\n|; #debug
-            }
-        }
-    } else {
-        #autosub_debug $results_stdout .= qq| NO CACHED PAGES! \n|; #debug
-    }
-
-    return;
-}
 #------------------------------------------------------------------
 sub httpget {  #send http request and read response
 
@@ -1597,7 +1586,7 @@ sub httpget {  #send http request and read response
     $cookie_jar->extract_cookies($response);
     #print $cookie_jar->as_string; print "\n\n";
 
-    save_page (); ## save page in the cache for the auto substitutions
+    save_page_when_method_post_and_has_action ();
 
     return;
 }
@@ -1641,7 +1630,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
         httpsend_form_urlencoded($_verb);  #use "x-www-form-urlencoded" if no encoding is specified
     }
 
-    save_page (); ## for auto substitutions
+    save_page_when_method_post_and_has_action ();
 
     return;
 }
