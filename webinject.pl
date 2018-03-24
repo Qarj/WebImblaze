@@ -1399,31 +1399,21 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
 
     my $_page_id = _find_page_in_cache($_post_url.q{$});
     if (not defined $_page_id) {
-        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the leading slash
-        $results_stdout .= " TRY WITH PAGE NAME ONLY    : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
-        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
-    }
-    if (not defined $_page_id) {
-        $_post_url =~ s{^.*/}{/}s; ## remove the path entirely, except for the page name itself
+        $_post_url =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
         $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
     }
     if (not defined $_page_id) {
-        $_post_url =~ s{^.*/}{}s; ## remove the path entirely, except for the page name itself
-        $results_stdout .= " REMOVE LEADING /           : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
-        $_page_id = _find_page_in_cache($_post_url.q{$}); ## try again without the full path
-    }
-    if (not defined $_page_id) {
         $results_stdout .= " DESPERATE MODE - NO ANCHOR : $_post_url\n" if $EXTRA_VERBOSE;
-        _find_page_in_cache($_post_url);
+        $_page_id = _find_page_in_cache($_post_url);
     }
 
     ## there is heavy use of regex in this sub, we need to ensure they are optimised
-    #autosub_debug my $_start_loop_timer = time;
+    my $_start_loop_timer = time if $EXTRA_VERBOSE;
 
     ## time for substitutions
     if (defined $_page_id) { ## did we find match?
-        #autosub_debug $results_stdout .= " ID MATCH $_page_id \n";
+        $results_stdout .= " ID MATCH $_page_id \n" if $EXTRA_VERBOSE;
         for my $_i (0 .. $#_post_fields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
             $_post_fields[$_i] = _substitute_name($_post_fields[$_i], $_page_id, $_post_type);
@@ -1442,11 +1432,10 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
         ##   1. subsitute out blank space first between the field separators
         $_post_body = join q{',}, @_post_fields; #'
     }
-    #autosub_debug  $results_stdout .= qq|\n\n POSTBODY is $_post_body \n|;
+    $results_stdout .= qq|\n\n POSTBODY is $_post_body \n| if $EXTRA_VERBOSE;
 
-    #autosub_debug my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000);  ## elapsed time rounded to thousandths
-    #autosub_debug # debug - make sure all the regular expressions are efficient
-    #autosub_debug $results_stdout .= qq| Looping took $_loop_latency \n|; #debug
+    my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000) if $EXTRA_VERBOSE;
+    $results_stdout .= qq| Auto substitution latency was $_loop_latency \n| if $EXTRA_VERBOSE;
 
     return $_post_body;
 }
@@ -1459,14 +1448,14 @@ sub _substitute_name {
 
     ## does the field name end in .x e.g. btnSubmit.x? The .x bit won't be in the saved page
     if ( $_post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
-        #autosub_debug $results_stdout .= qq| DOTX found in $_post_field \n|;
+        $results_stdout .= qq| DOTX found in $_post_field \n| if $EXTRA_VERBOSE;
         $_dot_x = 'true';
         $_post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
     }
 
     ## does the field name end in .y e.g. btnSubmit.y? The .y bit won't be in the saved page
     if ( $_post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-        #autosub_debug $results_stdout .= qq| DOTY found in $_post_field \n|;
+        $results_stdout .= qq| DOTY found in $_post_field \n| if $EXTRA_VERBOSE;
         $_dot_y = 'true';
         $_post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
     }
@@ -1478,12 +1467,12 @@ sub _substitute_name {
 
         $_lhs_name =~ s{\$}{\\\$}g; ## protect $ with \$
         $_lhs_name =~ s{[.]}{\\\.}g; ## protect . with \.
-        #autosub_debug $results_stdout .= qq| LHS of {NAME}: [$_lhs_name] \n|;
+        $results_stdout .= qq| LHS of {NAME}: [$_lhs_name] \n| if $EXTRA_VERBOSE;
 
         $_rhs_name =~ s{%24}{\$}g; ## change any encoding for $ (i.e. %24) back to a literal $ - this is what we'll really find in the html source
         $_rhs_name =~ s{\$}{\\\$}g; ## protect the $ with a \ in further regexs
         $_rhs_name =~ s{[.]}{\\\.}g; ## same for the .
-        #autosub_debug $results_stdout .= qq| RHS of {NAME}: [$_rhs_name] \n|;
+        $results_stdout .= qq| RHS of {NAME}: [$_rhs_name] \n| if $EXTRA_VERBOSE;
 
         ## find out what to substitute it with, then do the substitution
         ##
@@ -1492,11 +1481,11 @@ sub _substitute_name {
         ## so this code will find that {NAME}Username will match pagebody_3$left_7$txt for {NAME}
         if ($cached_pages[$_page_id] =~ m/name=['"]$_lhs_name([^'"]{0,70}?)$_rhs_name['"]/s) { ## "
             my $_name = $1;
-            #autosub_debug $results_stdout .= qq| NAME is $_name \n|;
+            $results_stdout .= qq| NAME is $_name \n| if $EXTRA_VERBOSE;
 
             ## substitute {NAME} for the actual (dynamic) value
             $_post_field =~ s/{NAME}/$_name/;
-            #autosub_debug $results_stdout .= qq| SUBBED_NAME is $_post_field \n|;
+            $results_stdout .= qq| SUBBED NAME is $_post_field \n| if $EXTRA_VERBOSE;
         }
     }
 
@@ -1507,7 +1496,7 @@ sub _substitute_name {
         } else {
             $_post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
         }
-        #autosub_debug $results_stdout .= qq| DOTX restored to $_post_field \n|;
+        $results_stdout .= qq| DOTX restored to $_post_field \n| if $EXTRA_VERBOSE;
     }
 
     ## did we take out the .y? we need to put it back
@@ -1517,7 +1506,7 @@ sub _substitute_name {
      } else {
         $_post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
      }
-        #autosub_debug $results_stdout .= qq| DOTY restored to $_post_field \n|;
+        $results_stdout .= qq| DOTY restored to $_post_field \n| if $EXTRA_VERBOSE;
     }
 
     return $_post_field;
@@ -1531,14 +1520,14 @@ sub _substitute_data {
     if ($_post_type eq 'normalpost') {
         if ($_post_field =~ m/(.{0,70}?)=[{]DATA}/s) {
             $_target_field = $1;
-            #autosub_debug $results_stdout .= qq| Normal Field $_target_field has {DATA} \n|; #debug
+            $results_stdout .= qq| Normal field $_target_field has {DATA} \n| if $EXTRA_VERBOSE;
         }
     }
 
     if ($_post_type eq 'multipost') {
         if ($_post_field =~ m/['](.{0,70}?)['].{0,70}?[{]DATA}/s) {
             $_target_field = $1;
-            #autosub_debug $results_stdout .= qq| Multi Field $_target_field has {DATA} \n|; #debug
+            $results_stdout .= qq| Multi field $_target_field has {DATA} \n| if $EXTRA_VERBOSE;
         }
     }
 
@@ -1548,17 +1537,17 @@ sub _substitute_data {
         $_target_field =~ s{[.]}{\\\.}; ## protect . with \. for final substitution
         if ($cached_pages[$_page_id] =~ m/="$_target_field" [^\>]*value="(.*?)"/s) {
             my $_data = $1;
-            #autosub_debug $results_stdout .= qq| DATA is $_data \n|; #debug
+            $results_stdout .= qq| DATA is $_data \n| if $EXTRA_VERBOSE;
 
             ## normal post must be escaped
             if ($_post_type eq 'normalpost') {
                 $_data = uri_escape($_data);
-                #autosub_debug $results_stdout .= qq| URLESCAPE!! \n|; #debug
+                $results_stdout .= qq| URLESCAPE!! \n| if $EXTRA_VERBOSE;
             }
 
             ## substitute in the data
             if ($_post_field =~ s/{DATA}/$_data/) {
-                #autosub_debug $results_stdout .= qq| SUBBED_FIELD is $_post_field \n|; #debug
+                $results_stdout .= qq| SUBBED FIELD is $_post_field \n| if $EXTRA_VERBOSE;
             }
 
         }

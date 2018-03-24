@@ -203,10 +203,14 @@ assert_stdout_contains('Field 2: c=d', 'auto_sub : field 2 display');
 assert_stdout_contains('Field 3: e=f', 'auto_sub : field 3 display');
 
 before_test();
+auto_sub("(  'a' => 'b', 'c' => 'd', 'e' => 'f' )", 'multipost', 'http://example.com');
+assert_stdout_contains(q|Field 1: \(  'a' => 'b|, 'auto_sub : multipost field 1 display');
+assert_stdout_contains(q|Field 2:  'c' => 'd|, 'auto_sub : multimpost field 2 display');
+assert_stdout_contains(q|Field 3:  'e' => 'f|, 'auto_sub : multimpost field 3 display'); #'
+
+before_test();
 is(auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com'), 'a=b&c=d&e=f', 'auto_sub : no change - no cached pages');
-assert_stdout_contains('TRY WITH PAGE NAME ONLY', 'auto_sub : try with page name only');
 assert_stdout_contains('REMOVE PATH', 'auto_sub : remove path');
-assert_stdout_contains('REMOVE LEADING /', 'auto_sub : remove leading /');
 assert_stdout_contains('DESPERATE MODE - NO ANCHOR', 'auto_sub : desperate mode - no anchor');
 
 before_test();
@@ -216,6 +220,100 @@ auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('MATCH at position 0', 'auto_sub : exact action match - assert 1');
 assert_stdout_does_not_contain('PAGE NAME ONLY', 'auto_sub : exact action match - assert 2');
 
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post"');
+save_page_when_method_post_and_has_action ();
+auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/premium/search.aspx');
+assert_stdout_contains('MATCH at position 0', 'auto_sub : page name only - assert 2');
+assert_stdout_contains('REMOVE PATH', 'auto_sub : page name only - assert 2');
+assert_stdout_does_not_contain('DESPERATE MODE', 'auto_sub : page name only - assert 3');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post"');
+save_page_when_method_post_and_has_action ();
+auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/premium/search');
+assert_stdout_contains('MATCH at position 0', 'auto_sub : desperate mode - assert 2');
+assert_stdout_contains('DESPERATE MODE', 'auto_sub : desperate mode - assert 2');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
+save_page_when_method_post_and_has_action ();
+auto_sub('a={DATA}&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('ID MATCH 0', 'auto_sub : ID MATCH');
+assert_stdout_contains('Normal field a has \{DATA\}', 'auto_sub : normal field has {DATA}');
+assert_stdout_contains('DATA is bee', 'auto_sub : normalpost {DATA} - field 1 - assert 1');
+assert_stdout_contains('URLESCAPE!!', 'auto_sub : normalpost {DATA} - field 1 - assert 2');
+assert_stdout_contains('SUBBED FIELD is a=bee%20bee', 'auto_sub : normalpost {DATA} - field 1 - assert 3');
+assert_stdout_contains('a=bee%20bee', 'auto_sub : normalpost {DATA} - field 1 - assert 4');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
+save_page_when_method_post_and_has_action ();
+auto_sub('a=b&c={DATA}&e={DATA}', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('c=dee', 'auto_sub : normalpost {DATA} - field 2');
+assert_stdout_contains('e=eff', 'auto_sub : normalpost {DATA} - field 3');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
+save_page_when_method_post_and_has_action ();
+auto_sub("(  'a' => '{DATA}', 'c' => 'd', 'e' => 'f' )", 'multipost', 'http://example.com/search.aspx');
+assert_stdout_contains('ID MATCH 0', 'auto_sub : ID MATCH');
+assert_stdout_contains('Multi field a has \{DATA\}', 'auto_sub : multi field has {DATA}');
+assert_stdout_contains('DATA is bee', 'auto_sub : multipost {DATA} - field 1 - assert 1');
+assert_stdout_contains(q|SUBBED FIELD is \(  'a' => 'bee bee|, 'auto_sub : multipost {DATA} - field 1 - assert 2'); #'
+assert_stdout_contains(q|POSTBODY is \(  'a' => 'bee bee', 'c' => 'd', 'e' => 'f' \)|, 'auto_sub : multipost {DATA} - field 1 - assert 3');
+assert_stdout_contains('Auto substitution latency was ', 'auto_sub : latency display');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
+save_page_when_method_post_and_has_action ();
+auto_sub(q|(  'a' => 'b', 'c' => '{DATA}', 'e' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
+assert_stdout_contains(q|'c' => 'dee'|, 'auto_sub : multipost {DATA} - field 2');
+assert_stdout_contains(q|'e' => 'eff'|, 'auto_sub : multipost {DATA} - field 3');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+save_page_when_method_post_and_has_action ();
+auto_sub('Row1_{NAME}_Field1=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('LHS of \{NAME}: \[Row1_] ', 'auto_sub : normal post - LHS of {NAME}');
+assert_stdout_contains('RHS of \{NAME}: \[_Field1] ', 'auto_sub : normal post - RHS of {NAME}');
+assert_stdout_contains('NAME is Col1', 'auto_sub : normal post - NAME is');
+assert_stdout_contains('SUBBED NAME is Row1_Col1_Field1=b', 'auto_sub : normal post - SUBBED NAME is');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
+save_page_when_method_post_and_has_action ();
+auto_sub('Row1_Col1_Field1=b&Row2_{NAME}_Field2=d&Row3_{NAME}_Field3=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('NAME is Col2', 'auto_sub : normal post - NAME is - field 2');
+assert_stdout_contains('NAME is Col3', 'auto_sub : normal post - NAME is - field 2');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+save_page_when_method_post_and_has_action ();
+auto_sub('{NAME}_Field1=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('LHS of \{NAME}: \[] ', 'auto_sub : LHS of {NAME} is null');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+save_page_when_method_post_and_has_action ();
+auto_sub('Row1_Col1_{NAME}=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('RHS of \{NAME}: \[] ', 'auto_sub : RHS of {NAME} is null');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
+save_page_when_method_post_and_has_action ();
+auto_sub(q|(  'a' => 'b', 'Row2_{NAME}_Field2' => '{DATA}', '{NAME}Field3' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
+assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'Row2_Col2_Field2' => 'd', 'Row3_Col3_Field3' => 'f' \)|, 'auto_sub : multi post - NAME and DATA');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="strange_xname" value="d" /> <input name="odd_yname" value="f" /> ');
+save_page_when_method_post_and_has_action ();
+auto_sub(q|(  'a' => 'b', '{NAME}_xname.x' => '{DATA}', '{NAME}_yname.y' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
+assert_stdout_contains('DOTX found in ', 'auto_sub : DOTX');
+assert_stdout_contains('DOTY found in ', 'auto_sub : DOTY');
+assert_stdout_contains(q|DOTX restored to  'strange_xname.x'|, 'auto_sub : DOTX restored');
+assert_stdout_contains(q|DOTY restored to  'odd_yname.y'|, 'auto_sub : DOTY restored');
+#assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'strange_xname.x' => 'd', 'odd_yname.y' => 'f' \)|, 'auto_sub : DOTX and DOTY');
 
 #
 # GLOBAL HELPER SUBS
