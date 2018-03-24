@@ -1416,10 +1416,26 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
         $results_stdout .= " ID MATCH $_page_id \n" if $EXTRA_VERBOSE;
         for my $_i (0 .. $#_post_fields) { ## loop through each of the fields being posted
             ## substitute {NAME} for actual
+
+            my $_dot_x_found;
+            my $_dot_y_found;
+
+            ($_dot_x_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'x');
+            ($_dot_y_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'y');
+    
             $_post_fields[$_i] = _substitute_name($_post_fields[$_i], $_page_id, $_post_type);
 
             ## substitute {DATA} for actual
             $_post_fields[$_i] = _substitute_data($_post_fields[$_i], $_page_id, $_post_type);
+
+            if ($_dot_x_found) {
+                $_post_fields[$_i] = _restore_dot_letter_to_field_name($_post_fields[$_i], $_post_type, 'x');
+            }
+
+            if ($_dot_y_found) {
+                $_post_fields[$_i] = _restore_dot_letter_to_field_name($_post_fields[$_i], $_post_type, 'y');
+            }
+    
         }
     }
 
@@ -1440,25 +1456,34 @@ sub auto_sub {## auto substitution - {DATA} and {NAME}
     return $_post_body;
 }
 
+sub _remove_dot_letter_from_field_name_if_present {
+    my ($_post_field, $_dot_letter) = @_;
+
+    ## does the field name end in .x or .y e.g. btnSubmit.x? The .x bit won't be in the saved page
+    if ( $_post_field =~ m{[.]$_dot_letter[=']} ) { ## does it end in .x or .y? #'
+        $results_stdout .= qq| DOT$_dot_letter found in $_post_field \n| if $EXTRA_VERBOSE;
+        $_post_field =~ s{[.]$_dot_letter}{}; ## remove first occurence only - so value not affected
+        return 1, $_post_field;
+    }
+
+    return 0, $_post_field;
+}    
+
+sub _restore_dot_letter_to_field_name {
+    my ($_post_field, $_post_type, $_post_letter) = @_;
+
+    if ($_post_type eq 'normalpost') {
+        $_post_field =~ s{[=]}{\.$_post_letter\=};
+    } else {
+        $_post_field =~ s{['][ ]?\=}{\.$_post_letter\' \=}; #[ ]? means match 0 or 1 space #'
+    }
+    $results_stdout .= qq| DOT$_post_letter restored to $_post_field \n| if $EXTRA_VERBOSE;
+
+    return $_post_field;
+}
+
 sub _substitute_name {
     my ($_post_field, $_page_id, $_post_type) = @_;
-
-    my $_dot_x;
-    my $_dot_y;
-
-    ## does the field name end in .x e.g. btnSubmit.x? The .x bit won't be in the saved page
-    if ( $_post_field =~ m{[.]x[=']} ) { ## does it end in .x? #'
-        $results_stdout .= qq| DOTX found in $_post_field \n| if $EXTRA_VERBOSE;
-        $_dot_x = 'true';
-        $_post_field =~ s{[.]x}{}; ## get rid of the .x, we'll have to put it back later
-    }
-
-    ## does the field name end in .y e.g. btnSubmit.y? The .y bit won't be in the saved page
-    if ( $_post_field =~ m/[.]y[=']/ ) { ## does it end in .y? #'
-        $results_stdout .= qq| DOTY found in $_post_field \n| if $EXTRA_VERBOSE;
-        $_dot_y = 'true';
-        $_post_field =~ s{[.]y}{}; ## get rid of the .y, we'll have to put it back later
-    }
 
     ## look for characters to the left and right of {NAME} and save them
     if ( $_post_field =~ m/([^'"]{0,70}?)[{]NAME[}]([^='"]{0,70})/s ) { ## '" was *?, {0,70}? much quicker
@@ -1487,26 +1512,6 @@ sub _substitute_name {
             $_post_field =~ s/{NAME}/$_name/;
             $results_stdout .= qq| SUBBED NAME is $_post_field \n| if $EXTRA_VERBOSE;
         }
-    }
-
-    ## did we take out the .x? we need to put it back
-    if (defined $_dot_x) {
-        if ($_post_type eq 'normalpost') {
-            $_post_field =~ s{[=]}{\.x\=};
-        } else {
-            $_post_field =~ s{['][ ]?\=}{\.x\' \=}; #[ ]? means match 0 or 1 space #'
-        }
-        $results_stdout .= qq| DOTX restored to $_post_field \n| if $EXTRA_VERBOSE;
-    }
-
-    ## did we take out the .y? we need to put it back
-    if (defined $_dot_y) {
-     if ($_post_type eq 'normalpost') {
-        $_post_field =~ s{[=]}{\.y\=};
-     } else {
-        $_post_field =~ s{['][ ]?\=}{\.y\' \=}; #'
-     }
-        $results_stdout .= qq| DOTY restored to $_post_field \n| if $EXTRA_VERBOSE;
     }
 
     return $_post_field;

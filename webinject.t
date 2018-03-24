@@ -309,11 +309,18 @@ before_test();
 $main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="strange_xname" value="d" /> <input name="odd_yname" value="f" /> ');
 save_page_when_method_post_and_has_action ();
 auto_sub(q|(  'a' => 'b', '{NAME}_xname.x' => '{DATA}', '{NAME}_yname.y' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
-assert_stdout_contains('DOTX found in ', 'auto_sub : DOTX');
-assert_stdout_contains('DOTY found in ', 'auto_sub : DOTY');
-assert_stdout_contains(q|DOTX restored to  'strange_xname.x'|, 'auto_sub : DOTX restored');
-assert_stdout_contains(q|DOTY restored to  'odd_yname.y'|, 'auto_sub : DOTY restored');
-#assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'strange_xname.x' => 'd', 'odd_yname.y' => 'f' \)|, 'auto_sub : DOTX and DOTY');
+assert_stdout_contains('DOTx found in ', 'auto_sub : NAME - DOTX');
+assert_stdout_contains('DOTy found in ', 'auto_sub : NAME - DOTY');
+assert_stdout_contains(q|DOTx restored to  'strange_xname.x'|, 'auto_sub : NAME - DOTX restored');
+assert_stdout_contains(q|DOTy restored to  'odd_yname.y'|, 'auto_sub : NAME - DOTY restored');
+assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'strange_xname.x' => 'd', 'odd_yname.y' => 'f' \)|, 'auto_sub : DOTX and DOTY');
+
+before_test();
+$main::response = HTTP::Response->parse('action="/search.aspx" method="post" <input name="odd_xname" value="default" /> <input name="odd_yname" value="default" /> ');
+save_page_when_method_post_and_has_action ();
+auto_sub('a=b&{NAME}xname.x=d.xtra&{NAME}yname.y=f.ytra', 'normalpost', 'http://example.com/search.aspx');
+assert_stdout_contains('odd_xname\.x=d\.xtra', 'auto_sub : DOTX - ensure value not affected');
+assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value not affected');
 
 #
 # GLOBAL HELPER SUBS
