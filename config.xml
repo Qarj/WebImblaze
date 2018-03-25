@@ -14,10 +14,10 @@
     </smartassertions>
     <windows>
         <chromedriver-binary>C:\selenium\chromedriver.exe</chromedriver-binary>
-        <selenium-binary>C:\selenium\selenium-server-standalone-2.53.1.jar</selenium-binary>
+        <selenium-binary>C:\selenium\selenium-server-standalone-3.11.0.jar</selenium-binary>
     </windows>
     <linux>
         <chromedriver-binary>$ENV{HOME}/selenium/chromedriver</chromedriver-binary>
-        <selenium-binary>$ENV{HOME}/selenium/selenium-server-standalone-2.53.1.jar</selenium-binary>
+        <selenium-binary>$ENV{HOME}/selenium/selenium-server-standalone-3.11.0.jar</selenium-binary>
     </linux>
 </root> 
