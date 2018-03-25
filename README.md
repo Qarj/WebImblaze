@@ -21,13 +21,11 @@ WebInject is very easy to setup and run. An example is test included.
 
 3. If you have git installed, then just clone the repository
     ```
-    cd /D C:\git
+    cd C:\git
     git clone https://github.com/Qarj/WebInject.git
     ```
     
-    If you don't have git, then download WebInject from GitHub as a ZIP and extract it somewhere.
-    To better follow the examples, extract it to C:\git\WebInject so that the file `C:\git\Webinject\webinject.pl` exists.
-
+    If you don't have git, you can get it from https://git-scm.com.
 
 That's it! You are now ready to run WebInject for the first time.
 
