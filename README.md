@@ -55,6 +55,10 @@ That's it! You are now ready to run WebInject for the first time.
 
 Tested with Fedora 26, Ubuntu 16.04, Linux Mint 18 and 18.1, OS X El Capitan and macOS 10.12.
 
+### Docker
+
+https://github.com/Qarj/webinject-docker
+
 ### Create your first WebInject test
 
 Note that these instructions are written with Windows in mind. 
