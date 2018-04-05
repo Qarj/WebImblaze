@@ -92,6 +92,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 [command command1 ... command20](#command)
 
+[commandonfail](#commandonfail)
+
 [commandonerror](#commandonerror)
 
 [addcookie](#addcookie)
@@ -1352,13 +1354,27 @@ In this last example, qq| is indicating that | should be used as a quote in this
 <br />
 
 
+<a name="commandonfail"></a>
+#### commandonfail
+
+Will run the specified command only if the test step is declared as having failed - after all
+retries exhausted.
+
+```
+    commandonfail="emailsupportteam.bat"
+```
+
+<br />
+
+
 <a name="commandonerror"></a>
 #### commandonerror
 
-Will run the specified command only if the test step fails for some reason.
+Will run the specified command if an assertion fails - regarless of whether the test step
+will be retried or not.
 
 ```
-    commandonerror="emailsupportteam.bat"
+    commandonerror="log_failure_statistic.bat"
 ```
 
 <br />

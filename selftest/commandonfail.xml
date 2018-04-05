@@ -1,0 +1,20 @@
+<testcases repeat="1">
+
+<!--
+Self test master file. All test steps in this file should pass.
+-->
+
+<testvar varname="feature">commandonfail</testvar>
+<case
+    id="10"
+    description1="${feature}"
+    method="cmd"
+    command="perl webinject.pl -o selftest{SLASH}output{SLASH}${feature}sub selftest{SLASH}substeps{SLASH}${feature}.xml"
+    command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subhttp.txt'
+    verifypositive="commandonfail in step 10 was run"
+	assertcount="commandonfail in step 30 was run|||2|||Command on fail should only be run once"
+    verifynegative1="commandonfail in step 20 was run"
+    verifynegative2="uninitialized value"
+/>
+
+</testcases>

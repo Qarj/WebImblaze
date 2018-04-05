@@ -1,0 +1,36 @@
+<testcases repeat="1">
+
+<!--
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+-->
+
+<case
+    id="10"
+    description1="commandonfail should be run"
+    method="cmd"
+    command="echo one one one"
+    verifypositive="two two two"
+    commandonfail="echo commandonfail in step 10 was run"
+/>
+
+<case
+    id="20"
+    description1="commandonfail should not be run"
+    method="cmd"
+    command="echo two two two"
+    verifypositive="two two two"
+    commandonfail="echo commandonfail in step 20 was run"
+/>
+
+<case
+    id="30"
+    description1="commandonfail should only be run once"
+    method="cmd"
+    command="echo two two two"
+    verifypositive="one one one"
+	retry="3"
+    commandonfail="echo commandonfail in step 30 was run"
+/>
+
+</testcases>

@@ -241,9 +241,9 @@ foreach ($start .. $repeat) {
             set_eval_variables(); ## perform simple true / false statement evaluations - or math expressions
             write_shared_variable();
 
-            httplog();  #write to http.txt file
-
             pass_fail_or_retry();
+
+            httplog();  #write to http.txt file
 
             output_test_step_latency();
             increment_run_count();
@@ -699,6 +699,10 @@ sub pass_fail_or_retry {
         $case_passed_count++;
         $retry = 0; # no need to retry when test case passes
         $attempts_since_last_success = 0; # reset attempts for auto retry
+    }
+
+    if (($case{commandonfail}) && $case_failed) { ## if test step declared as failure (after all retries), run a command
+        run_special_command('commandonfail');
     }
 
     return;
@@ -1848,21 +1852,20 @@ sub _shell_adjust {
 }
 
 #------------------------------------------------------------------
-sub commandonerror {  ## command only gets run on error - it does not count as part of the test
-                      ## intended for scenarios when you want to give something a kick - e.g. recycle app pool
+sub run_special_command {  ## for commandonerror and commandonfail
+
+    my ($_command_parameter) = @_;
 
     my $_combined_response = $response->as_string; ## take the existing test response
 
-    for (qw/commandonerror/) {
-        if ($case{$_}) {## perform command
-
-            my $_cmd = $case{$_};
-            $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust(\$_cmd);
-            my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $_combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; ## include it in the response
-        }
+    if ($case{$_command_parameter}) {
+        my $_cmd = $case{$_command_parameter};
+        $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+        _shell_adjust(\$_cmd);
+        my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+        $_combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; ## include it in the response
     }
+
     $response = HTTP::Response->parse($_combined_response); ## put the test response along with the command on error response back in the response
 
     return;
@@ -2015,8 +2018,8 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
         $results_xml .= qq|            <assertionskips-message>$assertion_skips_message</assertionskips-message>\n|;
     }
 
-    if (($case{commandonerror}) && ($is_failure > 0)) { ## if the test case failed, check if we want to run a command to help sort out any problems
-        commandonerror();
+    if (($case{commandonerror}) && ($is_failure > 0)) { ## if an assertion failed, run a command - even if we retry
+        run_special_command('commandonerror');
     }
 
     return;
