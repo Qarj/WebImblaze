@@ -11,7 +11,7 @@ Expected failures will be asserted by the master test file.
     method="cmd"
     command="echo one one one"
     verifypositive="two two two"
-    commandonfail="echo commandonfail in step 10 was run"
+    commandonfail="echo {OUTPUT} commandonfail in step 10 was run > {OUTPUT}commandonfail.txt"
 />
 
 <case
@@ -20,7 +20,7 @@ Expected failures will be asserted by the master test file.
     method="cmd"
     command="echo two two two"
     verifypositive="two two two"
-    commandonfail="echo commandonfail in step 20 was run"
+    commandonfail="echo {OUTPUT} commandonfail in step 20 was run >> {OUTPUT}commandonfail.txt"
 />
 
 <case
@@ -30,7 +30,7 @@ Expected failures will be asserted by the master test file.
     command="echo two two two"
     verifypositive="one one one"
 	retry="3"
-    commandonfail="echo commandonfail in step 30 was run"
+    commandonfail="echo {OUTPUT} commandonfail in step 30 was run >> {OUTPUT}commandonfail.txt"
 />
 
 </testcases>

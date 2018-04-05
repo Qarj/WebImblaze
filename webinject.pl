@@ -241,9 +241,9 @@ foreach ($start .. $repeat) {
             set_eval_variables(); ## perform simple true / false statement evaluations - or math expressions
             write_shared_variable();
 
-            pass_fail_or_retry();
-
             httplog();  #write to http.txt file
+
+            pass_fail_or_retry();
 
             output_test_step_latency();
             increment_run_count();
