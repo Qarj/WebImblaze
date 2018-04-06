@@ -750,6 +750,7 @@ The command line options are:
 -t|--selenium-host                -t 10.44.1.2
 -p|--selenium-port                -p 4444
 -i|--ignoreretry                  -i
+-z|--no-colour                    -z
 -n|--no-output                    -n
 -e|--verbose                      -e
 -u|--publish-to                   -u C:\inetpub\wwwroot\this_run_home
@@ -839,6 +840,10 @@ Port of Selenium (Grid) Server, e.g. `4444`
 `-i` or `--ignoreretry`
 
 Specifies to ignore any retry or retryfromstep parameters.
+
+`-z` or `--no-colour`
+
+Specifies to not output ansi colour
 
 `-n` or `--no-output`
 

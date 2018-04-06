@@ -39,6 +39,8 @@ local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
 use Encode qw(encode decode);
+use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+use Term::ANSIColor;
 use lib '.'; ## Current folder is not @INC from Perl 5.26
 
 local $| = 1; #don't buffer output to STDOUT
@@ -70,7 +72,7 @@ my (%parsedresult, %varvar, %late_sub);
 our $opt_proxy;
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
-my ($opt_ignoreretry, $opt_no_output, $opt_verbose, $opt_help);
+my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
 
 my $report_type; ## 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -640,7 +642,7 @@ sub pass_fail_or_retry {
         if ($case{errormessage}) { #Add defined error message to the output
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
             $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
-            $results_stdout .= qq|TEST CASE FAILED : $case{errormessage}\n|;
+            colour_stdout('bold red', qq|TEST CASE FAILED : $case{errormessage}\n|);
             if (not $nagios_return_message) {
                 $nagios_return_message = $case{errormessage}; ## only return the first error message to nagios
             }
@@ -648,7 +650,7 @@ sub pass_fail_or_retry {
         else { #print regular error output
             $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
             $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
-            $results_stdout .= qq|TEST CASE FAILED\n|;
+            colour_stdout('bold red', qq|TEST CASE FAILED\n|);
             if (not $nagios_return_message) {
                 $nagios_return_message = "Test case number $testnum failed"; ## only return the first test case failure to nagios
             }
@@ -704,6 +706,16 @@ sub pass_fail_or_retry {
     if (($case{commandonfail}) && $case_failed) { ## if test step declared as failure (after all retries), run a command
         run_special_command('commandonfail');
     }
+
+    return;
+}
+
+sub colour_stdout {
+    my ($_colour, $_text) = @_;
+
+    $results_stdout .= color($_colour) if !$opt_no_colour;
+    $results_stdout .= $_text;
+    $results_stdout .= color('reset')  if !$opt_no_colour;
 
     return;
 }
@@ -782,7 +794,7 @@ sub output_test_step_results {
 }
 
 sub write_html_dashes_separator {
-    $results_html .= qq|<br />\n------------------------------------------------------- <br />\n\n|;
+    $results_html .= qq|<br />\n---------------------------------------------------------------------- <br />\n\n|;
 }
 
 sub write_stdout_dashes_separator {
@@ -876,7 +888,7 @@ sub write_initial_html {  #write opening tags for results file
     $results_html .= qq|            background-color: #F5F5F5;\n|;
     $results_html .= qq|            color: #000000;\n|;
     $results_html .= qq|            font-family: Verdana, Arial, Helvetica, sans-serif;\n|;
-    $results_html .= qq|            font-size: 10px;\n|;
+    $results_html .= qq|            font-size: 17px;\n|;
     $results_html .= qq|        }\n|;
     $results_html .= qq|        .pass {\n|;
     $results_html .= qq|            color: green;\n|;
@@ -1951,7 +1963,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $results_html .= qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
                 $results_xml .= qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
-                $results_stdout .= "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n";
+                colour_stdout('red bold', "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n");
                 $failed_count++;
                 $retry_failed_count++;
                 $is_failure++;
@@ -1972,7 +1984,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $results_html .= '<span class="fail">Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
             $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
             $results_xml .=   '            <verifyresponsecode-message>Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
-            $results_stdout .= 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|;
+            colour_stdout('red bold', 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|);
             $failed_count++;
             $retry_failed_count++;
             $is_failure++;
@@ -1995,13 +2007,13 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     $results_html .= qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
                     $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                     $results_xml .= qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
-                    $results_stdout .= "Failed HTTP Response Code Verification ($1$2) \n"; #($1$2) is HTTP response code
+                    colour_stdout('red bold', "Failed HTTP Response Code Verification ($1$2) \n"); #($1$2) is HTTP response code
                 }
                 else {  #no HTTP response returned.. could be error in connection, bad hostname/address, or can not connect to web server
                     $results_html .= qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
                     $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                     $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
-                    $results_stdout .= "Failed - No Response \n"; #($1$2) is HTTP response code
+                    colour_stdout('red bold', "Failed - No Response \n"); #($1$2) is HTTP response code
                 }
                 $failed_count++;
                 $retry_failed_count++;
@@ -2058,7 +2070,7 @@ sub _verify_autoassertion {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                        $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
                     }
-                    $results_stdout .= "Failed Auto Assertion \n";
+                    colour_stdout('red bold', "Failed Auto Assertion \n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2114,7 +2126,7 @@ sub _verify_smartassertion {
                        $results_html .= qq|<span class="fail">$_verifyparms[2]</span><br />\n|;
                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[2])."</message>\n";
                     }
-                    $results_stdout .= 'Failed Smart Assertion';
+                    colour_stdout('red bold', 'Failed Smart Assertion');
                     if ($_verifyparms[2]) {
                        $results_stdout .= ": $_verifyparms[2]";
                     }
@@ -2153,7 +2165,6 @@ sub _verify_verifypositive {
                     $results_html .= qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Positive Verification \n";
-                    #$results_stdout .= $_verify_number." Passed Positive Verification \n"; ##DEBUG
                     $passed_count++;
                     $retry_passed_count++;
                 }
@@ -2164,7 +2175,7 @@ sub _verify_verifypositive {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    $results_stdout .= "Failed Positive Verification $_verify_number\n";
+                    colour_stdout('red bold', "Failed Positive Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2211,7 +2222,7 @@ sub _verify_verifynegative {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                          $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    $results_stdout .= "Failed Negative Verification $_verify_number\n";
+                    colour_stdout('red bold', "Failed Negative Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2292,7 +2303,7 @@ sub _verify_assertcount {
                         $results_xml .= qq|            <$_case_attribute-message>Failed Count Assertion of $_verify_count_parms[1], got $_count</$_case_attribute-message>\n|;
                         $results_xml .= "                <message>Failed Count Assertion of $_verify_count_parms[1], got $_count</message>\n";
                     }
-                    $results_stdout .= "Failed Count Assertion of $_verify_count_parms[1], got $_count \n";
+                    colour_stdout('red bold', "Failed Count Assertion of $_verify_count_parms[1], got $_count \n");
                     if ($_verify_count_parms[2]) {
                         $results_stdout .= "$_verify_count_parms[2] \n";
                     }
@@ -3459,6 +3470,7 @@ sub get_options {  #shell options
         'a|autocontroller'    => \$opt_autocontroller,
         'x|proxy=s'   => \$opt_proxy,
         'i|ignoreretry'   => \$opt_ignoreretry,
+        'z|no-colour'   => \$opt_no_colour,
         'n|no-output'   => \$opt_no_output,
         'e|verbose'   => \$opt_verbose,
         'u|publish-to=s' => \$opt_publish_full,
@@ -3527,6 +3539,7 @@ Usage: webinject.pl tests.xml <<options>>
 -a|--autocontroller               --autocontroller
 -x|--proxy proxy_server           --proxy localhost:9222
 -i|--ignoreretry                  --ignore-retry
+-z|--no-colour                    --no-colour
 -n|--no-output                    --no-output
 -e|--verbose                      --verbose
 -u|--publish-to                   --publish-to C:\inetpub\wwwroot\this_run_home
