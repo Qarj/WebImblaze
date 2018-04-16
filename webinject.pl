@@ -1963,7 +1963,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                 $results_html .= qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
                 $results_xml .= qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
-                colour_stdout('red bold', "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n");
+                colour_stdout('bold yellow', "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n");
                 $failed_count++;
                 $retry_failed_count++;
                 $is_failure++;
@@ -1984,7 +1984,7 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
             $results_html .= '<span class="fail">Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</span><br />\n|;
             $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
             $results_xml .=   '            <verifyresponsecode-message>Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode})</verifyresponsecode-message>\n|;
-            colour_stdout('red bold', 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|);
+            colour_stdout('bold yellow', 'Failed HTTP Response Code Verification (received ' . $response->code() .  qq|, expecting $case{verifyresponsecode}) \n|);
             $failed_count++;
             $retry_failed_count++;
             $is_failure++;
@@ -2007,13 +2007,13 @@ sub verify {  #do verification of http response and print status to HTML/XML/STD
                     $results_html .= qq|<span class="fail">Failed HTTP Response Code Verification ($1$2)</span><br />\n|; #($1$2) is HTTP response code
                     $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                     $results_xml .= qq|            <verifyresponsecode-message>($1$2)</verifyresponsecode-message>\n|;
-                    colour_stdout('red bold', "Failed HTTP Response Code Verification ($1$2) \n"); #($1$2) is HTTP response code
+                    colour_stdout('bold yellow', "Failed HTTP Response Code Verification ($1$2) \n"); #($1$2) is HTTP response code
                 }
                 else {  #no HTTP response returned.. could be error in connection, bad hostname/address, or can not connect to web server
                     $results_html .= qq|<span class="fail">Failed - No Response</span><br />\n|; #($1$2) is HTTP response code
                     $results_xml .= qq|            <verifyresponsecode-success>false</verifyresponsecode-success>\n|;
                     $results_xml .= qq|            <verifyresponsecode-message>Failed - No Response</verifyresponsecode-message>\n|;
-                    colour_stdout('red bold', "Failed - No Response \n"); #($1$2) is HTTP response code
+                    colour_stdout('bold yellow', "Failed - No Response \n"); #($1$2) is HTTP response code
                 }
                 $failed_count++;
                 $retry_failed_count++;
@@ -2070,7 +2070,7 @@ sub _verify_autoassertion {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                        $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
                     }
-                    colour_stdout('red bold', "Failed Auto Assertion \n");
+                    colour_stdout('bold yellow', "Failed Auto Assertion \n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2126,7 +2126,7 @@ sub _verify_smartassertion {
                        $results_html .= qq|<span class="fail">$_verifyparms[2]</span><br />\n|;
                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[2])."</message>\n";
                     }
-                    colour_stdout('red bold', 'Failed Smart Assertion');
+                    colour_stdout('bold yellow', 'Failed Smart Assertion');
                     if ($_verifyparms[2]) {
                        $results_stdout .= ": $_verifyparms[2]";
                     }
@@ -2175,7 +2175,7 @@ sub _verify_verifypositive {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    colour_stdout('red bold', "Failed Positive Verification $_verify_number\n");
+                    colour_stdout('bold yellow', "Failed Positive Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2222,7 +2222,7 @@ sub _verify_verifynegative {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                          $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
-                    colour_stdout('red bold', "Failed Negative Verification $_verify_number\n");
+                    colour_stdout('bold yellow', "Failed Negative Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
                        $results_stdout .= "$_verifyparms[1] \n";
                     }
@@ -2303,7 +2303,7 @@ sub _verify_assertcount {
                         $results_xml .= qq|            <$_case_attribute-message>Failed Count Assertion of $_verify_count_parms[1], got $_count</$_case_attribute-message>\n|;
                         $results_xml .= "                <message>Failed Count Assertion of $_verify_count_parms[1], got $_count</message>\n";
                     }
-                    colour_stdout('red bold', "Failed Count Assertion of $_verify_count_parms[1], got $_count \n");
+                    colour_stdout('bold yellow', "Failed Count Assertion of $_verify_count_parms[1], got $_count \n");
                     if ($_verify_count_parms[2]) {
                         $results_stdout .= "$_verify_count_parms[2] \n";
                     }
