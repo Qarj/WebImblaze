@@ -6,6 +6,7 @@ results.xml
 *.tmp
 output/
 temp/
+blocker/
 WebInjectSelenium.pm
 tests/*.xml
 tests/*.csv
