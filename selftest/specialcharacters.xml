@@ -22,8 +22,8 @@ Self test master file. All test steps in this file should pass.
     method="cmd"
     command1='perl -ne "print" selftest{SLASH}output{SLASH}${feature}subresults.xml'
     verifypositive1="&amp;"
-    verifypositive2="[{]LESSTHAN[}]"
-    verifypositive3="[{]GREATERTHAN[}]"
+    verifypositive2="&lt;"
+    verifypositive3="&gt;"
     verifynegative="uninitialized value"
 />
 

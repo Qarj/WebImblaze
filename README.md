@@ -53,7 +53,7 @@ That's it! You are now ready to run WebInject for the first time.
     perl webinject.pl --help
     ```
 
-Tested with Fedora 26, Ubuntu 16.04, Linux Mint 18 and 18.1, OS X El Capitan and macOS 10.12.
+Tested with Fedora 26, Ubuntu 16.04 and 18.04, Linux Mint 18.3, OS X El Capitan and macOS 10.13.
 
 ### Docker
 
