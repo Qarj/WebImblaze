@@ -35,7 +35,7 @@ use XML::Simple;
 use JSON::PP;
 use Time::HiRes qw( time sleep gettimeofday );
 use Getopt::Long;
-local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';
+#local $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 'false';  ## appears to be redundant
 use File::Copy qw(copy), qw(move);
 use File::Path qw(make_path remove_tree);
 use Encode qw(encode decode);
@@ -3402,7 +3402,7 @@ sub final_tasks {  #do ending tasks
 #------------------------------------------------------------------
 sub start_session {     ## creates the webinject user agent
 
-    require IO::Socket::SSL;
+    require IO::Socket::SSL; ## if this was a use statement we could use SSL_VERIFY_NONE below instead of 0, but self tests on Windows take 10% longer to run
     #require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
     require HTTP::Cookies;
 
@@ -3418,7 +3418,7 @@ sub start_session {     ## creates the webinject user agent
     eval
     {
        $useragent->ssl_opts(verify_hostname=>0); ## stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
-       $useragent->ssl_opts(SSL_verify_mode=>'SSL_VERIFY_NONE'); ## from Perl 5.16.3 need this to prevent ugly warnings
+       $useragent->ssl_opts(SSL_verify_mode=>0); ## from Perl 5.16.3 need this to prevent ugly warnings
     };
 
     #add proxy support if it is set in config.xml
