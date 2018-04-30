@@ -116,7 +116,7 @@ my $start_time = time;  #timer for entire test run
 my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $DAY_TEXT, $WEEKOFMONTH, $MONTH, $MONTH_TEXT, $YEAR, $YY) = get_formatted_datetime_for_seconds_since_epoch($start_time);
 my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
 
-my $this_script_folder_full = dirname(__FILE__);
+our $this_script_folder_full = dirname(__FILE__);
 chdir $this_script_folder_full;
 
 my $counter = 0; ## keeping track of the loop we are up to
