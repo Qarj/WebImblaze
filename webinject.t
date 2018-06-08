@@ -323,6 +323,75 @@ assert_stdout_contains('odd_xname\.x=d\.xtra', 'auto_sub : DOTX - ensure value n
 assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value not affected');
 
 #
+#
+# Lean Test Format
+#
+#
+
+# Do not attempt to parse classic webinject xml style format as lean tests format
+before_test();
+$main::unit_test_steps = <<'EOB'
+
+<testcases repeat="1">
+
+<case
+    id="10"
+    description1="Test that WebInject can run a very basic test"
+    method="cmd"
+    command="REM Nothing much"
+    verifypositive1="Nothing much"
+/>
+
+<case
+    id="20"
+    description1="Another step - retry {RETRY}"
+    description2="Sub description"
+    method="cmd"
+    command="REM Not much more - retry {RETRY}"
+    verifypositive="retry 1"
+    verifynegative="Nothing much"
+    retry="3"
+/>
+
+</testcases>
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains('Classic WebInject xml style format detected');
+assert_stdout_contains('Test steps parsed OK');
+
+# Lean test format will convert to classic xml style webinject
+before_test();
+$main::unit_test_steps = <<'EOB'
+
+id="10"
+description1="Test that WebInject can run a very basic test"
+method="cmd"
+command="REM Nothing much"
+verifypositive1="Nothing much"
+
+id="20"
+description1="Another step - retry {RETRY}"
+description2="Sub description"
+method="cmd"
+command="REM Not much more - retry {RETRY}"
+verifypositive="retry 1"
+verifynegative="Nothing much"
+retry="3"
+
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains('Lean test format detected');
+assert_stdout_contains('<case');
+assert_stdout_contains('Test steps parsed OK');
+
+# comments
+# multiline strings
+# multiline comments
+
+
+#
 # GLOBAL HELPER SUBS
 #
 
@@ -380,6 +449,7 @@ sub before_test {
 $main::response = '';
 $main::EXTRA_VERBOSE = 0;
 $main::results_stdout = '';
+$main::unit_test_steps = '';
 undef @main::cached_pages;
 undef @main::cached_page_actions;
 undef @main::cached_page_update_times;

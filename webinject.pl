@@ -64,6 +64,7 @@ our ($case_failed_count, $passed_count, $failed_count);
 our $is_failure;
 my ($run_count, $total_run_count, $case_passed_count, $case_failed);
 my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
+our $unit_test_steps;
 
 our %case;
 my %case_save; ## when we retry, we need to re-substitute some variables
@@ -2581,29 +2582,43 @@ sub _sub_xml_special {
 #------------------------------------------------------------------
 sub read_test_case_file {
 
-    my $_xml = read_file($current_case_file);
+    my $_test_steps;
+    if ($unit_test_steps) {
+        $_test_steps = $unit_test_steps;
+    } else {
+        $_test_steps = read_file($current_case_file);
+    }
+
+    if ( $_test_steps =~ /[^<]*<testcases/s ) {
+        $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
+    } else {
+        $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
+        _convert_lean_tests_format_to_classic_webinject(\ $_test_steps )
+    }
+
+    my $_xml = \ $_test_steps;
 
     # substitute in the included test step files
-    $_xml =~ s{<include[^>]*?
-               id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
-               [^>]*?
-               file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
-               [^>]*>
-               }{_include_file($2,$1,$&)}gsex;          # the actual file content
+    ${$_xml} =~ s{<include[^>]*?
+                  id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
+                  [^>]*?
+                  file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
+                  [^>]*>
+                 }{_include_file($2,$1,$&)}gsex;          # the actual file content
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
-    $_xml =~ s/&/{AMPERSAND}/g;
-    while ( $_xml =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
-    while ( $_xml =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
+    ${$_xml} =~ s/&/{AMPERSAND}/g;
+    while ( ${$_xml} =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
+    while ( ${$_xml} =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
     #$_xml =~ s/\\</{LESSTHAN}/g;
 
     $case_count = 0;
-    while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag
+    while (${$_xml} =~ /<case/g) {  #count test cases based on '<case' tag
         $case_count++;
     }
 
     if ($case_count == 1) {
-        $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
+        ${$_xml} =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
 
     # see the final test case file after all alerations for debug purposes
@@ -2611,19 +2626,36 @@ sub read_test_case_file {
 
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
-    $xml_test_cases = eval { XMLin($_xml, VarAttr => 'varname') };
+    $xml_test_cases = eval { XMLin(${$_xml}, VarAttr => 'varname') };
 
     if ($@) {
         $_message = $@;
         $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
-        my $_file_name_full = _write_failed_xml($_xml);
+        my $_file_name_full = _write_failed_xml(${$_xml});
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
+    $results_stdout .= qq| Test steps parsed OK\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| \n${$_xml}\n|if $EXTRA_VERBOSE;
 
-    $testfile_contains_selenium = _does_testfile_contain_selenium(\$_xml);
+    $testfile_contains_selenium = _does_testfile_contain_selenium($_xml);
     #print "Contains Selenium:$testfile_contains_selenium\n";
 
     return;
+}
+
+sub _convert_lean_tests_format_to_classic_webinject {
+    my ($_lean) = @_;
+
+    ${$_lean} =~ s|$|\n\n|;
+
+    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
+    {
+        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
+    }
+    
+    ${$_lean} =~ s|^|<testcases repeat="1">\n\n|;
+    ${$_lean} =~ s|$|\n\n</testcases>|;
+    
 }
 
 #------------------------------------------------------------------
@@ -3497,6 +3529,10 @@ sub get_options {  #shell options
         print_version();
         print_usage();
         exit;
+    }
+    
+    if ($opt_verbose) {
+        $EXTRA_VERBOSE = 1;
     }
 
     $opt_output //= 'output/';
