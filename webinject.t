@@ -357,8 +357,8 @@ $main::unit_test_steps = <<'EOB'
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains('Classic WebInject xml style format detected');
-assert_stdout_contains('Test steps parsed OK');
+assert_stdout_contains('Classic WebInject xml style format detected', 'read_test_case_file : can detect classic xml test step format');
+assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : classic style format parsed ok');
 
 # Lean test format will convert to classic xml style webinject
 before_test();
@@ -382,13 +382,25 @@ retry="3"
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains('Lean test format detected');
-assert_stdout_contains('<case');
-assert_stdout_contains('Test steps parsed OK');
+assert_stdout_contains('Lean test format detected', 'read_test_case_file : can detect lean test format');
+assert_stdout_contains('<case', '_convert_lean_tests_format_to_classic_webinject : can convert step block to case element');
+assert_stdout_does_not_contain('/>\v<case', '_convert_lean_tests_format_to_classic_webinject : blank line between case elements');
+assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
 
 # comments
 # multiline strings
 # multiline comments
+# repeat
+# first char in string is space
+# id must be found in step block
+# handling quotes " " ''
+# error messages - duplicate attributes with id number
+# maybe selenium1 selenium2 -> method="selenium"
+# maybe shell1 shell2 --> method="cmd"
+# url - default to get
+# postbody - default to post
+# error checking before substitutions
+
 
 
 #

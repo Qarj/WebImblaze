@@ -2648,14 +2648,25 @@ sub _convert_lean_tests_format_to_classic_webinject {
 
     ${$_lean} =~ s|$|\n\n|;
 
-    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
+    while ( ${$_lean} =~ s/\v*(.*?)\v{2,}/_convert_step_block_to_case($1)/egs )
     {
         $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
     }
-    
+
     ${$_lean} =~ s|^|<testcases repeat="1">\n\n|;
     ${$_lean} =~ s|$|\n\n</testcases>|;
+    ${$_lean} =~ s|/>\v<case|/>\n\n<case|;
+
+}
+
+sub _convert_step_block_to_case {
+    my ($_step) = @_;
     
+    $_step =~ s|^|    |gm;
+    $_step =~ s|^|<case\n|;
+    $_step =~ s|$|\n/>\n|;
+    
+    return $_step;
 }
 
 #------------------------------------------------------------------
