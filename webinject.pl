@@ -2647,7 +2647,7 @@ sub _convert_lean_tests_format_to_classic_webinject {
 
     my $_xml = "<testcases repeat='1'>\n\n";
 
-    ${$_lean} =~ s|$|\n\n|;
+    ${$_lean} =~ s|$|\n\n|; # needed to guarantee the last test step will be matched
 
     while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
     {

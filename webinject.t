@@ -398,6 +398,7 @@ assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : lean style
 # postbody - default to post
 # error checking before substitutions
 # have to deal with include files - old as xml for MVP?
+# perhaps the id can be the line number of step: ?
 
 
 
