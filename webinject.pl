@@ -2593,32 +2593,31 @@ sub read_test_case_file {
         $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
-        _convert_lean_tests_format_to_classic_webinject(\ $_test_steps )
+        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps )
     }
 
-    my $_xml = \ $_test_steps;
+#    my $_xml = \ $_test_steps;
 
     # substitute in the included test step files
-    ${$_xml} =~ s{<include[^>]*?
-                  id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
-                  [^>]*?
-                  file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
-                  [^>]*>
-                 }{_include_file($2,$1,$&)}gsex;          # the actual file content
+    $_test_steps =~ s{<include[^>]*?
+                      id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
+                      [^>]*?
+                      file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
+                      [^>]*>
+                     }{_include_file($2,$1,$&)}gsex;          # the actual file content
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
-    ${$_xml} =~ s/&/{AMPERSAND}/g;
-    while ( ${$_xml} =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
-    while ( ${$_xml} =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
-    #$_xml =~ s/\\</{LESSTHAN}/g;
+    $_test_steps =~ s/&/{AMPERSAND}/g;
+    while ( $_test_steps =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
+    while ( $_test_steps =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
 
     $case_count = 0;
-    while (${$_xml} =~ /<case/g) {  #count test cases based on '<case' tag
+    while ($_test_steps =~ /<case/g) {  #count test cases based on '<case' tag
         $case_count++;
     }
 
     if ($case_count == 1) {
-        ${$_xml} =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
+        $_test_steps =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
 
     # see the final test case file after all alerations for debug purposes
@@ -2626,18 +2625,18 @@ sub read_test_case_file {
 
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
-    $xml_test_cases = eval { XMLin(${$_xml}, VarAttr => 'varname') };
+    $xml_test_cases = eval { XMLin($_test_steps, VarAttr => 'varname') };
 
     if ($@) {
         $_message = $@;
         $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
-        my $_file_name_full = _write_failed_xml(${$_xml});
+        my $_file_name_full = _write_failed_xml($_test_steps);
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
     $results_stdout .= qq| Test steps parsed OK\n| if $EXTRA_VERBOSE;
-    $results_stdout .= qq| \n${$_xml}\n|if $EXTRA_VERBOSE;
+    $results_stdout .= qq| \n$_test_steps\n|if $EXTRA_VERBOSE;
 
-    $testfile_contains_selenium = _does_testfile_contain_selenium($_xml);
+    $testfile_contains_selenium = _does_testfile_contain_selenium(\ $_test_steps);
     #print "Contains Selenium:$testfile_contains_selenium\n";
 
     return;
@@ -2646,27 +2645,33 @@ sub read_test_case_file {
 sub _convert_lean_tests_format_to_classic_webinject {
     my ($_lean) = @_;
 
+    my $_xml = "<testcases repeat='1'>\n\n";
+
     ${$_lean} =~ s|$|\n\n|;
 
-    while ( ${$_lean} =~ s/\v*(.*?)\v{2,}/_convert_step_block_to_case($1)/egs )
+    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
     {
         $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
+        $_xml .= _convert_step_block_to_case($1)
     }
 
-    ${$_lean} =~ s|^|<testcases repeat="1">\n\n|;
-    ${$_lean} =~ s|$|\n\n</testcases>|;
-    ${$_lean} =~ s|/>\v<case|/>\n\n<case|;
+    $_xml .= "</testcases>";
 
+    return $_xml;
 }
 
 sub _convert_step_block_to_case {
-    my ($_step) = @_;
+    my ($_lean_step) = @_;
     
-    $_step =~ s|^|    |gm;
-    $_step =~ s|^|<case\n|;
-    $_step =~ s|$|\n/>\n|;
+    my $_xml_step = "<case\n";
+
+    while ( $_lean_step =~ /^(.*)$/gm ) {
+        $_xml_step .= "    $1\n";
+    }
     
-    return $_step;
+    $_xml_step .= "/>\n\n";
+    
+    return $_xml_step;
 }
 
 #------------------------------------------------------------------

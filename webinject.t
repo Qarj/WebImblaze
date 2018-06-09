@@ -331,7 +331,6 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 # Do not attempt to parse classic webinject xml style format as lean tests format
 before_test();
 $main::unit_test_steps = <<'EOB'
-
 <testcases repeat="1">
 
 <case
@@ -363,7 +362,6 @@ assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : classic st
 # Lean test format will convert to classic xml style webinject
 before_test();
 $main::unit_test_steps = <<'EOB'
-
 id="10"
 description1="Test that WebInject can run a very basic test"
 method="cmd"
@@ -378,7 +376,6 @@ command="REM Not much more - retry {RETRY}"
 verifypositive="retry 1"
 verifynegative="Nothing much"
 retry="3"
-
 EOB
     ;
 read_test_case_file();
@@ -400,6 +397,7 @@ assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : lean style
 # url - default to get
 # postbody - default to post
 # error checking before substitutions
+# have to deal with include files - old as xml for MVP?
 
 
 
