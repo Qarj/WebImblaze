@@ -2595,7 +2595,7 @@ sub read_test_case_file {
     } else {
         $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
 #        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps );
-        $xml_test_cases = _load_lean_steps_to_hash( \ $_test_steps );
+        $xml_test_cases = _parse_lean_test_steps( \ $_test_steps );
         $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
         $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
         return;
@@ -2649,7 +2649,7 @@ sub read_test_case_file {
     return;
 }
 
-sub _load_lean_steps_to_hash {
+sub _parse_lean_test_steps {
     my ($_lean) = @_;
 
     my %_test_steps = ();
@@ -2671,10 +2671,11 @@ sub _load_lean_steps_to_hash {
 
     ${$_lean} =~ s|$|\n\n|; # needed to guarantee the last test step will be matched
 
+    my $_step_id = 0;
     while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
     {
         $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
-        my $_step_id = _get_step_id($1);
+        $_step_id += 10;
         $_case{ $_step_id } = _get_step($1);
     }
 
@@ -2683,24 +2684,48 @@ sub _load_lean_steps_to_hash {
     return \ %_test_steps;
 }
 
-sub _get_step_id {
-    my ($_lean_step) = @_;
-
-    if ( $_lean_step =~ /^id: (\d+)$/m ) {
-        return $1;
-    }
-}
-
 sub _get_step {
     my ($_lean_step) = @_;
 
     my %_case_step = ();
+    $_case_step{ 'method' } = _get_step_method(\ $_lean_step);
+    _rename_parameters_to_classic_names(\ $_lean_step);
+
     while ( $_lean_step =~ /^(.*)$/gm ) {
         my $_parameter = _get_parameter_name($1);
         $_case_step{ $_parameter } = _get_parameter_value($1);
     }
 
+
     return \ %_case_step;
+}
+
+sub _get_step_method {
+    my ($_lean_step) = @_;
+
+    if ( ${$_lean_step} =~ /^shell/m ) {
+        return 'cmd';
+    }
+
+    if ( ${$_lean_step} =~ /^selenium/m ) {
+        return 'selenium';
+    }
+
+    if ( ${$_lean_step} =~ /^url/m ) {
+        if ( ${$_lean_step} =~ /^postbody/m ) {
+            return 'post';
+        } else {
+            return 'get';
+        }
+    }
+}
+
+sub _rename_parameters_to_classic_names {
+    my ($_lean_step) = @_;
+
+    ${$_lean_step} =~ s/^shell/command/mg;
+    ${$_lean_step} =~ s/^selenium/command/mg;
+    ${$_lean_step} =~ s/^step/description1/m;
 }
 
 sub _get_parameter_name {

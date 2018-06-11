@@ -386,17 +386,13 @@ assert_stdout_contains('Classic test steps parsed OK', 'read_test_case_file : cl
 
 before_test();
 $main::unit_test_steps = <<'EOB'
-id: 10
-description1: Test that WebInject can run a very basic test
-method: cmd
-command: REM Nothing: much
+step: Test that WebInject can run a very basic test
+shell: REM Nothing: much
 verifypositive1: Nothing: much
 
-id: 20
-description1: Another step - retry {RETRY}
+step: Another step - retry {RETRY}
 description2: Sub description
-method: cmd
-command: REM Not much more - retry {RETRY}
+shell: REM Not much more - retry {RETRY}
 verifypositive: retry 1
 verifynegative: Nothing much
 retry: 3
@@ -405,23 +401,139 @@ EOB
 read_test_case_file();
 assert_stdout_contains('Lean test format detected', 'read_test_case_file : can detect lean test format');
 assert_stdout_contains('Lean test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
+assert_stdout_contains("'repeat' => '1'", '_parse_lean_test_steps : defaults to repeat 1');
+assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
+assert_stdout_contains("'description1' => 'Test that WebInject can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
+assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
+assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
+assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
+assert_stdout_contains("'description1' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
+assert_stdout_contains("'description2' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
+assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : Step 20, method found');
+assert_stdout_contains("'command' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
+assert_stdout_contains("'retry' => '3'", '_parse_lean_test_steps : Step 20, retry found');
+assert_stdout_contains("'verifynegative' => 'Nothing much'", '_parse_lean_test_steps : Step 20, verifynegative found');
+assert_stdout_contains("'verifypositive' => 'retry 1'", '_parse_lean_test_steps : Step 20, verifypositive found');
 
+# can have a lean test case file with a single step
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Single test step in file
+shell: echo Short
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Can have just one test step');
+
+# can have quotes
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Can handle 'single' and "double" quotes
+shell: echo 'single' and "double" quotes
+verifypostive: 'single' and "double" quotes
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains('Lean test steps parsed OK', '_parse_lean_test_steps : Can handle single and double quotes');
+
+# id auto generated - cannot be specified
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Id is auto generated
+shell: echo auto
+
+step: Next step
+shell: echo next
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'10' =>", '_parse_lean_test_steps : step ids are auto generated - 10');
+assert_stdout_contains("'20' =>", '_parse_lean_test_steps : step ids are auto generated - 20');
+
+# method="cmd" is auto generated
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Shell method is detected
+shell: echo auto1
+shell20: echo auto2
+
+step: Next step
+shell5: echo next1
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected');
+assert_stdout_contains("'command20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
+
+# method="selenium" is auto generated
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Selenium method is detected
+selenium: $driver->get("https://www.totaljobs.com")
+selenium20: $driver->get_all_cookies()
+
+step: Next step
+selenium5: $driver->get('https://www.totaljobs.com/register')
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'selenium'", '_parse_lean_test_steps : Selenium method detected');
+assert_stdout_contains("'command20' => '.driver->get_all_cookies..'", '_parse_lean_test_steps : selenium converted back to command');
+
+# method="get" is auto generated
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Get method is detected
+url: https://www.totaljobs.com
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'get'", '_parse_lean_test_steps : get method detected');
+
+# method="post" is auto generated
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Get method is detected
+url: https://www.totaljobs.com
+postbody: RecipeName=Sheperds%20Pie&Cuisine=British
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'post'", '_parse_lean_test_steps : post method detected');
+
+# step: is description1:
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Parameter rename
+url: https://www.totaljobs.com
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test_steps : step is really description1');
+
+# description1: is step:
 # comments
 # multiline strings
 # multiline comments
+# special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # repeat
 # first char in string is space
 # id must be found in step block
-# handling quotes " " ''
 # error messages - duplicate attributes with id number
-# maybe selenium1 selenium2 -> method="selenium"
-# maybe shell1 shell2 --> method="cmd"
-# url - default to get
-# postbody - default to post
-# error checking before substitutions
 # have to deal with include files - old as xml for MVP?
-# perhaps the id can be the line number of step: ?
+# error checking before substitutions
+# validate that parameter name starts on first char of line
+# validate that parm name ends with ': ' colon space
+# validate that block starts with step:
+# validate that method is not allowed parm
+# validate that id is not allowed parm
+# validate that command is not allowed parm (must be selenium or shell)
+# validate that posttype is not allowed parm (if possible)
+# validate that description1: is not allowed parm
 
+
+#ideas:
+# perhaps the id can be the line number of step: ?
 
 
 #
