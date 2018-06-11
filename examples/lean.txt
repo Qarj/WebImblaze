@@ -1,14 +1,14 @@
-id="10"
-description1="Test that WebInject can run a very basic test"
-method="cmd"
-command="REM Nothing much"
-verifypositive1="Nothing much"
+id: 10
+description1: Test that WebInject can run a very basic test
+method: cmd
+command: REM Nothing: much
+verifypositive1: Nothing: much
 
-id="20"
-description1="Another step - retry {RETRY}"
-description2="Sub description"
-method="cmd"
-command="REM Not much more - retry {RETRY}"
-verifypositive="retry 1"
-verifynegative="Nothing much"
-retry="3"
+id: 20
+description1: Another step - retry {RETRY}
+description2: Sub description
+method: cmd
+command: REM Not much more - retry {RETRY}
+verifypositive: retry 1
+verifynegative: Nothing much
+retry: 3

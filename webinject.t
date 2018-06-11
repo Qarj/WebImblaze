@@ -357,32 +357,54 @@ EOB
     ;
 read_test_case_file();
 assert_stdout_contains('Classic WebInject xml style format detected', 'read_test_case_file : can detect classic xml test step format');
-assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : classic style format parsed ok');
+assert_stdout_contains('Classic test steps parsed OK', 'read_test_case_file : classic style format parsed ok');
 
 # Lean test format will convert to classic xml style webinject
+
+# XMLin function creates a data structure like the below, the lean parse must produce the same structure
+#
+#$VAR1 = {
+#          'case' => {
+#                      '20' => {
+#                                'description1' => 'Another step - retry {RETRY}',
+#                                'description2' => 'Sub description',
+#                                'method' => 'cmd',
+#                                'command' => 'REM Not much more - retry {RETRY}',
+#                                'retry' => '3',
+#                                'verifynegative' => 'Nothing much',
+#                                'verifypositive' => 'retry 1'
+#                              },
+#                      '10' => {
+#                                'description1' => 'Test that WebInject can run a very basic test',
+#                                'command' => 'REM Nothing: much',
+#                                'method' => 'cmd',
+#                                'verifypositive1' => 'Nothing: much'
+#                              }
+#                    },
+#          'repeat' => '1'
+#        };
+
 before_test();
 $main::unit_test_steps = <<'EOB'
-id="10"
-description1="Test that WebInject can run a very basic test"
-method="cmd"
-command="REM Nothing much"
-verifypositive1="Nothing much"
+id: 10
+description1: Test that WebInject can run a very basic test
+method: cmd
+command: REM Nothing: much
+verifypositive1: Nothing: much
 
-id="20"
-description1="Another step - retry {RETRY}"
-description2="Sub description"
-method="cmd"
-command="REM Not much more - retry {RETRY}"
-verifypositive="retry 1"
-verifynegative="Nothing much"
-retry="3"
+id: 20
+description1: Another step - retry {RETRY}
+description2: Sub description
+method: cmd
+command: REM Not much more - retry {RETRY}
+verifypositive: retry 1
+verifynegative: Nothing much
+retry: 3
 EOB
     ;
 read_test_case_file();
 assert_stdout_contains('Lean test format detected', 'read_test_case_file : can detect lean test format');
-assert_stdout_contains('<case', '_convert_lean_tests_format_to_classic_webinject : can convert step block to case element');
-assert_stdout_does_not_contain('/>\v<case', '_convert_lean_tests_format_to_classic_webinject : blank line between case elements');
-assert_stdout_contains('Test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
+assert_stdout_contains('Lean test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
 
 # comments
 # multiline strings

@@ -2581,6 +2581,7 @@ sub _sub_xml_special {
 
 #------------------------------------------------------------------
 sub read_test_case_file {
+    require Data::Dumper;
 
     my $_test_steps;
     if ($unit_test_steps) {
@@ -2593,7 +2594,11 @@ sub read_test_case_file {
         $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
-        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps )
+#        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps );
+        $xml_test_cases = _load_lean_steps_to_hash( \ $_test_steps );
+        $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
+        return;
     }
 
 #    my $_xml = \ $_test_steps;
@@ -2627,19 +2632,91 @@ sub read_test_case_file {
     my $_message;
     $xml_test_cases = eval { XMLin($_test_steps, VarAttr => 'varname') };
 
+    $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
+
     if ($@) {
         $_message = $@;
         $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
         my $_file_name_full = _write_failed_xml($_test_steps);
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
-    $results_stdout .= qq| Test steps parsed OK\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| Classic test steps parsed OK\n| if $EXTRA_VERBOSE;
     $results_stdout .= qq| \n$_test_steps\n|if $EXTRA_VERBOSE;
 
     $testfile_contains_selenium = _does_testfile_contain_selenium(\ $_test_steps);
     #print "Contains Selenium:$testfile_contains_selenium\n";
 
     return;
+}
+
+sub _load_lean_steps_to_hash {
+    my ($_lean) = @_;
+
+    my %_test_steps = ();
+    $_test_steps{ 'repeat' } = '1';
+
+    my %_case = ();
+
+#    my %_case_step = ();
+#    $_case_step{ 'method' } = 'cmd';
+#    $_case_step{ 'veriyfpositive1' } = 'Nothing: much';
+#    $_case{ '10' } = \ %_case_step;
+
+#    my %_case_step_2 = ();
+#    $_case_step_2{ 'method' } = 'cmd';
+#    $_case_step_2{ 'veriyfpositive' } = 'retry';
+
+#    $_case{ '20' } = \ %_case_step_2;
+
+
+    ${$_lean} =~ s|$|\n\n|; # needed to guarantee the last test step will be matched
+
+    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
+    {
+        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
+        my $_step_id = _get_step_id($1);
+        $_case{ $_step_id } = _get_step($1);
+    }
+
+    $_test_steps{ 'case' } = \ %_case;
+
+    return \ %_test_steps;
+}
+
+sub _get_step_id {
+    my ($_lean_step) = @_;
+
+    if ( $_lean_step =~ /^id: (\d+)$/m ) {
+        return $1;
+    }
+}
+
+sub _get_step {
+    my ($_lean_step) = @_;
+
+    my %_case_step = ();
+    while ( $_lean_step =~ /^(.*)$/gm ) {
+        my $_parameter = _get_parameter_name($1);
+        $_case_step{ $_parameter } = _get_parameter_value($1);
+    }
+
+    return \ %_case_step;
+}
+
+sub _get_parameter_name {
+    my ($_lean_step_line) = @_;
+
+    if ( $_lean_step_line =~ /^(\w+):/ ) {
+        return $1;
+    }
+}
+
+sub _get_parameter_value {
+    my ($_lean_step_line) = @_;
+
+    if ( $_lean_step_line =~ /^\w+: (.*)/ ) {
+        return $1;
+    }
 }
 
 sub _convert_lean_tests_format_to_classic_webinject {
@@ -2666,12 +2743,22 @@ sub _convert_step_block_to_case {
     my $_xml_step = "<case\n";
 
     while ( $_lean_step =~ /^(.*)$/gm ) {
-        $_xml_step .= "    $1\n";
+        $_xml_step .= _convert_step_line_to_case_attribute($1);
     }
-    
+
     $_xml_step .= "/>\n\n";
     
     return $_xml_step;
+}
+
+sub _convert_step_line_to_case_attribute {
+    my ($_lean_step_line) = @_;
+
+    my $_xml_step_line .= "    $_lean_step_line\n";
+    $_xml_step_line =~ s/: /= "/;
+    $_xml_step_line =~ s/$/"/;
+
+    return $_xml_step_line;
 }
 
 #------------------------------------------------------------------
