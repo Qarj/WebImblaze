@@ -9,3 +9,9 @@ verifypositive: retry 1
 #verifypositive2: This is ignored
 verifynegative: Nothing much
 retry: 3
+
+<!--
+step: This step is commented out
+shell: REM NOP
+verifypositive: Commented out
+-->

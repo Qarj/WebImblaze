@@ -514,7 +514,7 @@ assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test
 # single line comment is a hash
 before_test();
 $main::unit_test_steps = <<'EOB'
-step: Parameter rename
+step: Single line comment
 url: https://www.totaljobs.com
 #verifypositive: positive
 EOB
@@ -523,9 +523,26 @@ read_test_case_file();
 assert_stdout_does_not_contain("'verifypositive'", '_parse_lean_test_steps : single line comment first char');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment does not generate null parameter');
 
-# comments
-# multiline strings
+# multi line comment starts and ends with ===
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line comment
+url: https://www.totaljobs.com
+#verifypositive: positive
+
+<!--
+step: This step is commented out
+url: https://www.totaljobs.com
+verifypositive: Not found
+-->
+EOB
+    ;
+read_test_case_file();
+assert_stdout_does_not_contain("'Not found'", '_parse_lean_test_steps : multi line comment');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment does not generate null parameter');
+
 # multiline comments
+# multiline strings
 # special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # first char in string is space
 # have to deal with include files

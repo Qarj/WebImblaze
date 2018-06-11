@@ -2675,6 +2675,44 @@ sub _parse_lean_test_steps {
 sub _remove_comments_and_add_two_blank_lines {
     my ($_lean) = @_;
 
+    my $_normalised_pass_1 = _remove_multi_line_comments($_lean);
+    my $_normalised_pass_2 = _remove_single_line_comments(\ $_normalised_pass_1);
+
+    $results_stdout .= qq| After comments removed:\n$_normalised_pass_2 \n|if $EXTRA_VERBOSE;
+
+    return $_normalised_pass_2."\n\n";
+}
+
+sub _remove_multi_line_comments {
+    my ($_lean) = @_;
+
+    my $_normalised = '';
+    my $_within_multi_line_comment = 0;
+    while ( ${$_lean} =~ /(.*)\v?/mg ) {
+        my $_line = $1;
+        if ( $_line =~ /\s*<!--/ ) {
+            $_within_multi_line_comment = 1;
+        }
+        if ( $_line =~ /\s*-->/ ) {
+            $_within_multi_line_comment = 0;
+        }
+        if ($_within_multi_line_comment) {
+            # this is within a comment - we don't need it
+        } else {
+            if ( $_line =~ /\s*-->/ ) {
+                # we can discard the end comment line
+            } else {
+                $_normalised .= $_line."\n";
+            }
+        }
+    }
+
+    return $_normalised;
+}    
+
+sub _remove_single_line_comments {
+    my ($_lean) = @_;
+
     my $_normalised = '';
     while ( ${$_lean} =~ /(.*)\v?/mg ) {
         my $_line = $1;
@@ -2685,10 +2723,8 @@ sub _remove_comments_and_add_two_blank_lines {
         }
     }
 
-    $results_stdout .= qq| After comments removed:\n$_normalised \n|if $EXTRA_VERBOSE;
-
-    return $_normalised."\n\n";
-}
+    return $_normalised;
+}    
 
 sub _get_step {
     my ($_lean_step) = @_;
@@ -2747,48 +2783,6 @@ sub _get_parameter_value {
     if ( $_lean_step_line =~ /^\w+: (.*)/ ) {
         return $1;
     }
-}
-
-sub _convert_lean_tests_format_to_classic_webinject {
-    my ($_lean) = @_;
-
-    my $_xml = "<testcases repeat='1'>\n\n";
-
-    ${$_lean} =~ s|$|\n\n|; # needed to guarantee the last test step will be matched
-
-    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
-    {
-        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
-        $_xml .= _convert_step_block_to_case($1)
-    }
-
-    $_xml .= "</testcases>";
-
-    return $_xml;
-}
-
-sub _convert_step_block_to_case {
-    my ($_lean_step) = @_;
-    
-    my $_xml_step = "<case\n";
-
-    while ( $_lean_step =~ /^(.*)$/gm ) {
-        $_xml_step .= _convert_step_line_to_case_attribute($1);
-    }
-
-    $_xml_step .= "/>\n\n";
-    
-    return $_xml_step;
-}
-
-sub _convert_step_line_to_case_attribute {
-    my ($_lean_step_line) = @_;
-
-    my $_xml_step_line .= "    $_lean_step_line\n";
-    $_xml_step_line =~ s/: /= "/;
-    $_xml_step_line =~ s/$/"/;
-
-    return $_xml_step_line;
 }
 
 #------------------------------------------------------------------
