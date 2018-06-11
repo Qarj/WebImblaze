@@ -511,17 +511,28 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test_steps : step is really description1');
 
-# description1: is step:
+# single line comment is a hash
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Parameter rename
+url: https://www.totaljobs.com
+#verifypositive: positive
+EOB
+    ;
+read_test_case_file();
+assert_stdout_does_not_contain("'verifypositive'", '_parse_lean_test_steps : single line comment first char');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment does not generate null parameter');
+
 # comments
 # multiline strings
 # multiline comments
 # special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
-# repeat
 # first char in string is space
-# id must be found in step block
-# error messages - duplicate attributes with id number
-# have to deal with include files - old as xml for MVP?
+# have to deal with include files
+# repeat
+
 # error checking before substitutions
+# validate that there are not duplicate attributes
 # validate that parameter name starts on first char of line
 # validate that parm name ends with ': ' colon space
 # validate that block starts with step:
@@ -530,7 +541,11 @@ assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test
 # validate that command is not allowed parm (must be selenium or shell)
 # validate that posttype is not allowed parm (if possible)
 # validate that description1: is not allowed parm
+# line number of error must be output (presence of comments does not change line number)
+# step description must be output also
 
+#issues:
+# what to do for include step id - make that up too .01 .02
 
 #ideas:
 # perhaps the id can be the line number of step: ?

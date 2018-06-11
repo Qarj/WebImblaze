@@ -6,5 +6,6 @@ step: Another step - retry {RETRY}
 description2: Sub description
 shell: REM Not much more - retry {RETRY}
 verifypositive: retry 1
+#verifypositive2: This is ignored
 verifynegative: Nothing much
 retry: 3

@@ -2657,22 +2657,10 @@ sub _parse_lean_test_steps {
 
     my %_case = ();
 
-#    my %_case_step = ();
-#    $_case_step{ 'method' } = 'cmd';
-#    $_case_step{ 'veriyfpositive1' } = 'Nothing: much';
-#    $_case{ '10' } = \ %_case_step;
-
-#    my %_case_step_2 = ();
-#    $_case_step_2{ 'method' } = 'cmd';
-#    $_case_step_2{ 'veriyfpositive' } = 'retry';
-
-#    $_case{ '20' } = \ %_case_step_2;
-
-
-    ${$_lean} =~ s|$|\n\n|; # needed to guarantee the last test step will be matched
+    my $_normalised = _remove_comments_and_add_two_blank_lines( $_lean );
 
     my $_step_id = 0;
-    while ( ${$_lean} =~ m/\v*(.*?)\v{2,}/gs )
+    while ( $_normalised =~ m/\v*(.*?)\v{2,}/gs )
     {
         $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
         $_step_id += 10;
@@ -2682,6 +2670,24 @@ sub _parse_lean_test_steps {
     $_test_steps{ 'case' } = \ %_case;
 
     return \ %_test_steps;
+}
+
+sub _remove_comments_and_add_two_blank_lines {
+    my ($_lean) = @_;
+
+    my $_normalised = '';
+    while ( ${$_lean} =~ /(.*)\v?/mg ) {
+        my $_line = $1;
+        if ( $_line =~ /\s*\#/ ) {
+            # this is a comment - we don't need it
+        } else {
+            $_normalised .= $_line."\n";
+        }
+    }
+
+    $results_stdout .= qq| After comments removed:\n$_normalised \n|if $EXTRA_VERBOSE;
+
+    return $_normalised."\n\n";
 }
 
 sub _get_step {
@@ -2695,7 +2701,6 @@ sub _get_step {
         my $_parameter = _get_parameter_name($1);
         $_case_step{ $_parameter } = _get_parameter_value($1);
     }
-
 
     return \ %_case_step;
 }
