@@ -703,8 +703,25 @@ assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps
 assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - {{}}');
 assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : mirror char for quotes [<]>');
 
+# multiline string
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line value
+url: https://www.totaljobs.com
+postbody:|: | first line 
+second line
+third line|
+verifypositive1: first
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line value - 1');
+assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line value - 2');
+assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps : multi line value - 3');
+assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps : multi line value - 4');
+
 # multiline strings
-# special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
+# special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # have to deal with include files
 # repeat
 

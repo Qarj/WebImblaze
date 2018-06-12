@@ -2733,12 +2733,54 @@ sub _get_step {
     $_case_step{ 'method' } = _get_step_method(\ $_lean_step);
     _rename_parameters_to_classic_names(\ $_lean_step);
 
-    while ( $_lean_step =~ /^(.*)$/gm ) {
-        my $_parameter = _get_parameter_name($1);
-        $_case_step{ $_parameter } = _get_parameter_value($1);
+    my @_parms = _split_step_to_parms($_lean_step);
+    foreach $_parm (@_parms) {
+        $_case_step{ _get_parm_name($_parm) } = _get_parm_value($_parm);
     }
 
+#    while ( $_lean_step =~ /^(.*)$/gm ) {
+#        my $_parameter = _get_parameter_name($1);
+#        $_case_step{ $_parameter } = _get_parameter_value($1);
+#    }
+
     return \ %_case_step;
+}
+
+sub _split_step_to_parms {
+    my ($_lean_step) = @_;
+
+    my @_lines = split /\n/, $_lean_step;    
+
+    my @_parms;
+    my $_in_quote = 0;
+    my $_proto_parm = '';
+    my ($_quote, $_end_quote);
+    foreach my $_line (@_lines) {
+        if (! $_in_quote) {
+            $_quote, $_end_quote = _get_quote(\ $_lean_step_line);
+            if (defined $_quote) {
+                $_in_quote = 1;
+            } else {
+                $_in_quote = 0;
+            }
+        }
+        
+        if (! $_in_quote) {
+            push @_parms, $_line;
+            next;
+        }
+
+        $_proto_parm += $_line."\n";
+
+        # this won't work where delimiter is found in parm name or is :, and won't work where start quote and end quote are the same - need to make sure start quote has been satisified
+
+        if ( $_line =~ /\Q$_end_quote\E/ ) {
+            push @_parms, $_proto_parm;
+            $_proto_parm = '';
+        }
+    }
+    
+    return @_parms;
 }
 
 sub _get_step_method {
@@ -2806,7 +2848,7 @@ sub _get_quote {
         return $_quote, $_end_quote;
     }
 
-    return undef;
+    return undef, undef;
 }
 
 
