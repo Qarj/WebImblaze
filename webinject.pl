@@ -2780,15 +2780,15 @@ sub _get_parameter_name {
 sub _get_parameter_value {
     my ($_lean_step_line) = @_;
 
-    my $_quote = _get_quote(\ $_lean_step_line);
+    my ($_quote, $_end_quote) = _get_quote(\ $_lean_step_line);
 
     if (defined $_quote) {
-        if ( $_lean_step_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_quote\E| ) {
+        if ( $_lean_step_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
             return $1;
         }
     }
 
-    if ( $_lean_step_line =~ /^\w+: (.*)/ ) {
+    if ( $_lean_step_line =~ /^\w+: \s*(.*[^\s])\s*$/ ) {
         return $1;
     }
 }
@@ -2797,7 +2797,13 @@ sub _get_quote {
     my ($_lean_step_line) = @_;
 
     if ( ${$_lean_step_line} =~ /^\w+:(.+):/ ) {
-        return $1;
+        my $_quote = $1;
+        my $_end_quote = $_quote;
+        $_end_quote =~ s/[(]/\)/g;
+        $_end_quote =~ s/[{]/}/g;
+        $_end_quote =~ s/[[]/]/g;
+        $_end_quote =~ s/</>/g;
+        return $_quote, $_end_quote;
     }
 
     return undef;

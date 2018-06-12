@@ -625,6 +625,9 @@ verifypositiveB:#:    # sure #
 verifypositiveC:@:    @ sure @   
 verifypositiveD:&:    & sure &   
 verifypositiveE:=:    = sure =   
+verifypositiveF:":    " sure "   
+verifypositiveG:':    ' sure '   
+verifypositiveH:`:    ` sure `   
 EOB
     ;
 read_test_case_file();
@@ -642,13 +645,66 @@ assert_stdout_contains("'verifypositiveB' => ' sure '", '_parse_lean_test_steps 
 assert_stdout_contains("'verifypositiveC' => ' sure '", '_parse_lean_test_steps : single line quote - single char @');
 assert_stdout_contains("'verifypositiveD' => ' sure '", '_parse_lean_test_steps : single line quote - single char &');
 assert_stdout_contains("'verifypositiveE' => ' sure '", '_parse_lean_test_steps : single line quote - single char =');
+assert_stdout_contains("'verifypositiveF' => ' sure '", '_parse_lean_test_steps : single line quote - single char "');
+assert_stdout_contains("'verifypositiveG' => ' sure '", "_parse_lean_test_steps : single line quote - single char '");
+assert_stdout_contains("'verifypositiveH' => ' sure '", '_parse_lean_test_steps : single line quote - single char `');
 
-# null value quote
-# additional single char quotes " ' `
+# quoted string - empty string quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Empty string quote
+url: https://www.totaljobs.com
+verifypositive1::: ::
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char :');
+
+# unquoted string - preceeding and trailing spaces ignored
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Empty string quote
+url: https://www.totaljobs.com
+verifypositive1:   hello   
+verifypositive2: world
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => 'hello'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 1');
+assert_stdout_contains("'verifypositive2' => 'world'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 2');
+
+# multi char single line quotes
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi char single line quotes
+url: https://www.totaljobs.com
+verifypositive1:qqq:   qqq hello qqq  
+verifypositive2:--=:   --= hello --=  
+verifypositive3:=--:   =-- hello =--  
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 1');
+assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 2');
+assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 3');
+
+# mirrored chars for quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi char single line quotes
+url: https://www.totaljobs.com
+verifypositive1:(:   ( hello )  
+verifypositive2:{{:   {{ hello }}  
+verifypositive3:[<:   [< hello ]>  
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - ()');
+assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - {{}}');
+assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : mirror char for quotes [<]>');
+
 # multiline strings
-# test that trailing spaces are ignored (unquoted)
 # special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
-# first char in string is space
 # have to deal with include files
 # repeat
 
@@ -662,11 +718,13 @@ assert_stdout_contains("'verifypositiveE' => ' sure '", '_parse_lean_test_steps 
 # validate that command is not allowed parm (must be selenium or shell)
 # validate that posttype is not allowed parm (if possible)
 # validate that description1: is not allowed parm
+# validate that spaces only for unquoted is an error
 # line number of error must be output (presence of comments does not change line number)
 # step description must be output also
 
 #issues:
 # what to do for include step id - make that up too .01 .02
+# regex optimisations - possessive ++
 
 #ideas:
 # perhaps the id can be the line number of step: ?
