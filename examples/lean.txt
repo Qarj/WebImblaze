@@ -6,12 +6,14 @@ step: Another step - retry {RETRY}
 description2: Sub description
 shell: REM Not much more - retry {RETRY}
 verifypositive: retry 1
+verifypositive1:q:   q much q   
 #verifypositive2: This is ignored
 verifynegative: Nothing much
+verifypositive5:#:  # more #   
 retry: 3
 
-<!--
+--=
 step: This step is commented out
 shell: REM NOP
 verifypositive: Commented out
--->
+=--

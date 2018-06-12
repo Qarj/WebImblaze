@@ -2690,16 +2690,16 @@ sub _remove_multi_line_comments {
     my $_within_multi_line_comment = 0;
     while ( ${$_lean} =~ /(.*)\v?/mg ) {
         my $_line = $1;
-        if ( $_line =~ /\s*<!--/ ) {
+        if ( $_line =~ /^\s*--=/ ) {
             $_within_multi_line_comment = 1;
         }
-        if ( $_line =~ /\s*-->/ ) {
+        if ( $_line =~ /^\s*=--/ ) {
             $_within_multi_line_comment = 0;
         }
         if ($_within_multi_line_comment) {
             # this is within a comment - we don't need it
         } else {
-            if ( $_line =~ /\s*-->/ ) {
+            if ( $_line =~ /^\s*=--/ ) {
                 # we can discard the end comment line
             } else {
                 $_normalised .= $_line."\n";
@@ -2716,7 +2716,7 @@ sub _remove_single_line_comments {
     my $_normalised = '';
     while ( ${$_lean} =~ /(.*)\v?/mg ) {
         my $_line = $1;
-        if ( $_line =~ /\s*\#/ ) {
+        if ( $_line =~ /^\s*\#/ ) {
             # this is a comment - we don't need it
         } else {
             $_normalised .= $_line."\n";
@@ -2780,10 +2780,29 @@ sub _get_parameter_name {
 sub _get_parameter_value {
     my ($_lean_step_line) = @_;
 
+    my $_quote = _get_quote(\ $_lean_step_line);
+
+    if (defined $_quote) {
+        if ( $_lean_step_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_quote\E| ) {
+            return $1;
+        }
+    }
+
     if ( $_lean_step_line =~ /^\w+: (.*)/ ) {
         return $1;
     }
 }
+
+sub _get_quote {
+    my ($_lean_step_line) = @_;
+
+    if ( ${$_lean_step_line} =~ /^\w+:(.+):/ ) {
+        return $1;
+    }
+
+    return undef;
+}
+
 
 #------------------------------------------------------------------
 sub _write_failed_xml {

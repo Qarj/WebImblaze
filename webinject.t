@@ -523,26 +523,130 @@ read_test_case_file();
 assert_stdout_does_not_contain("'verifypositive'", '_parse_lean_test_steps : single line comment first char');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment does not generate null parameter');
 
-# multi line comment starts and ends with ===
+# multi line comment starts with --= and ends with =--
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Multi line comment
 url: https://www.totaljobs.com
 #verifypositive: positive
 
-<!--
+--=
 step: This step is commented out
 url: https://www.totaljobs.com
 verifypositive: Not found
--->
+=--
 EOB
     ;
 read_test_case_file();
 assert_stdout_does_not_contain("'Not found'", '_parse_lean_test_steps : multi line comment');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment does not generate null parameter');
 
-# multiline comments
+# multi line comment can exist in a test step
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line comment
+url: https://www.totaljobs.com
+verifypositive: sure
+--=
+verifypositive: positive
+=--
+verifynegative: negative
+EOB
+    ;
+read_test_case_file();
+assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : can have multi line comment in step');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment in step does not generate null parameter');
+assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : can have multi line comment in step - parm after comment is active');
+
+# multi line comment and single line comment beside each other
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line comment
+url: https://www.totaljobs.com
+verifypositive: sure
+#boring
+--=
+verifypositive: positive
+=--
+#verifypositive: happy
+verifynegative: negative
+#verifypositive: sad
+EOB
+    ;
+read_test_case_file();
+assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment ignore in mixed comments');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line and single line comment does not generate null parameter');
+assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi and single line comments mixed ok - 1');
+assert_stdout_contains("'verifypositive' => 'sure'", '_parse_lean_test_steps : multi and single line comments mixed ok - 2');
+assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line and single line comment - should only be one step');
+
+# not a multi line comment - should not be removed
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line comment
+url: https://www.totaljobs.com
+verifypositive1: sure --= thing
+verifypositive2: positive
+verifynegative1: negative  =-- 
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => 'sure --= thing'", '_parse_lean_test_steps : not a multiline quote - 1');
+assert_stdout_contains("'verifypositive2' => 'positive'", '_parse_lean_test_steps : not a multiline quote - 2');
+assert_stdout_contains("'verifynegative1' => .negative  =--", '_parse_lean_test_steps : not a multiline quote - 3');
+
+# quoted string - one line
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: One line quoted string
+url: https://www.totaljobs.com
+verifypositive:q:    q sure q   
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive' => ' sure '", '_parse_lean_test_steps : single line quote - single char');
+
+# quoted string - one line special characters
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Be sure of one line quoted string
+url: https://www.totaljobs.com
+verifypositive1:$:    $ sure $   
+verifypositive2:^:    ^ sure ^   
+verifypositive3:.:    . sure .   
+verifypositive4:*:    * sure *   
+verifypositive5:+:    + sure +   
+verifypositive6:?:    ? sure ?   
+verifypositive7:\:    \ sure \   
+verifypositive8:|:    | sure |   
+verifypositive9:-:    - sure -   
+verifypositiveA:/:    / sure /   
+verifypositiveB:#:    # sure #   
+verifypositiveC:@:    @ sure @   
+verifypositiveD:&:    & sure &   
+verifypositiveE:=:    = sure =   
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => ' sure '", '_parse_lean_test_steps : single line quote - single char $');
+assert_stdout_contains("'verifypositive2' => ' sure '", '_parse_lean_test_steps : single line quote - single char ^');
+assert_stdout_contains("'verifypositive3' => ' sure '", '_parse_lean_test_steps : single line quote - single char .');
+assert_stdout_contains("'verifypositive4' => ' sure '", '_parse_lean_test_steps : single line quote - single char *');
+assert_stdout_contains("'verifypositive5' => ' sure '", '_parse_lean_test_steps : single line quote - single char +');
+assert_stdout_contains("'verifypositive6' => ' sure '", '_parse_lean_test_steps : single line quote - single char ?');
+assert_stdout_contains("'verifypositive7' => ' sure '", '_parse_lean_test_steps : single line quote - single char \\');
+assert_stdout_contains("'verifypositive8' => ' sure '", '_parse_lean_test_steps : single line quote - single char |');
+assert_stdout_contains("'verifypositive9' => ' sure '", '_parse_lean_test_steps : single line quote - single char -');
+assert_stdout_contains("'verifypositiveA' => ' sure '", '_parse_lean_test_steps : single line quote - single char /');
+assert_stdout_contains("'verifypositiveB' => ' sure '", '_parse_lean_test_steps : single line quote - single char #');
+assert_stdout_contains("'verifypositiveC' => ' sure '", '_parse_lean_test_steps : single line quote - single char @');
+assert_stdout_contains("'verifypositiveD' => ' sure '", '_parse_lean_test_steps : single line quote - single char &');
+assert_stdout_contains("'verifypositiveE' => ' sure '", '_parse_lean_test_steps : single line quote - single char =');
+
+# null value quote
+# additional single char quotes " ' `
 # multiline strings
+# test that trailing spaces are ignored (unquoted)
 # special characters <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # first char in string is space
 # have to deal with include files
