@@ -2649,6 +2649,87 @@ sub read_test_case_file {
     return;
 }
 
+sub new_lean_parser {
+    $lean_parser_raw_ = @_;
+    @lean_parser_lines_ = split /\n/, $lean_parser_raw;    
+    $lean_parser_step_raw_ = '';
+    $lean_parser_current_step_num_ = 0;
+    $lean_parser_current_index_num_ = 0;
+    @lean_parser_step_parm_names_ = [];
+    @lean_parser_step_parm_values_ = [];
+
+    return;
+}
+
+sub lean_parser_has_next_step {
+    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) return 1;
+    return 0;
+}
+
+sub lean_parser_get_next_step {
+
+    my @_parms;
+    my $_in_quote = 0;
+    my $_proto_parm = '';
+    my ($_quote, $_end_quote);
+    my $_start_quote_found = 0;
+    my $_reached_end_of_step = 0;
+    while (!$_reached_end_of_step) {
+        if (! $_in_quote) {
+            my $_parm_name = _get_parm_name( $lean_parser_lines_[$lean_parser_current_index_num_]);
+            $_quote, $_end_quote = _get_quote( $lean_parser_lines_[$lean_parser_current_index_num_]);
+            my $_parm_value = _get_parm_value_if_single_line($lean_parser_lines_[$lean_parser_current_index_num_], $_quote, $_end_quote );
+            if (defined $_parm_value) {
+                push @lean_parser_step_parm_names_, $_parm_name;
+                push @lean_parser_step_parm_values_, $_parm_value;
+                if (lean_parser_step_has_next_line()) {
+                    $lean_parser_current_index_num_ += 1;
+                    next;
+                } else {
+                    $_reached_end_of_step = 1;
+                    next;
+                }
+            }
+            $_in_quote = 1;
+        }
+
+        if (! $_start_quote_found) {
+            $_start_quote_found = _search_for_start_quote( $lean_parser_lines_[$lean_parser_current_index_num_] );
+            if ($_start_quote_found) {
+                $_parm_value = _get_entire_parm_value_if_possible($lean_parser_lines_[$lean_parser_current_index_num_], $_quote, $_end_quote );
+
+                if (defined $_parm_value) {
+                    push @lean_parser_step_parm_names_, $_parm_name;
+                    push @lean_parser_step_parm_values_, $_parm_value;
+                    if (lean_parser_step_has_next_line()) {
+                        $lean_parser_current_index_num_ += 1;
+                        next;
+                    } else {
+                        $_reached_end_of_step = 1;
+                        next;
+                    }
+                }
+
+
+
+                $_proto_parm = _get_from_start_quote_to_end_of_line
+            }
+        }
+
+        $_proto_parm += $_line."\n";
+
+        # this won't work where delimiter is found in parm name or is :, and won't work where start quote and end quote are the same - need to make sure start quote has been satisified
+
+        if ( $_line =~ /\Q$_end_quote\E/ ) {
+            push @_parms, $_proto_parm;
+            $_proto_parm = '';
+        }
+    }
+
+
+    return $lean_parser_current_step_num_;
+}
+
 sub _parse_lean_test_steps {
     my ($_lean) = @_;
 
@@ -2659,13 +2740,23 @@ sub _parse_lean_test_steps {
 
     my $_normalised = _remove_comments_and_add_two_blank_lines( $_lean );
 
+    new_lean_parser( $_normalised );
     my $_step_id = 0;
-    while ( $_normalised =~ m/\v*(.*?)\v{2,}/gs )
+    while ( lean_parser_has_next_step() )
     {
-        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
+        my $_current_step_num = lean_parser_get_next_step();
+        $results_stdout .= qq| Processing step $_current_step_num:[[[\nlean_parser_step_raw()]]] \n|if $EXTRA_VERBOSE;
         $_step_id += 10;
-        $_case{ $_step_id } = _get_step($1);
+        $_case{ $_step_id } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
     }
+
+#    my $_step_id = 0;
+#    while ( $_normalised =~ m/\v*(.*?)\v{2,}/gs )
+#    {
+#        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
+#        $_step_id += 10;
+#        $_case{ $_step_id } = _get_step($1);
+#    }
 
     $_test_steps{ 'case' } = \ %_case;
 
