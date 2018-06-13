@@ -721,6 +721,7 @@ assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps
 assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps : multi line value - 4');
 
 # multiline strings
+    # string is all on one line, but on the next line
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # have to deal with include files
 # repeat
