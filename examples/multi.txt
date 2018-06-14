@@ -4,6 +4,7 @@ verifypositive1: Nothing: much
 
 step: Another step
 varBIG:abcd: abcdOne Fish
-Two Fishabcd
+Two Fish
+Three Fishabcd
 shell: REM {BIG}
-verifynegative: {BIG}
+verifypositive: {BIG}

@@ -654,11 +654,22 @@ before_test();
 $main::unit_test_steps = <<'EOB'
 step: Empty string quote
 url: https://www.totaljobs.com
-verifypositive1::: ::
+verifypositive1:_: __
 EOB
     ;
 read_test_case_file();
 assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char :');
+
+# quoted string - quote char is colon
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Empty string quote
+url: https://www.totaljobs.com
+verifypositive1::: :hey:
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => 'hey'", '_parse_lean_test_steps : quote character is colon :');
 
 # unquoted string - preceeding and trailing spaces ignored
 before_test();

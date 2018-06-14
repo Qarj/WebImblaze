@@ -2681,7 +2681,7 @@ sub lean_parser_step_values {
 
 sub lean_parser_has_next_step {
     if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Next step exists $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Next step exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
         return 1;
     }
     $results_stdout .= qq| NO NEXT STEP! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
@@ -2690,7 +2690,7 @@ sub lean_parser_has_next_step {
 
 sub lean_parser_has_next_line {
     if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Next line exists $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Next line exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
         return 1;
     }
     $results_stdout .= qq| NO NEXT LINE! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
@@ -2699,19 +2699,19 @@ sub lean_parser_has_next_line {
 
 sub lean_parser_step_has_next_line {
     if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Reached end of step and file\n| if $EXTRA_VERBOSE;
-        print qq| Reached end of step and file\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
+#        print qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
     if ( $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
-        $results_stdout .= qq| Reached end of step\n| if $EXTRA_VERBOSE;
-        print qq| Reached end of step\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| == reached end of step ==\n| if $EXTRA_VERBOSE;
+#        print qq| == reached end of step ==\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
-    $results_stdout .= qq| Seems to be more content for current step\n| if $EXTRA_VERBOSE;
-    print qq| Seems to be more content for current step\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| ->seems to be more content for current step\n| if $EXTRA_VERBOSE;
+#    print qq| ->seems to be more content for current step\n| if $EXTRA_VERBOSE;
     return 1;
 }
 
@@ -2734,12 +2734,13 @@ sub lean_parser_get_next_step {
     my $_reached_end_of_step = 0;
     @lean_parser_step_parm_names_ = ();
     @lean_parser_step_parm_values_ = ();
+    my $_parm_name;
+    my $_parm_value;
     while (!$_reached_end_of_step) {
-        my $_parm_name;
-        my $_parm_value;
         if (! $_in_quote) {
             $_parm_name = _get_parm_name( $lean_parser_lines_[$lean_parser_current_index_num_]);
             ($_quote, $_end_quote) = _get_quote( $lean_parser_lines_[$lean_parser_current_index_num_]);
+            $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE;
             $_parm_value = _get_parm_value_if_single_line($lean_parser_lines_[$lean_parser_current_index_num_], $_quote, $_end_quote );
             if (defined $_parm_value) {
                 push @lean_parser_step_parm_names_, $_parm_name;
@@ -2757,16 +2758,26 @@ sub lean_parser_get_next_step {
         }
 
         if (! $_start_quote_found) {
-            $_start_quote_found = _search_for_start_quote( $lean_parser_lines_[$lean_parser_current_index_num_] );
+            $_start_quote_found = _search_for_start_quote( $lean_parser_lines_[$lean_parser_current_index_num_], $_quote );
             if ($_start_quote_found) {
-                $_proto_parm = _get_from_start_quote_to_end_of_line( $lean_parser_lines_[$lean_parser_current_index_num_] );
-                next;
+                $_proto_parm = _get_from_start_quote_to_end_of_line( $lean_parser_lines_[$lean_parser_current_index_num_], $_quote ) . "\n";
+                $results_stdout .= qq| Got from start quote to end of line: [[$_proto_parm]] \n| if $EXTRA_VERBOSE;
+
+                if (lean_parser_step_has_next_line()) {
+                    $lean_parser_current_index_num_ += 1;
+                    next;
+                } else {
+                    $_reached_end_of_step = 1;
+                    next;
+                }
+
             }
         }
 
-        my $_last_bit = _get_from_start_of_line_to_end_quote( $lean_parser_lines_[$lean_parser_current_index_num_] );
+        my $_last_bit = _get_from_start_of_line_to_end_quote( $lean_parser_lines_[$lean_parser_current_index_num_], $_end_quote );
         if (defined $_last_bit) {
             $_proto_parm .= $_last_bit;
+            $results_stdout .= qq| Got from start of line to end quote: [[$_last_bit]] \n| if $EXTRA_VERBOSE;
 
 
             push @lean_parser_step_parm_names_, $_parm_name;
@@ -2781,15 +2792,47 @@ sub lean_parser_get_next_step {
                 next;
             }
 
+
         }
 
-        $_proto_parm += $lean_parser_lines_[$lean_parser_current_index_num_]."\n";
+        $_proto_parm .= $lean_parser_lines_[$lean_parser_current_index_num_]."\n";
+        $results_stdout .= qq| Put entire line into multi line quote: [[$lean_parser_lines_[$lean_parser_current_index_num_]]] \n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| PROTO PARM CURRENTLY: [[$_proto_parm]]] \n| if $EXTRA_VERBOSE;
+
+
+        if (lean_parser_step_has_next_line()) {
+            $lean_parser_current_index_num_ += 1;
+            next;
+        } else {
+            $_reached_end_of_step = 1;
+            next;
+        }
+
     }
 
     advance_cursor_to_next_step();
 
     $lean_parser_current_step_num_ += 1;
     return $lean_parser_current_step_num_;
+}
+
+sub _search_for_start_quote {
+   my ($_line, $_quote) = @_;
+   return $_line =~ /\Q$_quote\E/;
+}
+
+sub _get_from_start_quote_to_end_of_line {
+   my ($_line, $_quote) = @_;
+   $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
+   return $1;
+}
+
+sub _get_from_start_of_line_to_end_quote {
+   my ($_line, $_end_quote) = @_;
+   if ( $_line =~ /(.*?)\Q$_end_quote\E/ ) {
+       return $1;
+   }
+   return undef;
 }
 
 sub _get_parm_name {
@@ -2850,12 +2893,12 @@ sub _parse_lean_test_steps {
 sub _construct_step {
     my ($_parms, $_vals) = @_;
 
-    foreach my $_parm ( @{$_parms} ) {
-        print "_parm: $_parm\n";
-    }
-    foreach my $_val ( @{$_vals} ) {
-        print "_val: $_val\n";
-    }
+#    foreach my $_parm ( @{$_parms} ) {
+#        print "_parm: $_parm\n";
+#    }
+#    foreach my $_val ( @{$_vals} ) {
+#        print "_val: $_val\n";
+#    }
 
     my %_case_step = ();
     $_case_step{ 'method' } = _get_lean_step_method($_parms);
@@ -2876,7 +2919,7 @@ sub _get_lean_step_method {
         if ($_parm eq 'selenium') { return 'selenium'; }
         if ($_parm eq 'url') {
             foreach my $_parm_2 (@{$_parms}) {
-                if ($_parm eq 'postbody') { return 'post'; }
+                if ($_parm_2 eq 'postbody') { return 'post'; }
             }
             return 'get';
         }
@@ -3022,7 +3065,7 @@ sub _get_parameter_value {
 sub _get_quote {
     my ($_lean_step_line) = @_;
 
-    if ( $_lean_step_line =~ /^\w+:(.+):/ ) {
+    if ( $_lean_step_line =~ /^\w+:(.+): / ) {
         my $_quote = $1;
         my $_end_quote = $_quote;
         $_end_quote =~ s/[(]/\)/g;
