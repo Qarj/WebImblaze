@@ -809,9 +809,6 @@ assert_stdout_contains("'description1' => 'Step 2'", '_parse_lean_test_steps : b
 assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines between steps - 5');
 
 # multiline strings
-    # infinite loop protection?
-    # optimise main parser loop code
-    # make main loop code more readable - local var?
     # comment within quote - will it be stripped out?
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # have to deal with include files
@@ -832,6 +829,8 @@ assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines 
 # validate that multiline comment does not count as lines - so can be within step
 # line number of error must be output (presence of comments does not change line number)
 # step description must be output also
+
+# optimise main parser loop code
 
 #issues:
 # what to do for include step id - make that up too .01 .02
