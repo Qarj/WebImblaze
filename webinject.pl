@@ -2657,14 +2657,62 @@ sub read_test_case_file {
     return;
 }
 
+sub _parse_lean_test_steps {
+    my ($_lean) = @_;
+
+    my %_test_steps = ();
+    $_test_steps{ 'repeat' } = '1';
+
+    my %_case = ();
+
+    my $_normalised = _remove_comments_and_add_two_blank_lines( $_lean );
+
+    new_lean_parser( $_normalised );
+    my $_step_id = 0;
+    while ( lean_parser_has_unprocessed_step() )
+    {
+        my $_current_step_num = lean_parser_get_current_step();
+        $results_stdout .= qq| Processing step $_current_step_num:[[[\nlean_parser_step_raw()]]] \n|if $EXTRA_VERBOSE;
+        $_step_id += 10;
+        $_case{ $_step_id } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
+    }
+
+    $_test_steps{ 'case' } = \ %_case;
+
+    return \ %_test_steps;
+}
+
+sub _construct_step {
+    my ($_parms, $_vals) = @_;
+
+#    foreach my $_parm ( @{$_parms} ) {
+#        print "_parm: $_parm\n";
+#    }
+#    foreach my $_val ( @{$_vals} ) {
+#        print "_val: $_val\n";
+#    }
+
+    my %_case_step = ();
+    $_case_step{ 'method' } = _get_lean_step_method($_parms);
+    _rename_lean_parameters_to_classic_names($_parms);
+
+    for my $_i ( 0 .. $#{$_parms} ) {
+        $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
+    }
+
+    return \ %_case_step;
+}
+
 sub new_lean_parser {
     ($lean_parser_raw_) = @_;
     @lean_parser_lines_ = split /\n/, $lean_parser_raw_;    
     $lean_parser_step_raw_ = '';
     $lean_parser_current_step_num_ = 0;
-    $lean_parser_current_index_num_ = 0;
+    $lean_parser_current_index_num_ = -1;
 
     $results_stdout .= qq| Lean parsing [[[$lean_parser_raw_]]] \n| if $EXTRA_VERBOSE;
+
+    advance_cursor_to_next_step();
 
     return;
 }
@@ -2679,12 +2727,12 @@ sub lean_parser_step_values {
     return \ @lean_parser_step_parm_values_;
 }
 
-sub lean_parser_has_next_step {
+sub lean_parser_has_unprocessed_step {
     if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Next step exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Unprocessed step exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
         return 1;
     }
-    $results_stdout .= qq| NO NEXT STEP! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| NO UNPROCESSED STEP! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
     return 0;
 }
 
@@ -2700,31 +2748,35 @@ sub lean_parser_has_next_line {
 sub lean_parser_step_has_next_line {
     if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
         $results_stdout .= qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
-#        print qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
     if ( $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
         $results_stdout .= qq| == reached end of step ==\n| if $EXTRA_VERBOSE;
-#        print qq| == reached end of step ==\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
     $results_stdout .= qq| ->seems to be more content for current step\n| if $EXTRA_VERBOSE;
-#    print qq| ->seems to be more content for current step\n| if $EXTRA_VERBOSE;
     return 1;
 }
 
 sub advance_cursor_to_next_step {
-    if (lean_parser_has_next_line) {
-        $lean_parser_current_index_num_ += 1;
-    }
-    if (lean_parser_has_next_line) {
-        $lean_parser_current_index_num_ += 1;
+    my $_no_content_found_yet = 1;
+
+    while ($_no_content_found_yet) { 
+        if (lean_parser_has_next_line) {
+            $lean_parser_current_index_num_ += 1;
+        } else {
+            return;
+        }
+        if ( $lean_parser_lines_[$lean_parser_current_index_num_] =~ /\s*+.{1,}/ ) {
+            $_no_content_found_yet = 0;
+            $results_stdout .= qq| ... advancing cursor, found content on index $lean_parser_current_index_num_ ...\n| if $EXTRA_VERBOSE;
+        }
     }
 }
 
-sub lean_parser_get_next_step {
+sub lean_parser_get_current_step {
 
     my @_parms;
     my $_in_quote = 0;
@@ -2836,18 +2888,15 @@ sub _search_for_start_quote {
 
 sub _get_from_start_quote_to_end_of_line {
    my ($_line, $_quote) = @_;
-#   $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
-#   return $1;
+
     if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
         if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
             $results_stdout .= qq| After quote definition, got from start quote to end of line: [[$1]] \n| if $EXTRA_VERBOSE;
             return $1;
         }
         $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
-        # die - _search_for_start_quote_sub_stops_this
     }
-#    $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
-#    return $1;
+
     $_line =~ /\Q$_quote\E(.*)/;
     $results_stdout .= qq| Got from start quote to end of line [[$1]] \n| if $EXTRA_VERBOSE;
     return $1;
@@ -2881,52 +2930,6 @@ sub _get_parm_value_if_single_line {
     }
 
     return undef;
-}
-
-sub _parse_lean_test_steps {
-    my ($_lean) = @_;
-
-    my %_test_steps = ();
-    $_test_steps{ 'repeat' } = '1';
-
-    my %_case = ();
-
-    my $_normalised = _remove_comments_and_add_two_blank_lines( $_lean );
-
-    new_lean_parser( $_normalised );
-    my $_step_id = 0;
-    while ( lean_parser_has_next_step() )
-    {
-        my $_current_step_num = lean_parser_get_next_step();
-        $results_stdout .= qq| Processing step $_current_step_num:[[[\nlean_parser_step_raw()]]] \n|if $EXTRA_VERBOSE;
-        $_step_id += 10;
-        $_case{ $_step_id } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
-    }
-
-    $_test_steps{ 'case' } = \ %_case;
-
-    return \ %_test_steps;
-}
-
-sub _construct_step {
-    my ($_parms, $_vals) = @_;
-
-#    foreach my $_parm ( @{$_parms} ) {
-#        print "_parm: $_parm\n";
-#    }
-#    foreach my $_val ( @{$_vals} ) {
-#        print "_val: $_val\n";
-#    }
-
-    my %_case_step = ();
-    $_case_step{ 'method' } = _get_lean_step_method($_parms);
-    _rename_lean_parameters_to_classic_names($_parms);
-
-    for my $_i ( 0 .. $#{$_parms} ) {
-        $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
-    }
-
-    return \ %_case_step;
 }
 
 sub _get_lean_step_method {

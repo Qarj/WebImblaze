@@ -1,3 +1,4 @@
+   
 step: Test that WebInject can run a very basic test
 shell: REM Nothing: much
 verifypositive1: Nothing: much

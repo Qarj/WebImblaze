@@ -714,7 +714,7 @@ assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps
 assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - {{}}');
 assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : mirror char for quotes [<]>');
 
-# multiline string
+# multiline quotes - classic
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Multi line value
@@ -730,17 +730,89 @@ assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps :
 assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line value - 2');
 assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps : multi line value - 3');
 assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps : multi line value - 4');
+assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi line value - 5');
+
+# multiline quotes - minimum
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line min value
+url: https://www.totaljobs.com
+postbody:|: | first line 
+second line|
+verifypositive1: first
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line min value - 1');
+assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi line min value - 2');
+assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line min value - 3');
+assert_stdout_contains("'postbody' => [^|]+second line'", '_parse_lean_test_steps : multi line min value - 4');
+
+# multi scenarios
+before_test();
+$main::unit_test_steps = <<'EOB'
+
+step: Multi 10
+url: https://www.totaljobs.com
+postbody:QUOTE: QUOTE first line 
+second lineQUOTE
+
+--= Various: value
+=--
+#ignore: this
+step: Multi 20
+url: https://www.cwjobs.co.uk
+postbody:[[[: [[[
+first content line 
+ second content line
+]]]
+
+
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'description1' => 'Multi 10'", '_parse_lean_test_steps : multi scenarios - 1');
+assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : multi scenarios - 2');
+assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi scenarios - 3');
+assert_stdout_contains("second line'", '_parse_lean_test_steps : multi scenarios - 4');
+assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : multi scenarios - 5');
+assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi scenarios - 6');
+assert_stdout_does_not_contain("'ignore' => 'this'", '_parse_lean_test_steps : multi scenarios - 7');
+assert_stdout_contains("'description1' => 'Multi 20'", '_parse_lean_test_steps : multi scenarios - 8');
+assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : multi scenarios - 9');
+assert_stdout_contains('first content line ', '_parse_lean_test_steps : multi scenarios - 10');
+assert_stdout_contains(' second content line', '_parse_lean_test_steps : multi scenarios - 11');
+
+
+
+# multiple blank lines between steps
+before_test();
+$main::unit_test_steps = <<'EOB'
+    
+
+step: Multiple blank lines between steps
+url: https://www.totaljobs.com
+
+
+step: Step 2
+url: https://www.cwjobs.co.uk
+
+   
+
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : blank lines between steps - 1');
+assert_stdout_contains("'description1' => 'Multiple blank lines between steps'", '_parse_lean_test_steps : blank lines between steps - 2');
+assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : blank lines between steps - 3');
+assert_stdout_contains("'description1' => 'Step 2'", '_parse_lean_test_steps : blank lines between steps - 4');
+assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines between steps - 5');
 
 # multiline strings
-    # remove redundant code
-    # first line is blank
-    # multiple blank lines between steps
-    # final lines are blank
-    # string starts same line, ends next line
-    # string start next line, ends line after
     # infinite loop protection?
     # optimise main parser loop code
     # make main loop code more readable - local var?
+    # comment within quote - will it be stripped out?
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # have to deal with include files
 # repeat
@@ -756,6 +828,8 @@ assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps
 # validate that posttype is not allowed parm (if possible)
 # validate that description1: is not allowed parm
 # validate that spaces only for unquoted is an error
+# validate that multiline quote starts on parameter line
+# validate that multiline comment does not count as lines - so can be within step
 # line number of error must be output (presence of comments does not change line number)
 # step description must be output also
 
