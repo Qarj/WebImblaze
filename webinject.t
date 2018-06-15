@@ -783,8 +783,6 @@ assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_
 assert_stdout_contains('first content line ', '_parse_lean_test_steps : multi scenarios - 10');
 assert_stdout_contains(' second content line', '_parse_lean_test_steps : multi scenarios - 11');
 
-
-
 # multiple blank lines between steps
 before_test();
 $main::unit_test_steps = <<'EOB'
@@ -807,6 +805,25 @@ assert_stdout_contains("'description1' => 'Multiple blank lines between steps'",
 assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : blank lines between steps - 3');
 assert_stdout_contains("'description1' => 'Step 2'", '_parse_lean_test_steps : blank lines between steps - 4');
 assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines between steps - 5');
+
+# single line comment within quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+#assertcount: 5
+
+step: Single line comment within quote
+shell: echo NOP
+verifypositive:[[: [[
+#not a comment
+#more content]]
+verifynegative: bad stuff
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : single line comment in quote - 1');
+assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line comment in quote - 2');
+assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
+assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : single line comment in quote - 4');
 
 # multiline strings
     # comment within quote - will it be stripped out?
