@@ -2740,7 +2740,7 @@ sub lean_parser_get_next_step {
         if (! $_in_quote) {
             $_parm_name = _get_parm_name( $lean_parser_lines_[$lean_parser_current_index_num_]);
             ($_quote, $_end_quote) = _get_quote( $lean_parser_lines_[$lean_parser_current_index_num_]);
-            $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE;
+            $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
             $_parm_value = _get_parm_value_if_single_line($lean_parser_lines_[$lean_parser_current_index_num_], $_quote, $_end_quote );
             if (defined $_parm_value) {
                 push @lean_parser_step_parm_names_, $_parm_name;
@@ -2761,7 +2761,6 @@ sub lean_parser_get_next_step {
             $_start_quote_found = _search_for_start_quote( $lean_parser_lines_[$lean_parser_current_index_num_], $_quote );
             if ($_start_quote_found) {
                 $_proto_parm = _get_from_start_quote_to_end_of_line( $lean_parser_lines_[$lean_parser_current_index_num_], $_quote ) . "\n";
-                $results_stdout .= qq| Got from start quote to end of line: [[$_proto_parm]] \n| if $EXTRA_VERBOSE;
 
                 if (lean_parser_step_has_next_line()) {
                     $lean_parser_current_index_num_ += 1;
@@ -2797,7 +2796,7 @@ sub lean_parser_get_next_step {
 
         $_proto_parm .= $lean_parser_lines_[$lean_parser_current_index_num_]."\n";
         $results_stdout .= qq| Put entire line into multi line quote: [[$lean_parser_lines_[$lean_parser_current_index_num_]]] \n| if $EXTRA_VERBOSE;
-        $results_stdout .= qq| PROTO PARM CURRENTLY: [[$_proto_parm]]] \n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| PROTO PARM CURRENTLY: [[$_proto_parm]] \n| if $EXTRA_VERBOSE;
 
 
         if (lean_parser_step_has_next_line()) {
@@ -2817,14 +2816,41 @@ sub lean_parser_get_next_step {
 }
 
 sub _search_for_start_quote {
-   my ($_line, $_quote) = @_;
-   return $_line =~ /\Q$_quote\E/;
+    my ($_line, $_quote) = @_;
+    if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
+        if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E/ ) {
+            $results_stdout .= qq| QUOTE DEFINITION AND START QUOTE FOUND in line: [[$_line]] \n| if $EXTRA_VERBOSE;
+            return 1;
+        }
+        $results_stdout .= qq| QUOTE DEFINITION FOUND, BUT NOT START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
+        return 0;
+    }
+    if ( $_line =~ /\Q$_quote\E/ ) {
+        $results_stdout .= qq| FOUND START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
+        return 1;
+    } else {
+        $results_stdout .= qq| DID NOT FIND START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
+        return 0;
+    }
 }
 
 sub _get_from_start_quote_to_end_of_line {
    my ($_line, $_quote) = @_;
-   $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
-   return $1;
+#   $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
+#   return $1;
+    if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
+        if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
+            $results_stdout .= qq| After quote definition, got from start quote to end of line: [[$1]] \n| if $EXTRA_VERBOSE;
+            return $1;
+        }
+        $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
+        # die - _search_for_start_quote_sub_stops_this
+    }
+#    $_line =~ /\Q$_quote\E(?!.*\Q$_quote\E)(.*)/;
+#    return $1;
+    $_line =~ /\Q$_quote\E(.*)/;
+    $results_stdout .= qq| Got from start quote to end of line [[$1]] \n| if $EXTRA_VERBOSE;
+    return $1;
 }
 
 sub _get_from_start_of_line_to_end_quote {
@@ -2876,14 +2902,6 @@ sub _parse_lean_test_steps {
         $_step_id += 10;
         $_case{ $_step_id } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
     }
-
-#    my $_step_id = 0;
-#    while ( $_normalised =~ m/\v*(.*?)\v{2,}/gs )
-#    {
-#        $results_stdout .= qq| Found case:[\n$1] \n|if $EXTRA_VERBOSE;
-#        $_step_id += 10;
-#        $_case{ $_step_id } = _get_step($1);
-#    }
 
     $_test_steps{ 'case' } = \ %_case;
 
@@ -2989,78 +3007,6 @@ sub _remove_single_line_comments {
 
     return $_normalised;
 }    
-
-#sub _get_step {
-#    my ($_lean_step) = @_;
-#
-#    my %_case_step = ();
-#    $_case_step{ 'method' } = _get_step_method(\ $_lean_step);
-#    _rename_parameters_to_classic_names(\ $_lean_step);
-#
-#    my @_parms = _split_step_to_parms($_lean_step);
-#    foreach $_parm (@_parms) {
-#        $_case_step{ _get_parm_name($_parm) } = _get_parm_value($_parm);
-#    }
-#
-#    while ( $_lean_step =~ /^(.*)$/gm ) {
-#        my $_parameter = _get_parameter_name($1);
-#        $_case_step{ $_parameter } = _get_parameter_value($1);
-#    }
-#
-#    return \ %_case_step;
-#}
-
-sub _get_step_method {
-    my ($_lean_step) = @_;
-
-    if ( ${$_lean_step} =~ /^shell/m ) {
-        return 'cmd';
-    }
-
-    if ( ${$_lean_step} =~ /^selenium/m ) {
-        return 'selenium';
-    }
-
-    if ( ${$_lean_step} =~ /^url/m ) {
-        if ( ${$_lean_step} =~ /^postbody/m ) {
-            return 'post';
-        } else {
-            return 'get';
-        }
-    }
-}
-
-sub _rename_parameters_to_classic_names {
-    my ($_lean_step) = @_;
-
-    ${$_lean_step} =~ s/^shell/command/mg;
-    ${$_lean_step} =~ s/^selenium/command/mg;
-    ${$_lean_step} =~ s/^step/description1/m;
-}
-
-sub _get_parameter_name {
-    my ($_lean_step_line) = @_;
-
-    if ( $_lean_step_line =~ /^(\w+):/ ) {
-        return $1;
-    }
-}
-
-sub _get_parameter_value {
-    my ($_lean_step_line) = @_;
-
-    my ($_quote, $_end_quote) = _get_quote(\ $_lean_step_line);
-
-    if (defined $_quote) {
-        if ( $_lean_step_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
-            return $1;
-        }
-    }
-
-    if ( $_lean_step_line =~ /^\w+: \s*(.*[^\s])\s*$/ ) {
-        return $1;
-    }
-}
 
 sub _get_quote {
     my ($_lean_step_line) = @_;

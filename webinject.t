@@ -732,7 +732,15 @@ assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps
 assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps : multi line value - 4');
 
 # multiline strings
-    # string is all on one line, but on the next line
+    # remove redundant code
+    # first line is blank
+    # multiple blank lines between steps
+    # final lines are blank
+    # string starts same line, ends next line
+    # string start next line, ends line after
+    # infinite loop protection?
+    # optimise main parser loop code
+    # make main loop code more readable - local var?
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # have to deal with include files
 # repeat
