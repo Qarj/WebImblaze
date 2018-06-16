@@ -2724,34 +2724,71 @@ sub lean_parser_has_next_line {
     return 0;
 }
 
+sub lean_parser_increment_index_num_ {
+    my ($_package, $_filename, $_line) = caller;
+    $lean_parser_current_index_num_ += 1;
+    print " Lean index now: $lean_parser_current_index_num_ [$_line]\n";
+    return;
+}
+
 sub lean_parser_step_advance_line {
+    my ($_in_quote) = @_;
+
     if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
         $results_stdout .= qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
-    if ( $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
-        $results_stdout .= qq| == reached end of step ==\n| if $EXTRA_VERBOSE;
-        return 0;
+    if ($_in_quote) {
+        $results_stdout .= qq| -> in quote, advancing one line only\n| if $EXTRA_VERBOSE;
+        lean_parser_increment_index_num_();
+        return 1;
     }
 
-    $results_stdout .= qq| ->seems to be more content for current step\n| if $EXTRA_VERBOSE;
-    $lean_parser_current_index_num_ += 1;
-    return 1;
+    if ($lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
+        $results_stdout .= qq| == next line is blank, reached end of step ==\n| if $EXTRA_VERBOSE;
+        return 0;
+    }
+    
+    lean_parser_advance_to_last_line_of_any_comments_before_other_content();
+
+    if ( lean_parser_has_next_line() ) {
+        lean_parser_increment_index_num_();
+        return 1;
+    }
+
+    return 0;
+}
+
+sub lean_parser_advance_to_last_line_of_any_comments_before_other_content {
+
+    while ( 1 ) {
+        if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*\#/ ) {
+            lean_parser_increment_index_num_();
+        } else {
+            return;
+        }
+    }
+
 }
 
 sub advance_cursor_to_line_before_next_step {
 
     while (1) { 
-        if ( $lean_parser_lines_[$lean_parser_current_index_num_+1] =~ /\s*+.{1,}/ ) {
-            $results_stdout .= ' ... advance cursor to line before next step, found content on index ' . $lean_parser_current_index_num_+1 . qq| ...\n| if $EXTRA_VERBOSE;
-            return;
-        }
+
         if (lean_parser_has_next_line) {
-            $lean_parser_current_index_num_ += 1;
+            my $_next_index = $lean_parser_current_index_num_ + 1;
+#            print "_next_index:$_next_index\n";
+     
+            if ( $lean_parser_lines_[$_next_index] =~ /\s*+.{1,}/ ) {
+                $results_stdout .= ' ... advance cursor to line before next step, found content on index ' . $_next_index . qq| ...\n| if $EXTRA_VERBOSE;
+                return;
+            }
         } else {
             return;
         }
+ 
+        lean_parser_increment_index_num_();
     }
 }
 
@@ -2766,7 +2803,7 @@ sub lean_parser_get_current_step {
     @lean_parser_step_parm_values_ = ();
     my $_parm_name;
     my $_parm_value;
-    while (lean_parser_step_advance_line()) {
+    while (lean_parser_step_advance_line($_in_quote)) {
         my $_current_line = $lean_parser_lines_[$lean_parser_current_index_num_];
         if (! $_in_quote) {
             $_parm_name = _get_parm_name( $_current_line);
@@ -2823,6 +2860,7 @@ sub lean_parser_get_current_step {
 
 sub _search_for_start_quote {
     my ($_line, $_quote) = @_;
+    print "my line: $_line\n";
     if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
         if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E/ ) {
             $results_stdout .= qq| QUOTE DEFINITION AND START QUOTE FOUND in line: [[$_line]] \n| if $EXTRA_VERBOSE;
@@ -2915,11 +2953,11 @@ sub _remove_comments_and_add_two_blank_lines {
     my ($_lean) = @_;
 
     my $_normalised_pass_1 = _remove_multi_line_comments($_lean);
-    my $_normalised_pass_2 = _remove_single_line_comments($_normalised_pass_1);
+#    my $_normalised_pass_2 = _remove_single_line_comments($_normalised_pass_1);
 
-    $results_stdout .= qq| After comments removed:\n$_normalised_pass_2 \n|if $EXTRA_VERBOSE;
+    $results_stdout .= qq| After comments removed:\n$_normalised_pass_1 \n|if $EXTRA_VERBOSE;
 
-    return $_normalised_pass_2."\n\n";
+    return $_normalised_pass_1."\n\n";
 }
 
 sub _remove_multi_line_comments {

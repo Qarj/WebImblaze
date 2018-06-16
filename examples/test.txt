@@ -1,0 +1,6 @@
+step: Single line comment within quote
+shell: echo NOP
+verifypositive:[[: [[
+# not a comment
+# more content]]
+verifynegative: bad stuff
