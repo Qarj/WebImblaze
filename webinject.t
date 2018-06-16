@@ -809,21 +809,21 @@ assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines 
 # single line comment within quote
 before_test();
 $main::unit_test_steps = <<'EOB'
-#assertcount: 5
+# assertcount: 5
 
 step: Single line comment within quote
 shell: echo NOP
 verifypositive:[[: [[
-#not a comment
-#more content]]
+# not a comment
+# more content]]
 verifynegative: bad stuff
 EOB
     ;
-read_test_case_file();
-assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : single line comment in quote - 1');
-assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line comment in quote - 2');
-assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
-assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : single line comment in quote - 4');
+#read_test_case_file();
+#assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : single line comment in quote - 1');
+#assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line comment in quote - 2');
+#assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
+#assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : single line comment in quote - 4');
 
 # multiline strings
     # comment within quote - will it be stripped out?
