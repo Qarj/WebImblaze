@@ -825,12 +825,189 @@ assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line 
 assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
 assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : single line comment in quote - 4');
 
-# multiline strings
-    # comment within quote - will it be stripped out?
-    # multiline with blank lines
-# special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
-# have to deal with include files
+# single line comment not in quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+# assertcount: 5
+
+step: Single line comment not in quote
+shell: echo NOP
+verifypositive:[[: [[
+# more content]]
+verifynegative: bad stuff
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("found content on index 2", '_parse_lean_test_steps : single line comment not in quote - 1');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment not in quote - 2');
+
+# various single line comments
+before_test();
+$main::unit_test_steps = <<'EOB'
+# assertcount: 5
+# step: 1
+
+# step: 2
+
+#pre: comment
+step: Single line comment not in quote
+shell: echo NOP
+verifypositive:[[: [[
+# more content]]
+verifynegative: bad stuff
+# comment: 3
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("found content on index 6", '_parse_lean_test_steps : various single line comments - 1');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : various single line comments - 2');
+
+# multi line comment within quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+# assertcount: 5
+
+--= This truly is a comment
+this: too
+=--
+
+step: Single line comment within quote
+shell: echo NOP
+verifypositive:[[: [[
+--= not: a comment
+more: content
+=--
+also: content]]
+verifynegative: bad stuff
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : multi line comment in quote - 1');
+assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line comment in quote - 2');
+assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : multi line comment in quote - 3');
+assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : multi line comment in quote - 4');
+assert_stdout_contains("'verifypositive' => .*not: a comment", '_parse_lean_test_steps : multi line comment in quote - 5');
+assert_stdout_contains("'verifypositive' => .*more: content", '_parse_lean_test_steps : multi line comment in quote - 6');
+assert_stdout_does_not_contain("'this' => 'too'", '_parse_lean_test_steps : multi line comment in quote - 7');
+assert_stdout_contains("'verifypositive' => .*also: content", '_parse_lean_test_steps : multi line comment in quote - 8');
+
+# multi line quote with blank lines
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line quote with blank lines
+shell: echo NOP
+verifypositive:[[: [[
+
+one fish
+
+two fish
+
+]]
+verifynegative: bad stuff
+
+# the end
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : multi line quote with blank lines - 1');
+assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : multi line quote with blank lines - 2');
+
+# ends with multi line quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Ends with multi line quote
+shell: echo NOP
+verifypositive:[[: [[
+one fish
+two fish
+]]
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : ends with multi line quote - 1');
+assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : ends with multi line quote - 2');
+
+# test within a test
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Test within a test
+url: http://webinject.server/webinject/server/submit/?batch=Unit&target=test
+postbody:-=-: -=-
+
+step: Ends with multi line quote
+shell: echo NOP
+verifypositive:[[: [[
+one fish
+two fish
+]]
+
+-=-
+verifynegative: Severe error
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : test within a test - 1');
+assert_stdout_contains("'postbody' => .*step: Ends", '_parse_lean_test_steps : test within a test - 2');
+assert_stdout_contains("'postbody' => .*shell: echo NOP", '_parse_lean_test_steps : test within a test - 3');
+assert_stdout_contains("'postbody' => .*verifypositive:\\[\\[: \\[\\[", '_parse_lean_test_steps : test within a test - 4');
+
+# edge cases
+before_test();
+$main::unit_test_steps = <<'EOB'
+--= Various comments
+# comment in comment
+=--
+# single line comment
+step: Edge cases
+verifynegative10: Error
+url: http://webinject.server/webinject/server/submit/?batch=Unit&target=test
+postbody:-=-: -=-
+
+    step: Ends with multi line quote
+    shell: echo NOP
+    verifypositive:[[: [[
+    one fish
+    two fish
+    ]]
+
+-=-
+--= Multi mid
+=--
+# single mid
+verifynegative: Severe error
+# single end
+
+# Favourite
+step: Step 20
+shell: echo NOP
+   
+--=
+=--
+step: Step 30
+shell1: REM
+shell2: echo off 
+ 
+# 
+--= 
+=--
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : Edge cases - 1');
+assert_stdout_contains("'30' =>", '_parse_lean_test_steps : Edge cases - 2');
+assert_stdout_contains("'command2' => 'echo off'", '_parse_lean_test_steps : Edge cases - 3');
+assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : Edge cases - 4');
+assert_stdout_does_not_contain("'40' =>", '_parse_lean_test_steps : Edge cases - 5');
+
 # repeat
+# further increase readability of main loop - push out as many lines / debug prints as possible
+# have to deal with include files include: login.txt (maybe do validations first)
+    # Options
+        # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
+        # Try to parse seperately as encountered (Medium) - deals with comments problem
+        # Create a seperate type of step for include (very hard) - as for state driven tests
+        # Don't support feature
+# special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 
 # error checking before substitutions
 # validate that there are not duplicate attributes

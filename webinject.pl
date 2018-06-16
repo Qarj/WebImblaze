@@ -77,8 +77,6 @@ my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
 
 my $lean_parser_raw_;
 my @lean_parser_lines_;    
-my $lean_parser_step_raw_;
-my $lean_parser_current_step_num_;
 my $lean_parser_current_index_num_;
 my @lean_parser_step_parm_names_;
 my @lean_parser_step_parm_values_;
@@ -2665,16 +2663,14 @@ sub _parse_lean_test_steps {
 
     my %_case = ();
 
-    my $_normalised = _remove_comments_and_add_two_blank_lines( $_lean );
-
-    new_lean_parser( $_normalised );
+    new_lean_parser( $_lean );
     my $_step_id = 0;
     while ( lean_parser_has_unprocessed_step() )
     {
-        my $_current_step_num = lean_parser_get_current_step();
-        $results_stdout .= qq| Processing step $_current_step_num:[[[\nlean_parser_step_raw()]]] \n|if $EXTRA_VERBOSE;
+        lean_parser_get_current_step();
         $_step_id += 10;
         $_case{ $_step_id } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
+        $results_stdout .= qq| ---> PROCESSED STEP $_step_id \n\n|if $EXTRA_VERBOSE;
     }
 
     $_test_steps{ 'case' } = \ %_case;
@@ -2685,8 +2681,6 @@ sub _parse_lean_test_steps {
 sub new_lean_parser {
     ($lean_parser_raw_) = @_;
     @lean_parser_lines_ = split /\n/, $lean_parser_raw_;    
-    $lean_parser_step_raw_ = '';
-    $lean_parser_current_step_num_ = 0;
     $lean_parser_current_index_num_ = -1;
 
     $results_stdout .= qq| Lean parsing [[[$lean_parser_raw_]]] \n| if $EXTRA_VERBOSE;
@@ -2708,26 +2702,26 @@ sub lean_parser_step_values {
 
 sub lean_parser_has_unprocessed_step {
     if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Unprocessed step exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Unprocessed step exists: $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
         return 1;
     }
-    $results_stdout .= qq| NO UNPROCESSED STEP! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| NO UNPROCESSED STEP! $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
     return 0;
 }
 
 sub lean_parser_has_next_line {
     if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Next line exists: $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Next line exists: $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
         return 1;
     }
-    $results_stdout .= qq| NO NEXT LINE! $#lean_parser_lines_ lines total, current line $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| NO NEXT LINE! $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
     return 0;
 }
 
 sub lean_parser_increment_index_num_ {
-    my ($_package, $_filename, $_line) = caller;
+#    my ($_package, $_filename, $_line) = caller;
     $lean_parser_current_index_num_ += 1;
-    print " Lean index now: $lean_parser_current_index_num_ [$_line]\n";
+#    print " Lean index now: $lean_parser_current_index_num_ [$_line]\n";
     return;
 }
 
@@ -2745,12 +2739,12 @@ sub lean_parser_step_advance_line {
         return 1;
     }
 
+    lean_parser_advance_to_last_line_of_any_comments_before_other_content();
+
     if ($lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
         $results_stdout .= qq| == next line is blank, reached end of step ==\n| if $EXTRA_VERBOSE;
         return 0;
     }
-    
-    lean_parser_advance_to_last_line_of_any_comments_before_other_content();
 
     if ( lean_parser_has_next_line() ) {
         lean_parser_increment_index_num_();
@@ -2762,12 +2756,55 @@ sub lean_parser_step_advance_line {
 
 sub lean_parser_advance_to_last_line_of_any_comments_before_other_content {
 
+#    my ($_package, $_filename, $_line) = caller;
+#    print "before... [$_line]\n";
+
+    while (1) {
+        if ( lean_parser_advanced_index_after_jump_single_line_comment() ) {
+            next;
+        }
+        
+        if ( lean_parser_advanced_index_after_jump_multi_line_comment() ) {
+            next;
+        }
+        
+        return;
+    }
+
+}
+
+sub lean_parser_advanced_index_after_jump_single_line_comment {
+    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*\#/ ) {
+        lean_parser_increment_index_num_();
+        return 1;
+    }
+    return 0;
+}
+
+sub lean_parser_advanced_index_after_jump_multi_line_comment {
+
+    if ($#lean_parser_lines_ eq $lean_parser_current_index_num_) {
+        return 0;
+    }
+
+    my $_saw_comment = 0;
     while ( 1 ) {
-        if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*\#/ ) {
+        my $_line = $lean_parser_lines_[$lean_parser_current_index_num_ + 1];
+        if ( $_line =~ /^\s*--=/ ) {
+            $_saw_comment = 1;
+        }
+        if (!$_saw_comment) {
+            return 0;
+        }
+        if ($#lean_parser_lines_ > $lean_parser_current_index_num_) {
             lean_parser_increment_index_num_();
         } else {
-            return;
+            return 0;
         }
+        if ( $_line =~ /^\s*=--/ ) {
+            return 1;
+        }
+        
     }
 
 }
@@ -2775,6 +2812,8 @@ sub lean_parser_advance_to_last_line_of_any_comments_before_other_content {
 sub advance_cursor_to_line_before_next_step {
 
     while (1) { 
+
+        lean_parser_advance_to_last_line_of_any_comments_before_other_content();
 
         if (lean_parser_has_next_line) {
             my $_next_index = $lean_parser_current_index_num_ + 1;
@@ -2854,13 +2893,11 @@ sub lean_parser_get_current_step {
 
     advance_cursor_to_line_before_next_step();
 
-    $lean_parser_current_step_num_ += 1;
-    return $lean_parser_current_step_num_;
+    return;
 }
 
 sub _search_for_start_quote {
     my ($_line, $_quote) = @_;
-    print "my line: $_line\n";
     if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
         if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E/ ) {
             $results_stdout .= qq| QUOTE DEFINITION AND START QUOTE FOUND in line: [[$_line]] \n| if $EXTRA_VERBOSE;
@@ -2948,60 +2985,6 @@ sub _rename_lean_parameters_to_classic_names {
         $_parms->[$_i] =~ s/step/description1/;
     }
 }
-
-sub _remove_comments_and_add_two_blank_lines {
-    my ($_lean) = @_;
-
-    my $_normalised_pass_1 = _remove_multi_line_comments($_lean);
-#    my $_normalised_pass_2 = _remove_single_line_comments($_normalised_pass_1);
-
-    $results_stdout .= qq| After comments removed:\n$_normalised_pass_1 \n|if $EXTRA_VERBOSE;
-
-    return $_normalised_pass_1."\n\n";
-}
-
-sub _remove_multi_line_comments {
-    my ($_lean) = @_;
-
-    my $_normalised = '';
-    my $_within_multi_line_comment = 0;
-    while ( $_lean =~ /(.*)\v?/mg ) {
-        my $_line = $1;
-        if ( $_line =~ /^\s*--=/ ) {
-            $_within_multi_line_comment = 1;
-        }
-        if ( $_line =~ /^\s*=--/ ) {
-            $_within_multi_line_comment = 0;
-        }
-        if ($_within_multi_line_comment) {
-            # this is within a comment - we don't need it
-        } else {
-            if ( $_line =~ /^\s*=--/ ) {
-                # we can discard the end comment line
-            } else {
-                $_normalised .= $_line."\n";
-            }
-        }
-    }
-
-    return $_normalised;
-}    
-
-sub _remove_single_line_comments {
-    my ($_lean) = @_;
-
-    my $_normalised = '';
-    while ( $_lean =~ /(.*)\v?/mg ) {
-        my $_line = $1;
-        if ( $_line =~ /^\s*\#/ ) {
-            # this is a comment - we don't need it
-        } else {
-            $_normalised .= $_line."\n";
-        }
-    }
-
-    return $_normalised;
-}    
 
 sub _get_quote {
     my ($_lean_step_line) = @_;
