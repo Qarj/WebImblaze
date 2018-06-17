@@ -1,9 +1,2 @@
 step: Multi line comment
 url: https://www.totaljobs.com
-#verifypositive: positive
- 
---=
-step: This step is commented out
-url: https://www.totaljobs.com
-verifypositive: Not found
-=--
