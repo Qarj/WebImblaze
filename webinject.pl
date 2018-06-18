@@ -2601,15 +2601,11 @@ sub read_test_case_file {
         $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
-#        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps );
         $xml_test_cases = _parse_lean_test_steps( $_test_steps );
         $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
-#        print Data::Dumper::Dumper($xml_test_cases);
         $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
         return;
     }
-
-#    my $_xml = \ $_test_steps;
 
     # substitute in the included test step files
     $_test_steps =~ s{<include[^>]*?
@@ -2664,29 +2660,21 @@ sub _parse_lean_test_steps {
     
     while ( lean_parser_advance_next_line() ) {
         if ( lean_parser_get_blank_line() ) {
-#            print "==> got blank line ok\n";
             $results_stdout .= qq| Got a blank line index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
         if ( lean_parser_is_current_line_single_line_comment() ) {
             $results_stdout .= qq| Got a single line comment index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
-#            print "==> got single line comment line ok\n";
             next;
         }
         if ( lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it() ) {
             $results_stdout .= qq| Got a single line comment ending index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
-#            print "==> got multi line comment line ok\n";
             next;
         }
 
-#        if ( lean_parser_slurp_comments() ) {
-#            print "==> got comments line ok\n";
-#            next;
-#        }
         if ( parser_get_step() ) {
             $results_stdout .= qq| Got a step ending index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
-#            print "==> got step ok\n";
             next;
         }
     }
@@ -2694,10 +2682,7 @@ sub _parse_lean_test_steps {
     my %_tests = ();
     $_tests{ 'repeat' } = '1';
     $_tests{ 'case' } = \ %case_;
-
-#    print 'Dumping again...' . Data::Dumper::Dumper(%_tests);
     return \ %_tests;
-
 }
 
 sub new_lean_parser {
@@ -2710,8 +2695,6 @@ sub new_lean_parser {
 
     $results_stdout .= qq| Lean parsing [[[$lean_parser_raw_]]] \n| if $EXTRA_VERBOSE;
 
-#    advance_cursor_to_line_before_next_step();
-
     return;
 }
 
@@ -2719,7 +2702,6 @@ sub lean_parser_advance_next_line() {
 
     if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
         $results_stdout .= qq| ==== reached end of file ====\n| if $EXTRA_VERBOSE;
-#        print " ==> ==== reached end of file ====\n";
         return 0;
     }
 
@@ -2734,23 +2716,6 @@ sub lean_parser_increment_index_num_ {
     return;
 }
 
-sub parser_get_step {
-
-#    print "==> About to get a step\n";
-    if ( lean_parser_get_current_step() ) {
-        $step_id_ += 10;
-        $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
-        $results_stdout .= qq| ---> PROCESSED STEP $step_id_ \n\n|if $EXTRA_VERBOSE;
-
-#        print "==> Got a step\n";
-#        print Data::Dumper::Dumper(%case_);
-        return 1;
-    }
-#    print "==> Didn't get a step\n";
-    return 0;
-    
-}
-
 sub lean_parser_get_blank_line {
     if ( $lean_parser_lines_[$lean_parser_current_index_num_] =~ /^\s*$/ ) {
         return 1;
@@ -2758,13 +2723,92 @@ sub lean_parser_get_blank_line {
     return 0;
 }
 
-sub lean_parser_has_unprocessed_line {
-    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Unprocessed step exists: $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
+sub lean_parser_is_current_line_single_line_comment {
+    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_] =~ /^\s*\#/ ) {
         return 1;
     }
-    $results_stdout .= qq| NO UNPROCESSED STEP! $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
     return 0;
+}
+
+sub lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it {
+
+    my $_saw_comment = 0;
+    while ( 1 ) {
+        my $_line = $lean_parser_lines_[$lean_parser_current_index_num_];
+        if ( $_line =~ /^\s*--=/ ) {
+            $_saw_comment = 1;
+        }
+        if (!$_saw_comment) {
+            return 0;
+        }
+        if ( $_line =~ /^\s*=--/ ) {
+            return 1;
+        }
+        if ( lean_parser_advance_next_line() ) {
+        } else {
+            # is this a die condition?
+            return 0;
+        }
+    }
+}
+
+sub parser_get_step {
+
+    if ( lean_parser_get_current_step() ) {
+        $step_id_ += 10;
+        $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
+        $results_stdout .= qq| ---> PROCESSED STEP $step_id_ \n\n|if $EXTRA_VERBOSE;
+
+        return 1;
+    }
+
+    return 0;
+}
+
+sub _construct_step {
+    my ($_parms, $_vals) = @_;
+
+#    foreach my $_parm ( @{$_parms} ) {
+#        print "_parm: $_parm\n";
+#    }
+#    foreach my $_val ( @{$_vals} ) {
+#        print "_val: $_val\n";
+#    }
+
+    my %_case_step = ();
+    $_case_step{ 'method' } = _get_lean_step_method($_parms);
+    _rename_lean_parameters_to_classic_names($_parms);
+
+    for my $_i ( 0 .. $#{$_parms} ) {
+        $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
+    }
+
+    return \ %_case_step;
+}
+
+sub _get_lean_step_method {
+    my ($_parms) = @_;
+
+    foreach my $_parm (@{$_parms}) {
+        if ($_parm eq 'shell') { return 'cmd'; }
+        if ($_parm eq 'selenium') { return 'selenium'; }
+        if ($_parm eq 'url') {
+            foreach my $_parm_2 (@{$_parms}) {
+                if ($_parm_2 eq 'postbody') { return 'post'; }
+            }
+            return 'get';
+        }
+    }
+}
+
+sub _rename_lean_parameters_to_classic_names {
+    my ($_parms) = @_;
+
+    for my $_i (0 .. $#{$_parms}) {
+        $_parms->[$_i] =~ s/shell/command/;
+        $_parms->[$_i] =~ s/selenium/command/;
+        $_parms->[$_i] =~ s/step/description1/;
+    }
 }
 
 sub lean_parser_step_parm_names {
@@ -2777,123 +2821,6 @@ sub lean_parser_step_values {
     return \ @lean_parser_step_parm_values_;
 }
 
-sub lean_parser_has_next_line {
-    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| Next line exists: $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
-        return 1;
-    }
-    $results_stdout .= qq| NO NEXT LINE! $#lean_parser_lines_ max index, current index $lean_parser_current_index_num_\n| if $EXTRA_VERBOSE;
-    return 0;
-}
-
-sub lean_parser_step_advance_line {
-    my ($_in_quote) = @_;
-
-    if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
-        $results_stdout .= qq| ==== reached end of step and file ====\n| if $EXTRA_VERBOSE;
-        return 0;
-    }
-
-    if ($_in_quote) {
-        $results_stdout .= qq| -> in quote, advancing one line only\n| if $EXTRA_VERBOSE;
-        lean_parser_increment_index_num_();
-        return 1;
-    }
-
-    lean_parser_advance_to_last_line_of_any_comments_before_other_content();
-
-    if ($lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*$/ ) {
-        $results_stdout .= qq| == next line is blank, reached end of step ==\n| if $EXTRA_VERBOSE;
-        return 0;
-    }
-
-    if ( lean_parser_has_next_line() ) {
-        lean_parser_increment_index_num_();
-        return 1;
-    }
-
-    return 0;
-}
-
-sub lean_parser_advance_to_last_line_of_any_comments_before_other_content {
-
-#    my ($_package, $_filename, $_line) = caller;
-#    print "before... [$_line]\n";
-    my $_slurped_comment = 0;
-
-    while (1) {
-        if ( lean_parser_advanced_index_after_jump_single_line_comment() ) {
-            $_slurped_comment = 1;
-            next;
-        }
-        
-        if ( lean_parser_advanced_index_after_jump_multi_line_comment() ) {
-            $_slurped_comment = 1;
-            next;
-        }
-        
-        return $_slurped_comment;
-    }
-
-}
-
-sub lean_parser_advanced_index_after_jump_single_line_comment {
-    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_ + 1] =~ /^\s*\#/ ) {
-        lean_parser_increment_index_num_();
-        return 1;
-    }
-    return 0;
-}
-
-sub lean_parser_advanced_index_after_jump_multi_line_comment {
-
-    if ($#lean_parser_lines_ eq $lean_parser_current_index_num_) {
-        return 0;
-    }
-
-    my $_saw_comment = 0;
-    while ( 1 ) {
-        my $_line = $lean_parser_lines_[$lean_parser_current_index_num_ + 1];
-        if ( $_line =~ /^\s*--=/ ) {
-            $_saw_comment = 1;
-        }
-        if (!$_saw_comment) {
-            return 0;
-        }
-        if ($#lean_parser_lines_ > $lean_parser_current_index_num_) {
-            lean_parser_increment_index_num_();
-        } else {
-            return 0;
-        }
-        if ( $_line =~ /^\s*=--/ ) {
-            return 1;
-        }
-        
-    }
-
-}
-
-sub advance_cursor_to_line_before_next_step {
-
-    while (1) { 
-
-        lean_parser_advance_to_last_line_of_any_comments_before_other_content();
-
-        if (lean_parser_has_next_line) {
-            my $_next_index = $lean_parser_current_index_num_ + 1;
-#            print "_next_index:$_next_index\n";
-     
-            if ( $lean_parser_lines_[$_next_index] =~ /\s*+.{1,}/ ) {
-                $results_stdout .= ' ... advance cursor to line before next step, found content on index ' . $_next_index . qq| ...\n| if $EXTRA_VERBOSE;
-                return;
-            }
-        } else {
-            return;
-        }
- 
-        lean_parser_increment_index_num_();
-    }
-}
 
 sub lean_parser_get_current_step {
 
@@ -2971,40 +2898,10 @@ sub lean_parser_get_current_step {
     return 1;
 }
 
-sub lean_parser_is_current_line_single_line_comment {
-    if ( $#lean_parser_lines_ > $lean_parser_current_index_num_ && $lean_parser_lines_[$lean_parser_current_index_num_] =~ /^\s*\#/ ) {
-        return 1;
-    }
-    return 0;
-}
-
-sub lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it {
-
-#    if ($#lean_parser_lines_ eq $lean_parser_current_index_num_) {
-#        return 0;
-#    }
-
-    my $_saw_comment = 0;
-    while ( 1 ) {
-        my $_line = $lean_parser_lines_[$lean_parser_current_index_num_];
-        if ( $_line =~ /^\s*--=/ ) {
-#            print "==> saw the open multi comment tag\n";
-            $_saw_comment = 1;
-        }
-        if (!$_saw_comment) {
-            return 0;
-        }
-        if ( $_line =~ /^\s*=--/ ) {
-#            print "==> saw the close comment tag\n";
-            return 1;
-        }
-        if ( lean_parser_advance_next_line() ) {
-#            print "==> advancing to next multi comment line\n";
-        } else {
-            # is this a die condition?
-            return 0;
-        }
-    }
+sub _get_parm_name {
+   my ($_line) = @_;
+   $_line =~ /^(\w+):/;
+   return $1;
 }
 
 sub lean_parser_can_advance_one_line_to_content_line {
@@ -3034,6 +2931,37 @@ sub lean_parser_can_advance_one_line_to_content_line {
     return 0;
 } 
 
+sub _get_quote {
+    my ($_lean_step_line) = @_;
+
+    if ( $_lean_step_line =~ /^\w+:(.+): / ) {
+        my $_quote = $1;
+        my $_end_quote = $_quote;
+        $_end_quote =~ s/[(]/\)/g;
+        $_end_quote =~ s/[{]/}/g;
+        $_end_quote =~ s/[[]/]/g;
+        $_end_quote =~ s/</>/g;
+        return $_quote, $_end_quote;
+    }
+
+    return undef, undef;
+}
+
+sub _get_parm_value_if_single_line {
+    my ($_line, $_quote, $_end_quote) = @_;
+
+    if (defined $_quote) {
+        if ( $_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
+            return $1;
+        }
+    }
+
+    if ( $_line =~ /^\w+: \s*(.*[^\s])\s*$/ ) {
+        return $1;
+    }
+
+    return undef;
+}
 
 sub _search_for_start_quote {
     my ($_line, $_quote) = @_;
@@ -3078,89 +3006,13 @@ sub _get_from_start_of_line_to_end_quote {
    return undef;
 }
 
-sub _get_parm_name {
-   my ($_line) = @_;
-   $_line =~ /^(\w+):/;
-   return $1;
-}
 
-sub _get_parm_value_if_single_line {
-    my ($_line, $_quote, $_end_quote) = @_;
 
-    if (defined $_quote) {
-        if ( $_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
-            return $1;
-        }
-    }
 
-    if ( $_line =~ /^\w+: \s*(.*[^\s])\s*$/ ) {
-        return $1;
-    }
 
-    return undef;
-}
 
-sub _get_lean_step_method {
-    my ($_parms) = @_;
 
-    foreach my $_parm (@{$_parms}) {
-        if ($_parm eq 'shell') { return 'cmd'; }
-        if ($_parm eq 'selenium') { return 'selenium'; }
-        if ($_parm eq 'url') {
-            foreach my $_parm_2 (@{$_parms}) {
-                if ($_parm_2 eq 'postbody') { return 'post'; }
-            }
-            return 'get';
-        }
-    }
-}
 
-sub _rename_lean_parameters_to_classic_names {
-    my ($_parms) = @_;
-
-    for my $_i (0 .. $#{$_parms}) {
-        $_parms->[$_i] =~ s/shell/command/;
-        $_parms->[$_i] =~ s/selenium/command/;
-        $_parms->[$_i] =~ s/step/description1/;
-    }
-}
-
-sub _get_quote {
-    my ($_lean_step_line) = @_;
-
-    if ( $_lean_step_line =~ /^\w+:(.+): / ) {
-        my $_quote = $1;
-        my $_end_quote = $_quote;
-        $_end_quote =~ s/[(]/\)/g;
-        $_end_quote =~ s/[{]/}/g;
-        $_end_quote =~ s/[[]/]/g;
-        $_end_quote =~ s/</>/g;
-        return $_quote, $_end_quote;
-    }
-
-    return undef, undef;
-}
-
-sub _construct_step {
-    my ($_parms, $_vals) = @_;
-
-#    foreach my $_parm ( @{$_parms} ) {
-#        print "_parm: $_parm\n";
-#    }
-#    foreach my $_val ( @{$_vals} ) {
-#        print "_val: $_val\n";
-#    }
-
-    my %_case_step = ();
-    $_case_step{ 'method' } = _get_lean_step_method($_parms);
-    _rename_lean_parameters_to_classic_names($_parms);
-
-    for my $_i ( 0 .. $#{$_parms} ) {
-        $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
-    }
-
-    return \ %_case_step;
-}
 
 #------------------------------------------------------------------
 sub _write_failed_xml {
