@@ -1,2 +1,12 @@
-step: Multi line comment
-url: https://www.totaljobs.com
+step: Multi line quote with blank lines
+shell: echo NOP
+verifypositive:[[: [[
+
+one fish
+
+two fish
+
+]]
+verifynegative: bad stuff
+
+# the end

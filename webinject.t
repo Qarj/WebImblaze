@@ -838,7 +838,7 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("found content on index 2", '_parse_lean_test_steps : single line comment not in quote - 1');
+assert_stdout_contains("Got a single line comment index 0", '_parse_lean_test_steps : single line comment not in quote - 1');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment not in quote - 2');
 
 # various single line comments
@@ -859,7 +859,7 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("found content on index 6", '_parse_lean_test_steps : various single line comments - 1');
+assert_stdout_contains("Got a single line comment index 5", '_parse_lean_test_steps : various single line comments - 1');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : various single line comments - 2');
 
 # multi line comment within quote

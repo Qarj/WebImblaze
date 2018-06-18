@@ -2604,7 +2604,7 @@ sub read_test_case_file {
 #        $_test_steps = _convert_lean_tests_format_to_classic_webinject( \ $_test_steps );
         $xml_test_cases = _parse_lean_test_steps( $_test_steps );
         $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
-        print Data::Dumper::Dumper($xml_test_cases);
+#        print Data::Dumper::Dumper($xml_test_cases);
         $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
         return;
     }
@@ -2664,16 +2664,19 @@ sub _parse_lean_test_steps {
     
     while ( lean_parser_advance_next_line() ) {
         if ( lean_parser_get_blank_line() ) {
-            print "==> got blank line ok\n";
+#            print "==> got blank line ok\n";
+            $results_stdout .= qq| Got a blank line index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
         if ( lean_parser_is_current_line_single_line_comment() ) {
-            print "==> got single line comment line ok\n";
+            $results_stdout .= qq| Got a single line comment index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
+#            print "==> got single line comment line ok\n";
             next;
         }
         if ( lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it() ) {
-            print "==> got multi line comment line ok\n";
+            $results_stdout .= qq| Got a single line comment ending index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
+#            print "==> got multi line comment line ok\n";
             next;
         }
 
@@ -2682,7 +2685,8 @@ sub _parse_lean_test_steps {
 #            next;
 #        }
         if ( parser_get_step() ) {
-            print "==> got step ok\n";
+            $results_stdout .= qq| Got a step ending index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
+#            print "==> got step ok\n";
             next;
         }
     }
@@ -2691,7 +2695,7 @@ sub _parse_lean_test_steps {
     $_tests{ 'repeat' } = '1';
     $_tests{ 'case' } = \ %case_;
 
-    print 'Dumping again...' . Data::Dumper::Dumper(%_tests);
+#    print 'Dumping again...' . Data::Dumper::Dumper(%_tests);
     return \ %_tests;
 
 }
@@ -2715,7 +2719,7 @@ sub lean_parser_advance_next_line() {
 
     if ( $#lean_parser_lines_ eq $lean_parser_current_index_num_ ) {
         $results_stdout .= qq| ==== reached end of file ====\n| if $EXTRA_VERBOSE;
-        print qq| ==> ==== reached end of file ====\n|;
+#        print " ==> ==== reached end of file ====\n";
         return 0;
     }
 
@@ -2726,23 +2730,23 @@ sub lean_parser_advance_next_line() {
 sub lean_parser_increment_index_num_ {
     my ($_package, $_filename, $_line) = caller;
     $lean_parser_current_index_num_ += 1;
-    print " Lean index now: $lean_parser_current_index_num_ [$_line]\n";
+#    print "==> Lean index now: $lean_parser_current_index_num_ [$_line]\n";
     return;
 }
 
 sub parser_get_step {
 
-    print "==> About to get a step\n";
+#    print "==> About to get a step\n";
     if ( lean_parser_get_current_step() ) {
         $step_id_ += 10;
         $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
         $results_stdout .= qq| ---> PROCESSED STEP $step_id_ \n\n|if $EXTRA_VERBOSE;
 
-        print "==> Got a step\n";
-        print Data::Dumper::Dumper(%case_);
+#        print "==> Got a step\n";
+#        print Data::Dumper::Dumper(%case_);
         return 1;
     }
-    print "==> Didn't get a step\n";
+#    print "==> Didn't get a step\n";
     return 0;
     
 }
@@ -2903,25 +2907,27 @@ sub lean_parser_get_current_step {
     my $_parm_name;
     my $_parm_value;
     my $_first_loop = 1; # really want a do until loop that supports next, but Perl doesn't support it well
-    while ( lean_parser_can_advance_one_line_to_content_line($_first_loop) ) {
+    while ( lean_parser_can_advance_one_line_to_content_line($_first_loop, $_in_quote) ) {
         $_first_loop = 0;
 
-        if ( lean_parser_is_current_line_single_line_comment() ) {
-            next;
-        }
-        if ( lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it() ) {
-            next;
+        if (! $_in_quote) {
+            if ( lean_parser_is_current_line_single_line_comment() ) {
+                next;
+            }
+            if ( lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_it() ) {
+                next;
+            }
         }
 
         my $_current_line = $lean_parser_lines_[$lean_parser_current_index_num_];
         if (! $_in_quote) {
-            print "==> I'm not in quote\n";
+#            print "==> I'm not in quote\n";
             $_parm_name = _get_parm_name( $_current_line);
             ($_quote, $_end_quote) = _get_quote( $_current_line );
             $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
             $_parm_value = _get_parm_value_if_single_line( $_current_line, $_quote, $_end_quote );
             if (defined $_parm_value) {
-                print "==> Found cool parm name and value: [$_parm_name] [$_parm_value]\n";
+#                print "==> Found cool parm name and value: [$_parm_name] [$_parm_value]\n";
                 push @lean_parser_step_parm_names_, $_parm_name;
                 push @lean_parser_step_parm_values_, $_parm_value;
                 $results_stdout .= qq| Single pushed name[$_parm_name] value[$_parm_value]\n| if $EXTRA_VERBOSE;
@@ -2931,8 +2937,10 @@ sub lean_parser_get_current_step {
         }
 
         if (! $_start_quote_found) {
+#            print "==> Need to look for a start quote\n";
             $_start_quote_found = _search_for_start_quote( $_current_line, $_quote );
             if ($_start_quote_found) {
+#                print "  ==> Found a start quote\n";
                 $_proto_val = _get_from_start_quote_to_end_of_line( $_current_line, $_quote ) . "\n";
                 next;
             }
@@ -2980,18 +2988,18 @@ sub lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_
     while ( 1 ) {
         my $_line = $lean_parser_lines_[$lean_parser_current_index_num_];
         if ( $_line =~ /^\s*--=/ ) {
-            print "==> saw the open multi comment tag\n";
+#            print "==> saw the open multi comment tag\n";
             $_saw_comment = 1;
         }
         if (!$_saw_comment) {
             return 0;
         }
         if ( $_line =~ /^\s*=--/ ) {
-            print "==> saw the close comment tag\n";
+#            print "==> saw the close comment tag\n";
             return 1;
         }
         if ( lean_parser_advance_next_line() ) {
-            print "==> advancing to next multi comment line\n";
+#            print "==> advancing to next multi comment line\n";
         } else {
             # is this a die condition?
             return 0;
@@ -3000,21 +3008,29 @@ sub lean_parser_is_current_line_multi_line_comment_then_advance_to_last_line_of_
 }
 
 sub lean_parser_can_advance_one_line_to_content_line {
-    my ($_first_loop) = @_;
+    my ($_first_loop, $_in_quote) = @_;
     if ($_first_loop) {
         return 1;
     }
     
     if ( lean_parser_advance_next_line() ) {
 
-        if ( $lean_parser_lines_[$lean_parser_current_index_num_] =~ /^\s*$/ ) {
-            print "==> Oops! Current line is blank\n";
-            return 0;
+        if ($_in_quote) {
+            $results_stdout .= qq| --> in quote, advanced to index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
+#            print "==> Quoto! Current line is quote line\n";
+            return 1;
+            
+        } else {
+            if ( $lean_parser_lines_[$lean_parser_current_index_num_] =~ /^\s*$/ ) {
+#                print "==> Oops! Current line is blank\n";
+                return 0;
+            }
         }
-        print "==> Bingo! Current line has content\n";
+#        print "==> Bingo! Current line has content\n";
+        $results_stdout .= qq| --> found content on index $lean_parser_current_index_num_ \n| if $EXTRA_VERBOSE;
         return 1;
     }
-    print "==> Guess we must be at end of the file somehow...\n";
+#    print "==> Guess we must be at end of the file somehow...\n";
     return 0;
 } 
 
