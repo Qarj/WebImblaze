@@ -401,7 +401,7 @@ EOB
 read_test_case_file();
 assert_stdout_contains('Lean test format detected', 'read_test_case_file : can detect lean test format');
 assert_stdout_contains('Lean test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
-assert_stdout_contains("'repeat' => '1'", '_parse_lean_test_steps : defaults to repeat 1');
+assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
 assert_stdout_contains("'description1' => 'Test that WebInject can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
 assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
@@ -1000,7 +1000,27 @@ assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : Edge cases - 4
 assert_stdout_does_not_contain("'40' =>", '_parse_lean_test_steps : Edge cases - 5');
 
 # repeat
-# further increase readability of main loop - push out as many lines / debug prints as possible
+before_test();
+$main::unit_test_steps = <<'EOB'
+repeat:  42 
+
+step: Set repeat directive
+shell: REM repeat
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
+
+# validate that quote containing space is not accepted
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Set repeat directive
+shell:1 2: 1 2quoted text1 2
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("Expected parameter and value line ", '_parse_lean_test_steps : quote containing space not recognised');
+
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
         # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
@@ -1022,8 +1042,12 @@ assert_stdout_does_not_contain("'40' =>", '_parse_lean_test_steps : Edge cases -
 # validate that spaces only for unquoted is an error
 # validate that multiline quote starts on parameter line
 # validate that multiline comment does not count as lines - so can be within step
+# validate that quote does not contain space
 # line number of error must be output (presence of comments does not change line number)
 # step description must be output also
+# validate that file is utf-8
+# validate that repeat does not contain quotes
+# validate that repeat is numeric
 
 # optimise main parser loop code
 

@@ -82,6 +82,7 @@ my @parser_step_parm_names_;
 my @parser_step_parm_values_;
 my %case_;
 my $step_id_;
+my $repeat_;
 
 my $report_type; ## 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -2672,6 +2673,11 @@ sub _parse_steps {
             next;
         }
 
+        if ( parser_get_repeat() ) {
+            $results_stdout .= qq| Got a repeat directive index $parser_index_ \n| if $EXTRA_VERBOSE;
+            next;
+        }
+
         if ( parser_get_step() ) {
             $results_stdout .= qq| Got a step ending index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
@@ -2679,7 +2685,9 @@ sub _parse_steps {
     }
 
     my %_tests = ();
-    $_tests{ 'repeat' } = '1';
+    if (defined $repeat_) {
+        $_tests{ 'repeat' } = $repeat_;
+    }
     $_tests{ 'case' } = \ %case_;
     return \ %_tests;
 }
@@ -2688,6 +2696,8 @@ sub new_parser {
     my ($_parser_raw) = @_;
     @parser_lines_ = split /\n/, $_parser_raw;    
     $parser_index_ = -1;
+
+    undef $repeat_;
 
     %case_ = ();
     $step_id_ = 0;
@@ -2743,7 +2753,7 @@ sub parser_get_blank_line {
 }
 
 sub parser_get_single_line_comment {
-    return parser_has_more_lines() && parser_line() =~ /^\s*\#/;
+    return parser_line() =~ /^\s*\#/;
 }
 
 sub parser_get_multi_line_comment {
@@ -2762,6 +2772,15 @@ sub parser_get_multi_line_comment {
         parser_advance_line();
     }
 }
+
+sub parser_get_repeat {
+    if ( parser_line() =~ /^\s*repeat:\s+(\d+)/ ) {
+        $repeat_ = $1;
+        return 1;
+    }
+    return 0;
+}
+
 
 sub parser_get_step {
     if ( lean_parser_get_current_step() ) {
@@ -2863,6 +2882,7 @@ sub lean_parser_get_current_step {
                 $results_stdout .= qq| Single pushed name[$_parm_name] value[$_parm_value]\n| if $EXTRA_VERBOSE;
                 next;
             }
+            $results_stdout .= qq| "In multi line quote"\n| if $EXTRA_VERBOSE;
             $_in_quote = 1;
         }
 
@@ -2927,7 +2947,7 @@ sub lean_parser_can_advance_one_line_in_step {
 sub _get_quote {
     my ($_lean_step_line) = @_;
 
-    if ( $_lean_step_line =~ /^\w+:(.+): / ) {
+    if ( $_lean_step_line =~ /^\w+:([^\s]+): / ) {
         my $_quote = $1;
         my $_end_quote = $_quote;
         $_end_quote =~ s/[(]/\)/g;
