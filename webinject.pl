@@ -2775,13 +2775,12 @@ sub parser_get_multi_line_comment {
 }
 
 sub parser_get_repeat {
-    if ( parser_line() =~ /^\s*repeat:\s+(\d+)/ ) {
-        $repeat_ = $1;
+    if ( parser_line() =~ /^repeat:/ ) {
+        $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
         return 1;
     }
     return 0;
 }
-
 
 sub parser_get_step {
     if ( lean_parser_get_current_step() ) {
@@ -2877,7 +2876,7 @@ sub lean_parser_get_current_step {
             ($_quote, $_end_quote) = _get_quote();
             $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
 
-            $_parm_value = _get_parm_value_if_single_line( parser_line(), $_quote, $_end_quote );
+            $_parm_value = _get_parm_value_if_single_line( $_quote, $_end_quote );
             if (defined $_parm_value) {
                 parser_push_parm( $_parm_name, $_parm_value );
                 $results_stdout .= qq| Single pushed name[$_parm_name] value[$_parm_value]\n| if $EXTRA_VERBOSE;
@@ -2888,7 +2887,7 @@ sub lean_parser_get_current_step {
         }
 
         if (! $_start_quote_found) {
-            $_start_quote_found = _search_for_start_quote( parser_line(), $_quote );
+            $_start_quote_found = _search_for_start_quote( $_quote );
             if ($_start_quote_found) {
                 $_proto_val = _get_from_start_quote_to_end_of_line( parser_line(), $_quote ) . "\n";
                 next;
@@ -2916,7 +2915,7 @@ sub lean_parser_get_current_step {
 }
 
 sub _get_parm_name {
-   return _validate('^(\w+):', 'Parameter name must contain only A-Z a-z 0-9 or _ followed by a colon.', "well formed parameter and value:\n\nverifypositive7: Login successful");
+   return _validate('^(\w+):', 'Parameter name must contain only A-Z a-z 0-9 or _ followed by a colon. Must start at first character of line.', "well formed parameter and value:\n\nverifypositive7: Login successful");
 }
 
 sub lean_parser_can_advance_one_line_in_step {
@@ -2946,14 +2945,14 @@ sub lean_parser_can_advance_one_line_in_step {
 sub _get_quote {
 
     if ( parser_line() =~ /^\w+:[^\s]/ ) {
-        my $_quote = _validate( '^\w+:([^\s]+): ', 'Quote must end with a colon followed by a space. Quote must not contain spaces.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
+        my $_quote = _validate( '^\w+:([^\s:]+): ', 'Quote must end with a colon followed by a space. Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
         if (defined $_quote) {
-        my $_end_quote = $_quote;
-        $_end_quote =~ s/[(]/\)/g;
-        $_end_quote =~ s/[{]/}/g;
-        $_end_quote =~ s/[[]/]/g;
-        $_end_quote =~ s/</>/g;
-        return $_quote, $_end_quote;
+            my $_end_quote = $_quote;
+            $_end_quote =~ s/[(]/\)/g;
+            $_end_quote =~ s/[{]/}/g;
+            $_end_quote =~ s/[[]/]/g;
+            $_end_quote =~ s/</>/g;
+            return $_quote, $_end_quote;
         }
     }
 
@@ -2961,37 +2960,25 @@ sub _get_quote {
 }
 
 sub _get_parm_value_if_single_line {
-    my ($_line, $_quote, $_end_quote) = @_;
+    my ($_quote, $_end_quote) = @_;
 
     if (defined $_quote) {
-        if ( $_line =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
+        if ( parser_line() =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
             return $1;
         }
+        return undef;
     }
 
-    if ( $_line =~ /^\w+: \s*(.*[^\s])\s*$/ ) {
-        return $1;
-    }
-
-    return undef;
+    return _validate( '^\w+: \s*(.*[^\s])\s*$', "No value found - must use quotes if value is only white space.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
 }
 
 sub _search_for_start_quote {
-    my ($_line, $_quote) = @_;
-    if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
-        if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E/ ) {
-            $results_stdout .= qq| QUOTE DEFINITION AND START QUOTE FOUND in line: [[$_line]] \n| if $EXTRA_VERBOSE;
-            return 1;
-        }
-        $results_stdout .= qq| QUOTE DEFINITION FOUND, BUT NOT START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
-        return 0;
-    }
-    if ( $_line =~ /\Q$_quote\E/ ) {
-        $results_stdout .= qq| FOUND START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
+    my ($_quote) = @_;
+
+    my $_regex = '^\w+:' . quotemeta($_quote) . ':\s+(' . quotemeta($_quote) . ')';
+    my $_opening_quote = _validate( $_regex, "Quote declared but opening quote not found.\nOpening quote must be on the same line as the parameter name.", "well formed parameter, quote and multi line value:\n\nverifypositive5:[[[: [[[Logged in ok.\nPress enter to continue.]]]");
+    if (defined $_opening_quote) {
         return 1;
-    } else {
-        $results_stdout .= qq| DID NOT FIND START QUOTE: [[$_line]] \n| if $EXTRA_VERBOSE;
-        return 0;
     }
 }
 

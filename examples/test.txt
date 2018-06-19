@@ -1,2 +1,4 @@
-step:qu ote: 
-shell: echo Hello World
+repeat: 01
+
+step: Value must be present
+verifypostive: SYS 49152

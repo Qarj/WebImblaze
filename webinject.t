@@ -628,6 +628,7 @@ verifypositiveE:=:    = sure =
 verifypositiveF:":    " sure "   
 verifypositiveG:':    ' sure '   
 verifypositiveH:`:    ` sure `   
+verifypositiveI:0:    0 sure 0   
 EOB
     ;
 read_test_case_file();
@@ -648,6 +649,7 @@ assert_stdout_contains("'verifypositiveE' => ' sure '", '_parse_lean_test_steps 
 assert_stdout_contains("'verifypositiveF' => ' sure '", '_parse_lean_test_steps : single line quote - single char "');
 assert_stdout_contains("'verifypositiveG' => ' sure '", "_parse_lean_test_steps : single line quote - single char '");
 assert_stdout_contains("'verifypositiveH' => ' sure '", '_parse_lean_test_steps : single line quote - single char `');
+assert_stdout_contains("'verifypositiveI' => ' sure '", '_parse_lean_test_steps : single line quote - single char 0');
 
 # quoted string - empty string quote
 before_test();
@@ -658,18 +660,18 @@ verifypositive1:_: __
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char :');
+assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char _');
 
 # quoted string - quote char is colon
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Empty string quote
 url: https://www.totaljobs.com
-verifypositive1::: :hey:
+verifypositive1:;: ;hey;
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("'verifypositive1' => 'hey'", '_parse_lean_test_steps : quote character is colon :');
+assert_stdout_contains("'verifypositive1' => 'hey'", '_parse_lean_test_steps : quote character is semicolon ');
 
 # unquoted string - preceeding and trailing spaces ignored
 before_test();
@@ -1011,17 +1013,27 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
 
-# validate that keyword only contains \w
+# validate that parameter name only contains \w
 before_test();
 $main::unit_test_steps = <<'EOB'
-step: Malformed keyword
+step: Malformed paramater name
 she!!: echo Hello World
 EOB
     ;
 eval { read_test_case_file(); };
-assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate malformed keyword - she!!: - 1');
-assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed keyword - she!!: - 2');
-assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed keyword - she!!: - 3');
+assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 1');
+assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 2');
+assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed parameter name - she!!: - 3');
+
+# validate that parameter name starts at first character
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Malformed paramater name
+ shell: echo Hello World
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate parameter name starts in column 1');
 
 # quote must end with a colon
 before_test();
@@ -1042,7 +1054,7 @@ shell: echo Hello World
 EOB
     ;
 eval { read_test_case_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - space - 1');
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - space');
 
 # quote must end with colon space
 before_test();
@@ -1052,17 +1064,82 @@ shell: echo Hello World
 EOB
     ;
 eval { read_test_case_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space after final colon - 1');
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space after final colon');
 
-##validate that quote containing space is not accepted
-# before_test();
-# $main::unit_test_steps = <<'EOB'
-# step: Set repeat directive
-# shell:1 2: 1 2quoted text1 2
-# EOB
-    # ;
-# read_test_case_file();
-# assert_stdout_contains("Expected parameter and value line ", '_parse_lean_test_steps : quote containing space not recognised');
+# quote must not contain colon
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Quote
+shell::: :quoted text:
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon in quote');
+
+# quote must not contain white space - space
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Set repeat directive
+shell:1 2: 1 2quoted text1 2
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space in quote');
+
+# quote must not contain white space - tab
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Set repeat directive
+url:1	2: 1	2https://www.cwjobs.co.uk1	2
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no tab in quote');
+
+# quote must start on parameter line
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multiline quote
+url:JJ: 
+JJhttps://www.totaljobs.comJJ
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote declared but opening quote not found", '_parse_lean_test_steps : validate opening quote is present');
+
+# unquoted value cannot be just white space
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+verifypostive:      	 
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("No value found - must use quotes if value is only white space", '_parse_lean_test_steps : unquoted must not be only white space');
+
+# repeat value must be numeric only without quotes
+before_test();
+$main::unit_test_steps = <<'EOB'
+repeat: often
+
+step: Value must be present
+verifypostive: SYS 49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Repeat directive value must be a whole number without quotes", '_parse_lean_test_steps : repeat directive must be numeric');
+
+# repeat value must not begin with 0
+before_test();
+$main::unit_test_steps = <<'EOB'
+repeat: 05
+
+step: Value must be present
+verifypostive: SYS 49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Repeat directive value must be a whole number without quotes. It must not begin with 0", '_parse_lean_test_steps : repeat directive must not begin with 0');
 
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
@@ -1073,32 +1150,26 @@ assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : 
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
 # can 
 
-# error checking before substitutions
+# validate that end quote is defined - output line number of start quote
+# validate that tab outside of quote is an error
 # validate that there are not duplicate attributes
-# validate that parameter name starts on first char of line
-# validate that parm name ends with ': ' colon space
 # validate that block starts with step:
 # validate that method is not allowed parm
 # validate that id is not allowed parm
 # validate that command is not allowed parm (must be selenium or shell)
 # validate that posttype is not allowed parm (if possible)
 # validate that description1: is not allowed parm
-# validate that spaces only for unquoted is an error
-# validate that multiline quote starts on parameter line
-# validate that multiline comment does not count as lines - so can be within step
-# validate that quote does not contain space
-# validate that quote does not contain colon
-# line number of error must be output (presence of comments does not change line number)
 # step description must be output also
 # validate that file is utf-8
-# validate that repeat does not contain quotes
-# validate that repeat is numeric
 
 # optimise main parser loop code
+# regex optimisations - possessive ++
+# optimise _search_for_start_quote and _get_from_start_quote_to_end_of_line - should be in one function with validate
+# reduce number of verbose prints
 
 #issues:
 # what to do for include step id - make that up too .01 .02
-# regex optimisations - possessive ++
+# repeat parm needs to be renamed eventually for WebInject 3
 
 #ideas:
 # perhaps the id can be the line number of step: ?
