@@ -1,4 +1,2 @@
-step: Single line comment
-she!!: https://www.totaljobs.com
-
-repeat: 52
+step:qu ote: 
+shell: echo Hello World

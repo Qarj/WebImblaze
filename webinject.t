@@ -1023,6 +1023,37 @@ assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate
 assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed keyword - she!!: - 2');
 assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed keyword - she!!: - 3');
 
+# quote must end with a colon
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:quote
+shell: echo Hello World
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parse error line 1 ", '_parse_lean_test_steps : validate malformed quote - no colon - 1');
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon - 2');
+
+# quote cannot contain a space
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:qu ote: 
+shell: echo Hello World
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - space - 1');
+
+# quote must end with colon space
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:quote:quote ABCD quote
+shell: echo Hello World
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space after final colon - 1');
+
 ##validate that quote containing space is not accepted
 # before_test();
 # $main::unit_test_steps = <<'EOB'
@@ -1056,6 +1087,7 @@ assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean
 # validate that multiline quote starts on parameter line
 # validate that multiline comment does not count as lines - so can be within step
 # validate that quote does not contain space
+# validate that quote does not contain colon
 # line number of error must be output (presence of comments does not change line number)
 # step description must be output also
 # validate that file is utf-8

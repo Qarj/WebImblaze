@@ -2874,7 +2874,7 @@ sub lean_parser_get_current_step {
             }
 
             $_parm_name = _get_parm_name();
-            ($_quote, $_end_quote) = _get_quote( parser_line() );
+            ($_quote, $_end_quote) = _get_quote();
             $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
 
             $_parm_value = _get_parm_value_if_single_line( parser_line(), $_quote, $_end_quote );
@@ -2944,16 +2944,17 @@ sub lean_parser_can_advance_one_line_in_step {
 } 
 
 sub _get_quote {
-    my ($_lean_step_line) = @_;
 
-    if ( $_lean_step_line =~ /^\w+:([^\s]+): / ) {
-        my $_quote = $1;
+    if ( parser_line() =~ /^\w+:[^\s]/ ) {
+        my $_quote = _validate( '^\w+:([^\s]+): ', 'Quote must end with a colon followed by a space. Quote must not contain spaces.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
+        if (defined $_quote) {
         my $_end_quote = $_quote;
         $_end_quote =~ s/[(]/\)/g;
         $_end_quote =~ s/[{]/}/g;
         $_end_quote =~ s/[[]/]/g;
         $_end_quote =~ s/</>/g;
         return $_quote, $_end_quote;
+        }
     }
 
     return undef, undef;
