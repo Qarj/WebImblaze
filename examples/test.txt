@@ -1,5 +1,4 @@
 step: Single line comment
-url: https://www.totaljobs.com
-#verifypositive: positive
+she!!: https://www.totaljobs.com
 
 repeat: 52

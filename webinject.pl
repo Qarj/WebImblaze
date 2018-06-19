@@ -2593,6 +2593,7 @@ sub read_test_case_file {
     my $_test_steps;
     if ($unit_test_steps) {
         $_test_steps = $unit_test_steps;
+        $current_case_file = 'unit tests test';
     } else {
         $_test_steps = read_file($current_case_file);
     }
@@ -2872,7 +2873,7 @@ sub lean_parser_get_current_step {
                 next;
             }
 
-            $_parm_name = _get_parm_name( parser_line() );
+            $_parm_name = _get_parm_name();
             ($_quote, $_end_quote) = _get_quote( parser_line() );
             $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
 
@@ -2915,9 +2916,7 @@ sub lean_parser_get_current_step {
 }
 
 sub _get_parm_name {
-   my ($_line) = @_;
-   $_line =~ /^(\w+):/;
-   return $1;
+   return _validate('^(\w+):', 'Parameter name must contain only A-Z a-z 0-9 or _ followed by a colon.', "well formed parameter and value:\n\nverifypositive7: Login successful");
 }
 
 sub lean_parser_can_advance_one_line_in_step {
@@ -3017,6 +3016,22 @@ sub _get_from_start_of_line_to_end_quote {
        return $1;
    }
    return undef;
+}
+
+sub _validate {
+    my ($_regex, $_error_message, $_example) = @_;
+
+    if ( parser_line() =~ /$_regex/ ) {
+        return ($1);
+    }
+    my $_line_num = $parser_index_ + 1;
+    my $_line = parser_line();
+    $results_stdout .= qq|Parse error line $_line_num \n\n|;
+    $results_stdout .= qq|$_error_message\n\n|;
+    $results_stdout .= qq|Line $_line_num of $current_case_file:\n\n|;
+    $results_stdout .= qq|$_line\n\n|;
+    $results_stdout .= qq|Example of $_example\n|;
+    die $results_stdout."\n".'Test case file is malformed, aborted WebInject';
 }
 
 #------------------------------------------------------------------

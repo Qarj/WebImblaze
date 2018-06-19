@@ -1011,15 +1011,27 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
 
-# validate that quote containing space is not accepted
+# validate that keyword only contains \w
 before_test();
 $main::unit_test_steps = <<'EOB'
-step: Set repeat directive
-shell:1 2: 1 2quoted text1 2
+step: Malformed keyword
+she!!: echo Hello World
 EOB
     ;
-read_test_case_file();
-assert_stdout_contains("Expected parameter and value line ", '_parse_lean_test_steps : quote containing space not recognised');
+eval { read_test_case_file(); };
+assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate malformed keyword - she!!: - 1');
+assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed keyword - she!!: - 2');
+assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed keyword - she!!: - 3');
+
+##validate that quote containing space is not accepted
+# before_test();
+# $main::unit_test_steps = <<'EOB'
+# step: Set repeat directive
+# shell:1 2: 1 2quoted text1 2
+# EOB
+    # ;
+# read_test_case_file();
+# assert_stdout_contains("Expected parameter and value line ", '_parse_lean_test_steps : quote containing space not recognised');
 
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
@@ -1028,6 +1040,7 @@ assert_stdout_contains("Expected parameter and value line ", '_parse_lean_test_s
         # Create a seperate type of step for include (very hard) - as for state driven tests
         # Don't support feature
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
+# can 
 
 # error checking before substitutions
 # validate that there are not duplicate attributes
