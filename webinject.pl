@@ -80,6 +80,7 @@ my @parser_lines_;
 my $parser_index_;
 my @parser_step_parm_names_;
 my @parser_step_parm_values_;
+my $parser_step_start_line_;
 my %case_;
 my $step_id_;
 my $repeat_;
@@ -2719,6 +2720,7 @@ sub parser_line {
 sub parser_new_step {
     @parser_step_parm_names_ = ();
     @parser_step_parm_values_ = ();
+    $parser_step_start_line_ = $parser_index_ + 1;
 }
 
 sub parser_push_parm {
@@ -2784,6 +2786,7 @@ sub parser_get_repeat {
 
 sub parser_get_step {
     if ( lean_parser_get_current_step() ) {
+        _validate_step();
         $step_id_ += 10;
         $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
         $results_stdout .= qq| ---> PROCESSED STEP $step_id_ \n\n|if $EXTRA_VERBOSE;
@@ -2857,6 +2860,7 @@ sub lean_parser_get_current_step {
     my $_proto_val = '';
     my ($_quote, $_end_quote);
     my $_start_quote_found = 0;
+    my $_quote_start_line = 0;
     my $_parm_name;
     my $_parm_value;
     my $_first_loop = 1; # really want a do until loop that supports next, but Perl doesn't support it well
@@ -2884,6 +2888,7 @@ sub lean_parser_get_current_step {
             }
             $results_stdout .= qq| "In multi line quote"\n| if $EXTRA_VERBOSE;
             $_in_quote = 1;
+            $_quote_start_line = $parser_index_ + 1;
         }
 
         if (! $_start_quote_found) {
@@ -2901,7 +2906,12 @@ sub lean_parser_get_current_step {
             parser_push_parm( $_parm_name, $_proto_val );
             $_in_quote = 0;
             $_start_quote_found = 0;
+            $_quote_start_line = 0;
             next;
+        } else {
+            if ( not parser_has_more_lines() ) {
+                _output_validate_error("End of file reached, but quote starting line $_quote_start_line not found. Expected to find end quote: $_end_quote", "well formed parameter, quote and value:\n\nshell:==: ==echo This and\nthat==", $_quote_start_line);
+            }
         }
 
         $_proto_val .= parser_line()."\n";
@@ -3012,8 +3022,28 @@ sub _validate {
     if ( parser_line() =~ /$_regex/ ) {
         return ($1);
     }
-    my $_line_num = $parser_index_ + 1;
-    my $_line = parser_line();
+    _output_validate_error($_error_message, $_example);
+}
+
+sub _validate_step {
+    if (not $parser_step_parm_names_[0] eq 'step') {
+        _output_validate_error ('First parameter of step block must be step:', "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_);
+    }
+    my @_reserved_parms = ('description1', 'id', 'method', 'command');
+    for my $_i (0 .. $#parser_step_parm_names_) {
+        foreach my $_reserved (@_reserved_parms) {
+            if ( $parser_step_parm_names_[$_i] eq $_reserved ) {
+                _output_validate_error ("Parameter $_reserved is reserved", "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_ + $_i);
+            }
+        }
+    }
+}
+
+sub _output_validate_error {
+    my ($_error_message, $_example, $_line_num) = @_;
+
+    $_line_num //= $parser_index_ + 1;
+    my $_line = $parser_lines_[$_line_num - 1];
     $results_stdout .= qq|Parse error line $_line_num \n\n|;
     $results_stdout .= qq|$_error_message\n\n|;
     $results_stdout .= qq|Line $_line_num of $current_case_file:\n\n|;

@@ -1,4 +1,3 @@
-repeat: 01
-
 step: Value must be present
-verifypostive: SYS 49152
+shell: echo NOP
+id: 152

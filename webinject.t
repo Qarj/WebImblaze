@@ -1123,7 +1123,7 @@ $main::unit_test_steps = <<'EOB'
 repeat: often
 
 step: Value must be present
-verifypostive: SYS 49152
+verifypositive: SYS 49152
 EOB
     ;
 eval { read_test_case_file(); };
@@ -1135,11 +1135,81 @@ $main::unit_test_steps = <<'EOB'
 repeat: 05
 
 step: Value must be present
-verifypostive: SYS 49152
+verifypositive: SYS 49152
 EOB
     ;
 eval { read_test_case_file(); };
 assert_stdout_contains("Repeat directive value must be a whole number without quotes. It must not begin with 0", '_parse_lean_test_steps : repeat directive must not begin with 0');
+
+# runaway quote - no end quote
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+shell:[[: [[SYS 49152
+Some more lines
+end of file - no end quote!
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("End of file reached, but quote starting line 2 not found", '_parse_lean_test_steps : runaway quote');
+
+# step block must start with step parameter
+before_test();
+$main::unit_test_steps = <<'EOB'
+shell: echo NOP
+step: Value must be present
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : first parameter is step - 1');
+assert_stdout_contains("Parse error line 1", '_parse_lean_test_steps : first parameter is step - 2');
+
+# description1 is a reserved parameter
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+description1: This is not allowed
+shell: echo NOP
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parameter description1 is reserved", '_parse_lean_test_steps : description1 is reserved - 1');
+assert_stdout_contains("Parse error line 2", '_parse_lean_test_steps : description1 is reserved - 2');
+assert_stdout_contains("Line 2 of .*description1: This is not allowed", '_parse_lean_test_steps : description1 is reserved - 3');
+
+# id is a reserved parameter
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+shell: echo NOP
+id: 152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parameter id is reserved", '_parse_lean_test_steps : id is reserved - 1');
+assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : id is reserved - 2');
+
+# method is a reserved parameter
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+shell: echo NOP
+method: cmd
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parameter method is reserved", '_parse_lean_test_steps : method is reserved');
+
+# command is a reserved parameter
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+shell: echo NOP
+command: echo Stuff
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Parameter command is reserved", '_parse_lean_test_steps : command is reserved');
 
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
@@ -1148,18 +1218,10 @@ assert_stdout_contains("Repeat directive value must be a whole number without qu
         # Create a seperate type of step for include (very hard) - as for state driven tests
         # Don't support feature
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
-# can 
+# need to support method for delete and put - what to do?! - allow methods of delete and put?
 
-# validate that end quote is defined - output line number of start quote
-# validate that tab outside of quote is an error
 # validate that there are not duplicate attributes
-# validate that block starts with step:
-# validate that method is not allowed parm
-# validate that id is not allowed parm
-# validate that command is not allowed parm (must be selenium or shell)
-# validate that posttype is not allowed parm (if possible)
-# validate that description1: is not allowed parm
-# step description must be output also
+# validate that tab outside of quote is an error
 # validate that file is utf-8
 
 # optimise main parser loop code
