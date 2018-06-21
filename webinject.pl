@@ -82,6 +82,7 @@ my @parser_step_parm_names_;
 my @parser_step_parm_values_;
 my $parser_step_start_line_;
 my %case_;
+my %include_;
 my $step_id_;
 my $repeat_;
 
@@ -2596,7 +2597,7 @@ sub read_test_case_file {
         $_test_steps = $unit_test_steps;
         $current_case_file = 'unit tests test';
     } else {
-        $_test_steps = read_file($current_case_file);
+        $_test_steps = read_file( $current_case_file );
     }
 
     if ( $_test_steps =~ /[^<]*<testcases/s ) {
@@ -2680,6 +2681,11 @@ sub _parse_steps {
             next;
         }
 
+        if ( parser_get_include() ) {
+            $results_stdout .= qq| Got an include directive index $parser_index_ \n| if $EXTRA_VERBOSE;
+            next;
+        }
+
         if ( parser_get_step() ) {
             $results_stdout .= qq| Got a step ending index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
@@ -2690,6 +2696,7 @@ sub _parse_steps {
     if (defined $repeat_) {
         $_tests{ 'repeat' } = $repeat_;
     }
+    $_tests{ 'include' } = \ %include_;
     $_tests{ 'case' } = \ %case_;
     return \ %_tests;
 }
@@ -2702,6 +2709,7 @@ sub new_parser {
     undef $repeat_;
 
     %case_ = ();
+    %include_ = ();
     $step_id_ = 0;
 
     $results_stdout .= qq| Lean parsing [[[$_parser_raw]]] \n| if $EXTRA_VERBOSE;
@@ -2779,6 +2787,17 @@ sub parser_get_multi_line_comment {
 sub parser_get_repeat {
     if ( parser_line() =~ /^repeat:/ ) {
         $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
+        return 1;
+    }
+    return 0;
+}
+
+sub parser_get_include {
+    my $_include_filename;
+    if ( parser_line() =~ /^include:/ ) {
+        $_include_filename = _validate( '^include:\s+(.+[^\s])\s*$', "Include filename must be specified without quotes.", "well formed include directive:\n\ninclude: examples/include/include_demo.txt");
+        $step_id_ += 10;
+        $include_{ $step_id_ } = $_include_filename;
         return 1;
     }
     return 0;

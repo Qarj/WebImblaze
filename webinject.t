@@ -1296,19 +1296,63 @@ in all cases	$
 url:      https://www.totaljobs.com/job/49152
 EOB
     ;
-eval { read_test_case_file(); };
+read_test_case_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : tab can appear in value');
 
+# special characters can be used
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:£€: £€My cool test with £ and € chars£€ 
+shell: echo hello and also £€
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("parsed OK", '_parse_lean_test_steps : special chars do not croak');
+
+# specify one include file
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_1.txt
+
+step: This is my third step, 30 
+shell: REM 30
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in - 1');
+assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
+assert_stdout_contains("'20' => 'examples/include/include_demo_1.txt'", '_parse_lean_test_steps : include file names read in - 3');
+
+# specify two include files
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_1.txt
+
+step: This is my third step, 30 
+shell: REM 30
+
+include: examples/include/include_demo_2.txt
+
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'20' => 'examples/include/include_demo_1.txt'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains("'40' => 'examples/include/include_demo_2.txt'", '_parse_lean_test_steps : multi include files read in - 1');
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
         # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
         # Try to parse seperately as encountered (Medium) - deals with comments problem
         # Create a seperate type of step for include (very hard) - as for state driven tests
         # Don't support feature
-# special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
+        # repeat an error - just validate it cannot be encountered twice (global rule)
 
-# validate that file is utf-8
-
+        
 # optimise main parser loop code
 # regex optimisations - possessive ++
 # optimise _search_for_start_quote and _get_from_start_quote_to_end_of_line - should be in one function with validate
@@ -1317,6 +1361,7 @@ assert_stdout_contains("parsed OK", '_parse_lean_test_steps : tab can appear in 
 #issues:
 # what to do for include step id - make that up too .01 .02
 # repeat parm needs to be renamed eventually for WebInject 3
+# utf-8 mess - needs major attention
 
 #ideas:
 # perhaps the id can be the line number of step: ?
