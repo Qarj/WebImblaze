@@ -1189,16 +1189,16 @@ eval { read_test_case_file(); };
 assert_stdout_contains("Parameter id is reserved", '_parse_lean_test_steps : id is reserved - 1');
 assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : id is reserved - 2');
 
-# method is a reserved parameter
-before_test();
-$main::unit_test_steps = <<'EOB'
-step: Value must be present
-shell: echo NOP
-method: cmd
-EOB
-    ;
-eval { read_test_case_file(); };
-assert_stdout_contains("Parameter method is reserved", '_parse_lean_test_steps : method is reserved');
+# method can be specified if the value is delete
+# before_test();
+# $main::unit_test_steps = <<'EOB'
+# step: Value must be present
+# shell: echo NOP
+# method: cmd
+# EOB
+    # ;
+# eval { read_test_case_file(); };
+# assert_stdout_contains("Parameter method is reserved", '_parse_lean_test_steps : method is reserved');
 
 # command is a reserved parameter
 before_test();
@@ -1211,6 +1211,94 @@ EOB
 eval { read_test_case_file(); };
 assert_stdout_contains("Parameter command is reserved", '_parse_lean_test_steps : command is reserved');
 
+# method can be delete
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+url: https://www.totaljobs.com/job/49152
+method: delete
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'delete'", '_parse_lean_test_steps : method can be delete');
+
+# method can be put
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+url: https://www.totaljobs.com/job/49152
+method: put
+postbody: abd=efg&hijk=lmnop
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'put'", '_parse_lean_test_steps : method can be put');
+
+# method cannot be get - only put and delete accepted
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+url: https://www.totaljobs.com/job/49152
+method: get
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred", '_parse_lean_test_steps : method can only be delete or put');
+
+# duplicate attribute found
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Value must be present
+url: https://www.totaljobs.com/job/49152
+url: https://www.totaljobs.com/job/792168
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Duplicate parameter url found", '_parse_lean_test_steps : duplicate parameter - 1');
+assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : duplicate parameter - 2');
+
+# tab before value - no quote is an error
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:	Value must be present
+url:    https://www.totaljobs.com/job/49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Tab character found on column 6 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - no quote');
+
+# tab before value - with quote one liner is an error
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:$: 	  $Value must be present$
+url:    https://www.totaljobs.com/job/49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote one liner');
+
+# tab before value - with quote multi line is an error
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:$: 	  $		Value must be present
+in all cases	$
+url:    https://www.totaljobs.com/job/49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote multi line');
+
+# tab can appear in value
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:$:   $		Value must be present
+in all cases	$
+url:      https://www.totaljobs.com/job/49152
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("parsed OK", '_parse_lean_test_steps : tab can appear in value');
+
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
         # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
@@ -1218,10 +1306,7 @@ assert_stdout_contains("Parameter command is reserved", '_parse_lean_test_steps 
         # Create a seperate type of step for include (very hard) - as for state driven tests
         # Don't support feature
 # special characters utf-8: <> `¬|\/;:'@#~[]{}£$%^&*()_+-=?€
-# need to support method for delete and put - what to do?! - allow methods of delete and put?
 
-# validate that there are not duplicate attributes
-# validate that tab outside of quote is an error
 # validate that file is utf-8
 
 # optimise main parser loop code

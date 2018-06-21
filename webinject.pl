@@ -2955,7 +2955,7 @@ sub lean_parser_can_advance_one_line_in_step {
 sub _get_quote {
 
     if ( parser_line() =~ /^\w+:[^\s]/ ) {
-        my $_quote = _validate( '^\w+:([^\s:]+): ', 'Quote must end with a colon followed by a space. Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
+        my $_quote = _validate( '^\w+:([^\s:]+): ', 'Quote must end with a colon followed by a space (not tab). Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
         if (defined $_quote) {
             my $_end_quote = $_quote;
             $_end_quote =~ s/[(]/\)/g;
@@ -2973,13 +2973,16 @@ sub _get_parm_value_if_single_line {
     my ($_quote, $_end_quote) = @_;
 
     if (defined $_quote) {
+        my $_regex = '^(\w+:' . quotemeta($_quote) . ':\s+)';
+        _validate_tab( $_regex );
         if ( parser_line() =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
             return $1;
         }
         return undef;
     }
 
-    return _validate( '^\w+: \s*(.*[^\s])\s*$', "No value found - must use quotes if value is only white space.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
+    _validate_tab( '^(\w+:\s+).*[^\s]\s*$' );
+    return _validate( '^\w+:  *(.*[^\s])\s*$', "No value found - must use quotes if value is only white space. Use spaces, not tabs.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
 }
 
 sub _search_for_start_quote {
@@ -3025,15 +3028,42 @@ sub _validate {
     _output_validate_error($_error_message, $_example);
 }
 
+sub _validate_tab {
+    my ($_regex) = @_;
+
+    if ( parser_line() =~ /$_regex/ ) {
+        #return ($1);
+        for my $_i (0..length($1)-1) {
+            if ( substr($1, $_i, 1) eq "\t" ) {
+                my $_column = $_i + 1;
+                my $_line_num = $parser_index_ + 1;
+                _output_validate_error("Tab character found on column $_column of line $_line_num. Please use spaces.", "well formed step block:\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+            }
+        }
+    }
+}
+
 sub _validate_step {
     if (not $parser_step_parm_names_[0] eq 'step') {
         _output_validate_error ('First parameter of step block must be step:', "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_);
     }
-    my @_reserved_parms = ('description1', 'id', 'method', 'command');
+    my @_reserved_parms = ('description1', 'id', 'command');
     for my $_i (0 .. $#parser_step_parm_names_) {
         foreach my $_reserved (@_reserved_parms) {
             if ( $parser_step_parm_names_[$_i] eq $_reserved ) {
                 _output_validate_error ("Parameter $_reserved is reserved", "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_ + $_i);
+            }
+        }
+        if ( $parser_step_parm_names_[$_i] eq 'method' ) {
+            if ( not ($parser_step_parm_values_[$_i] eq 'delete' || $parser_step_parm_values_[$_i] eq 'put' ) ) {
+                _output_validate_error ("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred.", "well formed step block:\n\nstep: Post login details\nurl: https://www.example.com/log\npostbody: user=Admin&pass=123456", $parser_step_start_line_ + $_i);
+            }
+        }
+        for my $_j (0 .. $#parser_step_parm_names_) {
+            if ($_i ne $_j) {
+                if ( $parser_step_parm_names_[$_i] eq $parser_step_parm_names_[$_j] ) {
+                    _output_validate_error ("Duplicate parameter $parser_step_parm_names_[$_j] found.", "well formed step block:\n\nstep: Do shell operations\nshell1: ls -asl\nshell2: pwd", $parser_step_start_line_ + $_j);
+                } 
             }
         }
     }
