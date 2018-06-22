@@ -1409,30 +1409,52 @@ assert_stdout_contains("'40.01' =>", '_parse_lean_test_steps : include multi fil
 assert_stdout_contains("'command' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
 assert_stdout_contains("'description1' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
 
+# repeat cannot be encountered twice - primary file
+before_test();
+$main::unit_test_steps = <<'EOB'
+repeat: 5
 
-# have to deal with include files include: login.txt (maybe do validations first)
-    # Options
-        # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
-        # Try to parse seperately as encountered (Medium) - deals with comments problem
-        # Create a seperate type of step for include (very hard) - as for state driven tests
-        # Don't support feature
-        # repeat an error - just validate it cannot be encountered twice (global rule)
-        # multi steps
+step: This is my first step, 10 
+shell: REM 10
 
-        
+step: This is my third step, 30 
+shell: REM 30
+
+repeat: 2
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 1');
+assert_stdout_contains("Parse error line 9", '_parse_lean_test_steps : repeat is declared once only - 2');
+
+# repeat cannot be encountered twice - include file
+before_test();
+$main::unit_test_steps = <<'EOB'
+repeat: 5
+
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_4.txt
+
+step: This is my third step, 30 
+shell: REM 30
+EOB
+    ;
+eval { read_test_case_file(); };
+assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
+assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
+
+# optimise include code
 # optimise main parser loop code
+# variables declarations on one line
 # regex optimisations - possessive ++
 # optimise _search_for_start_quote and _get_from_start_quote_to_end_of_line - should be in one function with validate
 # reduce number of verbose prints
 
 #issues:
-# what to do for include step id - make that up too .01 .02
 # repeat parm needs to be renamed eventually for WebInject 3
-# utf-8 mess - needs major attention
-
-#ideas:
-# perhaps the id can be the line number of step: ?
-
+# utf-8 mess - needs major attention (alternatives to slurp, maybe Path::Tiny which support utf8 slurp)
 
 #
 # GLOBAL HELPER SUBS

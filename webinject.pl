@@ -2660,6 +2660,7 @@ sub read_test_case_file {
 sub _parse_steps {
     my ($_lean) = @_;
 
+    undef $repeat_;
     new_parser( $_lean );
     _parse_lines();
     my $_include_pass_1 = dclone \ %include_;
@@ -2742,7 +2743,7 @@ sub new_parser {
     @parser_lines_ = split /\n/, $_parser_raw;    
     $parser_index_ = -1;
 
-    undef $repeat_;
+#    undef $repeat_;
 
     %case_ = ();
     %include_ = ();
@@ -2822,6 +2823,9 @@ sub parser_get_multi_line_comment {
 
 sub parser_get_repeat {
     if ( parser_line() =~ /^repeat:/ ) {
+        if (defined $repeat_) {
+            _output_validate_error("Repeat directive can only be given once globally.", "well formed file with repeat:\n\nrepeat: 3\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+        }
         $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
         return 1;
     }
