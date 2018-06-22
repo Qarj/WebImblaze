@@ -1,0 +1,3 @@
+step: Can handle 'single' and "double" quotes
+shell: echo 'single' and "double" quotes
+verifypostive: 'single' and "double" quotes

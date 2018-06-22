@@ -1,4 +1,7 @@
-# WebInject 2.9.0
+# WebInject 2.10.0
+
+**_WebInject now supports a new test file format! Details at the bottom of this page._**
+
 WebInject is a free Perl based tool for automated testing of web applications and web services.
 
 You can see WebInject example output here: http://qarj.github.io/WebInject-Example/
@@ -227,3 +230,59 @@ Find the project here: https://github.com/Qarj/WebInject-Selenium
 A Chrome screenshot can be searched to see if it contains a specific (or approximate) sub-image.
 
 Find the project here: https://github.com/Qarj/search-image
+
+New Test File Format
+--------------------
+WebInject now supports a simplified test file format.
+
+Once it is proven in production, the intention is to deprecate the xml style file format then
+eventually remove it.
+
+The WebInject xml style format is misleading since it isn't true xml - for simplicity we allow
+illegal characters to improve readability.
+
+The goal of the new format is to simplify test specification and remove clutter. Common errors
+are validated for and a comprehensive error message is given explaining the problem, line
+number of the problem and an example of something that works.
+
+The example given higher up this page looks like this in the new format.
+
+hello.txt:
+```
+step: Get Totaljobs Home Page
+varTOTALJOBS_URL: https://www.totaljobs.com
+url: {TOTALJOBS_URL}
+verifypositive1: Search for and be recommended
+verifypositive2: See all hiring companies
+
+step: Search for hello jobs
+description2: Expect to see at least 2 pages of hello jobs
+url: {TOTALJOBS_URL}/jobs/hello
+verifypositive1: \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
+verifypositive2: page=2|||Should be at least two pages of results for keyword hello
+verifynegative1: Page not found
+```
+
+Quick start information for new format:
+* parameters must start in column 1 of each line
+* `step: ` must be on the first line of each step block
+* `step: ` replaces description1 (it is converted to description1 on file load)
+* `id: ` is reserved - it is assigned automatically in increments of 10
+* `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
+* all parameters for a step block must be grouped together without a blank line - blank lines seperates steps 
+* for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.txt)
+* for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.txt)
+* single and multi line comments are supported (see examples/lean.txt)
+* it is possible to assemble a test file from smaller fragment files (see examples/include.txt)
+
+Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor
+you view the file in. For this reason tabs are not supported for formatting. If you want to align a step, do
+it with spaces like this:
+```
+step:               Search for hello jobs
+description2:       Expect to see at least 2 pages of hello jobs
+url:                {TOTALJOBS_URL}/jobs/hello
+verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
+verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
+verifynegative1:    Page not found
+```

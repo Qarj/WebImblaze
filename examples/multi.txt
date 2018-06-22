@@ -1,0 +1,10 @@
+step: Test that WebInject can run a very basic test
+shell: REM Nothing: much
+verifypositive1: Nothing: much
+
+step: Another step
+varBIG:abcd: abcdOne Fish
+Two Fish
+Three Fishabcd
+shell: REM {BIG}
+verifypositive: {BIG}

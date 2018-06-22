@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.9.0';
+$VERSION = '2.10.0';
 
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
 #    Extensive updates 2015-2018 Tim Buckland
@@ -25,6 +25,7 @@ $VERSION = '2.9.0';
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
+use Storable 'dclone';
 use File::Basename;
 use File::Spec;
 use File::Slurp;
@@ -42,6 +43,7 @@ use Encode qw(encode decode);
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
 use lib '.'; ## Current folder is not @INC from Perl 5.26
+use Data::Dumper;
 
 local $| = 1; #don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; ## Set to 1 for additional std out messages, also used by the unit tests
@@ -64,6 +66,7 @@ our ($case_failed_count, $passed_count, $failed_count);
 our $is_failure;
 my ($run_count, $total_run_count, $case_passed_count, $case_failed);
 my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
+our $unit_test_steps;
 
 our %case;
 my %case_save; ## when we retry, we need to re-substitute some variables
@@ -73,6 +76,8 @@ our $opt_proxy;
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
+
+my ($parser_index_, $step_id_, $repeat_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
 
 my $report_type; ## 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -437,8 +442,6 @@ sub substitute_variables {
     set_late_var_list();
 
     foreach my $_case_attribute (  keys %case  ) {
-        #print "DEBUG: $_case_attribute", ": ", $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
-        #print "\n";
         $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
         convert_back_var_variables($case{$_case_attribute});
@@ -1139,13 +1142,9 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
     if ($case{addcookie}) { ## inject in an additional cookie for this test step only if specified
         my $_cookies = $request->header('Cookie');
         if (defined $_cookies) {
-            #print "[COOKIE] $_cookies\n";
             $request->header('Cookie' => "$_cookies; " . $case{addcookie});
-            #print '[COOKIE UPDATED] ' . $request->header('Cookie') . "\n";
         } else {
-            #print "[COOKIE] <UNDEFINED>\n";
             $request->header('Cookie' => $case{addcookie});
-            #print "[COOKIE UPDATED] " . $request->header('Cookie') . "\n";
         }
         undef $_cookies;
     }
@@ -1600,7 +1599,6 @@ sub httpget {  #send http request and read response
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     save_page_when_method_post_and_has_action ();
 
@@ -1680,7 +1678,6 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     return;
 }
@@ -1769,7 +1766,6 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     return;
 }
@@ -1885,7 +1881,6 @@ sub run_special_command {  ## for commandonerror and commandonfail
 
 #------------------------------------------------------------------
 sub dump_json {
-    require Data::Dumper;
 
 	if ($case{dumpjson}) {
 		 my $_dumped = eval { Data::Dumper::Dumper(decode_json $response->content) };
@@ -2108,14 +2103,11 @@ sub _verify_smartassertion {
             }
 
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
-            #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
                 $results_xml .= "            <$_config_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$_verifyparms[1]/si) {  ## verify existence of string in response
-                    #$results_html .= qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $results_xml .= qq|                <success>true</success>\n|;
-                    #$results_stdout .= "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
                     $passed_count++;
                     $retry_passed_count++;
                 }
@@ -2364,7 +2356,6 @@ sub parseresponse {  #parse values from responses for use in future request (for
                 }
             }
 
-            #print "\n\nParsed String: $parsedresult{$_}\n\n";
         }
     }
 
@@ -2485,12 +2476,10 @@ sub process_config_file { #parse config file and grab values it sets
 
     if ($config->{httpauth}) {
         if ( ref($config->{httpauth}) eq 'ARRAY') {
-            #print "We have an array of httpauths\n";
             for my $_auth ( @{ $config->{httpauth} } ) { ## $config->{httpauth} is an array
                 _push_httpauth ($_auth);
             }
         } else {
-            #print "Not an array - we just have one httpauth\n";
             _push_httpauth ($config->{httpauth});
         }
     }
@@ -2513,7 +2502,6 @@ sub process_config_file { #parse config file and grab values it sets
     $concurrency =  basename ( dirname($_abs_output_full) );
 
     $outsum = unpack '%32C*', $results_output_folder; ## checksum of output directory name - for concurrency
-    #print "outsum $outsum \n";
 
     if (defined $config->{ports_variable}) {
         if ($config->{ports_variable} eq 'convert_back') {
@@ -2553,7 +2541,6 @@ sub _push_httpauth {
     my $_delimiter = quotemeta substr $_auth,0,1;
     my $_err_delim = substr $_auth,0,1;
 
-    #print "\nhttpauth:$auth\n";
     my @_auth_entry = split /$_delimiter/, $_auth;
     if ($#_auth_entry != 5) {
         print {*STDERR} "\n$_auth\nError: httpauth should have 5 fields delimited by the first character [$_err_delim]\n\n";
@@ -2581,29 +2568,44 @@ sub _sub_xml_special {
 #------------------------------------------------------------------
 sub read_test_case_file {
 
-    my $_xml = read_file($current_case_file);
+    my $_test_steps;
+    if ($unit_test_steps) {
+        $_test_steps = $unit_test_steps;
+        $current_case_file = 'unit tests test';
+    } else {
+        $_test_steps = read_file( $current_case_file );
+    }
+
+    if ( $_test_steps =~ /[^<]*<testcases/s ) {
+        $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
+    } else {
+        $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
+        $xml_test_cases = _parse_steps( \ $_test_steps );
+        $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
+        $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
+        return;
+    }
 
     # substitute in the included test step files
-    $_xml =~ s{<include[^>]*?
-               id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
-               [^>]*?
-               file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
-               [^>]*>
-               }{_include_file($2,$1,$&)}gsex;          # the actual file content
+    $_test_steps =~ s{<include[^>]*?
+                      id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
+                      [^>]*?
+                      file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
+                      [^>]*>
+                     }{_include_file($2,$1,$&)}gsex;          # the actual file content
 
     # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
-    $_xml =~ s/&/{AMPERSAND}/g;
-    while ( $_xml =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
-    while ( $_xml =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
-    #$_xml =~ s/\\</{LESSTHAN}/g;
+    $_test_steps =~ s/&/{AMPERSAND}/g;
+    while ( $_test_steps =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
+    while ( $_test_steps =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
 
     $case_count = 0;
-    while ($_xml =~ /<case/g) {  #count test cases based on '<case' tag
+    while ($_test_steps =~ /<case/g) {  #count test cases based on '<case' tag
         $case_count++;
     }
 
     if ($case_count == 1) {
-        $_xml =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
+        $_test_steps =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
     }
 
     # see the final test case file after all alerations for debug purposes
@@ -2611,19 +2613,457 @@ sub read_test_case_file {
 
     # here we parse the xml file in an eval, and capture any error returned (in $@)
     my $_message;
-    $xml_test_cases = eval { XMLin($_xml, VarAttr => 'varname') };
+    $xml_test_cases = eval { XMLin($_test_steps, VarAttr => 'varname') };
+
+    $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
 
     if ($@) {
         $_message = $@;
         $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
-        my $_file_name_full = _write_failed_xml($_xml);
+        my $_file_name_full = _write_failed_xml($_test_steps);
         die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
     }
+    $results_stdout .= qq| Classic test steps parsed OK\n| if $EXTRA_VERBOSE;
+    $results_stdout .= qq| \n$_test_steps\n|if $EXTRA_VERBOSE;
 
-    $testfile_contains_selenium = _does_testfile_contain_selenium(\$_xml);
-    #print "Contains Selenium:$testfile_contains_selenium\n";
+    $testfile_contains_selenium = _does_testfile_contain_selenium(\ $_test_steps);
 
     return;
+}
+
+sub _parse_steps {
+    my ($_file_content_ref) = @_;
+
+    undef $repeat_;
+    new_parser( $_file_content_ref );
+    _parse_lines();
+    my $_files_to_include = dclone \ %include_;
+    my $_case_main_file = dclone \ %case_;
+
+    my %_tests = ();
+    $_tests{ 'include' } = $_files_to_include;
+    $_tests{ 'case' } = $_case_main_file;
+    if ( defined $repeat_ ) {
+        $_tests{ 'repeat' } = $repeat_;
+   }
+
+    foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
+        my $_include_file_name = %{ $_files_to_include}{$_include_integer_step_num};
+        my $_include_file_content = read_file( $_include_file_name );
+        new_parser( \ $_include_file_content );
+        _parse_lines();
+        foreach my $_sub_step (keys %case_ ) {
+            my $_insert_step = $_sub_step / 1000 + $_include_integer_step_num ;
+            $_tests{case}{$_insert_step} = $case_{$_sub_step};
+        }
+    }
+
+    return \ %_tests;
+}
+
+sub _parse_lines {
+    
+    while ( parser_advance_line() ) {
+        if ( parser_get_blank_line() ) {
+            next;
+        }
+
+        if ( parser_get_single_line_comment() ) {
+            $results_stdout .= qq| Got a single line comment index $parser_index_ \n| if $EXTRA_VERBOSE;
+            next;
+        }
+        if ( parser_get_multi_line_comment() ) {
+            next;
+        }
+
+        if ( parser_get_repeat() ) {
+            next;
+        }
+
+        if ( parser_get_include() ) {
+            next;
+        }
+
+        if ( parser_get_step() ) {
+            next;
+        }
+    }
+
+}
+
+sub new_parser {
+    my ($_parser_raw_ref) = @_;
+    @parser_lines_ = split /\n/, ${$_parser_raw_ref};    
+    $parser_index_ = -1;
+
+    %case_ = ();
+    %include_ = ();
+    $step_id_ = 0;
+
+    return;
+}
+
+sub parser_has_more_lines {
+    return !($#parser_lines_ eq $parser_index_);
+}
+
+sub parser_line {
+    return $parser_lines_[$parser_index_];
+}
+
+sub parser_new_step {
+    @parser_step_parm_names_ = ();
+    @parser_step_parm_values_ = ();
+    $parser_step_start_line_ = $parser_index_ + 1;
+}
+
+sub parser_push_parm {
+    my ($_name, $_value) = @_;
+    push @parser_step_parm_names_, $_name;
+    push @parser_step_parm_values_, $_value;
+}
+
+sub parser_step_has_parms {
+    return scalar(@parser_step_parm_names_);
+}
+
+sub parser_advance_line() {
+
+    if ( not parser_has_more_lines() ) {
+        return 0;
+    }
+
+    lean_parser_increment_index_num_();
+    return 1;
+}
+
+sub lean_parser_increment_index_num_ {
+    $parser_index_ += 1;
+    return;
+}
+
+sub parser_get_blank_line {
+    return parser_line() =~ /^\s*$/;
+}
+
+sub parser_get_single_line_comment {
+    return parser_line() =~ /^\s*\#/;
+}
+
+sub parser_get_multi_line_comment {
+
+    my $_saw_comment = 0;
+    while ( 1 ) {
+        if ( parser_line() =~ /^\s*--=/ ) {
+            $_saw_comment = 1;
+        }
+        if (!$_saw_comment) {
+            return 0;
+        }
+        if ( parser_line() =~ /^\s*=--/ ) {
+            return 1;
+        }
+        parser_advance_line();
+    }
+}
+
+sub parser_get_repeat {
+    if ( parser_line() =~ /^repeat:/ ) {
+        if (defined $repeat_) {
+            _output_validate_error("Repeat directive can only be given once globally.", "well formed file with repeat:\n\nrepeat: 3\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+        }
+        $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
+        return 1;
+    }
+    return 0;
+}
+
+sub parser_get_include {
+    my $_include_filename;
+    if ( parser_line() =~ /^include:/ ) {
+        $_include_filename = _validate( '^include:\s+(.+[^\s])\s*$', "Include filename must be specified without quotes.", "well formed include directive:\n\ninclude: examples/include/include_demo.txt");
+        $step_id_ += 10;
+        $include_{ $step_id_ } = $_include_filename;
+        return 1;
+    }
+    return 0;
+}
+
+sub parser_get_step {
+    if ( lean_parser_get_current_step() ) {
+        _validate_step();
+        $step_id_ += 10;
+        $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
+        return 1;
+    }
+    return 0;
+}
+
+sub _construct_step {
+    my ($_parms, $_vals) = @_;
+
+    my %_case_step = ();
+    $_case_step{ 'method' } = _get_lean_step_method($_parms);
+    _rename_lean_parameters_to_classic_names($_parms);
+
+    for my $_i ( 0 .. $#{$_parms} ) {
+        $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
+    }
+
+    return \ %_case_step;
+}
+
+sub _get_lean_step_method {
+    my ($_parms) = @_;
+
+    foreach my $_parm (@{$_parms}) {
+        if ($_parm eq 'shell') { return 'cmd'; }
+        if ($_parm eq 'selenium') { return 'selenium'; }
+        if ($_parm eq 'url') {
+            foreach my $_parm_2 (@{$_parms}) {
+                if ($_parm_2 eq 'postbody') { return 'post'; }
+            }
+            return 'get';
+        }
+    }
+}
+
+sub _rename_lean_parameters_to_classic_names {
+    my ($_parms) = @_;
+
+    for my $_i (0 .. $#{$_parms}) {
+        $_parms->[$_i] =~ s/shell/command/;
+        if ( $_parms->[$_i] =~ s/selenium/command/) {
+            $testfile_contains_selenium = 'true';
+        }
+        $_parms->[$_i] =~ s/step/description1/;
+    }
+}
+
+sub lean_parser_step_parm_names {
+    $results_stdout .= qq| $#parser_step_parm_names_ parm names in current step\n| if $EXTRA_VERBOSE;
+    return \ @parser_step_parm_names_;
+}
+
+sub lean_parser_step_values {
+    $results_stdout .= qq| $#parser_step_parm_values_ parm values in current step\n| if $EXTRA_VERBOSE;
+    return \ @parser_step_parm_values_;
+}
+
+sub lean_parser_get_current_step {
+
+    parser_new_step();
+
+    my $_in_quote = 0;
+    my $_start_quote_found = 0;
+    my $_quote_start_line = 0;
+    my $_proto_val = '';
+    my ($_parm_name, $_parm_value, $_quote, $_end_quote);
+    my $_first_loop = 1; # really want a do until loop that supports next, but Perl doesn't support it well
+    while ( lean_parser_can_advance_one_line_in_step($_first_loop, $_in_quote) ) {
+        $_first_loop = 0;
+
+        if (! $_in_quote) {
+            if ( parser_get_single_line_comment() ) {
+                next;
+            }
+
+            if ( parser_get_multi_line_comment() ) {
+                next;
+            }
+
+            $_parm_name = _get_parm_name();
+            ($_quote, $_end_quote) = _get_quote();
+
+            $_parm_value = _get_parm_value_if_single_line( $_quote, $_end_quote );
+            if (defined $_parm_value) {
+                parser_push_parm( $_parm_name, $_parm_value );
+                next;
+            }
+            $_in_quote = 1;
+            $_quote_start_line = $parser_index_ + 1;
+        }
+
+        if (! $_start_quote_found) {
+            $_start_quote_found = _search_for_start_quote( $_quote );
+            if ($_start_quote_found) {
+                $_proto_val = _get_from_start_quote_to_end_of_line( parser_line(), $_quote ) . "\n";
+                next;
+            }
+        }
+
+        my $_last_bit = _get_from_start_of_line_to_end_quote( parser_line(), $_end_quote );
+        if (defined $_last_bit) {
+            $_proto_val .= $_last_bit;
+            parser_push_parm( $_parm_name, $_proto_val );
+            $_in_quote = 0;
+            $_start_quote_found = 0;
+            $_quote_start_line = 0;
+            next;
+        } else {
+            if ( not parser_has_more_lines() ) {
+                _output_validate_error("End of file reached, but quote starting line $_quote_start_line not found. Expected to find end quote: $_end_quote", "well formed parameter, quote and value:\n\nshell:==: ==echo This and\nthat==", $_quote_start_line);
+            }
+        }
+
+        $_proto_val .= parser_line()."\n";
+        next;
+
+    }
+
+    return parser_step_has_parms();
+}
+
+sub _get_parm_name {
+   return _validate('^(\w+):', 'Parameter name must contain only A-Z a-z 0-9 or _ followed by a colon. Must start at first character of line.', "well formed parameter and value:\n\nverifypositive7: Login successful");
+}
+
+sub lean_parser_can_advance_one_line_in_step {
+    my ($_first_loop, $_in_quote) = @_;
+    if ($_first_loop) {
+        return 1;
+    }
+
+    if ( parser_advance_line() ) {
+
+        if ($_in_quote) {
+            return 1;
+        } else {
+            if ( parser_line() =~ /^\s*$/ ) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
+    return 0;
+} 
+
+sub _get_quote {
+
+    if ( parser_line() =~ /^\w++:[^\s]/ ) {
+        my $_quote = _validate( '^\w++:([^\s:]+): ', 'Quote must end with a colon followed by a space (not tab). Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
+        if (defined $_quote) {
+            my $_end_quote = $_quote;
+            $_end_quote =~ s/[(]/\)/g;
+            $_end_quote =~ s/[{]/}/g;
+            $_end_quote =~ s/[[]/]/g;
+            $_end_quote =~ s/</>/g;
+            return $_quote, $_end_quote;
+        }
+    }
+
+    return undef, undef;
+}
+
+sub _get_parm_value_if_single_line {
+    my ($_quote, $_end_quote) = @_;
+
+    if (defined $_quote) {
+        my $_regex = '^(\w++:' . quotemeta($_quote) . ':\s++)';
+        _validate_tab( $_regex );
+        if ( parser_line() =~ m|^\w++:\Q$_quote\E:\s++\Q$_quote\E(.*)\Q$_end_quote\E| ) {
+            return $1;
+        }
+        return undef;
+    }
+
+    _validate_tab( '^(\w++:\s+).*[^\s]\s*$' );
+    return _validate( '^\w++:  *(.*[^\s])\s*$', "No value found - must use quotes if value is only white space. Use spaces, not tabs.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
+}
+
+sub _search_for_start_quote {
+    my ($_quote) = @_;
+
+    my $_regex = '^\w++:' . quotemeta($_quote) . ':\s+(' . quotemeta($_quote) . ')';
+    my $_opening_quote = _validate( $_regex, "Quote declared but opening quote not found.\nOpening quote must be on the same line as the parameter name.", "well formed parameter, quote and multi line value:\n\nverifypositive5:[[[: [[[Logged in ok.\nPress enter to continue.]]]");
+    if (defined $_opening_quote) {
+        return 1;
+    }
+}
+
+sub _get_from_start_quote_to_end_of_line {
+   my ($_line, $_quote) = @_;
+
+    if ( $_line =~ /\s*\w++:\Q$_quote\E:\s+/ ) {
+        if ( $_line =~ /\s*\w++:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
+            return $1;
+        }
+        $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
+    }
+
+    $_line =~ /\Q$_quote\E(.*)/;
+    return $1;
+}
+
+sub _get_from_start_of_line_to_end_quote {
+   my ($_line, $_end_quote) = @_;
+   if ( $_line =~ /(.*?)\Q$_end_quote\E/ ) {
+       return $1;
+   }
+   return undef;
+}
+
+sub _validate {
+    my ($_regex, $_error_message, $_example) = @_;
+
+    if ( parser_line() =~ /$_regex/ ) {
+        return ($1);
+    }
+    _output_validate_error($_error_message, $_example);
+}
+
+sub _validate_tab {
+    my ($_regex) = @_;
+
+    if ( parser_line() =~ /$_regex/ ) {
+        for my $_i (0..length($1)-1) {
+            if ( substr($1, $_i, 1) eq "\t" ) {
+                my $_column = $_i + 1;
+                my $_line_num = $parser_index_ + 1;
+                _output_validate_error("Tab character found on column $_column of line $_line_num. Please use spaces.", "well formed step block:\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+            }
+        }
+    }
+}
+
+sub _validate_step {
+    if (not $parser_step_parm_names_[0] eq 'step') {
+        _output_validate_error ('First parameter of step block must be step:', "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_);
+    }
+    my @_reserved_parms = ('description1', 'id', 'command');
+    for my $_i (0 .. $#parser_step_parm_names_) {
+        foreach my $_reserved (@_reserved_parms) {
+            if ( $parser_step_parm_names_[$_i] eq $_reserved ) {
+                _output_validate_error ("Parameter $_reserved is reserved", "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_ + $_i);
+            }
+        }
+        if ( $parser_step_parm_names_[$_i] eq 'method' ) {
+            if ( not ($parser_step_parm_values_[$_i] eq 'delete' || $parser_step_parm_values_[$_i] eq 'put' ) ) {
+                _output_validate_error ("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred.", "well formed step block:\n\nstep: Post login details\nurl: https://www.example.com/log\npostbody: user=Admin&pass=123456", $parser_step_start_line_ + $_i);
+            }
+        }
+        for my $_j (0 .. $#parser_step_parm_names_) {
+            if ($_i ne $_j) {
+                if ( $parser_step_parm_names_[$_i] eq $parser_step_parm_names_[$_j] ) {
+                    _output_validate_error ("Duplicate parameter $parser_step_parm_names_[$_j] found.", "well formed step block:\n\nstep: Do shell operations\nshell1: ls -asl\nshell2: pwd", $parser_step_start_line_ + $_j);
+                } 
+            }
+        }
+    }
+}
+
+sub _output_validate_error {
+    my ($_error_message, $_example, $_line_num) = @_;
+
+    $_line_num //= $parser_index_ + 1;
+    my $_line = $parser_lines_[$_line_num - 1];
+    $results_stdout .= qq|Parse error line $_line_num \n\n|;
+    $results_stdout .= qq|$_error_message\n\n|;
+    $results_stdout .= qq|Line $_line_num of $current_case_file:\n\n|;
+    $results_stdout .= qq|$_line\n\n|;
+    $results_stdout .= qq|Example of $_example\n|;
+    die $results_stdout."\n".'Test case file is malformed, aborted WebInject';
 }
 
 #------------------------------------------------------------------
@@ -2668,10 +3108,6 @@ sub _include_file {
     my $_include = read_file(slash_me($_file));
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
     $_include =~ s{\n(\s*)retryfromstep[\s]*=[\s]*"}{"\n".$1.'retryfromstep="'.$_id.'.'}eg; #'
-
-    #open my $_INCLUDE, '>', "$results_output_folder".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
-    #print {$_INCLUDE} $_include;
-    #close $_INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
 
     return $_include;
 }
@@ -2961,8 +3397,6 @@ sub set_eval_variables { ## e.g. evalDIFF="10-5"
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
             $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## assign the variable
             my $_debug = $varvar{'var'.substr $_case_attribute, 4};
-            #print 'var'.substr $_case_attribute, 4;
-            #print " -> (eval) is [$_debug]\n";
         }
     }
 
@@ -3233,7 +3667,6 @@ sub _response_content_substitutions {
     my ($_response_content_ref) = @_;
 
     foreach my $_sub ( keys %{ $config->{content_subs} } ) {
-        #print "_sub:$_sub:$config->{content_subs}{$_sub}\n";
         my @_regex = split /[|][|][|]/, $config->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
     }
@@ -3301,11 +3734,8 @@ sub _replace_relative_urls_with_absolute {
 
     # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
     foreach my $_sub ( keys %{ $config->{baseurl_subs} } ) {
-        #print "_sub:$_sub:$config->{baseurl_subs}{$_sub}\n";
-        #print "orig _response_base:$_response_base\n";
         my @_regex = split /[|][|][|]/, $config->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         $_response_base =~ s{$_regex[0]}{$_regex[1]}ee;
-        #print "new _response_base:$_response_base\n";
     }
 
     while (
@@ -3408,10 +3838,9 @@ sub start_session {     ## creates the webinject user agent
 
     push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0); ## to prevent: Header line too long (limit is 8192)
 
-    #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
     $cookie_jar = HTTP::Cookies->new;
-    $useragent->agent('WebInject');  ## http useragent that will show up in webserver logs
+    $useragent->agent('WebInject');
     #$useragent->timeout(200); ## it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  #don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
@@ -3497,6 +3926,10 @@ sub get_options {  #shell options
         print_version();
         print_usage();
         exit;
+    }
+    
+    if ($opt_verbose) {
+        $EXTRA_VERBOSE = 1;
     }
 
     $opt_output //= 'output/';

@@ -1,0 +1,8 @@
+
+step: Demo 3 include step .01
+shell: echo include demo 3 first
+
+repeat: 77
+
+step: Demo 3 include step .02
+shell: echo include demo 3 second

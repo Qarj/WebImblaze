@@ -10,4 +10,5 @@ blocker/
 WebInjectSelenium.pm
 tests/*.xml
 tests/*.csv
+parse_error/
 session.config
