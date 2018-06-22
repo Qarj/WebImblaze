@@ -8,6 +8,15 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.10.0 - Jun 22, 2018
+* support a simplified test format in addition to xml, once it is production proven the xml format will be deprecated and later removed
+* support Perl 5.26 (@INC no longer includes '.' by default)
+* refactored auto substitutions, added unit tests for them and fixed some bugs
+* hints and tips section added to the manual
+* minor code tidy ups
+* support ANSI color for STDOUT
+* fixed Ubuntu 18.04 LTS SSL compatibility issue
+
 ### Version 2.9.0 - Mar 3, 2018
 * new dumpjson parameter for decoding emails sent to test email management systems like mailhog and inbucket
 * improved getallhrefs and getallsrcs feature - see manual

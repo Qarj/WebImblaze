@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.9.0';
+$VERSION = '2.10.0';
 
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
 #    Extensive updates 2015-2018 Tim Buckland

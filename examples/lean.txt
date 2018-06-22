@@ -1,4 +1,5 @@
-   
+repeat: 2
+
 step: Test that WebInject can run a very basic test
 shell: REM Nothing: much
 verifypositive1: Nothing: much
@@ -6,11 +7,14 @@ verifypositive1: Nothing: much
 step: Another step - retry {RETRY}
 description2: Sub description
 shell: REM Not much more - retry {RETRY}
+shell1: dir
 verifypositive: retry 1
 verifypositive1:q:   q much q   
 #verifypositive2: This is ignored
 verifynegative: Nothing much
-verifypositive5:#:  # more #   
+verifynegative5:WebInject:  WebInjectfirst line of multi line quote 
+second line of multi line quote
+last line of multi line quoteWebInject
 retry: 3
 
 --=

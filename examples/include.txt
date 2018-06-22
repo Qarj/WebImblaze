@@ -1,0 +1,9 @@
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_1.txt
+
+step: This is my third step, 30 
+shell: REM 30
+
+include: examples/include/include_demo_2.txt

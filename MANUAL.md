@@ -1,4 +1,4 @@
-# Manual for WebInject version 2.9.0
+# Manual for WebInject version 2.10.0
 
 Adapted from the original manual written by Corey Goldberg.
 
