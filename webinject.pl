@@ -25,6 +25,7 @@ $VERSION = '2.9.0';
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
+use Storable 'dclone';
 use File::Basename;
 use File::Spec;
 use File::Slurp;
@@ -2660,6 +2661,48 @@ sub _parse_steps {
     my ($_lean) = @_;
 
     new_parser( $_lean );
+    _parse_lines();
+    my $_include_pass_1 = dclone \ %include_;
+    my $_case_pass_1 = dclone \ %case_;
+    my $_repeat_pass_1;
+    if (defined $repeat_) {
+        $_repeat_pass_1 = $repeat_;
+    }
+
+    my %_tests = ();
+    $_tests{ 'include' } = $_include_pass_1;
+    $_tests{ 'case' } = $_case_pass_1;
+    if ( defined $_repeat_pass_1 ) {
+        $_tests{ 'repeat' } = $_repeat_pass_1;
+   }
+
+    foreach my $_include_step_num (keys %{ $_include_pass_1 } ) {
+        my $_include_file_name = %{ $_include_pass_1}{$_include_step_num};
+#        print "_include_file_name: $_include_file_name\n";
+        my $_file_content = read_file( $_include_file_name );
+        new_parser( $_file_content );
+        _parse_lines();
+ #       $results_stdout .= "Included cases:\n" . Data::Dumper::Dumper(\ %case_) if $EXTRA_VERBOSE;
+        foreach my $_sub_step (keys %case_ ) {
+ #           $results_stdout .= "_sub_step:$_sub_step \n" if $EXTRA_VERBOSE;
+            my $_insert_step = $_sub_step / 1000 + $_include_step_num ;
+ #           $results_stdout .= "_insert_step:$_insert_step \n" if $EXTRA_VERBOSE;
+ #           $results_stdout .= "step _content:\n" . Data::Dumper::Dumper( $case_{$_sub_step}) if $EXTRA_VERBOSE;
+            $_tests{case}{$_insert_step} = $case_{$_sub_step};
+        }
+    }
+
+    return \ %_tests;
+}
+
+#    if (defined $repeat_) {
+#        $_tests{ 'repeat' } = $repeat_;
+#   }
+#    $_tests{ 'include' } = \ %include_;
+#    $_tests{ 'case' } = \ %case_;
+
+
+sub _parse_lines {
     
     while ( parser_advance_line() ) {
         if ( parser_get_blank_line() ) {
@@ -2692,13 +2735,6 @@ sub _parse_steps {
         }
     }
 
-    my %_tests = ();
-    if (defined $repeat_) {
-        $_tests{ 'repeat' } = $repeat_;
-    }
-    $_tests{ 'include' } = \ %include_;
-    $_tests{ 'case' } = \ %case_;
-    return \ %_tests;
 }
 
 sub new_parser {

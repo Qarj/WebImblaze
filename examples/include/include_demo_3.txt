@@ -1,0 +1,6 @@
+
+step: Demo 3 include step .01
+shell: echo include demo 3 first
+
+step: Demo 3 include step .02
+shell: echo include demo 3 second

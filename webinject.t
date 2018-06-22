@@ -1344,6 +1344,72 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'20' => 'examples/include/include_demo_1.txt'", '_parse_lean_test_steps : multi include files read in - 1');
 assert_stdout_contains("'40' => 'examples/include/include_demo_2.txt'", '_parse_lean_test_steps : multi include files read in - 1');
+
+# include file gets loaded
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_1.txt
+
+step: This is my third step, 30 
+shell: REM 30
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file read in - 1');
+assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include file read in - 2');
+assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file read in - 3');
+assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include file read in - 4');
+
+# include file with multiple steps gets loaded
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_3.txt
+
+step: This is my third step, 30 
+shell: REM 30
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file multi steps read in - 1');
+assert_stdout_contains("'20.02' =>", '_parse_lean_test_steps : include file multi steps read in - 2');
+assert_stdout_contains("'command' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
+assert_stdout_contains("'command' => 'echo include demo 3 second'", '_parse_lean_test_steps : include file multi steps read in - 4');
+assert_stdout_contains("'description1' => 'Demo 3 include step .01'", '_parse_lean_test_steps : include file multi steps read in - 5');
+assert_stdout_contains("'description1' => 'Demo 3 include step .02'", '_parse_lean_test_steps : include file multi steps read in - 6');
+assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file multi steps read in - 7');
+assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include file multi steps read in - 8');
+
+# include multi files gets loaded
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples/include/include_demo_1.txt
+
+step: This is my third step, 30 
+shell: REM 30
+
+include: examples/include/include_demo_2.txt
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include multi file read in - 1');
+assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
+assert_stdout_contains("'description1' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
+assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include multi file read in - 4');
+assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include multi file read in - 5');
+assert_stdout_contains("'40.01' =>", '_parse_lean_test_steps : include multi file read in - 6');
+assert_stdout_contains("'command' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
+assert_stdout_contains("'description1' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
+
+
 # have to deal with include files include: login.txt (maybe do validations first)
     # Options
         # Verify file, insert steps, verify, parse as one (Easy) - what if found in comment?
@@ -1351,6 +1417,7 @@ assert_stdout_contains("'40' => 'examples/include/include_demo_2.txt'", '_parse_
         # Create a seperate type of step for include (very hard) - as for state driven tests
         # Don't support feature
         # repeat an error - just validate it cannot be encountered twice (global rule)
+        # multi steps
 
         
 # optimise main parser loop code
