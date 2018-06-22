@@ -1434,9 +1434,6 @@ eval { read_test_case_file(); };
 assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
 assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
 
-# does testfile contain selenium
-# optimise references
-# what about file load substitutions - not needed?
 # regex optimisations - possessive ++
 # optimise _search_for_start_quote and _get_from_start_quote_to_end_of_line - should be in one function with validate
 

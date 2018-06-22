@@ -442,8 +442,6 @@ sub substitute_variables {
     set_late_var_list();
 
     foreach my $_case_attribute (  keys %case  ) {
-        #print "DEBUG: $_case_attribute", ": ", $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
-        #print "\n";
         $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
         convert_back_var_variables($case{$_case_attribute});
@@ -1144,13 +1142,9 @@ sub addcookie { ## add a cookie like JBM_COOKIE=4830075
     if ($case{addcookie}) { ## inject in an additional cookie for this test step only if specified
         my $_cookies = $request->header('Cookie');
         if (defined $_cookies) {
-            #print "[COOKIE] $_cookies\n";
             $request->header('Cookie' => "$_cookies; " . $case{addcookie});
-            #print '[COOKIE UPDATED] ' . $request->header('Cookie') . "\n";
         } else {
-            #print "[COOKIE] <UNDEFINED>\n";
             $request->header('Cookie' => $case{addcookie});
-            #print "[COOKIE UPDATED] " . $request->header('Cookie') . "\n";
         }
         undef $_cookies;
     }
@@ -1605,7 +1599,6 @@ sub httpget {  #send http request and read response
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     save_page_when_method_post_and_has_action ();
 
@@ -1685,7 +1678,6 @@ sub httpsend_form_urlencoded {  #send application/x-www-form-urlencoded or appli
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     return;
 }
@@ -1774,7 +1766,6 @@ sub httpsend_xml{  #send text/xml HTTP request and read response
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    #print $cookie_jar->as_string; print "\n\n";
 
     return;
 }
@@ -2112,14 +2103,11 @@ sub _verify_smartassertion {
             }
 
             ## note the return statement in the previous condition, this code is executed if the assertion is not being skipped
-            #$results_stdout .= "$_verifyparms[0]\n"; ##DEBUG
             if ($response->as_string() =~ m/$_verifyparms[0]/si) {  ## pre-condition for smart assertion - first regex must pass
                 $results_xml .= "            <$_config_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
                 if ($response->as_string() =~ m/$_verifyparms[1]/si) {  ## verify existence of string in response
-                    #$results_html .= qq|<span class="pass">Passed Smart Assertion</span><br />\n|; ## Do not print out all the auto assertion passes
                     $results_xml .= qq|                <success>true</success>\n|;
-                    #$results_stdout .= "Passed Smart Assertion \n"; ## Do not print out the Smart Assertion passes
                     $passed_count++;
                     $retry_passed_count++;
                 }
@@ -2368,7 +2356,6 @@ sub parseresponse {  #parse values from responses for use in future request (for
                 }
             }
 
-            #print "\n\nParsed String: $parsedresult{$_}\n\n";
         }
     }
 
@@ -2489,12 +2476,10 @@ sub process_config_file { #parse config file and grab values it sets
 
     if ($config->{httpauth}) {
         if ( ref($config->{httpauth}) eq 'ARRAY') {
-            #print "We have an array of httpauths\n";
             for my $_auth ( @{ $config->{httpauth} } ) { ## $config->{httpauth} is an array
                 _push_httpauth ($_auth);
             }
         } else {
-            #print "Not an array - we just have one httpauth\n";
             _push_httpauth ($config->{httpauth});
         }
     }
@@ -2517,7 +2502,6 @@ sub process_config_file { #parse config file and grab values it sets
     $concurrency =  basename ( dirname($_abs_output_full) );
 
     $outsum = unpack '%32C*', $results_output_folder; ## checksum of output directory name - for concurrency
-    #print "outsum $outsum \n";
 
     if (defined $config->{ports_variable}) {
         if ($config->{ports_variable} eq 'convert_back') {
@@ -2557,7 +2541,6 @@ sub _push_httpauth {
     my $_delimiter = quotemeta substr $_auth,0,1;
     my $_err_delim = substr $_auth,0,1;
 
-    #print "\nhttpauth:$auth\n";
     my @_auth_entry = split /$_delimiter/, $_auth;
     if ($#_auth_entry != 5) {
         print {*STDERR} "\n$_auth\nError: httpauth should have 5 fields delimited by the first character [$_err_delim]\n\n";
@@ -2597,7 +2580,7 @@ sub read_test_case_file {
         $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
     } else {
         $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
-        $xml_test_cases = _parse_steps( $_test_steps );
+        $xml_test_cases = _parse_steps( \ $_test_steps );
         $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
         $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
         return;
@@ -2644,16 +2627,15 @@ sub read_test_case_file {
     $results_stdout .= qq| \n$_test_steps\n|if $EXTRA_VERBOSE;
 
     $testfile_contains_selenium = _does_testfile_contain_selenium(\ $_test_steps);
-    #print "Contains Selenium:$testfile_contains_selenium\n";
 
     return;
 }
 
 sub _parse_steps {
-    my ($_lean) = @_;
+    my ($_file_content_ref) = @_;
 
     undef $repeat_;
-    new_parser( $_lean );
+    new_parser( $_file_content_ref );
     _parse_lines();
     my $_files_to_include = dclone \ %include_;
     my $_case_main_file = dclone \ %case_;
@@ -2668,7 +2650,7 @@ sub _parse_steps {
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = %{ $_files_to_include}{$_include_integer_step_num};
         my $_include_file_content = read_file( $_include_file_name );
-        new_parser( $_include_file_content );
+        new_parser( \ $_include_file_content );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
             my $_insert_step = $_sub_step / 1000 + $_include_integer_step_num ;
@@ -2710,8 +2692,8 @@ sub _parse_lines {
 }
 
 sub new_parser {
-    my ($_parser_raw) = @_;
-    @parser_lines_ = split /\n/, $_parser_raw;    
+    my ($_parser_raw_ref) = @_;
+    @parser_lines_ = split /\n/, ${$_parser_raw_ref};    
     $parser_index_ = -1;
 
     %case_ = ();
@@ -2851,7 +2833,9 @@ sub _rename_lean_parameters_to_classic_names {
 
     for my $_i (0 .. $#{$_parms}) {
         $_parms->[$_i] =~ s/shell/command/;
-        $_parms->[$_i] =~ s/selenium/command/;
+        if ( $_parms->[$_i] =~ s/selenium/command/) {
+            $testfile_contains_selenium = 'true';
+        }
         $_parms->[$_i] =~ s/step/description1/;
     }
 }
@@ -2865,7 +2849,6 @@ sub lean_parser_step_values {
     $results_stdout .= qq| $#parser_step_parm_values_ parm values in current step\n| if $EXTRA_VERBOSE;
     return \ @parser_step_parm_values_;
 }
-
 
 sub lean_parser_get_current_step {
 
@@ -2958,8 +2941,8 @@ sub lean_parser_can_advance_one_line_in_step {
 
 sub _get_quote {
 
-    if ( parser_line() =~ /^\w+:[^\s]/ ) {
-        my $_quote = _validate( '^\w+:([^\s:]+): ', 'Quote must end with a colon followed by a space (not tab). Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
+    if ( parser_line() =~ /^\w++:[^\s]/ ) {
+        my $_quote = _validate( '^\w++:([^\s:]+): ', 'Quote must end with a colon followed by a space (not tab). Quote must not contain a colon or white space.', "well formed parameter, quote and value:\n\nverifypositive5:!!: !! Logged in ok. !!");
         if (defined $_quote) {
             my $_end_quote = $_quote;
             $_end_quote =~ s/[(]/\)/g;
@@ -2977,22 +2960,22 @@ sub _get_parm_value_if_single_line {
     my ($_quote, $_end_quote) = @_;
 
     if (defined $_quote) {
-        my $_regex = '^(\w+:' . quotemeta($_quote) . ':\s+)';
+        my $_regex = '^(\w++:' . quotemeta($_quote) . ':\s++)';
         _validate_tab( $_regex );
-        if ( parser_line() =~ m|^\w+:\Q$_quote\E:\s+\Q$_quote\E(.*)\Q$_end_quote\E| ) {
+        if ( parser_line() =~ m|^\w++:\Q$_quote\E:\s++\Q$_quote\E(.*)\Q$_end_quote\E| ) {
             return $1;
         }
         return undef;
     }
 
-    _validate_tab( '^(\w+:\s+).*[^\s]\s*$' );
-    return _validate( '^\w+:  *(.*[^\s])\s*$', "No value found - must use quotes if value is only white space. Use spaces, not tabs.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
+    _validate_tab( '^(\w++:\s+).*[^\s]\s*$' );
+    return _validate( '^\w++:  *(.*[^\s])\s*$', "No value found - must use quotes if value is only white space. Use spaces, not tabs.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
 }
 
 sub _search_for_start_quote {
     my ($_quote) = @_;
 
-    my $_regex = '^\w+:' . quotemeta($_quote) . ':\s+(' . quotemeta($_quote) . ')';
+    my $_regex = '^\w++:' . quotemeta($_quote) . ':\s+(' . quotemeta($_quote) . ')';
     my $_opening_quote = _validate( $_regex, "Quote declared but opening quote not found.\nOpening quote must be on the same line as the parameter name.", "well formed parameter, quote and multi line value:\n\nverifypositive5:[[[: [[[Logged in ok.\nPress enter to continue.]]]");
     if (defined $_opening_quote) {
         return 1;
@@ -3002,8 +2985,8 @@ sub _search_for_start_quote {
 sub _get_from_start_quote_to_end_of_line {
    my ($_line, $_quote) = @_;
 
-    if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
-        if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
+    if ( $_line =~ /\s*\w++:\Q$_quote\E:\s+/ ) {
+        if ( $_line =~ /\s*\w++:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
             return $1;
         }
         $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
@@ -3034,7 +3017,6 @@ sub _validate_tab {
     my ($_regex) = @_;
 
     if ( parser_line() =~ /$_regex/ ) {
-        #return ($1);
         for my $_i (0..length($1)-1) {
             if ( substr($1, $_i, 1) eq "\t" ) {
                 my $_column = $_i + 1;
@@ -3126,10 +3108,6 @@ sub _include_file {
     my $_include = read_file(slash_me($_file));
     $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
     $_include =~ s{\n(\s*)retryfromstep[\s]*=[\s]*"}{"\n".$1.'retryfromstep="'.$_id.'.'}eg; #'
-
-    #open my $_INCLUDE, '>', "$results_output_folder".'include.xml' or die "\nERROR: Failed to open include debug file\n\n";
-    #print {$_INCLUDE} $_include;
-    #close $_INCLUDE or die "\nERROR: Failed to close include debug file\n\n";
 
     return $_include;
 }
@@ -3419,8 +3397,6 @@ sub set_eval_variables { ## e.g. evalDIFF="10-5"
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
             $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## assign the variable
             my $_debug = $varvar{'var'.substr $_case_attribute, 4};
-            #print 'var'.substr $_case_attribute, 4;
-            #print " -> (eval) is [$_debug]\n";
         }
     }
 
@@ -3691,7 +3667,6 @@ sub _response_content_substitutions {
     my ($_response_content_ref) = @_;
 
     foreach my $_sub ( keys %{ $config->{content_subs} } ) {
-        #print "_sub:$_sub:$config->{content_subs}{$_sub}\n";
         my @_regex = split /[|][|][|]/, $config->{content_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         ${ $_response_content_ref } =~ s{$_regex[0]}{$_regex[1]}gees;
     }
@@ -3759,11 +3734,8 @@ sub _replace_relative_urls_with_absolute {
 
     # first we need to see if there are any substitutions defined for the base url - e.g. turn https: to http:
     foreach my $_sub ( keys %{ $config->{baseurl_subs} } ) {
-        #print "_sub:$_sub:$config->{baseurl_subs}{$_sub}\n";
-        #print "orig _response_base:$_response_base\n";
         my @_regex = split /[|][|][|]/, $config->{baseurl_subs}{$_sub}; #index 0 contains the LHS, 1 the RHS
         $_response_base =~ s{$_regex[0]}{$_regex[1]}ee;
-        #print "new _response_base:$_response_base\n";
     }
 
     while (
@@ -3866,10 +3838,9 @@ sub start_session {     ## creates the webinject user agent
 
     push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0); ## to prevent: Header line too long (limit is 8192)
 
-    #$useragent = LWP::UserAgent->new; ## 1.41 version
     $useragent = LWP::UserAgent->new(keep_alive=>1);
     $cookie_jar = HTTP::Cookies->new;
-    $useragent->agent('WebInject');  ## http useragent that will show up in webserver logs
+    $useragent->agent('WebInject');
     #$useragent->timeout(200); ## it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  #don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
