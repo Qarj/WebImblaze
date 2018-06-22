@@ -77,15 +77,7 @@ our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
 
-my @parser_lines_;    
-my $parser_index_;
-my @parser_step_parm_names_;
-my @parser_step_parm_values_;
-my $parser_step_start_line_;
-my %case_;
-my %include_;
-my $step_id_;
-my $repeat_;
+my ($parser_index_, $step_id_, $repeat_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
 
 my $report_type; ## 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -2663,32 +2655,23 @@ sub _parse_steps {
     undef $repeat_;
     new_parser( $_lean );
     _parse_lines();
-    my $_include_pass_1 = dclone \ %include_;
-    my $_case_pass_1 = dclone \ %case_;
-    my $_repeat_pass_1;
-    if (defined $repeat_) {
-        $_repeat_pass_1 = $repeat_;
-    }
+    my $_files_to_include = dclone \ %include_;
+    my $_case_main_file = dclone \ %case_;
 
     my %_tests = ();
-    $_tests{ 'include' } = $_include_pass_1;
-    $_tests{ 'case' } = $_case_pass_1;
-    if ( defined $_repeat_pass_1 ) {
-        $_tests{ 'repeat' } = $_repeat_pass_1;
+    $_tests{ 'include' } = $_files_to_include;
+    $_tests{ 'case' } = $_case_main_file;
+    if ( defined $repeat_ ) {
+        $_tests{ 'repeat' } = $repeat_;
    }
 
-    foreach my $_include_step_num (keys %{ $_include_pass_1 } ) {
-        my $_include_file_name = %{ $_include_pass_1}{$_include_step_num};
-#        print "_include_file_name: $_include_file_name\n";
-        my $_file_content = read_file( $_include_file_name );
-        new_parser( $_file_content );
+    foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
+        my $_include_file_name = %{ $_files_to_include}{$_include_integer_step_num};
+        my $_include_file_content = read_file( $_include_file_name );
+        new_parser( $_include_file_content );
         _parse_lines();
- #       $results_stdout .= "Included cases:\n" . Data::Dumper::Dumper(\ %case_) if $EXTRA_VERBOSE;
         foreach my $_sub_step (keys %case_ ) {
- #           $results_stdout .= "_sub_step:$_sub_step \n" if $EXTRA_VERBOSE;
-            my $_insert_step = $_sub_step / 1000 + $_include_step_num ;
- #           $results_stdout .= "_insert_step:$_insert_step \n" if $EXTRA_VERBOSE;
- #           $results_stdout .= "step _content:\n" . Data::Dumper::Dumper( $case_{$_sub_step}) if $EXTRA_VERBOSE;
+            my $_insert_step = $_sub_step / 1000 + $_include_integer_step_num ;
             $_tests{case}{$_insert_step} = $case_{$_sub_step};
         }
     }
@@ -2696,18 +2679,10 @@ sub _parse_steps {
     return \ %_tests;
 }
 
-#    if (defined $repeat_) {
-#        $_tests{ 'repeat' } = $repeat_;
-#   }
-#    $_tests{ 'include' } = \ %include_;
-#    $_tests{ 'case' } = \ %case_;
-
-
 sub _parse_lines {
     
     while ( parser_advance_line() ) {
         if ( parser_get_blank_line() ) {
-            $results_stdout .= qq| Got a blank line index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
@@ -2716,22 +2691,18 @@ sub _parse_lines {
             next;
         }
         if ( parser_get_multi_line_comment() ) {
-            $results_stdout .= qq| Got a single line comment ending index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
         if ( parser_get_repeat() ) {
-            $results_stdout .= qq| Got a repeat directive index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
         if ( parser_get_include() ) {
-            $results_stdout .= qq| Got an include directive index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
         }
 
         if ( parser_get_step() ) {
-            $results_stdout .= qq| Got a step ending index $parser_index_ \n| if $EXTRA_VERBOSE;
             next;
         }
     }
@@ -2743,13 +2714,9 @@ sub new_parser {
     @parser_lines_ = split /\n/, $_parser_raw;    
     $parser_index_ = -1;
 
-#    undef $repeat_;
-
     %case_ = ();
     %include_ = ();
     $step_id_ = 0;
-
-    $results_stdout .= qq| Lean parsing [[[$_parser_raw]]] \n| if $EXTRA_VERBOSE;
 
     return;
 }
@@ -2781,7 +2748,6 @@ sub parser_step_has_parms {
 sub parser_advance_line() {
 
     if ( not parser_has_more_lines() ) {
-        $results_stdout .= qq| ==== reached end of file ====\n| if $EXTRA_VERBOSE;
         return 0;
     }
 
@@ -2791,8 +2757,6 @@ sub parser_advance_line() {
 
 sub lean_parser_increment_index_num_ {
     $parser_index_ += 1;
-#    my ($_package, $_filename, $_line) = caller;
-#    print "==> Lean index now: $parser_index_ [$_line]\n";
     return;
 }
 
@@ -2848,7 +2812,6 @@ sub parser_get_step {
         _validate_step();
         $step_id_ += 10;
         $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
-        $results_stdout .= qq| ---> PROCESSED STEP $step_id_ \n\n|if $EXTRA_VERBOSE;
         return 1;
     }
     return 0;
@@ -2856,13 +2819,6 @@ sub parser_get_step {
 
 sub _construct_step {
     my ($_parms, $_vals) = @_;
-
-#    foreach my $_parm ( @{$_parms} ) {
-#        print "_parm: $_parm\n";
-#    }
-#    foreach my $_val ( @{$_vals} ) {
-#        print "_val: $_val\n";
-#    }
 
     my %_case_step = ();
     $_case_step{ 'method' } = _get_lean_step_method($_parms);
@@ -2916,12 +2872,10 @@ sub lean_parser_get_current_step {
     parser_new_step();
 
     my $_in_quote = 0;
-    my $_proto_val = '';
-    my ($_quote, $_end_quote);
     my $_start_quote_found = 0;
     my $_quote_start_line = 0;
-    my $_parm_name;
-    my $_parm_value;
+    my $_proto_val = '';
+    my ($_parm_name, $_parm_value, $_quote, $_end_quote);
     my $_first_loop = 1; # really want a do until loop that supports next, but Perl doesn't support it well
     while ( lean_parser_can_advance_one_line_in_step($_first_loop, $_in_quote) ) {
         $_first_loop = 0;
@@ -2937,15 +2891,12 @@ sub lean_parser_get_current_step {
 
             $_parm_name = _get_parm_name();
             ($_quote, $_end_quote) = _get_quote();
-            $results_stdout .= qq| Found quotes: [[$_quote]] [[$_end_quote]] \n| if $EXTRA_VERBOSE && defined $_quote;
 
             $_parm_value = _get_parm_value_if_single_line( $_quote, $_end_quote );
             if (defined $_parm_value) {
                 parser_push_parm( $_parm_name, $_parm_value );
-                $results_stdout .= qq| Single pushed name[$_parm_name] value[$_parm_value]\n| if $EXTRA_VERBOSE;
                 next;
             }
-            $results_stdout .= qq| "In multi line quote"\n| if $EXTRA_VERBOSE;
             $_in_quote = 1;
             $_quote_start_line = $parser_index_ + 1;
         }
@@ -2961,7 +2912,6 @@ sub lean_parser_get_current_step {
         my $_last_bit = _get_from_start_of_line_to_end_quote( parser_line(), $_end_quote );
         if (defined $_last_bit) {
             $_proto_val .= $_last_bit;
-            $results_stdout .= qq| Got from start of line to end quote: [[$_last_bit]] \n| if $EXTRA_VERBOSE;
             parser_push_parm( $_parm_name, $_proto_val );
             $_in_quote = 0;
             $_start_quote_found = 0;
@@ -2974,8 +2924,6 @@ sub lean_parser_get_current_step {
         }
 
         $_proto_val .= parser_line()."\n";
-        $results_stdout .= qq| Put entire line into multi line quote: [[parser_line()]] \n| if $EXTRA_VERBOSE;
-        $results_stdout .= qq| PROTO PARM CURRENTLY: [[$_proto_val]] \n| if $EXTRA_VERBOSE;
         next;
 
     }
@@ -2996,15 +2944,12 @@ sub lean_parser_can_advance_one_line_in_step {
     if ( parser_advance_line() ) {
 
         if ($_in_quote) {
-            $results_stdout .= qq| --> in quote, advanced to index $parser_index_ \n| if $EXTRA_VERBOSE;
             return 1;
-            
         } else {
             if ( parser_line() =~ /^\s*$/ ) {
                 return 0;
             }
         }
-        $results_stdout .= qq| --> found content on index $parser_index_ \n| if $EXTRA_VERBOSE;
         return 1;
     }
 
@@ -3059,14 +3004,12 @@ sub _get_from_start_quote_to_end_of_line {
 
     if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+/ ) {
         if ( $_line =~ /\s*\w+:\Q$_quote\E:\s+.*\Q$_quote\E(.*)/ ) {
-            $results_stdout .= qq| After quote definition, got from start quote to end of line: [[$1]] \n| if $EXTRA_VERBOSE;
             return $1;
         }
         $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
     }
 
     $_line =~ /\Q$_quote\E(.*)/;
-    $results_stdout .= qq| Got from start quote to end of line [[$1]] \n| if $EXTRA_VERBOSE;
     return $1;
 }
 
