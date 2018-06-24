@@ -144,7 +144,7 @@ process_config_file();
 write_initial_stdout();  #write opening tags for STDOUT.
 
 _whack($opt_publish_full.'http.txt');
-_whack($opt_publish_full.'results.html');
+_whack($opt_publish_full.'Results.html');
 
 write_initial_xml();
 write_initial_html();  #write opening tags for results file
