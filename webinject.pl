@@ -962,7 +962,7 @@ sub _write_xml {
 sub _write_html {
     my ($_html) = @_;
 
-    write_file($opt_publish_full.'results.html', {append => 1}, $_html); ## $_html is a ref, but we do not need to dereference with slurp
+    write_file($opt_publish_full.'Results.html', {append => 1}, $_html); ## $_html is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -1056,7 +1056,7 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
     $results_stdout .= qq|Verifications Failed: $failed_count\n\n|;
 
     if ($opt_publish_full eq $results_output_folder) {
-        $results_stdout .= qq|Results at: $opt_publish_full|.'results.html'.qq|\n|;
+        $results_stdout .= qq|Results at: $opt_publish_full|.'Results.html'.qq|\n|;
     }
 
     if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
