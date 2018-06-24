@@ -2817,8 +2817,8 @@ sub _get_lean_step_method {
     my ($_parms) = @_;
 
     foreach my $_parm (@{$_parms}) {
-        if ($_parm eq 'shell') { return 'cmd'; }
-        if ($_parm eq 'selenium') { return 'selenium'; }
+        if ($_parm =~ /shell/) { return 'cmd'; }
+        if ($_parm =~ /selenium/) { return 'selenium'; }
         if ($_parm eq 'url') {
             foreach my $_parm_2 (@{$_parms}) {
                 if ($_parm_2 eq 'postbody') { return 'post'; }

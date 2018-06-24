@@ -462,14 +462,27 @@ shell5: echo next1
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected');
 assert_stdout_contains("'command20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
+assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 1');
+
+# method="cmd" is auto generated - shell1
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Shell method is detected
+shell1: echo auto1
+
+step: Next step
+shell1: echo next1
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 2');
 
 # method="selenium" is auto generated
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Selenium method is detected
-selenium: $driver->get("https://www.totaljobs.com")
+selenium3: $driver->get("https://www.totaljobs.com")
 selenium20: $driver->get_all_cookies()
 
 step: Next step
@@ -1435,6 +1448,7 @@ assert_stdout_contains("Repeat directive can only be given once globally", '_par
 assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
 
 # support abort - step desc?
+# support testvar
 
 #issues:
 #   repeat parm needs to be renamed eventually for WebInject 3
