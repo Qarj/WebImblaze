@@ -34,27 +34,32 @@ That's it! You are now ready to run WebInject for the first time.
 
 ### Linux / Mac
 
-1. Clone WebInject with git
-    ```
-    mkdir ~/git
-    cd ~/git
-    git clone https://github.com/Qarj/WebInject.git
-    ```
+Clone WebInject with git
+```
+cd /usr/local/bin
+sudo git clone https://github.com/Qarj/WebInject.git
+```
 
-2. Enter the following commands
-    ```
-    cd WebInject
-    chmod +x webinject.pl
-    sudo cpan File::Slurp
-    sudo cpan XML::Simple
-    sudo cpan Math::Random::ISAAC
-    sudo cpan LWP::Protocol::https
-    ```
+Fix permissions
+```
+cd WebInject
+sudo find . -type d -exec chmod a+rwx {} \;
+sudo find . -type f -exec chmod a+rw {} \;
+sudo chmod +x webinject.pl
+```
 
-3. Check that you can see the WebInject help info
-    ```
-    perl webinject.pl --help
-    ```
+Install required Perl packages
+```
+sudo cpan File::Slurp
+sudo cpan XML::Simple
+sudo cpan Math::Random::ISAAC
+sudo cpan LWP::Protocol::https
+```
+
+Check that you can see the WebInject help info
+```
+perl webinject.pl --help
+```
 
 Tested with Fedora 26, Ubuntu 16.04 and 18.04, Linux Mint 18.3, OS X El Capitan and macOS 10.13.
 
