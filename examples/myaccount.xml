@@ -9,7 +9,7 @@
     id="1"
     description1="Info - Set unique key to {KEY}"
     method="cmd"
-    command1="REM {KEY}"
+    command1="echo {KEY}"
 />
 
 <case
@@ -17,7 +17,7 @@
     id="2"
     description1="Info - Read shared lock variable for jobseeker_test_account [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     method="cmd"
-    command1="REM lock_state[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    command1="echo lock_state[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     checkpoint="true"
 />
 
@@ -26,7 +26,7 @@
     id="3"
     description1="Info - Locked - wait up to 60 seconds - [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     method="cmd"
-    command1="REM lock[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    command1="echo lock[{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     retry="60"
     sleep="1"
     verifypositive="lock\[]|||Still locked"
@@ -37,7 +37,7 @@
     id="4"
     description1="Write lock [locked_{KEY}]"
     method="cmd"
-    command1="REM Write lock"
+    command1="echo Write lock"
     writesharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED|locked_{KEY}"
 />
 
@@ -46,7 +46,7 @@
     id="5"
     description1="Read lock back [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     method="cmd"
-    command1="REM [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
+    command1="echo [{JOBSEEKER_TEST_ACCOUNT_LOCKED}]"
     verifypositive="locked_{KEY}|||This is not our lock, return to checkpoint!"
 />
 
@@ -56,7 +56,7 @@
     id="10"
     description1="Info - Read shared variable for jobseeker_test_account@mailinator.com"
     method="cmd"
-    command1="REM session cookies[{JOBSEEKER_TEST_ACCOUNT}]"
+    command1="echo session cookies[{JOBSEEKER_TEST_ACCOUNT}]"
     checkpoint="false"
 />
 
@@ -98,9 +98,9 @@
     description1="Write out session cookies to shared location"
     description2="anonymous[{ANONYMOUS_COOKIE}]"
     method="cmd"
-    command1="REM anonymous[{ANONYMOUS_COOKIE}]"
-    command2="REM 2EASPXAUTH[{2EASPXAUTH_COOKIE}]"
-    command3="REM softlogin[{SOFTLOGIN_COOKIE}]"
+    command1="echo anonymous[{ANONYMOUS_COOKIE}]"
+    command2="echo 2EASPXAUTH[{2EASPXAUTH_COOKIE}]"
+    command3="echo softlogin[{SOFTLOGIN_COOKIE}]"
     writesharedvar="JOBSEEKER_TEST_ACCOUNT|AnonymousUser: {ANONYMOUS_COOKIE}; 2EASPXAUTH: {2EASPXAUTH_COOKIE}; SoftLoginCookie: {SOFTLOGIN_COOKIE}"
     runif="{COOKIES_EXPIRED}"
 />
@@ -110,7 +110,7 @@
     id="90"
     description1="Info - Release lock"
     method="cmd"
-    command1="REM NOP"
+    command1="echo NOP"
     writesharedvar="JOBSEEKER_TEST_ACCOUNT_LOCKED|"
 />
 

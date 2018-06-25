@@ -4,7 +4,7 @@
     id="10"
     description1="Demo a failing test"
     method="cmd"
-    command="REM Nothing much"
+    command="echo Nothing much"
     verifypositive1="This test will not pass"
     retry="0"
 />

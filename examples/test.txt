@@ -1,9 +1,9 @@
 repeat: 5
 
 step: This is my first step, 10 
-shell: REM 10
+shell: echo 10
 
 step: This is my third step, 30 
-shell: REM 30
+shell: echo 30
 
 repeat: 2
