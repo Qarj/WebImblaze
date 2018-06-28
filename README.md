@@ -252,7 +252,7 @@ number of the problem and an example of something that works.
 
 The example given higher up this page looks like this in the new format.
 
-hello.txt:
+hello.test:
 ```
 step: Get Totaljobs Home Page
 varTOTALJOBS_URL: https://www.totaljobs.com

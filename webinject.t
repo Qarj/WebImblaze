@@ -1317,7 +1317,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.txt
+include: examples/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1326,7 +1326,7 @@ EOB
 read_test_case_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in - 1');
 assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
-assert_stdout_contains("'20' => 'examples/include/include_demo_1.txt'", '_parse_lean_test_steps : include file names read in - 3');
+assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
 
 # specify two include files
 before_test();
@@ -1334,18 +1334,18 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.txt
+include: examples/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
 
-include: examples/include/include_demo_2.txt
+include: examples/include/include_demo_2.test
 
 EOB
     ;
 read_test_case_file();
-assert_stdout_contains("'20' => 'examples/include/include_demo_1.txt'", '_parse_lean_test_steps : multi include files read in - 1');
-assert_stdout_contains("'40' => 'examples/include/include_demo_2.txt'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains("'40' => 'examples/include/include_demo_2.test'", '_parse_lean_test_steps : multi include files read in - 1');
 
 # include file gets loaded
 before_test();
@@ -1353,7 +1353,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.txt
+include: examples/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1371,7 +1371,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_3.txt
+include: examples/include/include_demo_3.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1393,12 +1393,12 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.txt
+include: examples/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
 
-include: examples/include/include_demo_2.txt
+include: examples/include/include_demo_2.test
 EOB
     ;
 read_test_case_file();
@@ -1437,7 +1437,7 @@ repeat: 5
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_4.txt
+include: examples/include/include_demo_4.test
 
 step: This is my third step, 30 
 shell: REM 30
