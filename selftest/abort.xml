@@ -30,4 +30,18 @@ Self test master file. All test steps in this file should pass.
     verifynegative="uninitialized value"
 />
 
+<case
+    id="30"
+    description1="${feature}"
+    method="cmd"
+    command1=".\webinject.pl -o selftest\output\${feature}2sub selftest\substeps\${feature}2.test"
+    command2='perl -ne "print" selftest{SLASH}output{SLASH}${feature}2subresults.xml'
+    verifypositive="Test Cases Failed: 1"
+    verifypositive1="Test Cases Run: 3"
+    verifypositive2="EXECUTION ABORTED"
+    verifypositive3="JUMPING TO TEARDOWN"
+    verifypositive4="execution-aborted.true"
+    verifynegative="uninitialized value"
+/>
+
 </testcases>

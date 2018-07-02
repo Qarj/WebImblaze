@@ -1,0 +1,24 @@
+--=
+Self test sub step file. Some test steps may fail. 
+Expected failures will be asserted by the master test file.
+=--
+step: Step passes
+shell: echo NOP
+verifypositive: NOP
+
+step: Step passes
+shell: echo NOP
+verifypositive: No Operation
+abort: Teardown
+
+step: Step not executed
+shell: echo NOP
+verifypositive: Everything is OK
+
+step: Step also not executed
+shell: echo NOP
+verifypositive: Everything is OK
+
+step: Teardown
+shell: echo NOP
+verifypositive: NOP
