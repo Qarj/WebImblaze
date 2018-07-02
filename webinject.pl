@@ -735,7 +735,6 @@ sub set_step_index_for_test_step_to_jump_to {
         }
         if ($xml_test_cases->{case}->{$test_steps[$step_index]}->{description1} eq $_target_test_step) {
             $_found_index = 'true';
-            print "          FOUND       IT !!!! $test_steps[$step_index]  \n\n\n";
             last;
         }
         $step_index++
