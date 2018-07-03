@@ -1612,6 +1612,9 @@ sub httpget {  #send http request and read response
 #------------------------------------------------------------------
 sub httpdelete {
 
+    if (not defined $case{postbody}) { ## REST spec does not state if DELETE can have a postbody or not
+        $case{postbody} = '';
+    }
     httpsend('DELETE');
 
     return;
@@ -2796,11 +2799,22 @@ sub parser_get_include {
 sub parser_get_step {
     if ( lean_parser_get_current_step() ) {
         _validate_step();
-        $step_id_ += 10;
+        _increment_step_id(lean_parser_step_parm_names());
         $case_{ $step_id_ } = _construct_step(lean_parser_step_parm_names(), lean_parser_step_values());
         return 1;
     }
     return 0;
+}
+
+sub _increment_step_id {
+    my ($_parms) = @_;
+
+    $step_id_ += 10;
+    for my $_i ( 0 .. $#{$_parms} ) {
+        if ( $_parms->[$_i]  eq 'section' && $step_id_ > 10) {
+            $step_id_ = int( ($step_id_+100)/100 ) * 100;
+        }
+    }
 }
 
 sub _construct_step {

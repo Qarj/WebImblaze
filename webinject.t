@@ -1447,6 +1447,21 @@ eval { read_test_case_file(); };
 assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
 assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
 
+# section break increases step id to the next round 100 value
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+step: This is my third step, 100 
+section: section break
+shell: REM 100
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
+
+
 # support abort - step desc?
 # support testvar
 
