@@ -2767,7 +2767,7 @@ sub parser_get_multi_line_comment {
         if (!$_saw_comment) {
             return 0;
         }
-        if ( parser_line() =~ /^\s*=--/ ) {
+        if ( parser_line() =~ /=--/ ) {
             return 1;
         }
         parser_advance_line();

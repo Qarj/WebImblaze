@@ -593,6 +593,21 @@ assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps
 assert_stdout_contains("'verifypositive' => 'sure'", '_parse_lean_test_steps : multi and single line comments mixed ok - 2');
 assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line and single line comment - should only be one step');
 
+# multi line comment can end anywhere on line
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Multi line comment can end anywhere
+url: https://www.totaljobs.com
+verifypositive: sure
+--=
+verifypositive: positive =--
+verifynegative: negative
+EOB
+    ;
+read_test_case_file();
+assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment can end anywhere on line - 1');
+assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi comment can end anywhere on line - 2');
+
 # not a multi line comment - should not be removed
 before_test();
 $main::unit_test_steps = <<'EOB'
