@@ -275,10 +275,10 @@ Quick start information for new format:
 * `id: ` is reserved - it is assigned automatically in increments of 10
 * `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
 * all parameters for a step block must be grouped together without a blank line - blank lines seperates steps 
-* for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.txt)
-* for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.txt)
-* single and multi line comments are supported (see examples/lean.txt)
-* it is possible to assemble a test file from smaller fragment files (see examples/include.txt)
+* for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.test)
+* for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.test)
+* single and multi line comments are supported (see examples/lean.test)
+* it is possible to assemble a test file from smaller fragment files (see examples/include.test)
 
 Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor
 you view the file in. For this reason tabs are not supported for formatting. If you want to align a step, do
