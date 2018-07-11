@@ -246,7 +246,7 @@ Adapted from the original manual written by Corey Goldberg.
 
 ### [7.2 - Advanced Assertions](#advancedassertions)
 
-#### [7.2.1 Advanced assertion - at least n occurences](#atleastn)
+#### [7.2.1 Advanced assertion - at least n occurrences](#atleastn)
 
 ## [8 - Hints and tips](#tips)
 ### [Modify a variable using regular expressions](#tips)
@@ -271,7 +271,7 @@ WebInject is well suited to running large suites of functional automated regress
 test environments, or even production.
 
 When using WebInject with HTTP GET or POST commands, it is much faster than Selenium WebDriver. It is also less
-likely to suffer from the test flakiniess that is inherit with Selenium WebDriver.
+likely to suffer from the test flakiness that is inherit with Selenium WebDriver.
 
 <br/>
 
@@ -428,7 +428,7 @@ If not present, defaulted to 20.
 
 Sets how many times to automatically retry a failed test step.
 
-If a retry or retryfromstep paremeter is present, that will take preference.
+If a retry or retryfromstep parameter is present, that will take preference.
 
 If not present, auto retry defaults to off.
 
@@ -502,7 +502,7 @@ In the test step that you only want to run on automation controllers, specify th
 
 <a name="userdefined"></a>
 #### userdefined
-You can create your own abitrary config values that can be accessed as constants in the test steps.
+You can create your own arbitrary config values that can be accessed as constants in the test steps.
 
 ```xml
 <userdefined>
@@ -524,7 +524,7 @@ A possible usage is to check that you have not obtained an error page.
 
 ```xml
 <autoassertions>
-   <autoassertion1>^((?!error.stacktrace).)*$|||A java stacktrace has occurred</autoassertion1>
+   <autoassertion1>^((?!error.stacktrace).)*$|||A java stack trace has occurred</autoassertion1>
    <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2>
 </autoassertions>
 ```
@@ -639,7 +639,7 @@ WebInject OK - All tests passed successfully in 0.007 seconds |time=0.007;100;;0
 #### globaltimeout (Nagios Plugin Mode)
 
 The globaltimeout is only used when in Nagios plugin mode (see reporttype). If the globaltimeout parameter is
-present, then total test response time is checked against this parameter. If sum of the test step reponse times
+present, then total test response time is checked against this parameter. If sum of the test step response times
 is higher than this value (in seconds), then a warning is sent to Nagios.
 
 ```xml
@@ -778,7 +778,7 @@ directory, you must use the relative path to it (from WebInject directory).
 `-o` or `--output` : This option is followed by a directory name or a prefix to prepended to the output
 files.  This is used to specify the location for writing output files (http.txt, results.html, and
 results.xml).  If a directory name is supplied (use either an absolute or relative path and make sure to
-add the trailing slash), all output files are written to this directory.  If the trailing slash is ommitted,
+add the trailing slash), all output files are written to this directory.  If the trailing slash is omitted,
 it is assumed to a prefix and this will be prepended to the output files.  You may also use a combination
 of a directory and prefix.
 
@@ -823,7 +823,7 @@ Specifies how to connect to Selenium.
 
 `-r` or `--chromedriver-binary`
 
-Location of chromedriver executatble, e.g. `--chromedriver-binary C:\selenium-server\chromedriver.exe`
+Location of chromedriver executable, e.g. `--chromedriver-binary C:\selenium-server\chromedriver.exe`
 
 `-s` or `--selenium-binary`
 
@@ -843,7 +843,7 @@ Specifies to ignore any retry or retryfromstep parameters.
 
 `-z` or `--no-colour`
 
-Specifies to not output ansi colour
+Specifies to not output ANSI colour
 
 `-n` or `--no-output`
 
@@ -857,7 +857,7 @@ Specifies to display the request and response as_string for each test step
 
 Specifies where to output the individual html test step results for display by a web server.
 
-E.g, `--publish-to C:\inetpub\wwwroot\this_run_home`
+E.g., `--publish-to C:\inetpub\wwwroot\this_run_home`
 
 `-v` or `--version`
 
@@ -945,9 +945,9 @@ for those that require more customization or modifications.
 
 There are several parameters (attributes) you can use in your cases, depending on what you are trying to
 accomplish.  The only required parameters are the 'id' and the 'url'.  If no verification parameters
-(verifypositive, verifynegative, verifyresponsecode, etc) are provided, the test case will be marked as
+(verifypositive, verifynegative, verifyresponsecode, etc.) are provided, the test case will be marked as
 "FAILED" if the HTTP request returns an HTTP Response Code that is not in the 100-399 range.  
-See the "Pass/Fail Critera" section of this manual for more information.
+See the "Pass/Fail Criteria" section of this manual for more information.
 
 <br />
 
@@ -1129,7 +1129,7 @@ to specify a custom message for each verification that fails. See the examples.
 Example - check for "Saved OK" in response:
 `verifypositive='Saved OK'`
 
-Example - check for various webtrends tags in response, and output a custom message if it isn't found:
+Example - check for various Webtrends tags in response, and output a custom message if it isn't found:
 
 ```
     verifypositive='WT897234|||Webtrends Profile Saved tag not found'
@@ -1163,7 +1163,7 @@ WebInject should not retry the current test case.
 <a name="verneg"></a>
 #### verifynegative
 String in response for negative verification. Verification fails if this string exists in the HTTP response.  This is matched
-as a Perl regular expression, so you can do some complex verification patterns if you are familar with using regex matching.  
+as a Perl regular expression, so you can do some complex verification patterns if you are familiar with using regex matching.  
 
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
 backslash:  `{}[]()^$.|*+?\`
@@ -1270,12 +1270,12 @@ Example - match the ctl number for a field:
     parseresponse='ctl(\d\d).ctl00.btnApplyOnline|regex|'
 ```
 
-Example - match a Guid in format "91072487-558b-43be-a981-00b6516ef59c"
+Example - match a GUID in format "91072487-558b-43be-a981-00b6516ef59c"
 ```
     parseresponse="[a-z0-9\-]{36,36}?|regex|"
 ```
 
-Example - match third occurence
+Example - match third occurrence
 ```
     varREGEX_THAT_GRABS_FIRST_MATCH='"Result_Id":(\d*)'
     parseresponseSEARCH_RESULT_ID_3='(?:.*?{REGEX_THAT_GRABS_FIRST_MATCH}){3,3}|regex|'
@@ -1351,7 +1351,7 @@ It is even possible to run a line of Perl code in the current context.
 Note that in this example three types of quotes are used on the one line:
 
 ```
-    command='$selresp = $sel->find_element(qq|input[type="submit"]|,qq|css|)->click();'
+    command='$driver->find_element(qq|input[type="submit"]|,qq|css|)->click()'
 ```
 
 In this last example, qq| is indicating that | should be used as a quote in this line of Perl code.
@@ -1375,7 +1375,7 @@ retries exhausted.
 <a name="commandonerror"></a>
 #### commandonerror
 
-Will run the specified command if an assertion fails - regarless of whether the test step
+Will run the specified command if an assertion fails - regardless of whether the test step
 will be retried or not.
 
 ```
@@ -1427,7 +1427,7 @@ Note that when you use addheader, any existing header cookies will be clobbered.
 <a name="parms"></a>
 #### parms
 
-Subtitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
+Substitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
 
 ```
     parms="__SALMIN__={SALMIN}&__SALMAX__={SALMAX}"
@@ -1481,12 +1481,12 @@ Sets a new cookie for the url domain and port. The cookie will be retained for s
     setcookie="MyCookieName: value_of_cookie"
 ```
 
-Seperate multiple cookies with a semicolon:
+Separate multiple cookies with a semicolon:
 ```
    setcookie="MyFirstCookie: cookie_value; MySecondCookie: another_value"
 ```
 
-Note that leading and trailing whitespace is removed. Cookie values cannot contain a colon or semicolin.
+Note that leading and trailing whitespace is removed. Cookie values cannot contain a colon or semicolon.
 
 <br />
 
@@ -1532,7 +1532,7 @@ not captured.
 
 <a name="assertcount"></a>
 #### assertcount
-Used to assert that the specified text only appears a given number of times within the reponse. Can optionally give a custom message
+Used to assert that the specified text only appears a given number of times within the response. Can optionally give a custom message
 if the assertion fails.
 
 ```

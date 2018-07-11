@@ -15,7 +15,7 @@ WebInject is very easy to setup and run. An example is test included.
 
 1. Install Strawberry Perl.
     * Navigate to http://strawberryperl.com/
-    * Download and install the recommened version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+    * Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
 2. It doesn't matter where you put WebInject, for simplicity, put it in `C:\git`
     ```
@@ -123,7 +123,7 @@ Passed Positive Verification
 Passed Positive Verification
 Passed HTTP Response Code Verification
 TEST CASE PASSED
-Response Time = 1.31 sec
+Response Time = 0.18 sec
 -------------------------------------------------------
 Test:  tests\hello.xml - 20
 Search for hello jobs
@@ -136,12 +136,12 @@ Passed Positive Verification
 Passed Negative Verification
 Passed HTTP Response Code Verification
 TEST CASE PASSED
-Response Time = 0.335 sec
+Response Time = 0.057 sec
 -------------------------------------------------------
-Start Time: Sat 04 Mar 2017, 15:54:56
-Total Run Time: 2.944 seconds
+Start Time: Wed 11 Jul 2018, 23:13:59
+Total Run Time: 0.403 seconds
 
-Total Response Time: 1.645 seconds
+Total Response Time: 0.237 seconds
 
 Test Cases Run: 2
 Test Cases Passed: 2
@@ -149,7 +149,7 @@ Test Cases Failed: 0
 Verifications Passed: 9
 Verifications Failed: 0
 
-Results at: output\results.html
+Results at: output\Results.html
 ```
 
 So what happened?
@@ -165,7 +165,7 @@ Five files were created in the default output folder called `output`:
 * 10.html contains the http response for step 10
 * 20.html contains the http response for step 20
 
-If you double click on results.html to view in a browser, you will see hyperlinks to the indiviual results for steps 10 and 20.
+If you double click on results.html to view in a browser, you will see hyperlinks to the individual results for steps 10 and 20.
 Click on the link for step 10 and you will see the web page that WebInject received rendered in the browser. You are able to
 expand the `Request Headers` and `Response Headers`. You can also click on `next` to see the next test step results.
 Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebInject-Framework project is needed to make them functional.)
@@ -254,18 +254,18 @@ The example given higher up this page looks like this in the new format.
 
 hello.test:
 ```
-step: Get Totaljobs Home Page
-varTOTALJOBS_URL: https://www.totaljobs.com
-url: {TOTALJOBS_URL}
-verifypositive1: Search for and be recommended
-verifypositive2: See all hiring companies
+step:               Get Totaljobs Home Page
+varTOTALJOBS_URL:   https://www.totaljobs.com
+url:                {TOTALJOBS_URL}
+verifypositive1:    Search for and be recommended
+verifypositive2:    See all hiring companies
 
-step: Search for hello jobs
-description2: Expect to see at least 2 pages of hello jobs
-url: {TOTALJOBS_URL}/jobs/hello
-verifypositive1: \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
-verifypositive2: page=2|||Should be at least two pages of results for keyword hello
-verifynegative1: Page not found
+step:               Search for hello jobs
+description2:       Expect to see at least 2 pages of hello jobs
+url:                {TOTALJOBS_URL}/jobs/hello
+verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
+verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
+verifynegative1:    Page not found
 ```
 
 Quick start information for new format:
@@ -274,20 +274,11 @@ Quick start information for new format:
 * `step: ` replaces description1 (it is converted to description1 on file load)
 * `id: ` is reserved - it is assigned automatically in increments of 10
 * `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
-* all parameters for a step block must be grouped together without a blank line - blank lines seperates steps 
+* all parameters for a step block must be grouped together without a blank line - blank lines separates steps 
 * for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.test)
 * for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.test)
-* single and multi line comments are supported (see examples/lean.test)
+* single and multi-line comments are supported (see examples/lean.test)
 * it is possible to assemble a test file from smaller fragment files (see examples/include.test)
 
 Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor
-you view the file in. For this reason tabs are not supported for formatting. If you want to align a step, do
-it with spaces like this:
-```
-step:               Search for hello jobs
-description2:       Expect to see at least 2 pages of hello jobs
-url:                {TOTALJOBS_URL}/jobs/hello
-verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
-verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
-verifynegative1:    Page not found
-```
+you view the file in. For this reason tabs are not supported for formatting.
