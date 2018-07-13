@@ -3414,7 +3414,6 @@ sub set_eval_variables { ## e.g. evalDIFF="10-5"
     foreach my $_case_attribute ( sort keys %case ) {
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
             $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## assign the variable
-            my $_debug = $varvar{'var'.substr $_case_attribute, 4};
         }
     }
 

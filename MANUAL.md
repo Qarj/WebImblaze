@@ -2099,6 +2099,20 @@ The `eval` parameter is designed to be used in conjunction with `runif`.
 ```
 {OLD_DATA} will be falsy.
 
+```
+    evalSHA1="use Digest::SHA qw(sha1_hex); sha1_hex q|sha this text|;"
+```
+{SHA1} will be `c1afc46a1e23b4006d66fb94a38929d9410de27f`.
+
+```
+    evalNONCE="use Digest::MD5 qw(md5_hex); md5_hex q|{RANDOM:5}|;"
+```
+then
+```
+    evalBASE64_NONCE="use MIME::Base64; encode_base64(q|{NONCE}|, '');"
+```
+{BASE64_NONCE} will not have carriage return due to `''` parameter.
+
 <br />
 
 
