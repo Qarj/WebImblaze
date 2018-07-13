@@ -94,7 +94,7 @@ my $execution_aborted = 'false';
 our $results_output_folder; ## output relative path e.g. 'output/'
 my $results_filename_prefix; ## prefix for results file names e.g. 'run1'
 my $outsum; ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
-my $config; ## contents of config.xml
+our $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
 
