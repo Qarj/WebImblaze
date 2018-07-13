@@ -3890,12 +3890,8 @@ sub start_session {     ## creates the webinject user agent
         $useragent->timeout("$config->{timeout}");  #default LWP timeout is 180 secs.
     }
 
-    my $_set_user_agent;
-    if ($config->{useragent}) {
-        $_set_user_agent = $config->{useragent};
-        if ($_set_user_agent) { #http useragent that will show up in webserver logs
-            $useragent->agent($_set_user_agent);
-        }
+    if ($config->{useragent}) { #http useragent that will show up in webserver logs
+        $useragent->agent($config->{useragent});
     }
 
     if ($testfile_contains_selenium) { WebInjectSelenium::start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
