@@ -77,7 +77,7 @@ our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
 
-my ($parser_index_, $step_id_, $repeat_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
+my ($parser_index_, $step_id_, $repeat_, $useragent_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
 
 my $report_type; ## 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -2652,7 +2652,10 @@ sub _parse_steps {
     $_tests{ 'case' } = $_case_main_file;
     if ( defined $repeat_ ) {
         $_tests{ 'repeat' } = $repeat_;
-   }
+    }
+    if ( defined $useragent_ ) {
+        $_tests{ useragent } = $useragent_;
+    }
 
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = %{ $_files_to_include}{$_include_integer_step_num};
@@ -2684,6 +2687,10 @@ sub _parse_lines {
         }
 
         if ( parser_get_repeat() ) {
+            next;
+        }
+
+        if ( parser_get_useragent() ) {
             next;
         }
 
@@ -2780,6 +2787,17 @@ sub parser_get_repeat {
             _output_validate_error("Repeat directive can only be given once globally.", "well formed file with repeat:\n\nrepeat: 3\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
         }
         $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
+        return 1;
+    }
+    return 0;
+}
+
+sub parser_get_useragent {
+    if ( parser_line() =~ /^useragent:/ ) {
+        if (defined $useragent_) {
+            _output_validate_error("Useragent directive can only be given once globally.", "well formed file with useragent:\n\nuseragent: My custom useragent\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+        }
+        $useragent_ = _validate( '^useragent:\s+(.+[^\s])\s*$', "Useragent directive cannot be whitespace, and custom quotes are not supported.", "well formed useragent directive:\n\nuseragent: My special useragent");
         return 1;
     }
     return 0;
@@ -3887,6 +3905,10 @@ sub start_session {     ## creates the webinject user agent
     #change response delay timeout in seconds if it is set in config.xml
     if ($config->{timeout}) {
         $useragent->timeout("$config->{timeout}");  #default LWP timeout is 180 secs.
+    }
+
+    if (defined $useragent_) {  ## useragent set in test case file directly wins over config file value
+        $config->{useragent} = $useragent_;
     }
 
     if ($config->{useragent}) { #http useragent that will show up in webserver logs

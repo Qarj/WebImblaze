@@ -1041,6 +1041,18 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
 
+# useragent
+before_test();
+$main::unit_test_steps = <<'EOB'
+useragent:  My custom user agent 
+
+step: Set useragent directive
+shell: REM repeat
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'useragent' => 'My custom user agent'", '_parse_lean_test_steps : useragent directive - 1');
+
 # validate that parameter name only contains \w
 before_test();
 $main::unit_test_steps = <<'EOB'
