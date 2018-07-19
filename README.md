@@ -14,8 +14,8 @@ WebInject is very easy to setup and run. An example is test included.
 ### Windows
 
 1. Install Strawberry Perl.
-    * Navigate to http://strawberryperl.com/
-    * Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+    - Navigate to http://strawberryperl.com/
+    - Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
 2. It doesn't matter where you put WebInject, for simplicity, put it in `C:\git`
     ```
@@ -159,11 +159,11 @@ First WebInject read in the default config file called `config.xml` located in t
 Then it loaded `tests/hello.xml` and ran the two test steps in the file in numerical order.
 
 Five files were created in the default output folder called `output`:
-* results.html is a html version of the results you saw in the command prompt - with colour.
-* results.xml is an xml version of the results.
-* http.txt contains the response headers and the html that WebInject received.
-* 10.html contains the http response for step 10
-* 20.html contains the http response for step 20
+- results.html is a html version of the results you saw in the command prompt - with colour.
+- results.xml is an xml version of the results.
+- http.txt contains the response headers and the html that WebInject received.
+- 10.html contains the http response for step 10
+- 20.html contains the http response for step 20
 
 If you double click on results.html to view in a browser, you will see hyperlinks to the individual results for steps 10 and 20.
 Click on the link for step 10 and you will see the web page that WebInject received rendered in the browser. You are able to
@@ -269,16 +269,21 @@ verifynegative1:    Page not found
 ```
 
 Quick start information for new format:
-* parameters must start in column 1 of each line
-* `step: ` must be on the first line of each step block
-* `step: ` replaces description1 (it is converted to description1 on file load)
-* `id: ` is reserved - it is assigned automatically in increments of 10
-* `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
-* all parameters for a step block must be grouped together without a blank line - blank lines separates steps 
-* for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.test)
-* for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.test)
-* single and multi-line comments are supported (see examples/lean.test)
-* it is possible to assemble a test file from smaller fragment files (see examples/include.test)
+- parameters must start in column 1 of each line
+- `step: ` must be on the first line of each step block
+- `step: ` replaces description1 (it is converted to description1 on file load)
+- `id: ` is reserved - it is assigned automatically in increments of 10
+- `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
+- all parameters for a step block must be grouped together without a blank line - blank lines separates steps 
+- for Selenium steps, use `selenium: ` instead of `command: ` (see examples/selenium.test)
+- for command shell steps, use `shell: ` instead of `command: ` (see examples/lean.test)
+- single and multi-line comments are supported (see examples/lean.test)
+- it is possible to assemble a test file from smaller fragment files (see examples/include.test)
 
 Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor
 you view the file in. For this reason tabs are not supported for formatting.
+
+[Perl script for converting .xml test case files to .test files](https://github.com/Qarj/WebInject-Framework/blob/master/MANUAL.md#convert-webinject-xml-test-case-files-to-new-test-format)
+
+[Syntax highlighting for WebInject test case files](https://github.com/Qarj/WebInject-Framework/blob/master/MANUAL.md#syntax-highlighting-webinject-test-case-files)
+
