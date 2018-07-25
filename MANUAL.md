@@ -178,6 +178,8 @@ Adapted from the original manual written by Corey Goldberg.
 
 [eval](#eval)
 
+[gotostep](#gotostep)
+
 [runif](#runif)
 
 [runon](#runon)
@@ -2112,6 +2114,30 @@ then
     evalBASE64_NONCE="use MIME::Base64; encode_base64(q|{NONCE}|, '');"
 ```
 {BASE64_NONCE} will not have carriage return due to `''` parameter.
+
+<br />
+
+
+<a name="gotostep"></a>
+#### gotostep
+
+After executing current step, continue execution from the step defined by description1.
+```
+    gotostep="Teardown"
+```
+
+If there is a step with description1 `Teardown`, execution will continue from there.
+```
+    description1="Teardown"
+```
+
+If a matching step cannot be found, execution will end immediately without failing the current step.
+
+In practice, you would use this parameter with `runif`:
+```
+    runif="{SOME_VARIABLE}"
+    gotostep="Teardown"
+```
 
 <br />
 

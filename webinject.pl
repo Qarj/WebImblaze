@@ -266,6 +266,13 @@ foreach ($start .. $repeat) {
         } ## end of retry loop
         until ($retry < 0); ## no critic(ProhibitNegativeExpressionsInUnlessAndUntilConditions])
 
+        if ($case{gotostep}) {
+            $results_stdout .= qq|GOTO $case{gotostep} \n|;
+            if (set_step_index_for_test_step_to_jump_to($case{gotostep})) {
+                write_stdout_dashes_separator();
+            }
+        }
+
         if ($case{abort} && $case_failed) { ## if abort (i.e. this case (test step) failed all after retries exhausted), then execution is aborted
             $results_stdout .= qq|EXECUTION ABORTED!!! \n|;
             $execution_aborted = 'true';
@@ -626,7 +633,7 @@ sub execute_test_step {
         if ($case{method} eq 'put') { httpput(); return;}
     }
     else {
-        httpget();  #use "get" if no method is specified
+        cmd(); ## default to doing nothing if method is not specified, rather than get
     }
 
     return;
