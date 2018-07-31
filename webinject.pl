@@ -2875,11 +2875,11 @@ sub _rename_lean_parameters_to_classic_names {
     my ($_parms) = @_;
 
     for my $_i (0 .. $#{$_parms}) {
-        $_parms->[$_i] =~ s/shell/command/;
-        if ( $_parms->[$_i] =~ s/selenium/command/) {
+        $_parms->[$_i] =~ s/^shell/command/;
+        if ( $_parms->[$_i] =~ s/^selenium/command/) {
             $testfile_contains_selenium = 'true';
         }
-        $_parms->[$_i] =~ s/step/description1/;
+        $_parms->[$_i] =~ s/^step$/description1/;
     }
 }
 

@@ -1488,6 +1488,16 @@ EOB
 read_test_case_file();
 assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
 
+# bug - gotostep: being transformed to gotodescription1 => 'value'
+before_test();
+$main::unit_test_steps = <<'EOB'
+step:                   Already have stats for today, no further action required
+gotostep:               All done
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("'gotostep' => 'All done'", '_parse_lean_test_steps : bug - gotostep: being transformed to gotodescription1');
+
 
 # support abort - step desc?
 # support testvar
