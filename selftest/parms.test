@@ -1,0 +1,13 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .{SLASH}webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.xml
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
+verifypositive:         Test Cases Failed: 0
+verifypositive1:        name.tartiflette..name
+verifypositive2:        cuisine.French..cuisine
+verifypositive3:        preptime.75..preptime
+verifynegative:         uninitialized value
+

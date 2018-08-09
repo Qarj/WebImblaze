@@ -162,7 +162,7 @@ $min_response = 10_000_000; #set to large value so first minresponse will be les
 $globalretries=0; ## total number of retries for this run across all test cases
 
 $current_case_filename = basename($current_case_file); ## with extension
-$test_file_base_name = fileparse($current_case_file, '.xml');
+$test_file_base_name = fileparse($current_case_file, ('.xml', '.test'));
 
 read_test_case_file();
 

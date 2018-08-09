@@ -1,0 +1,24 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE} - with DEV config
+shell:                  .\webinject.pl -c selftest\substeps\{FEATURE}_config_DEV.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Run: 4
+verifypositive1:        Skipping Test Case 50... \(run on PROD\)
+verifynegative:         uninitialized value
+
+step:                   {FEATURE} - with PAT config
+shell:                  .\webinject.pl -c selftest\substeps\{FEATURE}_config_PAT.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Run: 3
+verifypositive1:        Skipping Test Case 30... \(run on DEV\)
+verifypositive2:        Skipping Test Case 50... \(run on PROD\)
+verifynegative:         uninitialized value
+
+step:                   {FEATURE} - with PROD config
+shell:                  .\webinject.pl -c selftest\substeps\{FEATURE}_config_PROD.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Run: 3
+verifypositive1:        Skipping Test Case 30... \(run on DEV\)
+verifypositive2:        Skipping Test Case 40... \(run on DEV|PAT\)
+verifynegative:         uninitialized value
+

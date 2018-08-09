@@ -1,0 +1,13 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+assertcount:            Passed Positive Verification|||5|||Only Step 10 should have passed positive verifications
+assertcount1:           TEST CASE FAILED|||2|||Steps 20 and 30 should fail
+assertcount2:           Failed Positive Verification|||6|||Should be failed positive verifications in steps 20 and 30
+verifypositive:         Should find text but did not
+verifypositive1:        Skipped Positive Verification 0 - Production Bug
+verifynegative:         uninitialized value
+

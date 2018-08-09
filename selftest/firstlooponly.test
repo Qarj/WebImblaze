@@ -1,0 +1,12 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+assertcount:            Skipping Test Case 10|||4
+assertcount1:           Step 20 loop counter is|||5
+verifypositive:         Test Cases Failed: 0
+verifypositive1:        Test Cases Run: 6
+verifynegative:         uninitialized value
+

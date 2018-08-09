@@ -1,0 +1,9 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Failed: 0
+verifynegative:         uninitialized value
+

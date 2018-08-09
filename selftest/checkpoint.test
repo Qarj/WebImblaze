@@ -1,0 +1,34 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.xml
+assertcount:            and also mynum variable  four  will be|||8
+verifypositive:         Test Cases Failed: 3
+verifypositive2:        70-2|||retryfromstep on step 70 should be triggered twice
+verifypositive4:        jumpbacks variable will update between jumpbacks:2
+verifypositive5:        jumpbacks variable will update between jumpbacks:10
+verifypositive6:        mynum variable is  seven
+verifypositive7:        mynum variable at this point is  four
+verifypositive9:        checkpoint.xml - 110-10
+verifynegative:         uninitialized value
+verifynegative1:        20-1|||Should not see step 20 more than once, retryfromstep not triggered
+verifynegative2:        30-1|||Should not see step 30 more than once, retryfromstep not triggered
+verifynegative3:        70-3|||retryfromstep on step 70 should be triggered only twice
+verifynegative9:        checkpoint.xml - 110-11
+verifyresponsetime:     39
+
+step:                   {FEATURE}1
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}1sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}1.xml
+assertcount:            --- CHECKPOINT ---|||4
+verifypositive:         Test Cases Failed: 0
+verifypositive1:        checkpoint1.xml - 20\.3
+verifypositive2:        checkpoint1.xml - 20-1\.3
+verifypositive3:        checkpoint1.xml - 20-2\.2
+verifypositive4:        RETRYING FROM STEP 5 ...  6 tries left
+verifynegative:         uninitialized value
+verifynegative1:        checkpoint1.xml - 20\.4
+verifynegative2:        checkpoint1.xml - 20-1\.4
+verifynegative3:        checkpoint1.xml - 20-2\.3
+

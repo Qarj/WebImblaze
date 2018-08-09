@@ -1,0 +1,310 @@
+#
+# Run all WebInject core self tests
+#
+
+step:                   verifypositive
+shell:                  .\webinject.pl -o selftest\output\verifypositive selftest\verifypositive.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+autoretry:              0
+
+step:                   verifynegative
+shell:                  .\webinject.pl -o selftest\output\verifynegative selftest\verifynegative.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   parseresponse
+shell:                  .\webinject.pl -o selftest\output\parseresponse selftest\parseresponse.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   assertcount
+shell:                  .\webinject.pl -o selftest\output\assertcount selftest\assertcount.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   commandonerror
+shell:                  .\webinject.pl -o selftest\output\commandonerror selftest\commandonerror.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   verifyresponsecode
+shell:                  .\webinject.pl -o selftest\output\verifyresponsecode selftest\verifyresponsecode.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   verifyresponsetime
+shell:                  .\webinject.pl -o selftest\output\verifyresponsetime selftest\verifyresponsetime.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   ignoreautoassertions
+shell:                  .\webinject.pl -o selftest\output\ignoreautoassertions selftest\ignoreautoassertions.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   ignorehttpresponsecode
+shell:                  .\webinject.pl -o selftest\output\ignorehttpresponsecode selftest\ignorehttpresponsecode.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   xml-parse-fail
+shell:                  .\webinject.pl -o selftest\output\retry selftest\xml-parse-fail.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   retry
+shell:                  .\webinject.pl -o selftest\output\retry selftest\retry.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   retryfromstep
+shell:                  .\webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   autoretry
+shell:                  .\webinject.pl -o selftest\output\autoretry selftest\autoretry.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   restartbrowseronfail
+shell:                  .\webinject.pl -o selftest\output\restartbrowseronfail selftest\restartbrowseronfail.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   restartbrowser
+shell:                  .\webinject.pl -o selftest\output\restartbrowser selftest\restartbrowser.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   errormessage
+shell:                  .\webinject.pl -o selftest\output\errormessage selftest\errormessage.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   logastext
+shell:                  .\webinject.pl -o selftest\output\logastext selftest\logastext.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   logresponseasfile
+shell:                  .\webinject.pl -o selftest\output\logresponseasfile selftest\logresponseasfile.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   section
+shell:                  .\webinject.pl -o selftest\output\section selftest\section.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   donotrunon
+shell:                  .\webinject.pl -o selftest\output\testonly selftest\donotrunon.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   runon
+shell:                  .\webinject.pl -o selftest\output\testonly selftest\runon.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   autocontrolleronly
+shell:                  .\webinject.pl -o selftest\output\autocontrolleronly selftest\autocontrolleronly.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             nagios
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             result_files
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             eval
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   abort
+shell:                  .\webinject.pl -o selftest\output\sanitycheck selftest\abort.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   ignoresmartassertions
+shell:                  .\webinject.pl -o selftest\output\ignoresmartassertions selftest\ignoresmartassertions.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   decodequotedprintable
+shell:                  .\webinject.pl -o selftest\output\decodequotedprintable selftest\decodequotedprintable.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             var
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             repeat
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             substitutions
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             useragent
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             firstlooponly
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             lastlooponly
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             getallsrcs
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             addheader
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             httppost
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             getallhrefs
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             name_data
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             getbackgroundimages
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             httppost_xml
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             httppost_form-data
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             parms
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             httpauth
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             assertionskips
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             random
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             include
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             specialcharacters
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             checkpoint
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             runif
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             setcookie
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             sharedvar
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             ssl
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             unittest
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+
+step:                   {FEATURE}
+varFEATURE:             commandonfail
+shell:                  .\webinject.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST CASE PASSED
+verifynegative:         TEST CASE FAILED
+

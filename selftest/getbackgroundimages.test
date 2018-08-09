@@ -1,0 +1,19 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell1:                 if exist selftest\output\germination.jpg del selftest\output\germination.jpg
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Failed: 0
+verifypositive1:        GET Asset \[version1_germination.jpg]
+verifynegative:         uninitialized value
+
+step:                   {FEATURE}
+shell1:                 dir selftest\output\
+shell2:                 ls selftest/output/
+verifypositive1:        germination.jpg
+verifynegative:         uninitialized value
+

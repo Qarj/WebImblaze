@@ -1,0 +1,11 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive:         Test Cases Failed: 1
+verifypositive1:        Test failed for some reason
+verifynegative1:        Maybe the drive is full
+verifynegative2:        uninitialized value
+

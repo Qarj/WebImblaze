@@ -1,0 +1,23 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.xml
+assertcount:            but mynum variable  seven  will not|||6
+assertcount1:           Won't retry - a fail fast was invoked|||2
+verifypositive:         Test Cases Failed: 5
+verifypositive1:        Won't retry - a fail fast was invoked
+verifypositive2:        RETRYING... 5 to go
+verifypositive3:        Retry 3 times
+verifypositive4:        retry variable will update between retries:0
+verifypositive5:        retry variable will update between retries:5
+verifypositive6:        mynum variable is  seven
+verifypositive7:        mynum variable now updated to  four
+verifypositive8:        Retry 6 times
+verifypositive9:        retry.xml - 40\.2
+verifypositive15:       retry.xml - 75\.2
+verifynegative:         uninitialized value
+verifynegative9:        retry.xml - 40\.3
+verifyresponsetime:     39
+

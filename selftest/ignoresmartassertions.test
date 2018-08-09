@@ -1,0 +1,11 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.xml
+assertcount:            Failed Smart Assertion|||1
+verifypositive:         Test Cases Failed: 1
+verifypositive1:        Must have a Cache-Control of private or no-cache when a cookie is set
+verifynegative:         uninitialized value
+

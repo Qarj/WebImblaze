@@ -1,0 +1,12 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+assertcount:            TEST CASE PASSED|||4
+verifypositive:         Test Cases Failed: 0
+verifypositive1:        found: scale=1.0 in response step 10
+verifypositive2:        found:  in response step 30
+verifynegative:         uninitialized value
+

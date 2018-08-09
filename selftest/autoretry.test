@@ -1,0 +1,18 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+verifypositive20:        20\.2
+verifypositive30:        30\.1
+verifypositive60:        60\.5
+verifynegative:         uninitialized value
+verifynegative10:        10\.1
+verifynegative20:        20\.3
+verifynegative30:        30\.2
+verifynegative40:        40\.1
+verifynegative60:        60\.6
+verifynegative80:        80\.1
+verifynegative90:        90\.1
+

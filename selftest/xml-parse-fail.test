@@ -1,0 +1,10 @@
+step:                   Self test feature {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  echo NOP
+
+step:                   {FEATURE}
+shell:                  .{SLASH}webinject.pl -o selftest/output/{FEATURE}sub selftest/substeps/{FEATURE}.xml
+verifypositive:         duplicate attribute at line|Attribute verifypositive1 redefined
+verifypositive1:        Refer to built test file
+verifynegative:         uninitialized value
+
