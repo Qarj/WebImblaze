@@ -63,6 +63,25 @@ perl webinject.pl --help
 
 Tested with Fedora 26, Ubuntu 16.04 and 18.04, Linux Mint 18.3, OS X El Capitan and macOS 10.13.
 
+#### CentOS 7
+
+CentOS seems to require a lot of additional setup before installing the packages above - some of the below may be redundant
+```
+sudo yum install cpan
+sudo cpan
+install CPAN
+reload CPAN
+
+sudo cpan IO::Socket
+sudo yum install perl-libwww-perl
+sudo yum install perl-DBI
+sudo yum install perl-DBD-MySQL
+sudo yum install perl-GD
+sudo yum install perl-XML-Simple
+sudo cpan JSON::PP
+sudo cpan HTTP::Cookies
+```
+
 ### Docker
 
 https://github.com/Qarj/webinject-docker
