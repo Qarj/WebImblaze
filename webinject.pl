@@ -3186,6 +3186,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
         ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval($1)*86400));
     }
+    if ($_[0] =~ s|{DATE_NOW:::([+\-*/\d]+)}||g) {
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86400));
+    }
 
 ## perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
     my ($_value, $_KEY);

@@ -2583,13 +2583,18 @@ is valid only for that parameter.
 
 The expression can contain the digits 0 to 9 and the operators + - * /.
 
-Consider this final example:
+Consider this example:
 ```xml
     verifypositive1="{DAY}/{MONTH}/{YEAR}"
     verifypositive2="{DATE:::1}{DAY}/{MONTH}/{YEAR}"
     verifypositive3="{DATE:::2}{DAY}/{MONTH}/{YEAR}"
 ```
 If today is 31/10/2017 then 31/10/2017, 01/11/2017 and 02/11/2017 will be asserted.
+
+If you need to modify from the current time rather than the test start time, do this using `DATE_NOW`:
+```xml
+    description1="{DATE_NOW:::-1/23}Day_Month_Year: {DAY}_{MONTH}_{YEAR}"
+```
 
 <br />
 

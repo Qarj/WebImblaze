@@ -255,10 +255,19 @@ If convert_back was set to null, {:8080} would be converted to null
 
 <case
     id="270"
-    description1="Date Modifier - Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}"
+    description1="Date modifier from test start time - Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}"
     method="cmd"
     command="echo Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}"
     verifypositive="Yesterday  \d{4}-\d{2}-\d{2}"
+    verifynegative=" 1900-"
+/>
+
+<case
+    id="280"
+    description1="Date modifier from now - Yesterday {DATE_NOW:::-1} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}"
+    method="cmd"
+    command="echo Yesterday {DATE_NOW:::-1} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}"
+    verifypositive="Yesterday  \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}"
     verifynegative=" 1900-"
 />
 
