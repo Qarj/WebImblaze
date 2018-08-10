@@ -1,0 +1,14 @@
+step:                   Will be run - truthy
+shell:                  echo NOP
+runif:                  abcd
+
+step:                   Will not be run - falsy
+shell:                  echo NOP
+runif:quote:             quotequote
+
+step:                   Will not be run - falsy
+description2:           var Variable will be substituted before evaluating runif
+varFALSE:^:             ^^
+shell:                  echo NOP
+runif:                  {FALSE}
+

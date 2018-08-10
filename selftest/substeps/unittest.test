@@ -1,0 +1,7 @@
+step:                   Run the unit tests
+shell:                  perl webinject.t
+verifynegative1:        Looks like you failed
+verifynegative2:        Failed test
+verifynegative3:        not ok \d+ 
+verifynegative4:        possible typo at webinject
+

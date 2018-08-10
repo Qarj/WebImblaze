@@ -1,0 +1,26 @@
+step:                   Step passes
+shell:                  echo NOP
+verifypositive:         NOP
+
+step:                   Step fails
+shell:                  echo NOP
+verifypositive:         No Operation
+abort:                  100
+
+step:                   Step not executed
+shell:                  echo NOP
+verifypositive:         Will definitely fail if run
+
+step:                   Step also not executed
+shell:                  echo Will not be seen
+verifypositive:         Will also definitely fail if run
+
+step:                   Get close account page
+section:                TEARDOWN
+shell:                  echo Get account close page
+verifypositive:         Get account close page
+
+step:                   Confirm account close
+shell:                  echo Your account has been closed
+verifypositive:         Your account has been closed
+

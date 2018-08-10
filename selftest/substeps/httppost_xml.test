@@ -1,0 +1,6 @@
+step:                   Post the file
+url:                    http://{WIC}/BulkUpload/XML
+posttype:               text/xml
+postbody:               file=>selftest\testdata\searches.xml
+verifypositive:         Confirmation
+

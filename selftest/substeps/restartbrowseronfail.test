@@ -1,0 +1,28 @@
+step:                   Get login page sets .AspNetCore.Antiforgery cookie
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+
+step:                   Get login page again does not set the same cookie again - it is already set
+description2:           Step will fail
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+
+step:                   Browser is restarted due to an error
+shell:                  echo NOP
+verifypositive:         Some text that is not there
+restartbrowseronfail:   true
+
+step:                   Get login page sets .AspNetCore.Antiforgery cookie since all cookies are gone
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+
+step:                   Browser is not restarted since the test step passes
+shell:                  echo Some text that is there
+verifypositive:         Some text that is there
+restartbrowseronfail:   true
+
+step:                   Get login page already has .AspNetCore.Antiforgery cookie
+description2:           Step will fail
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+

@@ -1,0 +1,11 @@
+step:                   Should fail due to smart assertion defined in ignoresmartassertionsconfig.xml
+shell:                  echo Set-Cookie: 
+
+step:                   Should pass - smartassertions are ignored
+shell:                  echo Set-Cookie: 
+ignoresmartassertions:  true
+
+step:                   Should pass - smart assertions are satisfied
+shell:                  echo Set-Cookie: 
+shell1:                 echo Cache-Control: private
+

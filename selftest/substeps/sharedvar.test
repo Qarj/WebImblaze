@@ -1,0 +1,30 @@
+step:                   Write a shared var
+varKEY:                 {RANDOM:5}
+shell:                  echo NOP
+writesharedvar:         MY_SPECIAL_VAR|my secret {KEY}
+
+step:                   Read a shared var - value is [{MY_SPECIAL_VAR}]
+shell:                  echo [{MY_SPECIAL_VAR}]
+verifypositive:         my secret {KEY}
+readsharedvar:          MY_SPECIAL_VAR
+
+step:                   Read a non existing shared variable, value of [{DOES_NOT_EXIST}]
+shell:                  echo value of [{DOES_NOT_EXIST}]
+verifypositive:         value of \[]
+readsharedvar:          DOES_NOT_EXIST
+
+step:                   Overwrite shared var with null
+shell:                  echo NOP
+writesharedvar:         MY_SPECIAL_VAR|
+
+step:                   Read a shared var - value is [{MY_SPECIAL_VAR}]
+shell:                  echo value of [{MY_SPECIAL_VAR}]
+verifypositive:         value of \[]
+readsharedvar:          MY_SPECIAL_VAR
+
+step:                   Read a shared var - value is [{WILL_NOT_BE_FOUND}]
+shell:                  REM value of [{WILL_NOT_BE_FOUND}]
+readsharedvar:          WILL_NOT_BE_FOUND
+verifypostive:          This step will not run, so it will not fail
+runif:                  {WILL_NOT_BE_FOUND}
+

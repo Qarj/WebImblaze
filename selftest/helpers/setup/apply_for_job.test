@@ -1,0 +1,37 @@
+step:                   Get home page
+section:                selftest\helpers\setup\apply_for_job.xml
+shell:                  echo NOP
+
+step:                   Enter partial search term (to check auto complete)
+shell:                  echo NOP
+
+step:                   Enter search term
+shell:                  echo NOP
+
+step:                   Enter search location
+shell:                  echo NOP
+
+step:                   Enter search job type (permanent or contract)
+shell:                  echo NOP
+
+step:                   Enter location search radius (in miles)
+shell:                  echo NOP
+
+step:                   Submit search
+shell:                  echo NOP
+
+step:                   Get search results
+shell:                  echo NOP
+
+step:                   View job details of first job on page
+shell:                  echo NOP
+
+step:                   Click apply for job button
+shell:                  echo NOP
+
+step:                   Fill out job application details
+shell:                  echo NOP
+
+step:                   Submit job application
+shell:                  echo NOP
+

@@ -1,0 +1,55 @@
+step:                   Step 10
+shell:                  echo NOP
+checkpoint:             true
+
+step:                   Should not jump back since the assertions pass
+shell:                  echo one one one
+assertcount:            one|||6
+verifypositive:         one
+verifynegative:         two
+
+step:                   Should not jump back since a fail fast flag is present
+shell:                  echo one one one
+shell1:                 echo critical error
+assertcount:            one|||6
+verifypositive:         one
+verifynegative:         fail fast!critical error
+
+step:                   Step 40
+shell:                  echo NOP
+
+step:                   Should not sleep since retryfromstep is not triggered
+shell:                  echo one one one
+shell1:                 echo six seven eight
+verifypositive:         one
+parseresponseMYNUM:     six|eight|
+sleep:                  40
+
+step:                   Step 60
+shell:                  echo NOP
+checkpoint:             true
+
+step:                   Will pass on attempt two
+shell:                  echo attempt {JUMPBACKS}
+verifypositive:         attempt 2
+
+step:                   Info - mynum variable is {MYNUM}
+shell:                  echo NOP
+checkpoint:             true
+
+step:                   Should jump back 8 times due to verifypostive failure
+description2:           jumpbacks variable will update between jumpbacks:{JUMPBACKS}, and also mynum variable {MYNUM} will be
+shell:                  echo one one one
+shell1:                 echo three four five
+shell2:                 echo mynum:{MYNUM}, retry:{JUMPBACKS}
+verifypositive:         two
+parseresponseMYNUM:     three|five|
+
+step:                   Info - mynum variable at this point is {MYNUM}
+shell:                  echo NOP
+checkpoint:             true
+
+step:                   Should not jump back - globaljumpbacks limit defined in retryfromstepconfig.xml file reached
+shell:                  echo one one one
+verifypositive:         two
+

@@ -1,0 +1,7 @@
+step:                   Post the file substituting parameters
+url:                    http://{WIC}/BulkUpload/XML
+posttype:               text/xml
+postbody:               file=>selftest\testdata\search_template.xml
+verifypositive:         /BulkUpload/Confirmation
+parms:                  __name__=tartiflette&__cuisine__=French&__preptime__=75
+

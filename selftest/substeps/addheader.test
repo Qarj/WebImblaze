@@ -1,0 +1,19 @@
+step:                   Get all the searches - no addheader
+url:                    http://{WIC}/api/GetAllSearches
+verifypositive:         "SearchId":1,"RecipeName"
+verifynegative:         ArrayOfSearch
+ignoresmartassertions:  true
+
+step:                   Get all the searches - add header json
+url:                    http://{WIC}/api/GetAllSearches
+verifypositive:         "SearchId":1,"RecipeName"
+verifynegative:         ArrayOfSearch
+addheader:              Accept: application/json, text/javascript, */*; q=0.01
+
+step:                   Get all the searches - add header xml
+url:                    http://{WIC}/api/GetAllSearches
+verifypositive1:        ArrayOfSearch
+verifypositive2:        XMLSchema-instance
+verifynegative:         "SearchId":1,"RecipeName"
+addheader:              Accept: application/xml
+

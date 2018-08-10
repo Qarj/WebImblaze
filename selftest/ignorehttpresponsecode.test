@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Failed: 1
 verifypositive1:        Failed HTTP Response Code Verification
 verifypositive2:        Ignored HTTP Response Code Verification

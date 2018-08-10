@@ -1,0 +1,17 @@
+step:                   SearchForm sets .AspNetCore.Antiforgery cookie
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+
+step:                   Get SearchForm again does not set the same cookie again - it is already set
+description2:           Step will fail
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+
+step:                   Browser is restarted
+shell:                  echo NOP
+restartbrowser:         true
+
+step:                   Get SearchForm sets .AspNetCore.Antiforgery cookie since all cookies are gone
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+

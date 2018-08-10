@@ -48,18 +48,8 @@ shell:                  .\webinject.pl -o selftest\output\ignorehttpresponsecode
 verifypositive:         TEST CASE PASSED
 verifynegative:         TEST CASE FAILED
 
-step:                   xml-parse-fail
-shell:                  .\webinject.pl -o selftest\output\retry selftest\xml-parse-fail.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
-
 step:                   retry
 shell:                  .\webinject.pl -o selftest\output\retry selftest\retry.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
-
-step:                   retryfromstep
-shell:                  .\webinject.pl -o selftest\output\retryfromstep selftest\retryfromstep.test
 verifypositive:         TEST CASE PASSED
 verifynegative:         TEST CASE FAILED
 

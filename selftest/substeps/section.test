@@ -1,0 +1,4 @@
+step:                   no operation
+section:                Register a new self service account
+shell:                  echo NOP
+

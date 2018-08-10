@@ -1,13 +1,10 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive1:        Test Cases Failed: 0
 verifypositive2:        Start Time: \w{3} \d{2} \w{3} \d{4}, \d{2}:\d{2}:\d{2}
 verifypositive3:        Starting WebInject Engine\.\.\.
-verifypositive4:        Test:  selftest.substeps.unittest\.xml - 10
+verifypositive4:        Test:  selftest.substeps.unittest\.test - 10
 verifypositive5:        Verify Negative:
 verifypositive6:        TEST CASE PASSED
 verifypositive7:        Verifications Passed

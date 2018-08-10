@@ -1,0 +1,16 @@
+step:                   commandonfail should be run
+shell:                  echo one one one
+shellonfail:            echo {OUTPUT} commandonfail in step 10 was run > {OUTPUT}commandonfail.txt
+verifypositive:         two two two
+
+step:                   commandonfail should not be run
+shell:                  echo two two two
+shellonfail:            echo {OUTPUT} commandonfail in step 20 was run >> {OUTPUT}commandonfail.txt
+verifypositive:         two two two
+
+step:                   commandonfail should only be run once
+shell:                  echo two two two
+shellonfail:            echo {OUTPUT} commandonfail in step 30 was run >> {OUTPUT}commandonfail.txt
+verifypositive:         one one one
+retry:                  3
+

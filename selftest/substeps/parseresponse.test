@@ -1,0 +1,20 @@
+step:                   Parse some text
+shell:                  echo Some example text to parse with the parse response parameter
+shell1:                 echo one two three four five six seven eight nine ten
+shell2:                 echo P_Jack {SHELL_ESCAPE}& Jill_P
+shell3:                 echo A_{SHELL_ESCAPE}&amp{SHELL_ESCAPE};{SHELL_ESCAPE}&amp{SHELL_ESCAPE};{SHELL_ESCAPE}&amp{SHELL_ESCAPE};_A
+parseresponse:          \RSome example | with the parse|
+parseresponse1:         \Rone two (\w*) four|regex|
+parseresponse5000:      \RP_|_P|escape
+parseresponseDECODE:    \RA_|_A|decode
+
+step:                   Have a look at the parsed text
+shell:                  echo parseresponse:{}
+shell1:                 echo parseresponse1:{1}
+shell2:                 echo parseresponse5000:{5000}
+shell3:                 echo parseresponseDECODE:{DECODE}
+verifypositive:         parseresponse:text to parse
+verifypositive1:        parseresponse1:three
+verifypositive2:        parseresponse5000:Jack %26 Jill
+verifypositive3:        parseresponseDECODE:\&\&\&
+

@@ -1,0 +1,14 @@
+step:                   Get home page
+url:                    http://{WIC}
+
+step:                   Get home page
+url:                    http://{WIC}
+useragent:              My Special Browser
+
+step:                   Get home page
+url:                    http://{WIC}
+
+step:                   Get home page
+url:                    http://{WIC}
+useragent:              Firefox Browser
+

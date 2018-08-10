@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE} - filename prefix included as part of output path
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 
 step:                   view WEBINJECT-CHECK_Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}WEBINJECT-CHECK_Home_Page.html
@@ -14,7 +11,7 @@ verifynegative:         uninitialized value
 step:                   {FEATURE} - filename prefix not included as part of output path
 shell1:                 if not exist selftest\output\temp\ mkdir selftest\output\temp\
 shell2:                 perl -MFile::Path=make_path -e "make_path(qq{selftest{SLASH}output{SLASH}temp{SLASH}})"
-shell3:                 .\webinject.pl -o selftest\output\temp\ selftest\substeps\{FEATURE}.xml
+shell3:                 .\webinject.pl -o selftest\output\temp\ selftest\substeps\{FEATURE}.test
 
 step:                   view WEBINJECT-CHECK_Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBINJECT-CHECK_Home_Page.html

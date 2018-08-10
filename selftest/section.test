@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE} - filename prefix included as part of output path
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Register a new self service account
 verifynegative:         uninitialized value
 

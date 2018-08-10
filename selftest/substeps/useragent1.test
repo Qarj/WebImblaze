@@ -1,0 +1,7 @@
+step:                   Get home page
+url:                    http://{WIC}
+
+step:                   Get home page
+url:                    http://{WIC}
+useragent:              Chrome Browser
+

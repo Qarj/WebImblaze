@@ -1,0 +1,9 @@
+step:                   Should pass verifyresponsetime
+shell:                  echo this will be quick
+verifyresponsetime:     10
+
+step:                   Should fail verifyresponsetime
+shell:                  echo this will be slow
+shell1:                 perl -e "sleep 2"
+verifyresponsetime:     1
+

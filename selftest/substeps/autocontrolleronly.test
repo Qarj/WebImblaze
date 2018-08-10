@@ -1,0 +1,7 @@
+step:                   Can be executed from any desktop or server
+shell:                  echo NOP
+
+step:                   Can only be executed from the test automation controller
+shell:                  echo NOP
+autocontrolleronly:     true
+

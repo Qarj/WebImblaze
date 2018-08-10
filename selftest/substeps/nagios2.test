@@ -1,0 +1,6 @@
+step:                   Step 10 should pass
+shell1:                 echo NOP
+
+step:                   Step 20 should pass also, so we report OK to Nagios
+shell1:                 echo NOP
+

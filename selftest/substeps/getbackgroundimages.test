@@ -1,0 +1,4 @@
+step:                   Get a background image
+url:                    http://{WIC}/Home/Pictures
+getbackgroundimages:    .jpg
+

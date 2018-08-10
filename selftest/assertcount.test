@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE}
-shell:                  .{SLASH}webinject.pl -o selftest/output/{FEATURE}sub selftest/substeps/{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .{SLASH}webinject.pl -o selftest/output/{FEATURE}sub selftest/substeps/{FEATURE}.test
 assertcount:            Passed Count Assertion of 6|||3
 assertcount1:           Failed Count Assertion of 6, got 8|||3
 assertcount2:           Should have one 6 times|||3

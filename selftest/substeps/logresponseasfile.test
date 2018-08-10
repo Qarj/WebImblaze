@@ -1,0 +1,4 @@
+step:                   logresponse as file
+url:                    http://{WIC}
+logresponseasfile:      WEBINJECT-CHECK_Home_Page.html
+

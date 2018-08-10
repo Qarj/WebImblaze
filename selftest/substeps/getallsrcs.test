@@ -1,0 +1,8 @@
+step:                   Get an image source
+url:                    http://{WIC}/Home/Pictures
+getallsrcs:             brickwork.jpg
+
+step:                   Get a JavaScript source
+url:                    http://{WIC}/Home/JavaScript
+getallsrcs:             element.js
+

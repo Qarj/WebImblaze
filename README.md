@@ -1,6 +1,8 @@
 # WebInject 2.10.0
 
-**_WebInject now supports a new test file format! Details at the bottom of this page._**
+**_WebInject is moving away from the fake .xml to a simpler .test file format._**
+**_Soon support for .xml will be removed and it will only run .test files._**
+**_Convert your test case files using the transmute.pl tool mentioned below._**
 
 WebInject is a free Perl based tool for automated testing of web applications and web services.
 
@@ -90,42 +92,30 @@ https://github.com/Qarj/webinject-docker
 
 Note that these instructions are written with Windows in mind. 
 
-In the `tests` folder, create a file called `hello.xml`.
+In the `tests` folder, create a file called `hello.test`.
 
 Edit the file with your favourite text editor and copy paste the following then save the file.
 
-```xml
-<testcases repeat="1">
+```
+step:               Get Totaljobs Home Page
+varTOTALJOBS_URL:   https://www.totaljobs.com
+url:                {TOTALJOBS_URL}
+verifypositive1:    Search for and be recommended
+verifypositive2:    See all hiring companies
 
-<case
-    varTOTALJOBS_URL="https://www.totaljobs.com"
-    id="10"
-    description1="Get Totaljobs Home Page"
-    method="get"
-    url="{TOTALJOBS_URL}"
-    verifypositive1="Search for and be recommended"
-    verifypositive2="See all hiring companies"
-/>
-
-<case
-    id="20"
-    description1="Search for hello jobs"
-    description2="Expect to see at least 2 pages of hello jobs"
-    method="get"
-    url="{TOTALJOBS_URL}/jobs/hello"
-    verifypositive1="\d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs"
-    verifypositive2="page=2|||Should be at least two pages of results for keyword hello"
-    verifynegative1="Page not found"
-/>
-
-</testcases>
+step:               Search for hello jobs
+description2:       Expect to see at least 2 pages of hello jobs
+url:                {TOTALJOBS_URL}/jobs/hello
+verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
+verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
+verifynegative1:    Page not found
 ```
 
 ### Run your first WebInject test
 
 ```
 cd C:\git\WebInject
-perl webinject.pl tests/hello.xml
+perl webinject.pl tests/hello.test
 ```
 
 If everything worked ok, then you'll see something like the following:
@@ -134,7 +124,7 @@ If everything worked ok, then you'll see something like the following:
 Starting WebInject Engine...
 
 -------------------------------------------------------
-Test:  tests\hello.xml - 10
+Test:  tests\hello.test - 10
 Get Totaljobs Home Page
 Verify Positive: "Search for and be recommended"
 Verify Positive: "See all hiring companies"
@@ -142,9 +132,9 @@ Passed Positive Verification
 Passed Positive Verification
 Passed HTTP Response Code Verification
 TEST CASE PASSED
-Response Time = 0.18 sec
+Response Time = 0.443 sec
 -------------------------------------------------------
-Test:  tests\hello.xml - 20
+Test:  tests\hello.test - 20
 Search for hello jobs
 Expect to see at least 2 pages of hello jobs
 Verify Negative: "Page not found"
@@ -155,12 +145,12 @@ Passed Positive Verification
 Passed Negative Verification
 Passed HTTP Response Code Verification
 TEST CASE PASSED
-Response Time = 0.057 sec
+Response Time = 0.557 sec
 -------------------------------------------------------
-Start Time: Wed 11 Jul 2018, 23:13:59
-Total Run Time: 0.403 seconds
+Start Time: Fri 10 Aug 2018, 12:18:39
+Total Run Time: 1.581 seconds
 
-Total Response Time: 0.237 seconds
+Total Response Time: 1.000 seconds
 
 Test Cases Run: 2
 Test Cases Passed: 2
@@ -175,7 +165,7 @@ So what happened?
 
 First WebInject read in the default config file called `config.xml` located in the root folder of the project.
 
-Then it loaded `tests/hello.xml` and ran the two test steps in the file in numerical order.
+Then it loaded `tests/hello.test` and ran the two test steps in the file in numerical order.
 
 Five files were created in the default output folder called `output`:
 - results.html is a html version of the results you saw in the command prompt - with colour.
@@ -226,13 +216,13 @@ how that feature works.
 You can run all the self tests with the following command:
 
 ```
-perl webinject.pl selftest/all_core.xml
+perl webinject.pl selftest/all_core.test
 ```
 
 Or you can run just one self test like this:
 
 ```
-perl webinject.pl selftest/verifypositive.xml
+perl webinject.pl selftest/verifypositive.test
 ```
 
 WebInject Plugins
@@ -269,23 +259,7 @@ The goal of the new format is to simplify test specification and remove clutter.
 are validated for and a comprehensive error message is given explaining the problem, line
 number of the problem and an example of something that works.
 
-The example given higher up this page looks like this in the new format.
-
-hello.test:
-```
-step:               Get Totaljobs Home Page
-varTOTALJOBS_URL:   https://www.totaljobs.com
-url:                {TOTALJOBS_URL}
-verifypositive1:    Search for and be recommended
-verifypositive2:    See all hiring companies
-
-step:               Search for hello jobs
-description2:       Expect to see at least 2 pages of hello jobs
-url:                {TOTALJOBS_URL}/jobs/hello
-verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
-verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
-verifynegative1:    Page not found
-```
+Check the example given higher up to see how it looks. Or study the files in `selftest/substeps`.
 
 Quick start information for new format:
 - parameters must start in column 1 of each line
@@ -303,6 +277,7 @@ Mixing tabs and spaces for formatting causes alignment to be out whack depending
 you view the file in. For this reason tabs are not supported for formatting.
 
 [Perl script for converting .xml test case files to .test files](https://github.com/Qarj/WebInject-Framework/blob/master/MANUAL.md#convert-webinject-xml-test-case-files-to-new-test-format)
+Note - you'll need to manually move over comments, plus the repeat parameter. It only works with two or more test steps, and two or more include steps (if present).
 
 [Syntax highlighting for WebInject test case files](https://github.com/Qarj/WebInject-Framework/blob/master/MANUAL.md#syntax-highlighting-webinject-test-case-files)
 

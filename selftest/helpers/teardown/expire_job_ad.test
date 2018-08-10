@@ -1,0 +1,14 @@
+step:                   Get expire jobs page
+section:                selftest\helpers\teardown\expire_job_ad.xml [{JOB_ID}]
+shell:                  echo NOP
+runon:                  UAT|PREPROD
+
+step:                   Submit {JOB_ID} to expire
+shell:                  echo your job has been expired ok
+verifypositive:         expired ok
+runon:                  UAT|PREPROD
+
+step:                   Info - expired job {JOB_ID}
+shell:                  echo NOP
+runon:                  UAT|PREPROD
+

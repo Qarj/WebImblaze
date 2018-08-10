@@ -1,0 +1,10 @@
+step:                   Step 10 should fail
+shell:                  echo NOP
+verifypositive:         Will not be found
+errormessage:           Nagios should see this error message
+
+step:                   Step 20 should fail also
+shell:                  echo NOP
+verifypositive:         Will not be found
+errormessage:           Nagios should NOT see this error message, even though this step fails
+

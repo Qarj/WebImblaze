@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE}
-shell:                  perl webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  perl webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
 verifypositive1:        Test Cases Run: 1
 verifypositive2:        Skipping Test Case 20
 verifypositive3:        runif evaluated as falsy

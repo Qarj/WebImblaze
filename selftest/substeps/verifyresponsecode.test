@@ -1,0 +1,16 @@
+step:                   verifyresponsecode should pass
+shell:                  echo hello world
+verifyresponsecode:     100
+
+step:                   verifyresponsecode should fail
+shell:                  echo hello world
+verifyresponsecode:     404
+
+step:                   verifyresponsecode should pass
+url:                    http://{WIC}/pagedoesnotexist
+verifyresponsecode:     404
+
+step:                   verifyresponsecode should pass
+url:                    http://{WIC}
+verifyresponsecode:     200
+

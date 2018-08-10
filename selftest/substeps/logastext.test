@@ -1,0 +1,7 @@
+step:                   log as text not used
+url:                    http://{WIC}
+
+step:                   log as text used
+url:                    http://{WIC}
+logastext:              true
+

@@ -1,0 +1,24 @@
+step:                   Use special characters in assertions
+shell:                  echo NOP
+verifypositive:         one > two
+verifypositive1:        one < two
+verifypositive2:        one & two
+
+step:                   less than < greater than > & ampersand
+description2:            <&> in description too
+shell:                  echo NOP
+
+step:                   Assertions should pass
+shell:                  echo one < NUL
+verifynegative1:        \<option selected="selected" value="Relevancy#0">Relevance\</option>|||Expected Search to be ordered by Relevance
+verifynegative2:        \<option selected='selected' value='Relevancy#0'>Relevance\</option>|||Expected Search to be ordered by Relevance
+verifynegative3:        '<<<
+verifynegative4:        "<<<
+verifynegative5:        <<'<
+verifynegative6:        <<"<
+
+step:                   More special characters'&<>
+shell:                  echo one < NUL
+verifynegative1:        <start>option "id="52" other="3"\<\end>
+verifynegative2:        <start>option 'id='51' & other='3'/\\<\\end>
+

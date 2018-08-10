@@ -1,9 +1,6 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   verifynegative
-shell:                  .\webinject.pl -o selftest\output\verifynegativesub selftest\substeps\verifynegative.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 assertcount:            Passed Negative Verification|||5|||Only Step 10 should have passed negative verifications
 assertcount1:           TEST CASE FAILED|||2|||Steps 20 and 30 should fail
 assertcount2:           Failed Negative Verification|||6|||Should be failed negative verifications in steps 20 and 30

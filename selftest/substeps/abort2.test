@@ -1,7 +1,8 @@
 --=
-Self test sub step file. Some test steps may fail. 
-Expected failures will be asserted by the master test file.
+    Self test sub step file. Some test steps may fail. 
+    Expected failures will be asserted by the master test file.
 =--
+
 step: Step passes
 shell: echo NOP
 verifypositive: NOP

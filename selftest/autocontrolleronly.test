@@ -1,14 +1,11 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             {TESTFILENAME}
-shell:                  echo NOP
-
 step:                   {FEATURE} - specifying that this is the automation controller
-shell:                  .\webinject.pl --autocontroller -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl --autocontroller -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Run: 2
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - without specifying that this is the automation controller
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Run: 1
 verifypositive1:        Skipping Test Case 20
 verifypositive2:        This is not the automation controller

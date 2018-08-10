@@ -1,0 +1,29 @@
+step:                   numeric [{MYNUM}], alpha [{MYALPHA}]
+description2:           alphanumeric [{MYAN}]
+varMYALPHA:             {RANDOM:10:ALPHA}
+varMYAN:                {RANDOM:10:ALPHANUMERIC}
+varMYNUM:               {RANDOM:10:NUMERIC}
+shell1:                 echo {MYNUM}
+shell2:                 echo {MYALPHA}
+shell3:                 echo {MYAN}
+shell4:                 echo {RANDOM:5:NUMERIC}
+shell5:                 echo {RANDOM:5:ALPHA}
+shell6:                 echo {RANDOM:5:ALPHANUMERIC}
+
+step:                   {RANDOM:60:ALPHANUMERIC} alphanumeric
+description2:           {RANDOM:60:NUMERIC} numeric
+shell:                  echo {RANDOM:20:ALPHANUMERIC}
+
+step:                   {RANDOM:10} default to alphanumeric
+shell:                  echo NOP
+
+step:                   Info - checking that first random digit is never 0
+shell:                  echo NOP
+
+step:                   Loop {JUMPBACKS}:[{FIRST}] 1st numeric should never be a 0
+varFIRST:               {RANDOM:1:NUMERIC}
+shell:                  echo On Loop {JUMPBACKS} got [{FIRST}]
+verifypositive:         Loop 50
+verifynegative:         fail fast!\[0\]
+retryfromstep:          35
+

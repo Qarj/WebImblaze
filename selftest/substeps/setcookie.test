@@ -1,0 +1,14 @@
+step:                   Get the Search form
+url:                    http://{WIC}/Search/SearchForm
+setcookie:              MyFirstCookie: cookie_value; MySecondCookie: another_value
+verifypositive:         Search Recipes
+verifypositive1:        Recipe Name
+verifypositive2:        Max Preparation Time
+
+step:                   Submit a search
+url:                    http://{WIC}/Search/SearchRecipes
+postbody:               RecipeName=Pesto&Cuisine=Italian&MaxPrepTime=20&__RequestVerificationToken={DATA}&BtnSubmit=Search+Recipes
+setcookie:               MyThirdCookie :  value_of_third_cookie  
+verifypositive:         Believe it or not, you just submitted a search
+addheader:              Cache-Control: max-age=0
+

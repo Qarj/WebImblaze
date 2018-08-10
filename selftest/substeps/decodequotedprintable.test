@@ -1,0 +1,15 @@
+step:                   Examine a quoted printable file with decode
+shell:                  perl -ne "print" selftest{SLASH}testdata{SLASH}quotedprintable.txt
+parseresponseSCALE10:   width=device-width, initial |"|
+decodequotedprintable:  true
+
+step:                   Info - found: {SCALE10} in response step 10
+shell:                  echo NOP
+
+step:                   Examine a quoted printable file without decode
+shell:                  perl -ne "print" selftest{SLASH}testdata{SLASH}quotedprintable.txt
+parseresponseSCALE30:   width=device-width, initial |"|
+
+step:                   Info - found: {SCALE30} in response step 30
+shell:                  echo NOP
+

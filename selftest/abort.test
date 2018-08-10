@@ -1,16 +1,13 @@
-step:                   Self test feature {FEATURE}
-varFEATURE:             abort
-shell:                  echo NOP
-
 step:                   {FEATURE}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.xml
+varFEATURE:             {TESTFILENAME}
+shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Failed: 2
 verifypositive1:        Test Cases Run: 3
 verifypositive2:        EXECUTION ABORTED
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
-shell1:                 .\webinject.pl -o selftest\output\{FEATURE}1sub selftest\substeps\{FEATURE}1.xml
+shell1:                 .\webinject.pl -o selftest\output\{FEATURE}1sub selftest\substeps\{FEATURE}1.test
 shell2:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}1subresults.xml
 verifypositive:         Test Cases Failed: 1
 verifypositive1:        Test Cases Run: 4

@@ -1,0 +1,16 @@
+step:                   Should pass assertcount
+shell:                  echo one one one
+assertcount:            one|||6
+assertcount1:           one|||6|||Should have one 6 times
+assertcountONE:         o.e|||6|||Should have one 6 times
+
+step:                   Should fail assertcount
+shell:                  echo one one one one
+assertcount:            one|||6
+assertcount1:           one|||6|||Should have one 6 times
+assertcountONE:         o.e|||6|||Should have one 6 times
+
+step:                   Assertion should be ignored
+shell:                  echo one one one one
+assertcount:            one|||6|||Should have one 6 times|||Production Bug
+

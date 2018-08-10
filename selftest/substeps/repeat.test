@@ -1,0 +1,10 @@
+repeat:                 5
+
+step:                   Step 10, loop number {COUNTER}
+shell:                  echo NOP
+
+step:                   Step 20
+shell:                  echo try number {RETRY}
+verifypositive:         try number 2
+retry:                  3
+

@@ -1,0 +1,8 @@
+step:                   Unmask a string - [[[|68656c6c6f|]]] world
+shell:                  REM [[[|68656c6c6f|]]] there
+verifypositive:         hello there
+
+step:                   Mask a string
+shell:                  perl -e "print unpack(q|H*|, q|hello|)"
+verifypositive:         68656c6c6f
+

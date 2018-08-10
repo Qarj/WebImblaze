@@ -1,0 +1,7 @@
+step:                   should fail
+url:                    http://{WIC}/pagedoesnotexist
+
+step:                   should pass
+url:                    http://{WIC}/pagedoesnotexist
+ignorehttpresponsecode: true
+

@@ -1,0 +1,42 @@
+step:                   Perform simple evals
+shell:                  echo NOP
+evalEXPECT_24:          4*6
+evalEXPECT_FALSE:       5>7
+evalEXPECT_TEN:         4 + 6
+evalEXPECT_TRUE:        7>5
+
+step:                   Check eval true, false results: _{EXPECT_TRUE}_, _{EXPECT_FALSE}_
+shell1:                 echo Should be true _{EXPECT_TRUE}_
+shell2:                 echo Should be false _{EXPECT_FALSE}_
+verifypositive1:        Should be true _1_
+verifypositive2:        Should be false __
+
+step:                   Check eval math: _{EXPECT_TEN}_, _{EXPECT_24}_
+shell1:                 echo Should be 10 _{EXPECT_TEN}_
+shell2:                 echo Should be 24 _{EXPECT_24}_
+verifypositive1:        Should be 10 _10_
+verifypositive2:        Should be 24 _24_
+
+step:                   Perform evals with other variables
+section:                Set vars
+varNINETY:              90
+varTEN:                 10
+shell:                  echo NOP
+
+step:                   Perform evals with other variables
+shell:                  echo NOP
+evalEXPECT_HUNDRED:     {NINETY}+{TEN}
+
+step:                   Check hundred: _{EXPECT_HUNDRED}_
+shell1:                 echo Should be hundred _{EXPECT_HUNDRED}_
+verifypositive1:        Should be hundred _100_
+
+step:                   Perform evals with octal number - leading 0
+section:                Octal
+shell:                  echo NOP
+evalEXPECT_EIGHT:       010
+
+step:                   Check leading zero treated as Octal
+shell1:                 echo Should be eight _{EXPECT_EIGHT}_
+verifypositive1:        Should be eight _8_
+

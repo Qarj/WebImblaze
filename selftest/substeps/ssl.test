@@ -1,0 +1,13 @@
+step:                   Get page over SSL
+url:                    https://www.totaljobs.com
+errormessage:           Could not get www.totaljobs.com over SSL, maybe need to cpan LWP::Protocol::https
+
+step:                   2 Postcodes
+url:                    https://api.postcodes.io/postcodes
+posttype:               application/json
+postbody:               {"postcodes":["BA15 2RW","BA2 3AQ"]}
+verifypositive:         admin_county
+addheader:              Content-Type application/x-www-form-urlencoded; charset=UTF-8
+errormessage:           Could not post json to api.postcodes.io over SSL, maybe need to cpan LWP::Protocol::https
+formatjson:             true
+

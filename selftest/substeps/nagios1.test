@@ -1,0 +1,8 @@
+step:                   Step 10 should pass
+shell1:                 perl -MTime::HiRes=sleep -e "sleep 0.01"
+errormessage:           Nagios should NOT see this error message
+
+step:                   Step 20 should pass also, however we should report a WARNING to Nagios due to exceeding globaltimeout of 0.01
+shell1:                 perl -MTime::HiRes=sleep -e "sleep 0.01"
+errormessage:           Nagios should NOT see this error message
+

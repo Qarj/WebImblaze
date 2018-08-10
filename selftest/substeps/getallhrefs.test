@@ -1,0 +1,4 @@
+step:                   Get a css file
+url:                    http://{WIC}/Home/Special
+getallhrefs:            ial.css
+

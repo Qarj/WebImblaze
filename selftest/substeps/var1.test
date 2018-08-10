@@ -1,0 +1,15 @@
+step:                   Set a var
+varNEW:                 My New Var
+shell:                  echo NOP
+
+step:                   View copied vars {COPY}
+varCOPY:                {NEW}
+shell1:                 echo
+
+step:                   View copied vars {COPY} {XCOPY}
+varXCOPY:               {NEW}
+shell1:                 echo _COPY_IS_{COPY}
+shell2:                 echo _XCOPY_IS_{XCOPY}
+verifypositive1:        _COPY_IS_My New Var
+verifypositive2:        _XCOPY_IS_My New Var
+
