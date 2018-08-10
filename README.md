@@ -1,4 +1,4 @@
-# WebInject 2.10.0
+# WebInject 2.11.0
 
 **_WebInject is moving away from the fake .xml to a simpler .test file format._**
 **_Soon support for .xml will be removed and it will only run .test files._**

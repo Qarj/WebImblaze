@@ -8,6 +8,15 @@ Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
 ---------------------------------
 ## Release History:
 
+### Version 2.11.0 - Aug 10, 2018
+* stabilised the simplified .test format including fixes for Linux
+* fix compilation error under CentOS 7 - Perl 5.16.3
+* abort will now continue execution from the specified step name e.g. Teardown when triggered
+* section breaks increment auto test step numbering system to nearest 100
+* can now specify a useragent in a .test file as a separate directive applying to all steps
+* failure to specify either a url, shell or selenium paremeter will result in an actionless step
+* additional substitution modifier DATE_NOW modifies the data from the current time (instead of test start time)
+
 ### Version 2.10.0 - Jun 22, 2018
 * support a simplified test format in addition to xml, once it is production proven the xml format will be deprecated and later removed
 * support Perl 5.26 (@INC no longer includes '.' by default)
