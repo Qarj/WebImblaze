@@ -1,11 +1,12 @@
-step: Get Totaljobs Home Page
-section: Selenium Smoke Test
-selenium: $driver->get("http://www.totaljobs.com")
-selenium1: $driver->get_all_cookies()
-verifytext: get_page_source,get_current_url
-verifypositive: Location
+step:                   Get Totaljobs Home Page
+section:                Selenium Smoke Test
+selenium:               $driver->get("https://www.totaljobs.com")
+selenium1:              $driver->get_all_cookies()
+verifytext:             get_page_source,get_current_url
+verifypositive:         Location
 
-step: Get SSL Sign in Page
-selenium: $driver->get('https://www.totaljobs.com/Authenticated/Login.aspx')
-verifytext: get_page_source,get_body_text
-verifypositive: password
+step:                   Get SSL Sign in Page
+selenium:               $driver->get('https://www.totaljobs.com/account/signin?ReturnUrl=/')
+verifytext:             get_page_source,get_body_text
+verifypositive:         password
+

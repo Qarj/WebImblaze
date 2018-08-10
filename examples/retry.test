@@ -1,0 +1,21 @@
+step:                   Get Recipe List
+url:                    http://webinject-check.azurewebsites.net/Recipes
+verifypositive1:        Create New
+
+step:                   Get create new recipe page
+url:                    http://webinject-check.azurewebsites.net/Recipes/Create
+verifypositive1:        Back to List
+
+step:                   Post new recipe details
+varROLL_TYPE:           {RANDOM:3}
+url:                    http://webinject-check.azurewebsites.net/Recipes/Create
+postbody:               Name=Chiko%20Roll%20type%20{ROLL_TYPE}&Cuisine=Australian&Serves=1.00&DelaySeconds={RANDOM:1:NUMERIC}&__RequestVerificationToken={DATA}&Vegetarian=false
+verifypositive1:        302 Found
+parseresponseREDIRECT_URL: Location: |\n|decode
+
+step:                   Get create new recipe page
+url:                    http://webinject-check.azurewebsites.net{REDIRECT_URL}
+verifypositive1:        Chiko Roll type {ROLL_TYPE}
+retry:                  4
+sleep:                  3
+

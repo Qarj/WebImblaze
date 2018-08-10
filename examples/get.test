@@ -1,0 +1,22 @@
+--=
+    The {TOTALJOBS} substitution is defined in config.xml in the same folder webinject.pl is located
+
+    http:// is not included as part of the substitution in this example. This is because the website
+    also uses https://
+
+    It would be awkward to two substitutions, with a second one called {TOTALJOBSHTTPS} (for example)
+    containing much the same information.
+
+    Defining substitutions of {HTTP} and {HTTPS} would be just silly.
+=--
+
+step:                   Get Totaljobs Home Page
+description2:           Description 2 is used to display additional information about the test step at hand
+url:                    https://{TOTALJOBS}
+verifypositive:         recommended
+
+step:                   Get Totaljobs Account Register Page
+description2:           Runs over https
+url:                    https://{TOTALJOBS}/account/register
+verifypositive:         mandatory
+

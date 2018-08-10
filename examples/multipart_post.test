@@ -1,0 +1,11 @@
+step:                   Get the multipart upload page
+url:                    http://webinject-check.azurewebsites.net/BulkUpload/Index
+verifypositive:         Select File
+
+step:                   Post the csv file
+url:                    http://webinject-check.azurewebsites.net/BulkUpload/Upload
+posttype:               multipart/form-data
+postbody:               ( 'fileUpload' => ['examples/multipart_post.csv'], 'name' => 'Upload' )
+verifypositive1:        File Upload Details
+verifypositive2:        Meat Balls
+

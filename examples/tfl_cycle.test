@@ -1,0 +1,32 @@
+step:                   From:_{FROM_RAW}_ To:_{TO_RAW}_
+varFROM_RAW:            SW8 1LF
+varTO_RAW:              SE1 0SU
+shell:                  echo From:_{FROM_RAW}_ To:_{TO_RAW}_
+parseresponseFROM:      From:_([^_]+)_|regex|uri_escape
+parseresponseTO:        To:_([^_]+)_|regex|uri_escape
+
+step:                   From:[{FROM}] To:[{TO}]
+shell:                  echo {FROM} {TO}
+
+step:                   Get TFL Cycle Route
+url:                    https://tfl.gov.uk/plan-a-journey/results?IsAsync=true&JpType=cycling&InputFrom={FROM}&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22bikePoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22placesExtra%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail%2Criver-tour&From={FROM}&FromId=&PreviousFrom=&InputTo={TO}&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22bikePoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22placesExtra%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail%2Criver-tour&To={TO}&ToId=&PreviousTo=&TimeIs=departing&Date={YEAR}{MONTH}{DAY}&Time=2100&Mode=bus&Mode=tube&Mode=national-rail&Mode=dlr&Mode=overground&Mode=tflrail&Mode=river-bus&Mode=tram&Mode=cable-car&Mode=coach&CyclePreference=AllTheWay&WalkingSpeedWalking=average&JourneyPreference=leasttime&AccessibilityPreference=norequirements&MaxWalkingMinutes=40&WalkingSpeedTransport=average&InputVia=&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail&Via=&ViaId=&PreviousVia=&NationalSearch=false&WalkingOptimization=false&SavePreferences=false&IsMultipleJourneySelection=False&JourneyType=&IsPastWarning=False
+parseresponseAPP_ID:    tfl.appId = "([\w]+)"|regex|
+parseresponseAPP_KEY:   tfl.appKey = "([\w]+)"|regex|
+
+step:                   TFL app_key is {APP_KEY}, app_id is {APP_ID}
+shell:                  echo NOP
+
+step:                   Get Cycle Route Turn by Turn Directions tfl_directions
+url:                    https://tfl.gov.uk/plan-a-journey/results?IsAsync=true&JpType=cycling&&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22bikePoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22placesExtra%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail%2Criver-tour&From={FROM}&FromId=&PreviousFrom=&&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22bikePoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%2C%5B%22placesExtra%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail%2Criver-tour&To={TO}&ToId=&PreviousTo=&TimeIs=departing&Date={YEAR}{MONTH}{DAY}&Time=2100&Mode=bus&Mode=tube&Mode=national-rail&Mode=dlr&Mode=overground&Mode=tflrail&Mode=river-bus&Mode=tram&Mode=cable-car&Mode=coach&CyclePreference=AllTheWay&WalkingSpeedWalking=average&JourneyPreference=leasttime&AccessibilityPreference=norequirements&MaxWalkingMinutes=40&WalkingSpeedTransport=average&InputVia=&DataSetsJson=%5B%5B%22stopPoints%22%2C%22journeyPlannerNoSubmit%3FInput%3D%7B%7Binput%7D%7D%22%5D%5D&Modes=tube%2Cdlr%2Coverground%2Ctflrail%2Cbus%2Criver-bus%2Ctram%2Ccable-car%2Cnational-rail&Via=&ViaId=&PreviousVia=&NationalSearch=false&WalkingOptimization=false&SavePreferences=false&IsMultipleJourneySelection=False&JourneyType=&IsPastWarning=False&ispostback=true&app_id={APP_ID}&app_key={APP_KEY}
+verifypositive:         location=
+verifypositive1:        instruction-heading
+verifypositive2:        instruction-description
+
+step:                   Get Cycle Route tfl_map
+url:                    https://api-prod6.tfl.gov.uk//Journey/JourneyResults/{FROM}/to/{TO}?AccessibilityPreference=norequirements&CyclePreference=AllTheWay&Date={YEAR}{MONTH}{DAY}&JourneyPreference=leasttime&MaxWalkingMinutes=40&numberOfTrips=3&Mode=cycle&NationalSearch=False&Time=2100&TimeIs=departing&WalkingOnly=False&IsExternalWidget=False&WalkingSpeed=average&bikeProficiency=easy,moderate,fast&alternativewalking=true&WalkingOptimization=False&app_id={APP_ID}&app_key={APP_KEY}
+verifypositive1:        startLat
+verifypositive2:        startLon
+verifypositive3:        endLat
+verifypositive4:        endLon
+formatjson:             true
+

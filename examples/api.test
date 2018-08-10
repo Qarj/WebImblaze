@@ -1,0 +1,19 @@
+step:                   View webinject-check API info
+url:                    http://webinject-check.azurewebsites.net/api
+verifypositive:         GetAllSearches
+
+step:                   Call GetSearch/3 with json header
+url:                    http://webinject-check.azurewebsites.net/api/GetSearch/3
+verifypositive:         "recipeName":"Pesto"
+addheader:              Accept: application/json
+
+step:                   Call GetSearch/3 with xml header
+url:                    http://webinject-check.azurewebsites.net/api/GetSearch/3
+verifypositive:         <RecipeName>Pesto</RecipeName>
+addheader:              Accept: application/xml
+
+step:                   Post 'id=2' to /api/PostSearch
+url:                    http://webinject-check.azurewebsites.net/api/PostSearch
+postbody:               id=2
+verifypositive:         American
+

@@ -1,0 +1,17 @@
+--=
+    assertcount checks that the existence of a given regular expression appears the specified
+    number of times in the response.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+assertcount:            example|||3
+
+step:                   Get Home page
+url:                    http://{WIC}
+assertcount:            example|||2
+
+step:                   Get Home page
+url:                    http://{WIC}
+assertcount:            example|||2|||The word example should appear 3 times in the html source
+

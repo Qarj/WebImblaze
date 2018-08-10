@@ -1,0 +1,5 @@
+step:                   Demo a failing test
+shell:                  echo Nothing much
+verifypositive1:        This test will not pass
+retry:                  0
+

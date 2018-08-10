@@ -1,0 +1,11 @@
+# After execution of the first step, WebInject waits 2 seconds.
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive1:        WebInject
+sleep:                  2
+
+step:                   Get Home page again
+url:                    http://{WIC}
+verifypositive1:        WebInject
+

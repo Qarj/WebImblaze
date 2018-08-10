@@ -1,0 +1,16 @@
+--=
+    formatxml makes it easier to read xml that has no carriage returns in it, by adding in a
+    carriage return between every ><
+
+    After running this example, type output\http.log to see the difference between step 10 and 20.
+=--
+
+step:                   Echo some xml
+shell:                  type examples\testdata\samplexml.xml
+verifypositive:         testcasefile
+
+step:                   Echo some xml
+shell:                  type examples\testdata\samplexml.xml
+verifypositive:         testcasefile
+formatxml:              true
+

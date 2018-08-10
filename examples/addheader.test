@@ -1,0 +1,13 @@
+--=
+    addheader in this example is used to add some cookies. It will replace any
+    existing cookies.
+
+    In this example, the application doesn't recognise these cookies so it doesn't
+    affect anything. Example is only so you can see syntax as part of a full example.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive1:        WebInject
+addheader:              Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1
+

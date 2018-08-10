@@ -1,0 +1,12 @@
+step:                   Run a long running test
+shell:                  echo Nothing much
+
+step:                   This is step {RETRY}
+shell:                  echo This is step {RETRY}
+verifypositive:         This is step 3
+retry:                  5
+sleep:                  5
+
+step:                   Sorry that took so long! All done now.
+shell:                  echo Nothing much
+

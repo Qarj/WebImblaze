@@ -1,0 +1,22 @@
+--=
+    When the abort="true" parameter is present on a test step, then execution will be halted if
+    any verification on that test step has failed (after all retries have been exhausted).
+
+    The idea is that it allows you to stop test execution if there is a serious problem.
+
+    For example, if the login page is failing to load, then there is no point proceeding with a
+    complicated workflow.
+
+    If you set abort to the name of another step, e.g. Teardown, execution will continue from
+    there instead of ending immediately.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive:         text that will not be found
+abort:                  true
+
+step:                   Get Search Form
+url:                    http://{WIC}/Search/SearchForm
+verifypositive:         Search Recipes
+

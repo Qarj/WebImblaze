@@ -1,0 +1,10 @@
+--=
+    Normally a 404 will fail a test step automatically. However if you specify
+    what response code you are expecting, and it matches, then the test will
+    not fail.
+=--
+
+step:                   Get a page that does not exist
+url:                    http://{WIC}/pagedoesnotexist
+verifyresponsecode:     404
+

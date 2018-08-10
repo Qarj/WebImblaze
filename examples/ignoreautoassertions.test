@@ -1,0 +1,17 @@
+--=
+    ignoreautoassertions will stop the automatic assertions defined in the config file from running.
+
+    For example, if we had this section defined in the config file,
+
+    <autoassertions> 
+       <autoassertion1>^((?!HTTP Error 404.0 . Not Found).)*$|||Page not found error</autoassertion1> 
+    </autoassertions> 
+
+    then this asertion would not be run if this parameter is present on a test step.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive1:        WebInject
+ignoreautoassertions:   true
+

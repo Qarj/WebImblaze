@@ -1,0 +1,14 @@
+--=
+    commandonerror allows you to perform an action if the test step fails.
+
+    In this example we pretend to start a batch file that sends an email to ops.
+
+    To see that the command was executed, type output\http.log - you'll see the
+    output of the command at the very end of the file.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive:         text that will not be found
+commandonerror:         echo send_email_to_ops.bat
+

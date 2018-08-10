@@ -1,0 +1,12 @@
+--=
+    logresponseasfile takes the content of the response (not the headers) and saves it in a file of
+    your choosing.
+
+    In this example, you can type output\HomePage.html to see the file.
+=--
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive1:        WebInject
+logresponseasfile:      HomePage.html
+

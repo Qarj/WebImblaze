@@ -1,0 +1,15 @@
+--=
+    By Default, WebInject will fail a test if the http response code indicates an error.
+
+    The ignorehttpresponsecode parameter tells WebInject not to do that assertion.
+
+    In this example, Step 10 fails, but Step 20 passes since we ignore error codes (in this case 404).
+=--
+
+step:                   Get Non existant page
+url:                    http://{WIC}/pagedoesnotexist
+
+step:                   Get Non existant page
+url:                    http://{WIC}/pagedoesnotexist
+ignorehttpresponsecode: true
+

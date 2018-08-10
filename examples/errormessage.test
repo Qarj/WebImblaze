@@ -1,0 +1,7 @@
+# errormessage will write out a custom errormessage if the test case fails.
+
+step:                   Get Home page
+url:                    http://{WIC}
+verifypositive1:        WebInject Test Tool
+errormessage:           Perhaps somebody deployed the old version of the page again
+
