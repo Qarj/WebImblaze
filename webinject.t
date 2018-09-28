@@ -1355,6 +1355,22 @@ assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names
 assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
 assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
 
+# specify include file with backslash
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: This is my first step, 10 
+shell: REM 10
+
+include: examples\include\include_demo_1.test
+
+step: This is my third step, 30 
+shell: REM 30
+EOB
+    ;
+read_test_case_file();
+assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in with backslash - 1');
+assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in with backslash - 2');
+
 # specify two include files
 before_test();
 $main::unit_test_steps = <<'EOB'

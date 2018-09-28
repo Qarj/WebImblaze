@@ -2666,7 +2666,7 @@ sub _parse_steps {
 
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = $_files_to_include->{$_include_integer_step_num};
-        my $_include_file_content = read_file( $_include_file_name );
+        my $_include_file_content = read_file( slash_me($_include_file_name) );
         new_parser( \ $_include_file_content );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
