@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive20:        20\.2
 verifypositive30:        30\.1
 verifypositive60:        60\.5

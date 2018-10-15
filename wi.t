@@ -4,7 +4,7 @@ use strict;
 use Test::More qw( no_plan );
 
 #http://www.drdobbs.com/scripts-as-modules/184416165
-do './webinject.pl';
+do './wi.pl';
 
 #
 # GLOBAL TEST SETUP
@@ -375,7 +375,7 @@ assert_stdout_contains('Classic test steps parsed OK', 'read_test_case_file : cl
 #                                'verifypositive' => 'retry 1'
 #                              },
 #                      '10' => {
-#                                'description1' => 'Test that WebInject can run a very basic test',
+#                                'description1' => 'Test that WebImblaze can run a very basic test',
 #                                'command' => 'REM Nothing: much',
 #                                'method' => 'cmd',
 #                                'verifypositive1' => 'Nothing: much'
@@ -386,7 +386,7 @@ assert_stdout_contains('Classic test steps parsed OK', 'read_test_case_file : cl
 
 before_test();
 $main::unit_test_steps = <<'EOB'
-step: Test that WebInject can run a very basic test
+step: Test that WebImblaze can run a very basic test
 shell: REM Nothing: much
 verifypositive1: Nothing: much
 
@@ -403,7 +403,7 @@ assert_stdout_contains('Lean test format detected', 'read_test_case_file : can d
 assert_stdout_contains('Lean test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
 assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
-assert_stdout_contains("'description1' => 'Test that WebInject can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
+assert_stdout_contains("'description1' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
 assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
 assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
 assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
@@ -961,7 +961,7 @@ assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Test within a test
-url: http://webinject.server/webinject/server/submit/?batch=Unit&target=test
+url: http://webimblaze.server/webimblaze/server/submit/?batch=Unit&target=test
 postbody:-=-: -=-
 
 step: Ends with multi line quote
@@ -990,7 +990,7 @@ $main::unit_test_steps = <<'EOB'
 # single line comment
 step: Edge cases
 verifynegative10: Error
-url: http://webinject.server/webinject/server/submit/?batch=Unit&target=test
+url: http://webimblaze.server/webimblaze/server/submit/?batch=Unit&target=test
 postbody:-=-: -=-
 
     step: Ends with multi line quote
@@ -1519,7 +1519,7 @@ assert_stdout_contains("'gotostep' => 'All done'", '_parse_lean_test_steps : bug
 # support testvar
 
 #issues:
-#   repeat parm needs to be renamed eventually for WebInject 3
+#   repeat parm needs to be renamed eventually for WebImblaze
 #   utf-8 mess - needs major attention (alternatives to slurp, maybe Path::Tiny which support utf8 slurp)
 
 #

@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Failed: 5
 verifypositive1:        Skipped Assertion Count 0 - Expected count of 4
 verifypositive2:        Skipped Assertion Count 1ONE1 - Expected count of 4

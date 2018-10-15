@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Failed: 1
 verifynegative:         uninitialized value
 

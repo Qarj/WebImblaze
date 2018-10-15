@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 assertcount:            testemail_1_0_0_|||2
 assertcount1:           testemail_1_0_1_|||1
 assertcount2:           testemail_2_0_1_|||1
@@ -10,7 +10,7 @@ verifypositive1:        Test Cases Run: 14
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}1
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}1sub selftest\substeps\{FEATURE}1.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}1sub selftest\substeps\{FEATURE}1.test
 verifypositive:         Test Cases Failed: 0
 verifypositive1:        Test Cases Run: 3
 verifynegative:         uninitialized value

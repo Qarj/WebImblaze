@@ -4,7 +4,7 @@ shell1:                 if exist selftest\output\small_brickwork.jpg del selftes
 shell2:                 if exist selftest\output\append_element.js del selftest\output\append_element.js
 
 step:                   {FEATURE}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Failed: 0
 verifypositive1:        GET Asset \[version10_small_brickwork.jpg]
 verifypositive2:        GET Asset \[version20_append_element.js]

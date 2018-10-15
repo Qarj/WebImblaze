@@ -1,19 +1,19 @@
 step:                   {FEATURE} - with DEV config
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -c selftest\substeps\runon_config_DEV.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -c selftest\substeps\runon_config_DEV.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Run: 4
 verifypositive1:        Skipping Test Case 50... \(do not run on DEV|PAT\)
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - with PAT config
-shell:                  .\webinject.pl -c selftest\substeps\runon_config_PAT.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -c selftest\substeps\runon_config_PAT.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Run: 3
 verifypositive1:        Skipping Test Case 30... \(do not run on PAT|PROD\)
 verifypositive2:        Skipping Test Case 50... \(do not run on DEV|PAT\)
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - with PROD config
-shell:                  .\webinject.pl -c selftest\substeps\runon_config_PROD.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -c selftest\substeps\runon_config_PROD.xml -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Cases Run: 3
 verifypositive1:        Skipping Test Case 30... \(do not run on PAT|PROD\)
 verifypositive2:        Skipping Test Case 40... \(do not run on PROD\)

@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  .{SLASH}webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
+shell:                  .{SLASH}wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
 verifypositive:         Test Cases Failed: 0
 verifypositive1:        name.tartiflette..name

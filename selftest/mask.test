@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  perl webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
+shell:                  perl wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
 verifypositive1:        Test Cases Run: 2
 verifypositive2:        Test Cases Passed: 2
 verifynegative:         uninitialized value

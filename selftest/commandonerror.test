@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell:                  perl webinject.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
+shell:                  perl wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
 verifypositive:         commandonerror in step 10 was run
 verifynegative1:        commandonerror in step 20 was run

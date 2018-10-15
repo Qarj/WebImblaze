@@ -1,6 +1,6 @@
 step:                   {FEATURE} - parameter
 varFEATURE:             {TESTFILENAME}
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
 assertcount:            User-Agent: WebInject|||1
 assertcount1:           User-Agent: My Special Browser|||2
@@ -8,7 +8,7 @@ assertcount2:           User-Agent: Firefox Browser|||1
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - from config file
-shell:                  .\webinject.pl -o selftest\output\{FEATURE}1sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}1.test
+shell:                  .\wi.pl -o selftest\output\{FEATURE}1sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}1.test
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}1subhttp.txt
 assertcount:            User-Agent: WebInject|||0
 assertcount1:           User-Agent: HTTP Test Tool|||1
