@@ -224,7 +224,7 @@ foreach ($start .. $repeat) {
             $retry_passed_count = 0;
             $retry_failed_count = 0;
 
-            if ($case{description1} and $case{description1} =~ /dummy test case/) {  ## if we hit the dummy record, skip it (this is a hack for test case files with only one step)
+            if ($case{step} and $case{step} =~ /dummy test case/) {  ## if we hit the dummy record, skip it (this is a hack for test case files with only one step)
                 next;
             }
 
@@ -428,7 +428,7 @@ sub get_test_step_skip_message {
 #------------------------------------------------------------------
 sub substitute_variables {
 
-    ## "method", "description1", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", ... "command20", "parms", "verifytext",
+    ## "method", "step", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", ... "command20", "parms", "verifytext",
     ## "verifypositive", "verifypositive1", ... "verifypositive9999",
     ## "verifynegative", "verifynegative1", ... "verifynegative9999",
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
@@ -562,7 +562,7 @@ sub output_test_step_description {
     $results_stdout .= qq|Test:  $current_steps_file - $testnum_display$jumpbacks_print$retries_print \n|;
     $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
-    for (qw/section description1 description2/) { ## support section breaks
+    for (qw/section step description2/) { ## support section breaks
         next unless defined $case{$_};
         $results_html .= qq|$case{$_} <br />\n|;
         $results_stdout .= qq|$case{$_} \n|;
@@ -740,7 +740,7 @@ sub set_step_index_for_test_step_to_jump_to {
             $_found_index = 'true';
             last;
         }
-        if ($lean_test_steps->{case}->{$test_steps[$step_index]}->{description1} eq $_target_test_step) {
+        if ($lean_test_steps->{case}->{$test_steps[$step_index]}->{step} eq $_target_test_step) {
             $_found_index = 'true';
             last;
         }
@@ -2831,7 +2831,6 @@ sub _rename_lean_parameters_to_classic_names {
         if ( $_parms->[$_i] =~ s/^selenium/command/) {
             $testfile_contains_selenium = 'true';
         }
-        $_parms->[$_i] =~ s/^step$/description1/;
     }
 }
 
@@ -3026,7 +3025,7 @@ sub _validate_step {
     if (not $parser_step_parm_names_[0] eq 'step') {
         _output_validate_error ('First parameter of step block must be step:', "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_);
     }
-    my @_reserved_parms = ('description1', 'id', 'command');
+    my @_reserved_parms = ('id', 'command');
     for my $_i (0 .. $#parser_step_parm_names_) {
         foreach my $_reserved (@_reserved_parms) {
             if ( $parser_step_parm_names_[$_i] eq $_reserved ) {
@@ -3362,7 +3361,7 @@ sub httplog {  # write requests and responses to http.txt file
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
 
-    $_step_info .=  $case{description1};
+    $_step_info .=  $case{step};
     if (defined $case{description2}) {
        $_step_info .= ' ['.$case{description2}.']';
     }
@@ -3447,7 +3446,7 @@ sub _write_step_html {
     $_html .= qq|        <div style="padding:1em 1em 0 1em; border:1px solid #ddd; background:DarkSlateGray; margin:0 2em 2em 0; font-weight:normal;  color:#D1E6E7; line-height:1.6em !important; font:Verdana, sans-serif !important;">\n|;
     $_html .= qq|            <h1 style="font-weight: normal; font-size:1.6em !important; font-family: Verdana, sans-serif; float: left; margin: 0; padding: 0; border: 0; color:#D1E6E7;">Step $testnum_display$jumpbacks_print$retries_print</wi>\n|;
     $_html .= qq|            <h3 style="font-size: 1.0em !important; font-family: Verdana, sans-serif !important; margin-bottom: 0.3em; float: right; margin: 0; padding: 0; border: 0; line-height: 1.0em !important; color:#D1E6E7;">\n|;
-    $_html .= qq|              $case{description1}\n|;
+    $_html .= qq|              $case{step}\n|;
     $_html .= qq|            </h3>\n|;
     $_html .= qq|            <div style="clear: both;"></div>\n|;
     $_html .= qq|            <h2 style="font-size:1.2em !important; font-family: Verdana, sans-serif !important; margin-bottom:0.3em !important; text-align: left;">\n|;

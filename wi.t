@@ -335,7 +335,7 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #$VAR1 = {
 #          'case' => {
 #                      '20' => {
-#                                'description1' => 'Another step - retry {RETRY}',
+#                                'step' => 'Another step - retry {RETRY}',
 #                                'description2' => 'Sub description',
 #                                'method' => 'cmd',
 #                                'command' => 'REM Not much more - retry {RETRY}',
@@ -344,7 +344,7 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #                                'verifypositive' => 'retry 1'
 #                              },
 #                      '10' => {
-#                                'description1' => 'Test that WebImblaze can run a very basic test',
+#                                'step' => 'Test that WebImblaze can run a very basic test',
 #                                'command' => 'REM Nothing: much',
 #                                'method' => 'cmd',
 #                                'verifypositive1' => 'Nothing: much'
@@ -371,11 +371,11 @@ read_test_steps_file();
 assert_stdout_contains('Lean test steps parsed OK', 'read_test_steps_file : lean style format parsed ok');
 assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
-assert_stdout_contains("'description1' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
+assert_stdout_contains("'step' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, step name found');
 assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
 assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
 assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
-assert_stdout_contains("'description1' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
+assert_stdout_contains("'step' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
 assert_stdout_contains("'description2' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
 assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : Step 20, method found');
 assert_stdout_contains("'command' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
@@ -481,16 +481,6 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'method' => 'post'", '_parse_lean_test_steps : post method detected');
-
-# step: is description1:
-before_test();
-$main::unit_test_steps = <<'EOB'
-step: Parameter rename
-url: https://www.totaljobs.com
-EOB
-    ;
-read_test_steps_file();
-assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test_steps : step is really description1');
 
 # single line comment is a hash
 before_test();
@@ -769,14 +759,14 @@ first content line
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'description1' => 'Multi 10'", '_parse_lean_test_steps : multi scenarios - 1');
+assert_stdout_contains("'step' => 'Multi 10'", '_parse_lean_test_steps : multi scenarios - 1');
 assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : multi scenarios - 2');
 assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi scenarios - 3');
 assert_stdout_contains("second line'", '_parse_lean_test_steps : multi scenarios - 4');
 assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : multi scenarios - 5');
 assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi scenarios - 6');
 assert_stdout_does_not_contain("'ignore' => 'this'", '_parse_lean_test_steps : multi scenarios - 7');
-assert_stdout_contains("'description1' => 'Multi 20'", '_parse_lean_test_steps : multi scenarios - 8');
+assert_stdout_contains("'step' => 'Multi 20'", '_parse_lean_test_steps : multi scenarios - 8');
 assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : multi scenarios - 9');
 assert_stdout_contains('first content line ', '_parse_lean_test_steps : multi scenarios - 10');
 assert_stdout_contains(' second content line', '_parse_lean_test_steps : multi scenarios - 11');
@@ -799,9 +789,9 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : blank lines between steps - 1');
-assert_stdout_contains("'description1' => 'Multiple blank lines between steps'", '_parse_lean_test_steps : blank lines between steps - 2');
+assert_stdout_contains("'step' => 'Multiple blank lines between steps'", '_parse_lean_test_steps : blank lines between steps - 2');
 assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : blank lines between steps - 3');
-assert_stdout_contains("'description1' => 'Step 2'", '_parse_lean_test_steps : blank lines between steps - 4');
+assert_stdout_contains("'step' => 'Step 2'", '_parse_lean_test_steps : blank lines between steps - 4');
 assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines between steps - 5');
 
 # single line comment within quote
@@ -1172,19 +1162,6 @@ eval { read_test_steps_file(); };
 assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : first parameter is step - 1');
 assert_stdout_contains("Parse error line 1", '_parse_lean_test_steps : first parameter is step - 2');
 
-# description1 is a reserved parameter
-before_test();
-$main::unit_test_steps = <<'EOB'
-step: Value must be present
-description1: This is not allowed
-shell: echo NOP
-EOB
-    ;
-eval { read_test_steps_file(); };
-assert_stdout_contains("Parameter description1 is reserved", '_parse_lean_test_steps : description1 is reserved - 1');
-assert_stdout_contains("Parse error line 2", '_parse_lean_test_steps : description1 is reserved - 2');
-assert_stdout_contains("Line 2 of .*description1: This is not allowed", '_parse_lean_test_steps : description1 is reserved - 3');
-
 # id is a reserved parameter
 before_test();
 $main::unit_test_steps = <<'EOB'
@@ -1393,8 +1370,8 @@ assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file mult
 assert_stdout_contains("'20.02' =>", '_parse_lean_test_steps : include file multi steps read in - 2');
 assert_stdout_contains("'command' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
 assert_stdout_contains("'command' => 'echo include demo 3 second'", '_parse_lean_test_steps : include file multi steps read in - 4');
-assert_stdout_contains("'description1' => 'Demo 3 include step .01'", '_parse_lean_test_steps : include file multi steps read in - 5');
-assert_stdout_contains("'description1' => 'Demo 3 include step .02'", '_parse_lean_test_steps : include file multi steps read in - 6');
+assert_stdout_contains("'step' => 'Demo 3 include step .01'", '_parse_lean_test_steps : include file multi steps read in - 5');
+assert_stdout_contains("'step' => 'Demo 3 include step .02'", '_parse_lean_test_steps : include file multi steps read in - 6');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file multi steps read in - 7');
 assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include file multi steps read in - 8');
 
@@ -1415,12 +1392,12 @@ EOB
 read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include multi file read in - 1');
 assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
-assert_stdout_contains("'description1' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
+assert_stdout_contains("'step' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include multi file read in - 4');
 assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include multi file read in - 5');
 assert_stdout_contains("'40.01' =>", '_parse_lean_test_steps : include multi file read in - 6');
 assert_stdout_contains("'command' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
-assert_stdout_contains("'description1' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
+assert_stdout_contains("'step' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
 
 # repeat cannot be encountered twice - primary file
 before_test();
@@ -1471,16 +1448,6 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
-
-# bug - gotostep: being transformed to gotodescription1 => 'value'
-before_test();
-$main::unit_test_steps = <<'EOB'
-step:                   Already have stats for today, no further action required
-gotostep:               All done
-EOB
-    ;
-read_test_steps_file();
-assert_stdout_contains("'gotostep' => 'All done'", '_parse_lean_test_steps : bug - gotostep: being transformed to gotodescription1');
 
 
 # support abort - step desc?
