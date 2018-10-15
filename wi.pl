@@ -65,7 +65,7 @@ my ($cookie_jar, @http_auth);
 our ($case_failed_count, $passed_count, $failed_count);
 our $is_failure;
 my ($run_count, $total_run_count, $case_passed_count, $case_failed);
-my ($current_case_file, $current_case_filename, $case_count, $fast_fail_invoked);
+my ($current_steps_file, $current_steps_filename, $case_count, $fast_fail_invoked);
 our $unit_test_steps;
 
 our %case;
@@ -88,7 +88,7 @@ my ($previous_test_step, $delayed_file_full, $delayed_html);
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print);
 my ($retry, $retries, $globalretries, $jumpbacks, $auto_retry, $checkpoint);
 my $attempts_since_last_success = 0;
-my ($xml_test_cases, $step_index, @test_steps);
+my ($lean_test_steps, $step_index, @test_steps);
 my $execution_aborted = 'false';
 
 our $results_output_folder; ## output relative path e.g. 'output/'
@@ -161,15 +161,15 @@ $min_response = 10_000_000; #set to large value so first minresponse will be les
 
 $globalretries=0; ## total number of retries for this run across all test cases
 
-$current_case_filename = basename($current_case_file); ## with extension
-$test_file_base_name = fileparse($current_case_file, ('.xml', '.test'));
+$current_steps_filename = basename($current_steps_file); ## with extension
+$test_file_base_name = fileparse($current_steps_file, ('.xml', '.test'));
 
-read_test_case_file();
+read_test_steps_file();
 
-$repeat = $xml_test_cases->{repeat};  #grab the number of times to iterate test case file
+$repeat = $lean_test_steps->{repeat};  #grab the number of times to iterate test case file
 $repeat //= 1;  #set to 1 in case it is not defined in test case file
 
-$start = $xml_test_cases->{start};  #grab the start for repeating (for restart)
+$start = $lean_test_steps->{start};  #grab the start for repeating (for restart)
 $start //= 1;  #set to 1 in case it is not defined in test case file
 
 $counter = $start - 1; #so starting position and counter are aligned
@@ -184,7 +184,7 @@ foreach ($start .. $repeat) {
     $jumpbacks_print = q{}; ## we do not indicate a jump back until we actually jump back
     $jumpbacks = 0;
 
-    @test_steps = sort {$a<=>$b} keys %{$xml_test_cases->{case}};
+    @test_steps = sort {$a<=>$b} keys %{$lean_test_steps->{case}};
     my $numsteps = scalar @test_steps;
 
     ## Loop over each of the test cases (test steps) with C Style for loop (due to need to update $step_index in a non standard fashion)
@@ -443,13 +443,13 @@ sub substitute_variables {
     undef %case; ## do not allow values from previous test cases to bleed over
     undef %late_sub; ## do not substitute vars set this step with previous value
 
-    foreach my $_case_attribute ( keys %{ $xml_test_cases->{case}->{$testnum} } ) {
-        $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
+    foreach my $_case_attribute ( keys %{ $lean_test_steps->{case}->{$testnum} } ) {
+        $case{$_case_attribute} = $lean_test_steps->{case}->{$testnum}->{$_case_attribute};
     }
     set_late_var_list();
 
     foreach my $_case_attribute (  keys %case  ) {
-        $case{$_case_attribute} = $xml_test_cases->{case}->{$testnum}->{$_case_attribute};
+        $case{$_case_attribute} = $lean_test_steps->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
         convert_back_var_variables($case{$_case_attribute});
         $case_save{$_case_attribute} = $case{$_case_attribute}; ## in case we have to retry, some parms need to be resubbed
@@ -558,8 +558,8 @@ sub check_for_checkpoint {
 #------------------------------------------------------------------
 sub output_test_step_description {
 
-    $results_html .= qq|<b>Test:  $current_case_file - <a href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
-    $results_stdout .= qq|Test:  $current_case_file - $testnum_display$jumpbacks_print$retries_print \n|;
+    $results_html .= qq|<b>Test:  $current_steps_file - <a href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
+    $results_stdout .= qq|Test:  $current_steps_file - $testnum_display$jumpbacks_print$retries_print \n|;
     $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
     for (qw/section description1 description2/) { ## support section breaks
@@ -740,7 +740,7 @@ sub set_step_index_for_test_step_to_jump_to {
             $_found_index = 'true';
             last;
         }
-        if ($xml_test_cases->{case}->{$test_steps[$step_index]}->{description1} eq $_target_test_step) {
+        if ($lean_test_steps->{case}->{$test_steps[$step_index]}->{description1} eq $_target_test_step) {
             $_found_index = 'true';
             last;
         }
@@ -952,7 +952,7 @@ sub write_initial_xml {  #write opening tags for results file
         $_results_xml .= "    </wif>\n";
     }
 
-    $_results_xml .= qq|\n    <testcases file="$current_case_file">\n\n|;
+    $_results_xml .= qq|\n    <testcases file="$current_steps_file">\n\n|;
 
     _whack($opt_publish_full.$results_xml_file_name);
     _write_xml(\$_results_xml);
@@ -2476,7 +2476,7 @@ sub process_config_file { #parse config file and grab values it sets
         #if testcase filename is not passed on the command line, use files in config.xml
 
         if ($config->{testcasefile}) {
-            $current_case_file = slash_me($config->{testcasefile});
+            $current_steps_file = slash_me($config->{testcasefile});
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
         }
@@ -2485,7 +2485,7 @@ sub process_config_file { #parse config file and grab values it sets
 
     elsif (($#ARGV + 1) == 1) {  #one command line arg was passed
         #use testcase filename passed on command line (config.xml is only used for other options)
-        $current_case_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
+        $current_steps_file = slash_me($ARGV[0]);  #first commandline argument is the test case file
     }
 
     if ($config->{httpauth}) {
@@ -2580,67 +2580,19 @@ sub _sub_xml_special {
 }
 
 #------------------------------------------------------------------
-sub read_test_case_file {
+sub read_test_steps_file {
 
     my $_test_steps;
     if ($unit_test_steps) {
         $_test_steps = $unit_test_steps;
-        $current_case_file = 'unit tests test';
+        $current_steps_file = 'unit tests test';
     } else {
-        $_test_steps = read_file( $current_case_file );
+        $_test_steps = read_file( $current_steps_file );
     }
 
-    if ( $_test_steps =~ /[^<]*<testcases/s ) {
-        $results_stdout .= qq| Classic WebInject xml style format detected\n| if $EXTRA_VERBOSE;
-    } else {
-        $results_stdout .= qq| Lean test format detected\n| if $EXTRA_VERBOSE;
-        $xml_test_cases = _parse_steps( \ $_test_steps );
-        $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
-        $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
-        return;
-    }
-
-    # substitute in the included test step files
-    $_test_steps =~ s{<include[^>]*?
-                      id[ ]*=[ ]*["'](\d*)["']                 # ' # id = "10"
-                      [^>]*?
-                      file[ ]*=[ ]*["']([^"']*)["']            # file = "tests\helpers\setup\create_job_ad.xml"
-                      [^>]*>
-                     }{_include_file($2,$1,$&)}gsex;          # the actual file content
-
-    # for convenience, WebInject allows ampersand and less than to appear in xml data, so this needs to be masked
-    $_test_steps =~ s/&/{AMPERSAND}/g;
-    while ( $_test_steps =~ s/\w\s*=\s*"[^"]*\K<(?!case)([^"]*")/{LESSTHAN}$1/sg ) {}
-    while ( $_test_steps =~ s/\w\s*=\s*'[^']*\K<(?!case)([^']*')/{LESSTHAN}$1/sg ) {}
-
-    $case_count = 0;
-    while ($_test_steps =~ /<case/g) {  #count test cases based on '<case' tag
-        $case_count++;
-    }
-
-    if ($case_count == 1) {
-        $_test_steps =~ s/<\/testcases>/<case id="99999999" description1="dummy test case"\/><\/testcases>/;  #add dummy test case to end of file
-    }
-
-    # see the final test case file after all alerations for debug purposes
-    #write_file('final_test_case_file_'.int(rand(999)).'.xml', $_xml);
-
-    # here we parse the xml file in an eval, and capture any error returned (in $@)
-    my $_message;
-    $xml_test_cases = eval { XMLin($_test_steps, VarAttr => 'varname') };
-
-    $results_stdout .= Data::Dumper::Dumper($xml_test_cases) if $EXTRA_VERBOSE;
-
-    if ($@) {
-        $_message = $@;
-        $_message =~ s{XML::Simple.*\n}{}g; # remove misleading line number reference
-        my $_file_name_full = _write_failed_xml($_test_steps);
-        die "\n".$_message."\nRefer to built test file: $_file_name_full\n";
-    }
-    $results_stdout .= qq| Classic test steps parsed OK\n| if $EXTRA_VERBOSE;
-    $results_stdout .= qq| \n$_test_steps\n|if $EXTRA_VERBOSE;
-
-    $testfile_contains_selenium = _does_testfile_contain_selenium(\ $_test_steps);
+    $lean_test_steps = _parse_steps( \ $_test_steps );
+    $results_stdout .= Data::Dumper::Dumper($lean_test_steps) if $EXTRA_VERBOSE;
+    $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
 
     return;
 }
@@ -3103,67 +3055,10 @@ sub _output_validate_error {
     my $_line = $parser_lines_[$_line_num - 1];
     $results_stdout .= qq|Parse error line $_line_num \n\n|;
     $results_stdout .= qq|$_error_message\n\n|;
-    $results_stdout .= qq|Line $_line_num of $current_case_file:\n\n|;
+    $results_stdout .= qq|Line $_line_num of $current_steps_file:\n\n|;
     $results_stdout .= qq|$_line\n\n|;
     $results_stdout .= qq|Example of $_example\n|;
     die $results_stdout."\n".'Test case file is malformed, aborted WebInject';
-}
-
-#------------------------------------------------------------------
-sub _write_failed_xml {
-    my ($_xml) = @_;
-
-    my $_path = slash_me ($results_output_folder.'parse_error');
-
-    File::Path::make_path ( $_path );
-
-    my $_rand = int rand 999;
-    my $_file_name = 'test_file_'.$_rand.'.xml';
-    my $_file_name_full = slash_me ( $_path.q{/}.$_file_name);
-
-    my $_abs_file_full = File::Spec->rel2abs( $_file_name_full );
-
-    write_file($_abs_file_full, $_xml);
-
-    return $_abs_file_full;
-}
-
-#------------------------------------------------------------------
-sub _include_file {
-    my ($_file, $_id, $_match) = @_;
-
-    if ( $_match =~ /runon[\s]*=[\s]*"([^"]*)/ ) {
-        if ( not _run_this_step($1) ) {
-            $results_stdout .= "not included: [id $_id] $_file (run on $1)\n";
-            return q{};
-        }
-    }
-
-    if ($_match =~ /autocontrolleronly/) {
-        if (not $opt_autocontroller) {
-            $results_stdout .= "not included: [id $_id] $_file (autocontrolleronly)\n";
-            return q{};
-        }
-    }
-
-    $results_stdout .= "include: [id $_id] $_file\n";
-
-    my $_include = read_file(slash_me($_file));
-    $_include =~ s{\n(\s*)id[\s]*=[\s]*"}{"\n".$1.'id="'.$_id.'.'}eg; #'
-    $_include =~ s{\n(\s*)retryfromstep[\s]*=[\s]*"}{"\n".$1.'retryfromstep="'.$_id.'.'}eg; #'
-
-    return $_include;
-}
-
-#------------------------------------------------------------------
-sub _does_testfile_contain_selenium {
-    my ($_text) = @_; # sub is passed reference to file contents in string
-
-    if ( ${$_text} =~ m/(["'])selenium(['"])/ ) {
-        return 'true';
-    }
-
-    return 0;
 }
 
 #------------------------------------------------------------------

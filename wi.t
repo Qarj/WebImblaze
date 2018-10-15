@@ -328,37 +328,6 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #
 #
 
-# Do not attempt to parse classic webinject xml style format as lean tests format
-before_test();
-$main::unit_test_steps = <<'EOB'
-<testcases repeat="1">
-
-<case
-    id="10"
-    description1="Test that WebInject can run a very basic test"
-    method="cmd"
-    command="REM Nothing much"
-    verifypositive1="Nothing much"
-/>
-
-<case
-    id="20"
-    description1="Another step - retry {RETRY}"
-    description2="Sub description"
-    method="cmd"
-    command="REM Not much more - retry {RETRY}"
-    verifypositive="retry 1"
-    verifynegative="Nothing much"
-    retry="3"
-/>
-
-</testcases>
-EOB
-    ;
-read_test_case_file();
-assert_stdout_contains('Classic WebInject xml style format detected', 'read_test_case_file : can detect classic xml test step format');
-assert_stdout_contains('Classic test steps parsed OK', 'read_test_case_file : classic style format parsed ok');
-
 # Lean test format will convert to classic xml style webinject
 
 # XMLin function creates a data structure like the below, the lean parse must produce the same structure
@@ -398,9 +367,8 @@ verifynegative: Nothing much
 retry: 3
 EOB
     ;
-read_test_case_file();
-assert_stdout_contains('Lean test format detected', 'read_test_case_file : can detect lean test format');
-assert_stdout_contains('Lean test steps parsed OK', 'read_test_case_file : lean style format parsed ok');
+read_test_steps_file();
+assert_stdout_contains('Lean test steps parsed OK', 'read_test_steps_file : lean style format parsed ok');
 assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
 assert_stdout_contains("'description1' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, desc1 found');
@@ -422,7 +390,7 @@ step: Single test step in file
 shell: echo Short
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Can have just one test step');
 
 # can have quotes
@@ -433,7 +401,7 @@ shell: echo 'single' and "double" quotes
 verifypostive: 'single' and "double" quotes
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains('Lean test steps parsed OK', '_parse_lean_test_steps : Can handle single and double quotes');
 
 # id auto generated - cannot be specified
@@ -446,7 +414,7 @@ step: Next step
 shell: echo next
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : step ids are auto generated - 10');
 assert_stdout_contains("'20' =>", '_parse_lean_test_steps : step ids are auto generated - 20');
 
@@ -461,7 +429,7 @@ step: Next step
 shell5: echo next1
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'command20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
 assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 1');
 
@@ -475,7 +443,7 @@ step: Next step
 shell1: echo next1
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 2');
 
 # method="selenium" is auto generated
@@ -489,7 +457,7 @@ step: Next step
 selenium5: $driver->get('https://www.totaljobs.com/register')
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'selenium'", '_parse_lean_test_steps : Selenium method detected');
 assert_stdout_contains("'command20' => '.driver->get_all_cookies..'", '_parse_lean_test_steps : selenium converted back to command');
 
@@ -500,7 +468,7 @@ step: Get method is detected
 url: https://www.totaljobs.com
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'get'", '_parse_lean_test_steps : get method detected');
 
 # method="post" is auto generated
@@ -511,7 +479,7 @@ url: https://www.totaljobs.com
 postbody: RecipeName=Sheperds%20Pie&Cuisine=British
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'post'", '_parse_lean_test_steps : post method detected');
 
 # step: is description1:
@@ -521,7 +489,7 @@ step: Parameter rename
 url: https://www.totaljobs.com
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'description1' => 'Parameter rename'", '_parse_lean_test_steps : step is really description1');
 
 # single line comment is a hash
@@ -532,7 +500,7 @@ url: https://www.totaljobs.com
 #verifypositive: positive
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_does_not_contain("'verifypositive'", '_parse_lean_test_steps : single line comment first char');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment does not generate null parameter');
 
@@ -550,7 +518,7 @@ verifypositive: Not found
 =--
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_does_not_contain("'Not found'", '_parse_lean_test_steps : multi line comment');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment does not generate null parameter');
 
@@ -566,7 +534,7 @@ verifypositive: positive
 verifynegative: negative
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : can have multi line comment in step');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment in step does not generate null parameter');
 assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : can have multi line comment in step - parm after comment is active');
@@ -586,7 +554,7 @@ verifynegative: negative
 #verifypositive: sad
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment ignore in mixed comments');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line and single line comment does not generate null parameter');
 assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi and single line comments mixed ok - 1');
@@ -604,7 +572,7 @@ verifypositive: positive =--
 verifynegative: negative
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment can end anywhere on line - 1');
 assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi comment can end anywhere on line - 2');
 
@@ -618,7 +586,7 @@ verifypositive2: positive
 verifynegative1: negative  =-- 
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => 'sure --= thing'", '_parse_lean_test_steps : not a multiline quote - 1');
 assert_stdout_contains("'verifypositive2' => 'positive'", '_parse_lean_test_steps : not a multiline quote - 2');
 assert_stdout_contains("'verifynegative1' => .negative  =--", '_parse_lean_test_steps : not a multiline quote - 3');
@@ -631,7 +599,7 @@ url: https://www.totaljobs.com
 verifypositive:q:    q sure q   
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive' => ' sure '", '_parse_lean_test_steps : single line quote - single char');
 
 # quoted string - one line special characters
@@ -659,7 +627,7 @@ verifypositiveH:`:    ` sure `
 verifypositiveI:0:    0 sure 0   
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => ' sure '", '_parse_lean_test_steps : single line quote - single char $');
 assert_stdout_contains("'verifypositive2' => ' sure '", '_parse_lean_test_steps : single line quote - single char ^');
 assert_stdout_contains("'verifypositive3' => ' sure '", '_parse_lean_test_steps : single line quote - single char .');
@@ -687,7 +655,7 @@ url: https://www.totaljobs.com
 verifypositive1:_: __
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char _');
 
 # quoted string - quote char is colon
@@ -698,7 +666,7 @@ url: https://www.totaljobs.com
 verifypositive1:;: ;hey;
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => 'hey'", '_parse_lean_test_steps : quote character is semicolon ');
 
 # unquoted string - preceeding and trailing spaces ignored
@@ -710,7 +678,7 @@ verifypositive1:   hello
 verifypositive2: world
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => 'hello'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 1');
 assert_stdout_contains("'verifypositive2' => 'world'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 2');
 
@@ -724,7 +692,7 @@ verifypositive2:--=:   --= hello --=
 verifypositive3:=--:   =-- hello =--  
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 1');
 assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 2');
 assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 3');
@@ -739,7 +707,7 @@ verifypositive2:{{:   {{ hello }}
 verifypositive3:[<:   [< hello ]>  
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - ()');
 assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - {{}}');
 assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : mirror char for quotes [<]>');
@@ -755,7 +723,7 @@ third line|
 verifypositive1: first
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line value - 1');
 assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line value - 2');
 assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps : multi line value - 3');
@@ -772,7 +740,7 @@ second line|
 verifypositive1: first
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line min value - 1');
 assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi line min value - 2');
 assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line min value - 3');
@@ -800,7 +768,7 @@ first content line
 
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'description1' => 'Multi 10'", '_parse_lean_test_steps : multi scenarios - 1');
 assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : multi scenarios - 2');
 assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi scenarios - 3');
@@ -829,7 +797,7 @@ url: https://www.cwjobs.co.uk
 
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : blank lines between steps - 1');
 assert_stdout_contains("'description1' => 'Multiple blank lines between steps'", '_parse_lean_test_steps : blank lines between steps - 2');
 assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : blank lines between steps - 3');
@@ -849,7 +817,7 @@ verifypositive:[[: [[
 verifynegative: bad stuff
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : single line comment in quote - 1');
 assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line comment in quote - 2');
 assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
@@ -867,7 +835,7 @@ verifypositive:[[: [[
 verifynegative: bad stuff
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("Got a single line comment index 0", '_parse_lean_test_steps : single line comment not in quote - 1');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment not in quote - 2');
 
@@ -888,7 +856,7 @@ verifynegative: bad stuff
 # comment: 3
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("Got a single line comment index 5", '_parse_lean_test_steps : various single line comments - 1');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : various single line comments - 2');
 
@@ -911,7 +879,7 @@ also: content]]
 verifynegative: bad stuff
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : multi line comment in quote - 1');
 assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line comment in quote - 2');
 assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : multi line comment in quote - 3');
@@ -938,7 +906,7 @@ verifynegative: bad stuff
 # the end
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : multi line quote with blank lines - 1');
 assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : multi line quote with blank lines - 2');
 
@@ -953,7 +921,7 @@ two fish
 ]]
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : ends with multi line quote - 1');
 assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : ends with multi line quote - 2');
 
@@ -975,7 +943,7 @@ two fish
 verifynegative: Severe error
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : test within a test - 1');
 assert_stdout_contains("'postbody' => .*step: Ends", '_parse_lean_test_steps : test within a test - 2');
 assert_stdout_contains("'postbody' => .*shell: echo NOP", '_parse_lean_test_steps : test within a test - 3');
@@ -1022,7 +990,7 @@ shell2: echo off
 =--
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : Edge cases - 1');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : Edge cases - 2');
 assert_stdout_contains("'command2' => 'echo off'", '_parse_lean_test_steps : Edge cases - 3');
@@ -1038,7 +1006,7 @@ step: Set repeat directive
 shell: REM repeat
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
 
 # useragent
@@ -1050,7 +1018,7 @@ step: Set useragent directive
 shell: REM repeat
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'useragent' => 'My custom user agent'", '_parse_lean_test_steps : useragent directive - 1');
 
 # validate that parameter name only contains \w
@@ -1060,7 +1028,7 @@ step: Malformed paramater name
 she!!: echo Hello World
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 1');
 assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 2');
 assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed parameter name - she!!: - 3');
@@ -1072,7 +1040,7 @@ step: Malformed paramater name
  shell: echo Hello World
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate parameter name starts in column 1');
 
 # quote must end with a colon
@@ -1082,7 +1050,7 @@ step:quote
 shell: echo Hello World
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parse error line 1 ", '_parse_lean_test_steps : validate malformed quote - no colon - 1');
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon - 2');
 
@@ -1093,7 +1061,7 @@ step:qu ote:
 shell: echo Hello World
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - space');
 
 # quote must end with colon space
@@ -1103,7 +1071,7 @@ step:quote:quote ABCD quote
 shell: echo Hello World
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space after final colon');
 
 # quote must not contain colon
@@ -1113,7 +1081,7 @@ step: Quote
 shell::: :quoted text:
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon in quote');
 
 # quote must not contain white space - space
@@ -1123,7 +1091,7 @@ step: Set repeat directive
 shell:1 2: 1 2quoted text1 2
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space in quote');
 
 # quote must not contain white space - tab
@@ -1133,7 +1101,7 @@ step: Set repeat directive
 url:1	2: 1	2https://www.cwjobs.co.uk1	2
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no tab in quote');
 
 # quote must start on parameter line
@@ -1144,7 +1112,7 @@ url:JJ:
 JJhttps://www.totaljobs.comJJ
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Quote declared but opening quote not found", '_parse_lean_test_steps : validate opening quote is present');
 
 # unquoted value cannot be just white space
@@ -1154,7 +1122,7 @@ step: Value must be present
 verifypostive:      	 
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("No value found - must use quotes if value is only white space", '_parse_lean_test_steps : unquoted must not be only white space');
 
 # repeat value must be numeric only without quotes
@@ -1166,7 +1134,7 @@ step: Value must be present
 verifypositive: SYS 49152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Repeat directive value must be a whole number without quotes", '_parse_lean_test_steps : repeat directive must be numeric');
 
 # repeat value must not begin with 0
@@ -1178,7 +1146,7 @@ step: Value must be present
 verifypositive: SYS 49152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Repeat directive value must be a whole number without quotes. It must not begin with 0", '_parse_lean_test_steps : repeat directive must not begin with 0');
 
 # runaway quote - no end quote
@@ -1190,7 +1158,7 @@ Some more lines
 end of file - no end quote!
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("End of file reached, but quote starting line 2 not found", '_parse_lean_test_steps : runaway quote');
 
 # step block must start with step parameter
@@ -1200,7 +1168,7 @@ shell: echo NOP
 step: Value must be present
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : first parameter is step - 1');
 assert_stdout_contains("Parse error line 1", '_parse_lean_test_steps : first parameter is step - 2');
 
@@ -1212,7 +1180,7 @@ description1: This is not allowed
 shell: echo NOP
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parameter description1 is reserved", '_parse_lean_test_steps : description1 is reserved - 1');
 assert_stdout_contains("Parse error line 2", '_parse_lean_test_steps : description1 is reserved - 2');
 assert_stdout_contains("Line 2 of .*description1: This is not allowed", '_parse_lean_test_steps : description1 is reserved - 3');
@@ -1225,7 +1193,7 @@ shell: echo NOP
 id: 152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parameter id is reserved", '_parse_lean_test_steps : id is reserved - 1');
 assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : id is reserved - 2');
 
@@ -1237,7 +1205,7 @@ shell: echo NOP
 command: echo Stuff
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Parameter command is reserved", '_parse_lean_test_steps : command is reserved');
 
 # method can be delete
@@ -1248,7 +1216,7 @@ url: https://www.totaljobs.com/job/49152
 method: delete
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'delete'", '_parse_lean_test_steps : method can be delete');
 
 # method can be put
@@ -1260,7 +1228,7 @@ method: put
 postbody: abd=efg&hijk=lmnop
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'method' => 'put'", '_parse_lean_test_steps : method can be put');
 
 # method cannot be get - only put and delete accepted
@@ -1271,7 +1239,7 @@ url: https://www.totaljobs.com/job/49152
 method: get
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred", '_parse_lean_test_steps : method can only be delete or put');
 
 # duplicate attribute found
@@ -1282,7 +1250,7 @@ url: https://www.totaljobs.com/job/49152
 url: https://www.totaljobs.com/job/792168
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Duplicate parameter url found", '_parse_lean_test_steps : duplicate parameter - 1');
 assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : duplicate parameter - 2');
 
@@ -1293,7 +1261,7 @@ step:	Value must be present
 url:    https://www.totaljobs.com/job/49152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Tab character found on column 6 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - no quote');
 
 # tab before value - with quote one liner is an error
@@ -1303,7 +1271,7 @@ step:$: 	  $Value must be present$
 url:    https://www.totaljobs.com/job/49152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote one liner');
 
 # tab before value - with quote multi line is an error
@@ -1314,7 +1282,7 @@ in all cases	$
 url:    https://www.totaljobs.com/job/49152
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote multi line');
 
 # tab can appear in value
@@ -1325,7 +1293,7 @@ in all cases	$
 url:      https://www.totaljobs.com/job/49152
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : tab can appear in value');
 
 # special characters can be used
@@ -1335,7 +1303,7 @@ step:£€: £€My cool test with £ and € chars£€
 shell: echo hello and also £€
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : special chars do not croak');
 
 # specify one include file
@@ -1350,7 +1318,7 @@ step: This is my third step, 30
 shell: REM 30
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in - 1');
 assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
 assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
@@ -1367,7 +1335,7 @@ step: This is my third step, 30
 shell: REM 30
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in with backslash - 1');
 assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in with backslash - 2');
 
@@ -1386,7 +1354,7 @@ include: examples/include/include_demo_2.test
 
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : multi include files read in - 1');
 assert_stdout_contains("'40' => 'examples/include/include_demo_2.test'", '_parse_lean_test_steps : multi include files read in - 1');
 
@@ -1402,7 +1370,7 @@ step: This is my third step, 30
 shell: REM 30
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file read in - 1');
 assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include file read in - 2');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file read in - 3');
@@ -1420,7 +1388,7 @@ step: This is my third step, 30
 shell: REM 30
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file multi steps read in - 1');
 assert_stdout_contains("'20.02' =>", '_parse_lean_test_steps : include file multi steps read in - 2');
 assert_stdout_contains("'command' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
@@ -1444,7 +1412,7 @@ shell: REM 30
 include: examples/include/include_demo_2.test
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include multi file read in - 1');
 assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
 assert_stdout_contains("'description1' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
@@ -1468,7 +1436,7 @@ shell: REM 30
 repeat: 2
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 1');
 assert_stdout_contains("Parse error line 9", '_parse_lean_test_steps : repeat is declared once only - 2');
 
@@ -1486,7 +1454,7 @@ step: This is my third step, 30
 shell: REM 30
 EOB
     ;
-eval { read_test_case_file(); };
+eval { read_test_steps_file(); };
 assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
 assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
 
@@ -1501,7 +1469,7 @@ section: section break
 shell: REM 100
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
 
 # bug - gotostep: being transformed to gotodescription1 => 'value'
@@ -1511,7 +1479,7 @@ step:                   Already have stats for today, no further action required
 gotostep:               All done
 EOB
     ;
-read_test_case_file();
+read_test_steps_file();
 assert_stdout_contains("'gotostep' => 'All done'", '_parse_lean_test_steps : bug - gotostep: being transformed to gotodescription1');
 
 
