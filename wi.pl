@@ -8,19 +8,19 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '2.11.0';
+$VERSION = '1.0.0';
 
+#    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
-#    Extensive updates 2015-2018 Tim Buckland
+#    
+#    WebImblaze https://github.com/Qarj/WebImblaze
 #
-#    This file is part of WebInject.
-#
-#    WebInject is free software; you can redistribute it and/or modify
+#    WebImblaze is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation; either version 2 of the License, or
 #    (at your option) any later version.
 #
-#    WebInject is distributed in the hope that it will be useful,
+#    WebImblaze is distributed in the hope that it will be useful,
 #    but without any warranty; without even the implied warranty of
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
@@ -982,7 +982,7 @@ sub _write_html {
 sub write_initial_stdout {  #write initial text for STDOUT
 
     $results_stdout .= "\n";
-    $results_stdout .= "Starting WebInject Engine...\n\n";
+    $results_stdout .= "Starting WebImblaze Engine...\n\n";
 
     return;
 }
@@ -3891,7 +3891,7 @@ sub get_options {  #shell options
 }
 
 sub print_version {
-    print "\nWebInject version $VERSION\nFor more info: https://github.com/Qarj/WebInject\n\n";
+    print "\nWebImblaze version $VERSION\nFor more info: https://github.com/Qarj/WebImblaze\n\n";
 
     if ($selenium_plugin_present) { WebInjectSelenium::print_version(); }
 
@@ -3900,10 +3900,10 @@ sub print_version {
 
 sub print_usage {
         print <<'EOB'
-webinject.pl -v|--version
-webinject.pl -h|--help
+wi.pl -v|--version
+wi.pl -h|--help
 
-Usage: webinject.pl tests.xml <<options>>
+Usage: wi.pl tests.xml <<options>>
 
                                   examples/simple.xml
 -c|--config config_file           --config config.xml
