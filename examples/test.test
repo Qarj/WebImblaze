@@ -3,7 +3,7 @@ shell:                  echo Nothing much
 verifypositive1:        Nothing much
 
 step:                   Another step - retry {RETRY}
-description2:           Sub description
+desc:           Sub description
 shell:                  echo Not much more - retry {RETRY}
 verifypositive:         retry 1
 verifynegative:         Nothing much

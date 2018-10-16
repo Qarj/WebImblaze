@@ -37,7 +37,7 @@ step:                   Info - mynum variable is {MYNUM}
 shell:                  echo NOP
 
 step:                   Should retry 5 times due to verifypostive failure
-description2:           retry variable will update between retries:{RETRY}, but mynum variable {MYNUM} will not
+desc:           retry variable will update between retries:{RETRY}, but mynum variable {MYNUM} will not
 shell:                  echo one one one
 shell1:                 echo three four five
 shell2:                 echo mynum:{MYNUM}, retry:{RETRY}

@@ -6,7 +6,7 @@ step:                   Step 20
 shell:                  echo NOP
 
 step:                   Retry 5 times, pass on attempt three
-description2:           Will not get to a regular retry attempt three - will eventually pass
+desc:           Will not get to a regular retry attempt three - will eventually pass
 shell1:                 echo step 30 attempt {RETRY}
 shell2:                 echo step 30 jumpbacks {JUMPBACKS}
 verifypositive:         step 30 attempt 3|step 30 jumpbacks 5

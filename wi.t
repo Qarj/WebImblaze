@@ -336,7 +336,7 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #          'case' => {
 #                      '20' => {
 #                                'step' => 'Another step - retry {RETRY}',
-#                                'description2' => 'Sub description',
+#                                'desc' => 'Sub description',
 #                                'method' => 'cmd',
 #                                'command' => 'REM Not much more - retry {RETRY}',
 #                                'retry' => '3',
@@ -360,7 +360,7 @@ shell: REM Nothing: much
 verifypositive1: Nothing: much
 
 step: Another step - retry {RETRY}
-description2: Sub description
+desc: Sub description
 shell: REM Not much more - retry {RETRY}
 verifypositive: retry 1
 verifynegative: Nothing much
@@ -376,7 +376,7 @@ assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_ste
 assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
 assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
 assert_stdout_contains("'step' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
-assert_stdout_contains("'description2' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
+assert_stdout_contains("'desc' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
 assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : Step 20, method found');
 assert_stdout_contains("'command' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
 assert_stdout_contains("'retry' => '3'", '_parse_lean_test_steps : Step 20, retry found');

@@ -428,7 +428,7 @@ sub get_test_step_skip_message {
 #------------------------------------------------------------------
 sub substitute_variables {
 
-    ## "method", "step", "description2", "url", "postbody", "posttype", "addheader", "command", "command1", ... "command20", "parms", "verifytext",
+    ## "method", "step", "desc", "url", "postbody", "posttype", "addheader", "command", "command1", ... "command20", "parms", "verifytext",
     ## "verifypositive", "verifypositive1", ... "verifypositive9999",
     ## "verifynegative", "verifynegative1", ... "verifynegative9999",
     ## "parseresponse", "parseresponse1", ... , "parseresponse40", ... , "parseresponse9999", "parseresponseORANYTHING", "verifyresponsecode",
@@ -562,7 +562,7 @@ sub output_test_step_description {
     $results_stdout .= qq|Test:  $current_steps_file - $testnum_display$jumpbacks_print$retries_print \n|;
     $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
-    for (qw/section step description2/) { ## support section breaks
+    for (qw/section step desc/) { ## support section breaks
         next unless defined $case{$_};
         $results_html .= qq|$case{$_} <br />\n|;
         $results_stdout .= qq|$case{$_} \n|;
@@ -3362,8 +3362,8 @@ sub httplog {  # write requests and responses to http.txt file
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
 
     $_step_info .=  $case{step};
-    if (defined $case{description2}) {
-       $_step_info .= ' ['.$case{description2}.']';
+    if (defined $case{desc}) {
+       $_step_info .= ' ['.$case{desc}.']';
     }
     $_step_info .= "\n";
 

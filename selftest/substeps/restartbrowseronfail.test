@@ -3,7 +3,7 @@ url:                    http://{WIC}/Search/SearchForm
 verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
 
 step:                   Get login page again does not set the same cookie again - it is already set
-description2:           Step will fail
+desc:           Step will fail
 url:                    http://{WIC}/Search/SearchForm
 verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
 
@@ -22,7 +22,7 @@ verifypositive:         Some text that is there
 restartbrowseronfail:   true
 
 step:                   Get login page already has .AspNetCore.Antiforgery cookie
-description2:           Step will fail
+desc:           Step will fail
 url:                    http://{WIC}/Search/SearchForm
 verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
 

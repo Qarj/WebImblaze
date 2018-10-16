@@ -5,7 +5,7 @@ verifypositive1:        Search for and be recommended
 verifypositive2:        See all hiring companies
 
 step:                   Search for hello jobs
-description2:           Expect to see at least 2 pages of hello jobs
+desc:           Expect to see at least 2 pages of hello jobs
 url:                    {TOTALJOBS_URL}/jobs/hello
 verifypositive1:        \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
 verifypositive2:        page=2|||Should be at least two pages of results for keyword hello
