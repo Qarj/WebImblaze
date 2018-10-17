@@ -93,7 +93,7 @@ my $execution_aborted = 'false';
 
 our $results_output_folder; ## output relative path e.g. 'output/'
 my $results_filename_prefix; ## prefix for results file names e.g. 'run1'
-my $outsum; ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebInject processes are running in parallel.
+my $outsum; ## outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebImblaze processes are running in parallel.
 our $config; ## contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); ## turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
@@ -206,7 +206,7 @@ foreach ($start .. $repeat) {
         do ## retry loop
         {
             substitute_retry_variables(); ## for each retry, there are a few substitutions that we need to redo - like the retry number
-            read_shared_variable();  ## read in a variable from another instance of WebInject that is running concurrently
+            read_shared_variable();  ## read in a variable from another instance of WebImblaze that is running concurrently
             set_var_variables(); ## set any variables after doing all the static and dynamic substitutions
             late_substitute_var_variables(); ## allow var variables set in this test step to be used immediately
 
@@ -846,12 +846,12 @@ sub update_latency_statistics {
 #------------------------------------------------------------------
 sub restart_browser {
 
-    if ($case{restartbrowseronfail} && ($is_failure > 0)) { ## restart the Selenium browser session and also the WebInject session
+    if ($case{restartbrowseronfail} && ($is_failure > 0)) { ## restart the Selenium browser session and also the WebImblaze session
         $results_stdout .= qq|RESTARTING SESSION DUE TO FAIL ... \n|;
         start_session();
     }
 
-    if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebInject session
+    if ($case{restartbrowser}) { ## restart the Selenium browser session and also the WebImblaze session
         $results_stdout .= qq|RESTARTING SESSION ... \n|;
         start_session();
     }
@@ -895,7 +895,7 @@ sub write_initial_html {  #write opening tags for results file
 
     $results_html .= qq|<html xmlns="http://www.w3.org/1999/xhtml">\n|;
     $results_html .= qq|<head>\n|;
-    $results_html .= qq|    <title>WebInject Test Results</title>\n|;
+    $results_html .= qq|    <title>WebImblaze Test Results</title>\n|;
     $results_html .= qq|    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />\n|;
     $results_html .= qq|    <style type="text/css">\n|;
     $results_html .= qq|        body {\n|;
@@ -941,7 +941,7 @@ sub write_initial_xml {  #write opening tags for results file
     $_results_xml .= '<?xml-stylesheet type="text/xsl" href="/content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
-    if ( defined $config->{wif}->{dd} && defined $config->{wif}->{run_number} ) { # presume if this info is present, webinject.pl has been called by wif.pl
+    if ( defined $config->{wif}->{dd} && defined $config->{wif}->{run_number} ) { # presume if this info is present, wi.pl has been called by wif.pl
         $results_xml_file_name = 'results_'.$config->{wif}->{run_number}.'.xml';
         $_results_xml .= "    <wif>\n";
         $_results_xml .= "        <environment>$config->{wif}->{environment}</environment>\n";
@@ -1088,15 +1088,15 @@ sub write_final_stdout {  #write summary and closing text for STDOUT
 	    my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
             if ($case_failed_count > 0) {
-	        print "WebInject CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
+	        print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {
-                print "WebInject WARNING - All tests passed successfully but global timeout ($config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
+                print "WebImblaze WARNING - All tests passed successfully but global timeout ($config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
                 exit $_exit_codes{'WARNING'};
             }
             else {
-                print "WebInject OK - All tests passed successfully in $total_response seconds |time=$total_response;$_end\n";
+                print "WebImblaze OK - All tests passed successfully in $total_response seconds |time=$total_response;$_end\n";
                 exit $_exit_codes{'OK'};
             }
         }
@@ -1866,7 +1866,7 @@ sub _shell_adjust {
     } else {
         ${$_parm} =~ s{\\}{\\\\}g; ## need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
         ${$_parm} =~ s/{SLASH}/\//g;
-        ${$_parm} =~ s{^[.][/\\]}{perl ./}; ## for running perl scripts from within webinject using perlbrew
+        ${$_parm} =~ s{^[.][/\\]}{perl ./}; ## for running perl scripts from within WebImblaze using perlbrew
         ${$_parm} =~ s/{SHELL_ESCAPE}/\\/g;
     }
 
@@ -2418,7 +2418,7 @@ sub _initialise_shared_variables {
         $shared_folder_full = $ENV{TEMP};
     }
 
-    $shared_folder_full .= '/WebInjectSharedVariables/';
+    $shared_folder_full .= '/WebImblazeSharedVariables/';
     $shared_folder_full .= $YEAR . $MONTH . $DAYOFMONTH;
     File::Path::make_path ( slash_me($shared_folder_full) );
 
@@ -3057,7 +3057,7 @@ sub _output_validate_error {
     $results_stdout .= qq|Line $_line_num of $current_steps_file:\n\n|;
     $results_stdout .= qq|$_line\n\n|;
     $results_stdout .= qq|Example of $_example\n|;
-    die $results_stdout."\n".'Test case file is malformed, aborted WebInject';
+    die $results_stdout."\n".'Test case file is malformed, aborted WebImblaze';
 }
 
 #------------------------------------------------------------------
@@ -3104,7 +3104,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{JUMPBACKS}/$jumpbacks/g; #Number of times we have jumped back due to failure
 
 ## hostname, testnum, concurrency, teststeptime
-    $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running webinject
+    $_[0] =~ s/{HOSTNAME}/$hostname/g; #of the computer currently running WebImblaze
     $_[0] =~ s/{TESTNUM}/$testnum_display/g;
     $_[0] =~ s/{TESTFILENAME}/$test_file_base_name/g;
     $_[0] =~ s/{LENGTH}/$_my_length/g; #length of the previous test step response
@@ -3436,8 +3436,8 @@ sub _write_step_html {
         $_wif_batch = $config->{wif}->{batch};
         $_wif_run_number = $config->{wif}->{run_number};
     } else {
-        $_wif_batch = 'needs_webinject_framework';
-        $_wif_run_number = 'needs_webinject_framework';
+        $_wif_batch = 'needs_WebImblaze_Framework';
+        $_wif_run_number = 'needs_WebImblaze_Framework';
     }
 
     my $_html = '<!DOCTYPE html>';
@@ -3713,10 +3713,10 @@ sub _determine_absolute_url {
     my $_ur_url = URI::URL->new($_ref, $_response_base);
     my $_abs_url = $_ur_url->abs;
 
-    # we must return a url beginning with http (or javascript), otherwise WebInject will get stuck in an infinite loop
+    # we must return a url beginning with http (or javascript), otherwise WebImblaze will get stuck in an infinite loop
     # if the url we are processing begins with something like android-app://, URI:URL will not turn it into a http url - better just to get rid of it
     if ( (substr $_abs_url, 0, 1) ne 'h') {
-        $_abs_url = 'http://webinject_could_not_determine_absolute_url';
+        $_abs_url = 'http://webimblaze_could_not_determine_absolute_url';
     }
 
     return $_abs_url;
@@ -3769,7 +3769,7 @@ sub final_tasks {  #do ending tasks
 }
 
 #------------------------------------------------------------------
-sub start_session {     ## creates the webinject user agent
+sub start_session {     ## creates the WebImblaze user agent
 
     require IO::Socket::SSL; ## if this was a use statement we could use SSL_VERIFY_NONE below instead of 0, but self tests on Windows take 10% longer to run
     #require Crypt::SSLeay;  #for SSL/HTTPS (you may comment this out if you don't need it)
@@ -3779,7 +3779,7 @@ sub start_session {     ## creates the webinject user agent
 
     $useragent = LWP::UserAgent->new(keep_alive=>1);
     $cookie_jar = HTTP::Cookies->new;
-    $useragent->agent('WebInject');
+    $useragent->agent('WebImblaze');
     #$useragent->timeout(200); ## it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  #don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with

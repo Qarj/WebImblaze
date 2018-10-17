@@ -1,21 +1,21 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
-verifypositive:         WebInject CRITICAL - Nagios should see this error message \|time=
+verifypositive:         WebImblaze CRITICAL - Nagios should see this error message \|time=
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}1sub -c selftest\substeps\{FEATURE}1config.xml selftest\substeps\{FEATURE}1.test
-verifypositive:         WebInject WARNING - All tests passed successfully but global timeout \(0\.01 seconds\) has been reached \|time=
+verifypositive:         WebImblaze WARNING - All tests passed successfully but global timeout \(0\.01 seconds\) has been reached \|time=
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}2sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}2.test
-verifypositive:         WebInject OK - All tests passed successfully in
+verifypositive:         WebImblaze OK - All tests passed successfully in
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}3sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}3.test
-verifypositive:         WebInject CRITICAL - Test case number 10 failed |time=
+verifypositive:         WebImblaze CRITICAL - Test case number 10 failed |time=
 verifynegative:         uninitialized value
 
