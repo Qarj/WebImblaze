@@ -1,5 +1,5 @@
 #
-# Run all WebInject core self tests
+# Run all WebImblaze core self tests
 #
 
 step:                   verifypositive
