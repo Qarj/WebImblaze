@@ -430,7 +430,7 @@ shell5: echo next1
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'shell20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
+assert_stdout_contains("'shell20' => 'echo auto2'", '_parse_lean_test_steps : shell not converted back to command');
 assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : shell method detected - 1');
 
 # method="cmd" is auto generated - shell1
@@ -459,7 +459,7 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'method' => 'selenium'", '_parse_lean_test_steps : Selenium method detected');
-assert_stdout_contains("'command20' => '.driver->get_all_cookies..'", '_parse_lean_test_steps : selenium converted back to command');
+assert_stdout_contains("'selenium20' => '.driver->get_all_cookies..'", '_parse_lean_test_steps : selenium not converted back to command');
 
 # method="get" is auto generated
 before_test();

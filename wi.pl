@@ -2799,7 +2799,6 @@ sub _construct_step {
 
     my %_case_step = ();
     $_case_step{ 'method' } = _get_lean_step_method($_parms);
-    _rename_lean_parameters_to_classic_names($_parms);
 
     for my $_i ( 0 .. $#{$_parms} ) {
         $_case_step{ $_parms->[$_i] } = $_vals->[$_i];
@@ -2813,22 +2812,12 @@ sub _get_lean_step_method {
 
     foreach my $_parm (@{$_parms}) {
         if ($_parm =~ /shell/) { return 'shell'; }
-        if ($_parm =~ /selenium/) { return 'selenium'; }
+        if ($_parm =~ /selenium/) { $testfile_contains_selenium = 'true'; return 'selenium'; }
         if ($_parm eq 'url') {
             foreach my $_parm_2 (@{$_parms}) {
                 if ($_parm_2 eq 'postbody') { return 'post'; }
             }
             return 'get';
-        }
-    }
-}
-
-sub _rename_lean_parameters_to_classic_names {
-    my ($_parms) = @_;
-
-    for my $_i (0 .. $#{$_parms}) {
-        if ( $_parms->[$_i] =~ s/^selenium/command/) {
-            $testfile_contains_selenium = 'true';
         }
     }
 }
