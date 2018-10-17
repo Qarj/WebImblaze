@@ -8,7 +8,10 @@ output/
 temp/
 blocker/
 WebInjectSelenium.pm
+WebImblazeSelenium.pm
+tests/*.test
 tests/*.xml
 tests/*.csv
 parse_error/
 session.config
+debug.log

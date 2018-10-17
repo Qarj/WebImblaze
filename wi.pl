@@ -111,18 +111,18 @@ my ($hrefs_version, $srcs_version) = 0;
 my $session_started; ## only start up http sesion if http is being used
 my $shared_folder_full;
 
+our (undef, $this_script_folder_full, undef) = fileparse(File::Spec->rel2abs( __FILE__ ));
+chdir $this_script_folder_full;
+
 my ($testfile_contains_selenium, $selenium_plugin_present); ## so we know if Selenium Browser Session needs to be started
-if (-e 'plugins/WebInjectSelenium.pm') {
-    require 'plugins/WebInjectSelenium.pm';
+if (-e 'plugins/WebImblazeSelenium.pm') {
+    require 'plugins/WebImblazeSelenium.pm';
     $selenium_plugin_present = 1;
 }
 
 my $start_time = time;  #timer for entire test run
 my ($SECOND, $MINUTE, $HOUR, $DAYOFMONTH, $DAY_TEXT, $WEEKOFMONTH, $MONTH, $MONTH_TEXT, $YEAR, $YY) = get_formatted_datetime_for_seconds_since_epoch($start_time);
 my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$SECOND";
-
-our $this_script_folder_full = dirname(__FILE__);
-chdir $this_script_folder_full;
 
 my $counter = 0; ## keeping track of the loop we are up to
 
@@ -620,7 +620,7 @@ sub execute_test_step {
     }
 
     if ($case{method}) {
-        if ($case{method} eq 'selenium') { WebInjectSelenium::selenium(); return; }
+        if ($case{method} eq 'selenium') { WebImblazeSelenium::selenium(); return; }
     }
 
     set_useragent($case{useragent});
@@ -1932,7 +1932,7 @@ sub decode_quoted_printable {
 #------------------------------------------------------------------
 sub verify {  #do verification of http response and print status to HTML/XML/STDOUT/UI
 
-    if ($testfile_contains_selenium) { WebInjectSelenium::searchimage(); } ## search for images within actual screen or page grab
+    if ($testfile_contains_selenium) { WebImblazeSelenium::searchimage(); } ## search for images within actual screen or page grab
 
     ## reset the global variables
     $assertion_skips = 0;
@@ -3762,7 +3762,7 @@ sub final_tasks {  #do ending tasks
 
     ## shut down the Selenium session and Selenium Server last - it is less important than closing the files
     if ($testfile_contains_selenium) {
-        WebInjectSelenium::shutdown_selenium();
+        WebImblazeSelenium::shutdown_selenium();
     }
 
     return;
@@ -3819,7 +3819,7 @@ sub start_session {     ## creates the webinject user agent
         $useragent->agent($config->{useragent});
     }
 
-    if ($testfile_contains_selenium) { WebInjectSelenium::start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
+    if ($testfile_contains_selenium) { WebImblazeSelenium::start_selenium_browser(); }  ## start selenium browser if applicable. If it is already started, close browser then start it again.
 
     $session_started='true';
 
@@ -3893,7 +3893,7 @@ sub get_options {  #shell options
 sub print_version {
     print "\nWebImblaze version $VERSION\nFor more info: https://github.com/Qarj/WebImblaze\n\n";
 
-    if ($selenium_plugin_present) { WebInjectSelenium::print_version(); }
+    if ($selenium_plugin_present) { WebImblazeSelenium::print_version(); }
 
     return;
 }
@@ -3903,9 +3903,9 @@ sub print_usage {
 wi.pl -v|--version
 wi.pl -h|--help
 
-Usage: wi.pl tests.xml <<options>>
+Usage: wi.pl tests.test <<options>>
 
-                                  examples/simple.xml
+                                  examples/simple.test
 -c|--config config_file           --config config.xml
 -o|--output output_location       --output output/
 -a|--autocontroller               --autocontroller
@@ -3914,11 +3914,11 @@ Usage: wi.pl tests.xml <<options>>
 -z|--no-colour                    --no-colour
 -n|--no-output                    --no-output
 -e|--verbose                      --verbose
--u|--publish-to                   --publish-to C:\inetpub\wwwroot\this_run_home
+-u|--publish-to                   --publish-to C:\Apache24\htdocs\this_run_home
 EOB
     ;
 
-    if ($selenium_plugin_present) { WebInjectSelenium::print_usage(); }
+    if ($selenium_plugin_present) { WebImblazeSelenium::print_usage(); }
 
     return;
 }
