@@ -612,7 +612,7 @@ sub execute_test_step {
     undef $results_stdout;
 
     if ($case{method}) {
-        if ($case{method} eq 'cmd') { cmd(); return; }
+        if ($case{method} eq 'shell') { shell(); return; }
     }
 
     if (not $session_started) {
@@ -633,7 +633,7 @@ sub execute_test_step {
         if ($case{method} eq 'put') { httpput(); return;}
     }
     else {
-        cmd(); ## default to doing nothing if method is not specified, rather than get
+        shell(); ## default to doing nothing if method is not specified, rather than get
     }
 
     return;
@@ -1823,20 +1823,20 @@ sub httpsend_form_data {  #send multipart/form-data HTTP request and read respon
 }
 
 #------------------------------------------------------------------
-sub cmd {  ## send terminal command and read response
+sub shell {  ## send terminal command and read response
 
     my $_combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
     my $_start_timer = time;
 
-    for (qw/command command1 command2 command3 command4 command5 command6 command7 command8 command9 command10 command11 command12 command13 command14 command15 command16 command17 command18 command19 command20/) {
+    for (qw/shell shell1 shell2 shell3 shell4 shell5 shell6 shell7 shell8 shell9 shell10 shell11 shell12 shell13 shell14 shell15 shell16 shell17 shell18 shell19 shell20/) {
         if ($case{$_}) {#perform command
-            my $_cmd = $case{$_};
-            $_cmd =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
-            _shell_adjust(\$_cmd);
+            my $_command = $case{$_};
+            $_command =~ s/\%20/ /g; ## turn %20 to spaces for display in log purposes
+            _shell_adjust(\$_command);
             #$request = new HTTP::Request('GET',$cmd);  ## pretend it is a HTTP GET request - but we won't actually invoke it
-            my $_cmdresp = (`$_cmd 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-            $_combined_response =~ s{$}{<$_> $_cmd </$_>\n$_cmdresp\n\n\n}; ## include it in the response
+            my $_command_response = (`$_command 2>\&1`); ## run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+            $_combined_response =~ s{$}{<$_> $_command </$_>\n$_command_response\n\n\n}; ## include it in the response
         }
     }
     $_combined_response =~ s{^}{HTTP/1.1 100 OK\n}; ## pretend this is an HTTP response - 100 means continue
@@ -2812,7 +2812,7 @@ sub _get_lean_step_method {
     my ($_parms) = @_;
 
     foreach my $_parm (@{$_parms}) {
-        if ($_parm =~ /shell/) { return 'cmd'; }
+        if ($_parm =~ /shell/) { return 'shell'; }
         if ($_parm =~ /selenium/) { return 'selenium'; }
         if ($_parm eq 'url') {
             foreach my $_parm_2 (@{$_parms}) {
@@ -2827,7 +2827,6 @@ sub _rename_lean_parameters_to_classic_names {
     my ($_parms) = @_;
 
     for my $_i (0 .. $#{$_parms}) {
-        $_parms->[$_i] =~ s/^shell/command/;
         if ( $_parms->[$_i] =~ s/^selenium/command/) {
             $testfile_contains_selenium = 'true';
         }

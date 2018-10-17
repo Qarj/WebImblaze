@@ -337,16 +337,16 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #                      '20' => {
 #                                'step' => 'Another step - retry {RETRY}',
 #                                'desc' => 'Sub description',
-#                                'method' => 'cmd',
-#                                'command' => 'REM Not much more - retry {RETRY}',
+#                                'method' => 'shell',
+#                                'shell' => 'REM Not much more - retry {RETRY}',
 #                                'retry' => '3',
 #                                'verifynegative' => 'Nothing much',
 #                                'verifypositive' => 'retry 1'
 #                              },
 #                      '10' => {
 #                                'step' => 'Test that WebImblaze can run a very basic test',
-#                                'command' => 'REM Nothing: much',
-#                                'method' => 'cmd',
+#                                'shell' => 'REM Nothing: much',
+#                                'method' => 'shell',
 #                                'verifypositive1' => 'Nothing: much'
 #                              }
 #                    },
@@ -372,13 +372,13 @@ assert_stdout_contains('Lean test steps parsed OK', 'read_test_steps_file : lean
 assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
 assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
 assert_stdout_contains("'step' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, step name found');
-assert_stdout_contains("'command' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
+assert_stdout_contains("'shell' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
 assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
 assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
 assert_stdout_contains("'step' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
 assert_stdout_contains("'desc' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
-assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : Step 20, method found');
-assert_stdout_contains("'command' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
+assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : Step 20, method found');
+assert_stdout_contains("'shell' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
 assert_stdout_contains("'retry' => '3'", '_parse_lean_test_steps : Step 20, retry found');
 assert_stdout_contains("'verifynegative' => 'Nothing much'", '_parse_lean_test_steps : Step 20, verifynegative found');
 assert_stdout_contains("'verifypositive' => 'retry 1'", '_parse_lean_test_steps : Step 20, verifypositive found');
@@ -430,8 +430,8 @@ shell5: echo next1
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'command20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
-assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 1');
+assert_stdout_contains("'shell20' => 'echo auto2'", '_parse_lean_test_steps : shell converted back to command');
+assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : shell method detected - 1');
 
 # method="cmd" is auto generated - shell1
 before_test();
@@ -444,7 +444,7 @@ shell1: echo next1
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'cmd'", '_parse_lean_test_steps : shell method detected - 2');
+assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : shell method detected - 2');
 
 # method="selenium" is auto generated
 before_test();
@@ -983,7 +983,7 @@ EOB
 read_test_steps_file();
 assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : Edge cases - 1');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : Edge cases - 2');
-assert_stdout_contains("'command2' => 'echo off'", '_parse_lean_test_steps : Edge cases - 3');
+assert_stdout_contains("'shell2' => 'echo off'", '_parse_lean_test_steps : Edge cases - 3');
 assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : Edge cases - 4');
 assert_stdout_does_not_contain("'40' =>", '_parse_lean_test_steps : Edge cases - 5');
 
@@ -1349,9 +1349,9 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file read in - 1');
-assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include file read in - 2');
+assert_stdout_contains("'shell' => 'echo include demo 1'", '_parse_lean_test_steps : include file read in - 2');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file read in - 3');
-assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include file read in - 4');
+assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include file read in - 4');
 
 # include file with multiple steps gets loaded
 before_test();
@@ -1368,12 +1368,12 @@ EOB
 read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file multi steps read in - 1');
 assert_stdout_contains("'20.02' =>", '_parse_lean_test_steps : include file multi steps read in - 2');
-assert_stdout_contains("'command' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
-assert_stdout_contains("'command' => 'echo include demo 3 second'", '_parse_lean_test_steps : include file multi steps read in - 4');
+assert_stdout_contains("'shell' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
+assert_stdout_contains("'shell' => 'echo include demo 3 second'", '_parse_lean_test_steps : include file multi steps read in - 4');
 assert_stdout_contains("'step' => 'Demo 3 include step .01'", '_parse_lean_test_steps : include file multi steps read in - 5');
 assert_stdout_contains("'step' => 'Demo 3 include step .02'", '_parse_lean_test_steps : include file multi steps read in - 6');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file multi steps read in - 7');
-assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include file multi steps read in - 8');
+assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include file multi steps read in - 8');
 
 # include multi files gets loaded
 before_test();
@@ -1391,12 +1391,12 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include multi file read in - 1');
-assert_stdout_contains("'command' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
+assert_stdout_contains("'shell' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
 assert_stdout_contains("'step' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
 assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include multi file read in - 4');
-assert_stdout_contains("'command' => 'REM 30'", '_parse_lean_test_steps : include multi file read in - 5');
+assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include multi file read in - 5');
 assert_stdout_contains("'40.01' =>", '_parse_lean_test_steps : include multi file read in - 6');
-assert_stdout_contains("'command' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
+assert_stdout_contains("'shell' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
 assert_stdout_contains("'step' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
 
 # repeat cannot be encountered twice - primary file
