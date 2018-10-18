@@ -124,7 +124,7 @@ my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$S
 
 my $counter = 0; # keeping track of the loop we are up to
 
-my $concurrency = 'null'; # current working directory - not full path
+my $output_folder_name = 'null'; # current working directory - not full path
 
 our ($results_stdout, $results_html, $results_xml);
 my $results_xml_file_name;
@@ -2471,7 +2471,7 @@ sub process_config_file { # parse config file and grab values it sets
 
     # find the name of the output folder only i.e. not full path - OS safe
     my $_abs_output_full = File::Spec->rel2abs( $results_output_folder ) . '/dummy';
-    $concurrency =  basename ( dirname($_abs_output_full) );
+    $output_folder_name =  basename ( dirname($_abs_output_full) );
 
     $outsum = unpack '%32C*', $results_output_folder; # checksum of output directory name - for concurrency
 
@@ -3086,7 +3086,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s{{FORMATDATETIME}}{$_DAYOFMONTH\/$_MONTH\/$_YEAR$_underscore$_HOUR:$_MINUTE:$_SECOND}g;
 
     $_[0] =~ s/{COUNTER}/$counter/g;
-    $_[0] =~ s/{CONCURRENCY}/$concurrency/g; # name of the temporary folder being used - not full path
+    $_[0] =~ s/{OUTPUTFOLDERNAME}/$output_folder_name/g; # name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$results_output_folder/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{OUTSUM}/$outsum/g;

@@ -84,8 +84,8 @@ varSUB:                 _{COUNTER}_
 shell:                  echo {SUB}
 verifypositive:         _1_
 
-step:                   CONCURRENCY is {SUB}
-varSUB:                 _{CONCURRENCY}_
+step:                   OUTPUTFOLDERNAME is {SUB}
+varSUB:                 _{OUTPUTFOLDERNAME}_
 shell:                  echo {SUB}
 verifypositive:         _output_
 

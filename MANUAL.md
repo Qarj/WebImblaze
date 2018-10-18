@@ -2517,9 +2517,9 @@ Constant | Description
 **{LESSTHAN}** | Gives you a <
 **{SINGLEQUOTE}** | Gives you a '
 **{CWD}** | Current working directory
-**{OUTPUT}** | WebInject output directory name, or "no output" if output is suppressed
+**{OUTPUT}** | WebInject output folder path, or "no output" if output is suppressed
 **{HOSTNAME}** | Name of the computer currently running WebInject
-**{CONCURRENCY}** | Output folder name only - not the full path
+**{OUTPUTFOLDERNAME}** | Output folder name only - not the full path
 **{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
