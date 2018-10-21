@@ -94,11 +94,6 @@ varSUB:                 _{OUTPUT}_
 shell:                  echo {SUB}
 verifypositive:         output
 
-step:                   OUTSUM is {SUB}
-varSUB:                 _{OUTSUM}_
-shell:                  echo {SUB}
-verifypositive:         _\d*_
-
 step:                   CWD is {SUB}
 varSUB:                 _{CWD}_
 shell:                  echo {SUB}

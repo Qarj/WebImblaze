@@ -2481,7 +2481,6 @@ Constant | Description
 **{OUTPUT}** | WebInject output folder path, or "no output" if output is suppressed
 **{HOSTNAME}** | Name of the computer currently running WebInject
 **{OUTPUTFOLDERNAME}** | Output folder name only - not the full path
-**{OUTSUM}** | Output folder name turned into a 32 bit checksum. Helps with concurrency since two instances of webinject running in parallel should not be outputing to the same folder
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXY}** | What proxy option was specified via the command line to webinject.pl
 **{BASEURL}** | Value of `baseurl` specified in your config file

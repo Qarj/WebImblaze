@@ -91,7 +91,6 @@ my $execution_aborted = 'false';
 
 our $results_output_folder; # output relative path e.g. 'output/'
 my $results_filename_prefix; # prefix for results file names e.g. 'run1'
-my $outsum; # outsum is a checksum calculated on the output directory name. Used to help guarantee test data uniqueness where two WebImblaze processes are running in parallel.
 our $config; # contents of config.xml
 my ($convert_back_ports, $convert_back_ports_null); # turn {:4040} into :4040 or null
 my $total_assertion_skips = 0;
@@ -2434,8 +2433,6 @@ sub process_config_file { # parse config file and grab values it sets
     my $_abs_output_full = File::Spec->rel2abs( $results_output_folder ) . '/dummy';
     $output_folder_name =  basename ( dirname($_abs_output_full) );
 
-    $outsum = unpack '%32C*', $results_output_folder; # checksum of output directory name - for concurrency
-
     if (defined $config->{ports_variable}) {
         if ($config->{ports_variable} eq 'convert_back') {
             $convert_back_ports = 'true';
@@ -3050,7 +3047,6 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     $_[0] =~ s/{OUTPUTFOLDERNAME}/$output_folder_name/g; # name of the temporary folder being used - not full path
     $_[0] =~ s/{OUTPUT}/$results_output_folder/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
-    $_[0] =~ s/{OUTSUM}/$outsum/g;
     $_[0] =~ s/{CWD}/$this_script_folder_full/g;
 
     # parsedresults moved before config so you can have a parsedresult of {BASEURL2} say that in turn gets turned into the actual value
