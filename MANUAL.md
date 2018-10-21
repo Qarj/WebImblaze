@@ -102,8 +102,6 @@ Adapted from the original manual written by Corey Goldberg.
 
 [maxredirect](#maxredirect)
 
-[parms](#parms)
-
 [setcookie](#setcookie)
 
 [useragent](#useragentparameter)
@@ -1116,6 +1114,18 @@ Example: `postbody="file=>soap_payload.xml"`
     addheader='SOAPAction: "http://www.example.com/ns/1.0/GetNewJobs"'
 ```
 
+Standard substituions are supported when posting a file using the "text/xml" or "application/soap+xml" posttype.
+In the example above, `GetJobs.xml` could look like the following.
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<search>
+	<seq>1</seq>
+	<title>{TITLE}</title>
+	<location>{LOCATION}</location>
+</search>
+```
+
+
 <br />
 
 
@@ -1422,55 +1432,6 @@ You may add multiple headers, separating each with a pipe character.
 ```
 
 Note that when you use addheader, any existing header cookies will be clobbered.
-
-<br />
-
-
-<a name="parms"></a>
-#### parms
-
-Substitutes dummy fields in an xml file with actual values. Used in conjunction with posting an xml file, as in a SOAP request.
-
-```
-    parms="__SALMIN__={SALMIN}&__SALMAX__={SALMAX}"
-```
-
-Allows you to create a xml template file then easily substitute in dynamic values at test run time.
-
-**Full Example:**
-```xml
-<case
-    id="40"
-    description1="Add Unique Job"
-    url="https://www.example.com/XMLJobLoad/jobloader.aspx"
-    method="post"
-    postbody="file=>testdata\AddJob.xml"
-    posttype="text/xml"
-    parms="__SALMIN__=20000&__SALMAX__=35000"
-    verifypositive1="Job Loaded Successfully"
-    logastext="true"
-/>
-```
-
-testdata\AddJob.xml might look like:
-```xml
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<FILE>
-	<JOB
-		JOBID="333211"
-		TITLE="Test Automation Engineer"
-		DESCRIPTION="Great new test automation opportunity"
-		LOCATION="London"
-		SALARYTYPE="ANNUAL"
-		SALARYMIN="__SALMIN__"
-		SALARYMAX="__SALMAX__"
-		SALARYDESC="Great Benefits"
-	/>
-</FILE>
-```
-
-When you run the test, the __SALMIN__ and __SALMAX__ placeholders will be swapped with
-20000 and 35000 respectively.
 
 <br />
 

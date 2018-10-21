@@ -1677,7 +1677,7 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
 }
 
 #------------------------------------------------------------------
-sub httpsend_xml{  # send text/xml HTTP request and read response
+sub httpsend_xml { # send text/xml HTTP request and read response
     my ($_verb) = @_;
 
     my @_parms;
@@ -1694,44 +1694,9 @@ sub httpsend_xml{  # send text/xml HTTP request and read response
         close $_XML_BODY or die "\nCould not close xml file to be posted\n\n";
     }
 
-    if ($case{parms}) { # is there a postbody for this testcase - if so need to subtitute in fields
-       @_parms = split /\&/, $case{parms} ; # & is separator
-       $_len = @_parms; # number of items in the array
-
-       # loop through each of the fields and substitute
-       foreach my $_idx (1..$_len) {
-            $_field_name = q{};
-            if ($_parms[$_idx-1] =~ m/(.*?)\=/s) { # we only want everything to the left of the = sign
-                $_field_name = $1;
-            }
-            $_field_value = q{};
-            if ($_parms[$_idx-1] =~ m/\=(.*)/s) { #we only want everything to the right of the = sign
-                $_field_value = $1;
-            }
-
-            # make the substitution
-            foreach (@_xml_body) {
-                # non escaped fields
-                $_ =~ s{\<$_field_name\>.*?\<\/$_field_name\>}{\<$_field_name\>$_field_value\<\/$_field_name\>};
-
-                # escaped fields
-                $_ =~ s{\&lt;$_field_name\&gt;.*?\&lt;\/$_field_name\&gt;}{\&lt;$_field_name\&gt;$_field_value\&lt;\/$_field_name\&gt;};
-
-                # attributes
-                # ([^a-zA-Z]) says there must be a non alpha so that bigid and id and treated separately
-                # $1 will put it back - otherwise it'll be eaten
-                $_ =~ s{([^a-zA-Z])$_field_name\=\".*?\"}{$1$_field_name\=\"$_field_value\"}; ## no critic(ProhibitEnumeratedClasses)
-
-                # variable substitution
-                $_sub_name = $_field_name;
-                if ( $_sub_name =~ s{__}{} ) {# if there are double underscores, like __salarymax__ then replace it
-                    $_ =~ s{__$_sub_name}{$_field_value}g;
-                }
-
-            }
-
-       }
-
+    foreach (@_xml_body) {
+        convert_back_xml($_);
+        convert_back_var_variables($_);
     }
 
     $request = HTTP::Request->new($_verb, "$case{url}");

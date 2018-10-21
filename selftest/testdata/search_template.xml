@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <search>
 	<seq>1</seq>
-	<name>__name__</name>
-	<cuisine>__cuisine__</cuisine>
-	<preptime>__preptime__</preptime>
+	<name>{RECIPE}</name>
+	<cuisine>{CUISINE}</cuisine>
+	<preptime>{PREPTIME}</preptime>
 </search>

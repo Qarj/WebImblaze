@@ -221,7 +221,7 @@ verifypositive:         TEST CASE PASSED
 verifynegative:         TEST CASE FAILED
 
 step:                   {FEATURE}
-varFEATURE:             parms
+varFEATURE:             httppost_xml-substitutions
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
 verifypositive:         TEST CASE PASSED
 verifynegative:         TEST CASE FAILED
