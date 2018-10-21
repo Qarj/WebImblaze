@@ -179,7 +179,7 @@ foreach (1 .. $repeat) {
     my $numsteps = scalar @test_steps;
 
     # loop over each of the test steps with C Style for loop (due to need to update $step_index in a non standard fashion)
-    TESTCASE:   for ($step_index = 0; $step_index < $numsteps; $step_index++) {  ## no critic(ProhibitCStyleForLoops)
+    STEP: for ($step_index = 0; $step_index < $numsteps; $step_index++) {  ## no critic(ProhibitCStyleForLoops)
 
         $testnum = $test_steps[$step_index];
 
@@ -200,7 +200,7 @@ foreach (1 .. $repeat) {
             if ( $skip_message ) {
                 $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
                 write_stdout_dashes_separator();
-                next TESTCASE; # skip running this test step
+                next STEP; # skip running this test step
             }
 
             substitute_retry_variables(); # for each retry, there are a few substitutions that we need to redo - like the retry number
