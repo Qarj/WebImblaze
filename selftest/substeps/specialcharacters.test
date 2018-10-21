@@ -5,7 +5,7 @@ verifypositive1:        one < two
 verifypositive2:        one & two
 
 step:                   less than < greater than > & ampersand
-desc:            <&> in description too
+desc:                    <&> in description too
 shell:                  echo NOP
 
 step:                   Assertions should pass

@@ -1,5 +1,5 @@
 step:                   numeric [{MYNUM}], alpha [{MYALPHA}]
-desc:           alphanumeric [{MYAN}]
+desc:                   alphanumeric [{MYAN}]
 varMYALPHA:             {RANDOM:10:ALPHA}
 varMYAN:                {RANDOM:10:ALPHANUMERIC}
 varMYNUM:               {RANDOM:10:NUMERIC}
@@ -11,7 +11,7 @@ shell5:                 echo {RANDOM:5:ALPHA}
 shell6:                 echo {RANDOM:5:ALPHANUMERIC}
 
 step:                   {RANDOM:60:ALPHANUMERIC} alphanumeric
-desc:           {RANDOM:60:NUMERIC} numeric
+desc:                   {RANDOM:60:NUMERIC} numeric
 shell:                  echo {RANDOM:20:ALPHANUMERIC}
 
 step:                   {RANDOM:10} default to alphanumeric

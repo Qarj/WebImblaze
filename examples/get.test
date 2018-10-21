@@ -11,12 +11,12 @@
 =--
 
 step:                   Get Totaljobs Home Page
-desc:           Description 2 is used to display additional information about the test step at hand
+desc:                   Description 2 is used to display additional information about the test step at hand
 url:                    https://{TOTALJOBS}
 verifypositive:         recommended
 
 step:                   Get Totaljobs Account Register Page
-desc:           Runs over https
+desc:                   Runs over https
 url:                    https://{TOTALJOBS}/account/register
 verifypositive:         mandatory
 

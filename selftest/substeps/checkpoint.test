@@ -38,7 +38,7 @@ shell:                  echo NOP
 checkpoint:             true
 
 step:                   Should jump back 8 times due to verifypostive failure
-desc:           jumpbacks variable will update between jumpbacks:{JUMPBACKS}, and also mynum variable {MYNUM} will be
+desc:                   jumpbacks variable will update between jumpbacks:{JUMPBACKS}, and also mynum variable {MYNUM} will be
 shell:                  echo one one one
 shell1:                 echo three four five
 shell2:                 echo mynum:{MYNUM}, retry:{JUMPBACKS}

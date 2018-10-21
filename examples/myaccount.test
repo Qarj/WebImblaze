@@ -53,7 +53,7 @@ parseresponseSOFTLOGIN_COOKIE: SoftLoginCookie=([^;\v]*)|regex|
 runif:                  {COOKIES_EXPIRED}
 
 step:                   Write out session cookies to shared location
-desc:           anonymous[{ANONYMOUS_COOKIE}]
+desc:                   anonymous[{ANONYMOUS_COOKIE}]
 shell1:                 echo anonymous[{ANONYMOUS_COOKIE}]
 shell2:                 echo 2EASPXAUTH[{2EASPXAUTH_COOKIE}]
 shell3:                 echo softlogin[{SOFTLOGIN_COOKIE}]
