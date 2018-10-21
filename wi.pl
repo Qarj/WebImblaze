@@ -128,7 +128,7 @@ my $output_folder_name = 'null'; # current working directory - not full path
 
 our ($results_stdout, $results_html, $results_xml);
 my $results_xml_file_name;
-my ($repeat, $start);
+my $repeat;
 
 my $hostname = `hostname`; ## no critic(ProhibitBacktickOperators) # hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; # strip out any rogue linefeeds or carriage returns
@@ -165,15 +165,11 @@ read_test_steps_file();
 
 $repeat = $lean_test_steps->{repeat};
 $repeat //= 1;
-
-$start = $lean_test_steps->{start};  # grab the start for repeating (for restart)
-$start //= 1;  # set to 1 in case it is not defined in test case file
-
-$counter = $start - 1; # so starting position and counter are aligned
+$counter = 0;
 
 write_stdout_dashes_separator();
 
-foreach ($start .. $repeat) {
+foreach (1 .. $repeat) {
 
     $counter = $counter + 1;
     $run_count = 0;
