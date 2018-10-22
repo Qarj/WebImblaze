@@ -196,6 +196,8 @@ foreach (1 .. $repeat) {
 
         do # retry loop
         {
+            read_shared_variable();  # read in a variable from another instance of WebImblaze that is running concurrently
+
             my $skip_message = get_test_step_skip_message();
             if ( $skip_message ) {
                 $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
@@ -204,7 +206,6 @@ foreach (1 .. $repeat) {
             }
 
             substitute_retry_variables(); # for each retry, there are a few substitutions that we need to redo - like the retry number
-            read_shared_variable();  # read in a variable from another instance of WebImblaze that is running concurrently
             set_var_variables(); # set any variables after doing all the static and dynamic substitutions
             late_substitute_var_variables(); # allow var variables set in this test step to be used immediately
 

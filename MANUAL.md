@@ -2235,6 +2235,7 @@ Will read a variable created by a previous instance of `webinject.pl`, or indeed
 In this example, the contents of the shared variable named SESSION_COOKIE will be read into a local variable called SESSION_COOKIE.
 If there is no shared variable called SESSION_COOKIE, then the local variable of the same name will have no value.
 
+Note that the `readsharedvar` will be performed regardless of whether runif passes or fails for the current step.
 
 <br />
 
