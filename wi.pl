@@ -113,7 +113,7 @@ chdir $this_script_folder_full;
 
 my ($testfile_contains_selenium, $selenium_plugin_present); # so we know if Selenium Browser Session needs to be started
 if (-e 'plugins/WebImblazeSelenium.pm') {
-    require 'plugins/WebImblazeSelenium.pm';
+    require plugins::WebImblazeSelenium;
     $selenium_plugin_present = 1;
 }
 
@@ -1411,7 +1411,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
     }
 
     # there is heavy use of regex in this sub, we need to ensure they are optimised
-    my $_start_loop_timer = time if $EXTRA_VERBOSE;
+    my $_start_loop_timer = time;
 
     # time for substitutions
     if (defined $_page_id) { # did we find match?
@@ -1452,7 +1452,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
     }
     $results_stdout .= qq|\n\n POSTBODY is $_post_body \n| if $EXTRA_VERBOSE;
 
-    my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000) if $EXTRA_VERBOSE;
+    my $_loop_latency = (int(1000 * (time - $_start_loop_timer)) / 1000);
     $results_stdout .= qq| Auto substitution latency was $_loop_latency \n| if $EXTRA_VERBOSE;
 
     return $_post_body;
@@ -2852,7 +2852,7 @@ sub _get_quote {
         }
     }
 
-    return undef, undef;
+    return;
 }
 
 sub _get_parm_value_if_single_line {
@@ -2864,7 +2864,7 @@ sub _get_parm_value_if_single_line {
         if ( parser_line() =~ m|^\w++:\Q$_quote\E:\s++\Q$_quote\E(.*)\Q$_end_quote\E| ) {
             return $1;
         }
-        return undef;
+        return;
     }
 
     _validate_tab( '^(\w++:\s+).*[^\s]\s*$' );
@@ -2900,7 +2900,7 @@ sub _get_from_start_of_line_to_end_quote {
    if ( $_line =~ /(.*?)\Q$_end_quote\E/ ) {
        return $1;
    }
-   return undef;
+   return;
 }
 
 sub _validate {
@@ -2983,10 +2983,10 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_HOUR = $HOUR;
 
     if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval($1)*86400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval{$1}*86400));
     }
     if ($_[0] =~ s|{DATE_NOW:::([+\-*/\d]+)}||g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval{$1}*86400));
     }
 
     # perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
@@ -3238,7 +3238,7 @@ sub set_late_var_list {
 sub set_eval_variables { # e.g. evalDIFF="10-5"
     foreach my $_case_attribute ( sort keys %case ) {
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
-            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; # assign the variable
+            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## no critic(ProhibitStringyEval)
         }
     }
 
