@@ -63,7 +63,7 @@ my ($cookie_jar, @http_auth);
 our ($case_failed_count, $passed_count, $failed_count);
 our $is_failure;
 my ($run_count, $total_run_count, $case_passed_count, $case_failed);
-my ($current_steps_file, $current_steps_filename, $case_count, $fast_fail_invoked);
+my ($current_steps_file, $current_steps_filename, $fast_fail_invoked);
 our $unit_test_steps;
 
 our %case;
@@ -1203,7 +1203,7 @@ sub getbackgroundimages { # style="background-image: url( )"
 }
 
 #------------------------------------------------------------------
-sub get_assets { # get page assets matching a list for a reference type
+sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a list for a reference type
                 # get_assets ('href',q{"},q{"},'.less|.css')
 
     my ($_match, $_left_delim, $_right_delim, $assetlist, $_type, $_version) = @_;
@@ -1674,12 +1674,6 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
 sub httpsend_xml { # send text/xml HTTP request and read response
     my ($_verb) = @_;
 
-    my @_parms;
-    my $_len;
-    my $_field_name;
-    my $_field_value;
-    my $_sub_name;
-
     # read the xml file specified in the testcase
     my @_xml_body;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
@@ -1724,7 +1718,7 @@ sub httpsend_form_data {  # send multipart/form-data HTTP request and read respo
     $_substituted_postbody = auto_sub("$case{postbody}", 'multipost', "$case{url}");
 
     my %_my_content_;
-    eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval)
+    eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval,RequireCheckingReturnValueOfEval)
     if ($_verb eq 'POST') {
         $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
@@ -1882,25 +1876,7 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
     _verify_verifypositive();
     _verify_verifynegative();
     _verify_assertcount();
-
-     if ($case{verifyresponsetime}) { # verify that the response time is less than or equal to given amount in seconds
-         if ($latency <= $case{verifyresponsetime}) {
-                $results_html .= qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
-                $results_xml .= qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
-                $results_stdout .= "Passed Response Time Verification \n";
-                $passed_count++;
-                $retry_passed_count++;
-         }
-         else {
-                $results_html .= qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
-                $results_xml .= qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
-                $results_xml .= qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
-                colour_stdout('bold yellow', "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n");
-                $failed_count++;
-                $retry_failed_count++;
-                $is_failure++;
-        }
-     }
+    _verify_verifyresponsetime();
 
     if ($case{verifyresponsecode}) {
         if ($case{verifyresponsecode} == $response->code()) { # verify returned HTTP response code matches verifyresponsecode set in test case
@@ -2174,6 +2150,29 @@ sub _verify_verifynegative {
     return;
 }
 
+sub _verify_verifyresponsetime {
+
+     if ($case{verifyresponsetime}) { # verify that the response time is less than or equal to given amount in seconds
+         if ($latency <= $case{verifyresponsetime}) {
+                $results_html .= qq|<span class="pass">Passed Response Time Verification</span><br />\n|;
+                $results_xml .= qq|            <verifyresponsetime-success>true</verifyresponsetime-success>\n|;
+                $results_stdout .= "Passed Response Time Verification \n";
+                $passed_count++;
+                $retry_passed_count++;
+         }
+         else {
+                $results_html .= qq|<span class="fail">Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency</span><br />\n|;
+                $results_xml .= qq|            <verifyresponsetime-success>false</verifyresponsetime-success>\n|;
+                $results_xml .= qq|            <verifyresponsetime-message>Latency should be at most $case{verifyresponsetime} seconds</verifyresponsetime-message>\n|;
+                colour_stdout('bold yellow', "Failed Response Time Verification - should be at most $case{verifyresponsetime}, got $latency \n");
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
+        }
+     }
+
+     return;
+}
 
 sub _is_fail_fast {
     my ($_assertion) = @_;
@@ -2367,7 +2366,7 @@ sub slash_me {
 }
 
 #------------------------------------------------------------------
-sub process_config_file { # parse config file and grab values it sets
+sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config file and grab values it sets
 
     my $_config_file_path;
 
@@ -2900,8 +2899,11 @@ sub _get_from_start_quote_to_end_of_line {
         $results_stdout .= qq| \n\nLOGIC ERROR in _get_from_start_quote_to_end_of_line  \n\n| if $EXTRA_VERBOSE;
     }
 
-    $_line =~ /\Q$_quote\E(.*)/;
-    return $1;
+    if ( $_line =~ /\Q$_quote\E(.*)/ ) {
+        return $1;
+    }
+
+    return;
 }
 
 sub _get_from_start_of_line_to_end_quote {
@@ -3341,7 +3343,7 @@ sub _write_http_log {
 }
 
 #------------------------------------------------------------------
-sub _write_step_html {
+sub _write_step_html { ## no critic(ProhibitManyArgs)
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base) = @_;
 
     _format_xml($_response_content_ref);
@@ -3698,7 +3700,7 @@ sub start_session {     # creates the WebImblaze user agent
     #$useragent->timeout(200); # it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  # don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
-    eval
+    eval ## no critic(RequireCheckingReturnValueOfEval)
     {
        $useragent->ssl_opts(verify_hostname=>0); # stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
        $useragent->ssl_opts(SSL_verify_mode=>0); # from Perl 5.16.3 need this to prevent ugly warnings
