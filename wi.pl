@@ -589,6 +589,7 @@ sub execute_test_step {
 
     if ($case{method}) {
         if ($case{method} eq 'shell') { shell(); return; }
+        if ($case{method} eq 'none') { shell(); return; } # run an empty shell command by default - variables will still be set
     }
 
     if (not $session_started) {
@@ -607,9 +608,6 @@ sub execute_test_step {
         if ($case{method} eq 'post') { httppost(); return;}
         if ($case{method} eq 'delete') { httpdelete(); return;}
         if ($case{method} eq 'put') { httpput(); return;}
-    }
-    else {
-        shell(); # default to doing nothing if method is not specified, rather than get
     }
 
     return;
@@ -2747,7 +2745,7 @@ sub _get_lean_step_method {
         }
     }
 
-    return;
+    return 'none';
 }
 
 sub lean_parser_step_parm_names {
