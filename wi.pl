@@ -405,7 +405,7 @@ sub get_test_step_skip_message {
     if (defined $case{runif}) {
         print"runif:[$case{runif}]\n";
     }
-    if (defined $case{runif} && not $case{runif}) { # evaluate content - truthy or falsy
+    if (defined $case{runif} and not $case{runif}) { # evaluate content - truthy or falsy
         return 'runif evaluated as falsy';
     }
 
@@ -463,7 +463,7 @@ sub get_number_of_times_to_retry_this_test_step {
 
     # getting this far means there is no retry or retryfromstep parameter, perhaps this step is eligible for autoretry
     # to prevent excessive retries when there are severe errors, auto retry will turn itself off until it sees a test step pass
-    if ( defined $auto_retry && not $case{ignoreautoretry} ) {
+    if ( defined $auto_retry and not $case{ignoreautoretry} ) {
         if ($attempts_since_last_success < $auto_retry) {
             my $_max = $auto_retry - $attempts_since_last_success;
             if ($_max > $auto_retry) {$_max = $auto_retry};
@@ -784,11 +784,11 @@ sub output_test_step_results {
 }
 
 sub write_html_dashes_separator {
-    $results_html .= qq|<br />\n---------------------------------------------------------------------- <br />\n\n|;
+    $results_html .= qq|<br />\n---------------------------------------------------------------------- <br />\n\n|; return;
 }
 
 sub write_stdout_dashes_separator {
-    $results_stdout .= qq|------------------------------------------------------- \n|;
+    $results_stdout .= qq|------------------------------------------------------- \n|; return;
 }
 
 #------------------------------------------------------------------
@@ -2579,6 +2579,7 @@ sub _parse_lines {
         }
     }
 
+    return;
 }
 
 sub new_parser {
@@ -2605,12 +2606,16 @@ sub parser_new_step {
     @parser_step_parm_names_ = ();
     @parser_step_parm_values_ = ();
     $parser_step_start_line_ = $parser_index_ + 1;
+
+    return;
 }
 
 sub parser_push_parm {
     my ($_name, $_value) = @_;
     push @parser_step_parm_names_, $_name;
     push @parser_step_parm_values_, $_value;
+
+    return;
 }
 
 sub parser_step_has_parms {
@@ -2655,6 +2660,8 @@ sub parser_get_multi_line_comment {
         }
         parser_advance_line();
     }
+
+    return;
 }
 
 sub parser_get_repeat {
@@ -2709,6 +2716,8 @@ sub _increment_step_id {
             $step_id_ = int( ($step_id_+100)/100 ) * 100;
         }
     }
+
+    return;
 }
 
 sub _construct_step {
@@ -2737,6 +2746,8 @@ sub _get_lean_step_method {
             return 'get';
         }
     }
+
+    return;
 }
 
 sub lean_parser_step_parm_names {
@@ -2900,6 +2911,7 @@ sub _get_from_start_of_line_to_end_quote {
    if ( $_line =~ /(.*?)\Q$_end_quote\E/ ) {
        return $1;
    }
+
    return;
 }
 
@@ -2910,6 +2922,8 @@ sub _validate {
         return ($1);
     }
     _output_validate_error($_error_message, $_example);
+
+    return;
 }
 
 sub _validate_tab {
@@ -2924,6 +2938,8 @@ sub _validate_tab {
             }
         }
     }
+
+    return;
 }
 
 sub _validate_step {
@@ -2950,6 +2966,8 @@ sub _validate_step {
             }
         }
     }
+
+    return;
 }
 
 sub _output_validate_error {
