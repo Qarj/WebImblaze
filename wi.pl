@@ -42,7 +42,7 @@ use File::Path qw(make_path remove_tree);
 use Encode qw(encode decode);
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
-use lib '.'; # current folder is not @INC from Perl 5.26
+use lib q{.}; # current folder is not @INC from Perl 5.26
 use Data::Dumper;
 
 local $| = 1; # don't buffer output to STDOUT
@@ -129,7 +129,7 @@ our ($results_stdout, $results_html, $results_xml);
 my $results_xml_file_name;
 my $repeat;
 
-my $hostname = `hostname`; ## no critic(ProhibitBacktickOperators) # hostname should work on Linux and Windows
+my $hostname = `hostname`; # hostname should work on Linux and Windows
 $hostname =~ s/\r|\n//g; # strip out any rogue linefeeds or carriage returns
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
@@ -212,7 +212,7 @@ foreach (1 .. $repeat) {
             set_retry_to_zero_if_global_limit_exceeded();
 
             $is_failure = 0;
-            $fast_fail_invoked = '';
+            $fast_fail_invoked = q{};
             $retry_passed_count = 0;
             $retry_failed_count = 0;
 
@@ -518,7 +518,7 @@ sub check_for_checkpoint {
         # checkpoint cleared - will not automatically jump back from this step onwards
         $results_html .= qq|--- CHECKPOINT CLEARED --- <br />\n|;
         $results_stdout .= qq|--- CHECKPOINT CLEARED --- \n|;
-        $checkpoint = '';
+        $checkpoint = q{};
 
         return;
     }
@@ -1129,7 +1129,7 @@ sub setcookie {
             $_key = trim($_key);
             $_value = trim($_value);
             $results_stdout .= " Set cookie -> $_key: $_value\n";
-            $cookie_jar->set_cookie( 0, $_key, $_value, '/', $_uri->host, $_uri->port, 0, 0, 86400, 0 )
+            $cookie_jar->set_cookie( 0, $_key, $_value, q{/}, $_uri->host, $_uri->port, 0, 0, 86_400, 0 )
         }
     }
 
@@ -1400,7 +1400,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
     my $_page_id = _find_page_in_cache($_post_url.q{$});
     if (not defined $_page_id) {
         $_post_url =~ s{^.*/}{}s; # remove the path entirely, except for the page name itself
-        $results_stdout .= " REMOVE PATH                : $_post_url".'$'."\n" if $EXTRA_VERBOSE;
+        $results_stdout .= " REMOVE PATH                : $_post_url".q{$}."\n" if $EXTRA_VERBOSE;
         $_page_id = _find_page_in_cache($_post_url.q{$}); # try again without the full path
     }
     if (not defined $_page_id) {
