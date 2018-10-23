@@ -1,5 +1,5 @@
 --=
-    addcookie will add a cookie for this step only.
+    setcookie will add a cookie and it will be carried forward to subsequent steps
 
     It will not clobber existing cookies (unlike addheader).
 =--
@@ -7,6 +7,6 @@
 step:                   Get Mobile Home page
 url:                    http://{WIC}
 verifypositive1:        WebInject
-addcookie:              MobileWebsite=1
+setcookie:              MobileWebsite: 1
 
 

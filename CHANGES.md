@@ -1,12 +1,18 @@
-# WebInject change log
+# WebImblaze change log
 
-Up to version 1.41 - Copyright 2004, 2005, 2006 Corey Goldberg (corey@goldb.org)
-For information and documentation on version 1.41, visit the website at http://www.webinject.org
+This project is a fork of WebInject version 1.41, http://webinject.org/.
 
-Version 1.42 onwards - Tim Buckland, https://github.com/Qarj/WebInject
+Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ---------------------------------
-## Release History:
+## WebImblaze Release History:
+
+### Version 1.0.0 - Nov, 2018
+* Initial release of WebImblaze
+* addcookie feature removed (use setcookie instead)
+
+---------------------------------
+## WebInject Release History:
 
 ### Version 2.11.0 - Aug 10, 2018
 * stabilised the simplified .test format including fixes for Linux

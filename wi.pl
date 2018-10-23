@@ -1122,16 +1122,14 @@ sub setcookie {
 sub trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
 
 #------------------------------------------------------------------
-# function addcookie is deprecated since it only adds the cookie for the current step
-sub addcookie { # add a cookie like JBM_COOKIE=4830075
-    if ($case{addcookie}) { # inject in an additional cookie for this test step only if specified
-        my $_cookies = $request->header('Cookie');
-        if (defined $_cookies) {
-            $request->header('Cookie' => "$_cookies; " . $case{addcookie});
-        } else {
-            $request->header('Cookie' => $case{addcookie});
+sub addheader {
+
+    if ($case{addheader}) {  # add an additional HTTP Header if specified
+        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
+            m/(.*): (.*)/;
+            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
         }
-        undef $_cookies;
     }
 
     return;
@@ -1566,18 +1564,9 @@ sub httpget {  # send http request and read response
 
     $request = HTTP::Request->new('GET',"$case{url}");
 
-    setcookie ();
+    setcookie();
     $cookie_jar->add_cookie_header($request);
-
-    addcookie (); # append additional cookies rather than overwriting with add header
-
-    if ($case{addheader}) {  # add an additional HTTP Header if specified
-        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
-        foreach (@_add_headers) {
-            $_ =~ m/(.*): (.*)/;
-            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
-        }
-    }
+    addheader();
 
     my $_start_timer = time;
     $response = $useragent->request($request);
@@ -1594,7 +1583,7 @@ sub httpget {  # send http request and read response
 sub httpdelete {
 
     if (not defined $case{postbody}) { # REST spec does not state if DELETE can have a postbody or not
-        $case{postbody} = '';
+        $case{postbody} = q{};
     }
     httpsend('DELETE');
 
@@ -1648,18 +1637,9 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
     $request->content_type("$case{posttype}");
     $request->content("$_substituted_postbody");
 
-    setcookie ();
+    setcookie();
     $cookie_jar->add_cookie_header($request);
-
-    addcookie (); # append to additional cookies rather than overwriting with add header
-
-    if ($case{addheader}) {  # add an additional HTTP Header if specified
-        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
-        foreach (@_add_headers) {
-            $_ =~ m{(.*): (.*)};
-            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
-        }
-    }
+    addheader();
 
     my $_start_timer = time;
     $response = $useragent->request($request);
@@ -1691,15 +1671,9 @@ sub httpsend_xml { # send text/xml HTTP request and read response
     $request->content_type("$case{posttype}");
     $request->content(join q{ }, @_xml_body);  # load the contents of the file into the request body
 
+    setcookie();
     $cookie_jar->add_cookie_header($request);
-
-    if ($case{addheader}) {
-        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
-        foreach (@_add_headers) {
-            $_ =~ m/(.*): (.*)/;
-            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
-        }
-    }
+    addheader();
 
     my $_start_timer = time;
     $response = $useragent->request($request);
@@ -1728,16 +1702,7 @@ sub httpsend_form_data {  # send multipart/form-data HTTP request and read respo
     }
     setcookie ();
     $cookie_jar->add_cookie_header($request);
-
-    addcookie (); # append additional cookies rather than overwriting with add header
-
-    if ($case{addheader}) {
-        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
-        foreach (@_add_headers) {
-            $_ =~ m/(.*): (.*)/;
-            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
-        }
-    }
+    addheader();
 
     my $_start_timer = time;
     $response = $useragent->request($request);
@@ -2255,7 +2220,7 @@ sub parseresponse {  # parse values from responses for use in future request (fo
 
             $_left_boundary = $_parse_args[0]; $_right_boundary = $_parse_args[1]; $_escape = $_parse_args[2];
 
-            $parsedresult{$_case_attribute} = ''; # clear out any old value first
+            $parsedresult{$_case_attribute} = q{}; # clear out any old value first
 
             $_response_to_parse = $response->as_string;
 
@@ -2299,7 +2264,7 @@ sub write_shared_variable {
         _initialise_shared_variables();
         my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
         my ($_second, $_minute, $_hour, undef, undef, undef, undef, undef, undef, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
-        my $_file_full = slash_me($shared_folder_full.'/'.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
+        my $_file_full = slash_me($shared_folder_full.q{/}.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
         write_file ( $_file_full, $_var_value);
         $results_stdout .= " Wrote $_file_full\n";
     }
@@ -2311,7 +2276,7 @@ sub read_shared_variable {
 
     if ($case{readsharedvar}) {
         _initialise_shared_variables();
-        my @_vars = glob(slash_me($shared_folder_full.'/'.$case{readsharedvar}.'___*'));
+        my @_vars = glob(slash_me($shared_folder_full.q{/}.$case{readsharedvar}.'___*'));
     
         my @_sorted_vars = sort { -M $a <=> -M $b } @_vars; # -C is created, -M for modified
 
@@ -2319,7 +2284,7 @@ sub read_shared_variable {
             $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0]);
             $results_stdout .= " Read  $_sorted_vars[0]\n";
         } else {
-            $varvar{'var'.$case{readsharedvar}} = ''; # set variable to null if it does not exist
+            $varvar{'var'.$case{readsharedvar}} = q{}; # set variable to null if it does not exist
             $results_stdout .= " Set  {$case{readsharedvar}} to null\n";
         }
     }
@@ -2394,7 +2359,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
         if ($config->{testcasefile}) {
             $current_steps_file = slash_me($config->{testcasefile});
         } else {
-            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename."; ## no critic(RequireCarping)
+            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
         }
 
     }
@@ -2764,7 +2729,7 @@ sub lean_parser_get_current_step {
     my $_in_quote = 0;
     my $_start_quote_found = 0;
     my $_quote_start_line = 0;
-    my $_proto_val = '';
+    my $_proto_val = q{};
     my ($_parm_name, $_parm_value, $_quote, $_end_quote);
     my $_first_loop = 1; # really want a do until loop that supports next, but Perl doesn't support it well
     while ( lean_parser_can_advance_one_line_in_step($_first_loop, $_in_quote) ) {
@@ -2946,7 +2911,7 @@ sub _validate_step {
     if (not $parser_step_parm_names_[0] eq 'step') {
         _output_validate_error ('First parameter of step block must be step:', "well formed step block:\n\nstep: Get totaljobs home page\nurl: https://www.totaljobs.com", $parser_step_start_line_);
     }
-    my @_reserved_parms = ('id', 'command');
+    my @_reserved_parms = qw(id command);
     for my $_i (0 .. $#parser_step_parm_names_) {
         foreach my $_reserved (@_reserved_parms) {
             if ( $parser_step_parm_names_[$_i] eq $_reserved ) {
@@ -3001,10 +2966,10 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_HOUR = $HOUR;
 
     if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval{$1}*86400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval{$1}*86_400));
     }
     if ($_[0] =~ s|{DATE_NOW:::([+\-*/\d]+)}||g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval{$1}*86400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval{$1}*86_400));
     }
 
     # perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
@@ -3267,7 +3232,7 @@ sub set_eval_variables { # e.g. evalDIFF="10-5"
 sub uri_escape {
     my ($_string) = @_;
 
-    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg; ## no critic(RegularExpressions::ProhibitEnumeratedClasses) #'
+    $_string =~ s/([^^A-Za-z0-9\-_.!~*'()])/ sprintf "%%%02x", ord $1 /eg;
 
     return $_string;
 }
@@ -3790,7 +3755,7 @@ sub get_command_line_options {
     $opt_output //= 'output/';
     $opt_output = slash_me($opt_output);
 
-    $results_output_folder = slash_me(dirname($opt_output.'dummy') . '/'); # remove any prefix passed from command line e.g. --output output\run1 becomes output/
+    $results_output_folder = slash_me(dirname($opt_output.'dummy') . q{/}); # remove any prefix passed from command line e.g. --output output\run1 becomes output/
     File::Path::make_path ( $results_output_folder );
 
     $results_filename_prefix = $opt_output;

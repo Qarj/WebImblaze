@@ -96,8 +96,6 @@ Adapted from the original manual written by Corey Goldberg.
 
 [commandonerror](#commandonerror)
 
-[addcookie](#addcookie)
-
 [addheader](#addheader)
 
 [maxredirect](#maxredirect)
@@ -1392,21 +1390,6 @@ will be retried or not.
 
 ```
     commandonerror="log_failure_statistic.bat"
-```
-
-<br />
-
-
-<a name="addcookie"></a>
-#### addcookie
-
-This is used to add an additional cookie to an outgoing HTTP request without overwriting the existing cookies.
-
-The cookie will be added for the current step only - for that reason this parameter is deprecated. Use the
-`setcookie` parameter instead.
-
-```
-    addcookie="LASTVIEWEDJOB_COOKIE=4830075"
 ```
 
 <br />
