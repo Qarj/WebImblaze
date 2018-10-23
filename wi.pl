@@ -1100,6 +1100,22 @@ sub _run_this_step {
     return;
 }
 
+#------------------------------------------------------------------
+sub add_headers {
+
+    setcookie();
+    $cookie_jar->add_cookie_header($request);
+
+    if ($case{addheader}) {  # add an additional HTTP Header if specified
+        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
+        foreach (@_add_headers) {
+            m/(.*): (.*)/;
+            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
+        }
+    }
+
+    return;
+}
 
 #------------------------------------------------------------------
 sub setcookie {
@@ -1120,20 +1136,6 @@ sub setcookie {
     return;
 }
 sub trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
-
-#------------------------------------------------------------------
-sub addheader {
-
-    if ($case{addheader}) {  # add an additional HTTP Header if specified
-        my @_add_headers = split /[|]/, $case{addheader} ;  # can add multiple headers with a pipe delimiter
-        foreach (@_add_headers) {
-            m/(.*): (.*)/;
-            if ($1) {$request->header($1 => $2);}  # using HTTP::Headers Class
-        }
-    }
-
-    return;
-}
 
 #------------------------------------------------------------------
 sub getresources {
@@ -1564,17 +1566,9 @@ sub httpget {  # send http request and read response
 
     $request = HTTP::Request->new('GET',"$case{url}");
 
-    setcookie();
-    $cookie_jar->add_cookie_header($request);
-    addheader();
+    do_http_request();
 
-    my $_start_timer = time;
-    $response = $useragent->request($request);
-    $latency = _get_latency_since($_start_timer);
-
-    $cookie_jar->extract_cookies($response);
-
-    save_page_when_method_post_and_has_action ();
+    save_page_when_method_post_and_has_action();
 
     return;
 }
@@ -1621,7 +1615,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
         httpsend_form_urlencoded($_verb);  # use "x-www-form-urlencoded" if no encoding is specified
     }
 
-    save_page_when_method_post_and_has_action ();
+    save_page_when_method_post_and_has_action();
 
     return;
 }
@@ -1637,15 +1631,7 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
     $request->content_type("$case{posttype}");
     $request->content("$_substituted_postbody");
 
-    setcookie();
-    $cookie_jar->add_cookie_header($request);
-    addheader();
-
-    my $_start_timer = time;
-    $response = $useragent->request($request);
-    $latency = _get_latency_since($_start_timer);
-
-    $cookie_jar->extract_cookies($response);
+    do_http_request();
 
     return;
 }
@@ -1671,15 +1657,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
     $request->content_type("$case{posttype}");
     $request->content(join q{ }, @_xml_body);  # load the contents of the file into the request body
 
-    setcookie();
-    $cookie_jar->add_cookie_header($request);
-    addheader();
-
-    my $_start_timer = time;
-    $response = $useragent->request($request);
-    $latency = _get_latency_since($_start_timer);
-
-    $cookie_jar->extract_cookies($response);
+    do_http_request();
 
     return;
 }
@@ -1700,16 +1678,23 @@ sub httpsend_form_data {  # send multipart/form-data HTTP request and read respo
     } else {
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
-    setcookie ();
-    $cookie_jar->add_cookie_header($request);
-    addheader();
+
+    do_http_request();
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub do_http_request {
+
+    add_headers();
 
     my $_start_timer = time;
     $response = $useragent->request($request);
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-
+    
     return;
 }
 
