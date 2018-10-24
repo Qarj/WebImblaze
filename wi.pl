@@ -130,7 +130,7 @@ my $results_xml_file_name;
 my $repeat;
 
 my $hostname = `hostname`; # hostname should work on Linux and Windows
-$hostname =~ s/\r|\n//g; # strip out any rogue linefeeds or carriage returns
+$hostname =~ s/[\r\n]//g; # strip out any rogue linefeeds or carriage returns
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
@@ -294,7 +294,7 @@ sub get_formatted_datetime_for_seconds_since_epoch {
     my @_MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
     my @_MONTHS_TEXT = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my @_WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
-    my ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime($_seconds_since_epoch);
+    my ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime $_seconds_since_epoch;
     my $_YEAR = 1900 + $_YEAROFFSET;
     my $_YY = substr $_YEAR, 2;
     my $_MONTH_TEXT = $_MONTHS_TEXT[$_MONTH];
@@ -304,7 +304,7 @@ sub get_formatted_datetime_for_seconds_since_epoch {
     $_MINUTE = sprintf '%02d', $_MINUTE; #put in up to 2 leading zeros
     $_SECOND = sprintf '%02d', $_SECOND;
     $_HOUR = sprintf '%02d', $_HOUR;
-    
+
     return $_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTHS[$_MONTH], $_MONTH_TEXT, $_YEAR, $_YY;
 }
 
@@ -1422,7 +1422,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
 
             ($_dot_x_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'x');
             ($_dot_y_found, $_post_fields[$_i]) = _remove_dot_letter_from_field_name_if_present($_post_fields[$_i], 'y');
-    
+
             $_post_fields[$_i] = _substitute_name($_post_fields[$_i], $_page_id, $_post_type);
 
             # substitute {DATA} for actual
@@ -1435,7 +1435,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
             if ($_dot_y_found) {
                 $_post_fields[$_i] = _restore_dot_letter_to_field_name($_post_fields[$_i], $_post_type, 'y');
             }
-    
+
         }
     }
 
@@ -1467,7 +1467,7 @@ sub _remove_dot_letter_from_field_name_if_present {
     }
 
     return 0, $_post_field;
-}    
+}
 
 sub _restore_dot_letter_to_field_name {
     my ($_post_field, $_post_type, $_post_letter) = @_;
@@ -1694,7 +1694,7 @@ sub do_http_request {
     $latency = _get_latency_since($_start_timer);
 
     $cookie_jar->extract_cookies($response);
-    
+
     return;
 }
 
@@ -1784,7 +1784,7 @@ sub decode_smtp {
 
 	if ($case{decodesmtp}) {
 		 my $_decoded = $response->as_string;
-		 $_decoded =~ s/(^|\v)\.\./$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
+		 $_decoded =~ s/(^|\v)[.][.]/$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
 		 $response = HTTP::Response->parse($_decoded);
 	}
 
@@ -1850,7 +1850,7 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
     }
     else { # verify http response code is in the 100-399 range
         if (not $case{ignorehttpresponsecode}) {
-            if (($response->as_string() =~ /HTTP\/1.(0|1) (1|2|3)/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
+            if (($response->as_string() =~ /HTTP\/1.([01]) ([123])/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
                 $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
                 $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
@@ -2247,7 +2247,7 @@ sub write_shared_variable {
 
     if ($case{writesharedvar}) {
         _initialise_shared_variables();
-        my ($_var_name, $_var_value) = split /\|/, $case{writesharedvar};
+        my ($_var_name, $_var_value) = split /[|]/, $case{writesharedvar};
         my ($_second, $_minute, $_hour, undef, undef, undef, undef, undef, undef, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
         my $_file_full = slash_me($shared_folder_full.q{/}.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
         write_file ( $_file_full, $_var_value);
@@ -2262,7 +2262,7 @@ sub read_shared_variable {
     if ($case{readsharedvar}) {
         _initialise_shared_variables();
         my @_vars = glob(slash_me($shared_folder_full.q{/}.$case{readsharedvar}.'___*'));
-    
+
         my @_sorted_vars = sort { -M $a <=> -M $b } @_vars; # -C is created, -M for modified
 
         if ($_sorted_vars[0]) { # only the most recent variable value is relevant
@@ -2401,7 +2401,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
     my $_os;
     if ($is_windows) { $_os = 'windows'; }
     $_os //= 'linux';
-    
+
     if (defined $config->{$_os}->{'chromedriver-binary'}) {
         $opt_chromedriver_binary //= $config->{$_os}->{'chromedriver-binary'}; # default to value from config file if present
     }
@@ -2495,7 +2495,7 @@ sub _parse_steps {
 }
 
 sub _parse_lines {
-    
+
     while ( parser_advance_line() ) {
         if ( parser_get_blank_line() ) {
             next;
@@ -2531,7 +2531,7 @@ sub _parse_lines {
 
 sub new_parser {
     my ($_parser_raw_ref) = @_;
-    @parser_lines_ = split /\n/, ${$_parser_raw_ref};    
+    @parser_lines_ = split /\n/, ${$_parser_raw_ref};
     $parser_index_ = -1;
 
     %case_ = ();
@@ -2566,7 +2566,7 @@ sub parser_push_parm {
 }
 
 sub parser_step_has_parms {
-    return scalar(@parser_step_parm_names_);
+    return scalar @parser_step_parm_names_;
 }
 
 sub parser_advance_line() {
@@ -2614,9 +2614,9 @@ sub parser_get_multi_line_comment {
 sub parser_get_repeat {
     if ( parser_line() =~ /^repeat:/ ) {
         if (defined $repeat_) {
-            _output_validate_error("Repeat directive can only be given once globally.", "well formed file with repeat:\n\nrepeat: 3\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+            _output_validate_error('Repeat directive can only be given once globally.', "well formed file with repeat:\n\nrepeat: 3\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
         }
-        $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', "Repeat directive value must be a whole number without quotes. It must not begin with 0.", "well formed repeat directive:\n\nrepeat: 11");
+        $repeat_ = _validate( '^repeat:\s+([1-9]\d*)\s*$', 'Repeat directive value must be a whole number without quotes. It must not begin with 0.', "well formed repeat directive:\n\nrepeat: 11");
         return 1;
     }
     return 0;
@@ -2625,9 +2625,9 @@ sub parser_get_repeat {
 sub parser_get_useragent {
     if ( parser_line() =~ /^useragent:/ ) {
         if (defined $useragent_) {
-            _output_validate_error("Useragent directive can only be given once globally.", "well formed file with useragent:\n\nuseragent: My custom useragent\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
+            _output_validate_error('Useragent directive can only be given once globally.', "well formed file with useragent:\n\nuseragent: My custom useragent\n\nstep: Get totaljobs home page\nurl:  https://www.totaljobs.com");
         }
-        $useragent_ = _validate( '^useragent:\s+(.+[^\s])\s*$', "Useragent directive cannot be whitespace, and custom quotes are not supported.", "well formed useragent directive:\n\nuseragent: My special useragent");
+        $useragent_ = _validate( '^useragent:\s+(.+[^\s])\s*$', 'Useragent directive cannot be whitespace, and custom quotes are not supported.', "well formed useragent directive:\n\nuseragent: My special useragent");
         return 1;
     }
     return 0;
@@ -2636,7 +2636,7 @@ sub parser_get_useragent {
 sub parser_get_include {
     my $_include_filename;
     if ( parser_line() =~ /^include:/ ) {
-        $_include_filename = _validate( '^include:\s+(.+[^\s])\s*$', "Include filename must be specified without quotes.", "well formed include directive:\n\ninclude: examples/include/include_demo.txt");
+        $_include_filename = _validate( '^include:\s+(.+[^\s])\s*$', 'Include filename must be specified without quotes.', "well formed include directive:\n\ninclude: examples/include/include_demo.txt");
         $step_id_ += 10;
         $include_{ $step_id_ } = $_include_filename;
         return 1;
@@ -2794,7 +2794,7 @@ sub lean_parser_can_advance_one_line_in_step {
     }
 
     return 0;
-} 
+}
 
 sub _get_quote {
 
@@ -2819,14 +2819,14 @@ sub _get_parm_value_if_single_line {
     if (defined $_quote) {
         my $_regex = '^(\w++:' . quotemeta($_quote) . ':\s++)';
         _validate_tab( $_regex );
-        if ( parser_line() =~ m|^\w++:\Q$_quote\E:\s++\Q$_quote\E(.*)\Q$_end_quote\E| ) {
+        if ( parser_line() =~ m{^\w++:\Q$_quote\E:\s++\Q$_quote\E(.*)\Q$_end_quote\E} ) {
             return $1;
         }
         return;
     }
 
     _validate_tab( '^(\w++:\s+).*[^\s]\s*$' );
-    return _validate( '^\w++:  *(.*[^\s])\s*$', "No value found - must use quotes if value is only white space. Use spaces, not tabs.", "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
+    return _validate( '^\w++:  *(.*[^\s])\s*$', 'No value found - must use quotes if value is only white space. Use spaces, not tabs.', "well formed parameter, quote white space value:\n\nverifypositive8:{{: {{     }}");
 }
 
 sub _search_for_start_quote {
@@ -2880,7 +2880,7 @@ sub _validate_tab {
     my ($_regex) = @_;
 
     if ( parser_line() =~ /$_regex/ ) {
-        for my $_i (0..length($1)-1) {
+        for my $_i (0 .. (length $1) - 1) {
             if ( substr($1, $_i, 1) eq "\t" ) {
                 my $_column = $_i + 1;
                 my $_line_num = $parser_index_ + 1;
@@ -2905,14 +2905,14 @@ sub _validate_step {
         }
         if ( $parser_step_parm_names_[$_i] eq 'method' ) {
             if ( not ($parser_step_parm_values_[$_i] eq 'delete' || $parser_step_parm_values_[$_i] eq 'put' ) ) {
-                _output_validate_error ("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred.", "well formed step block:\n\nstep: Post login details\nurl: https://www.example.com/log\npostbody: user=Admin&pass=123456", $parser_step_start_line_ + $_i);
+                _output_validate_error (q{Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred.}, "well formed step block:\n\nstep: Post login details\nurl: https://www.example.com/log\npostbody: user=Admin&pass=123456", $parser_step_start_line_ + $_i);
             }
         }
         for my $_j (0 .. $#parser_step_parm_names_) {
             if ($_i ne $_j) {
                 if ( $parser_step_parm_names_[$_i] eq $parser_step_parm_names_[$_j] ) {
                     _output_validate_error ("Duplicate parameter $parser_step_parm_names_[$_j] found.", "well formed step block:\n\nstep: Do shell operations\nshell1: ls -asl\nshell2: pwd", $parser_step_start_line_ + $_j);
-                } 
+                }
             }
         }
     }
@@ -2950,10 +2950,10 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_SECOND = $SECOND;
     my $_HOUR = $HOUR;
 
-    if ($_[0] =~ s|{DATE:::([+\-*/\d]+)}||g) {
+    if ($_[0] =~ s{[{]DATE:::([+\-*/\d]+)[}]}{}g) {
         ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval{$1}*86_400));
     }
-    if ($_[0] =~ s|{DATE_NOW:::([+\-*/\d]+)}||g) {
+    if ($_[0] =~ s{[{]DATE_NOW:::([+\-*/\d]+)[}]}{}g) {
         ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval{$1}*86_400));
     }
 
@@ -3024,14 +3024,14 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     # parseresponse = {}, parseresponse5 = {5}, parseresponseMYVAR = {MYVAR}
     foreach my $_case_attribute ( sort keys %{parsedresult} ) {
        my $_parse_var = substr $_case_attribute, 13;
-       $_[0] =~ s/\{$_parse_var}/$parsedresult{$_case_attribute}/g;
+       $_[0] =~ s/[{]$_parse_var}/$parsedresult{$_case_attribute}/g;
     }
 
     $_[0] =~ s/{BASEURL}/$config->{baseurl}/g;
     $_[0] =~ s/{BASEURL1}/$config->{baseurl1}/g;
     $_[0] =~ s/{BASEURL2}/$config->{baseurl2}/g;
 
-    $_[0] =~ s/\[\[\[\|(.{1,80})\|\]\]\]/pack('H*',$1)/eg;
+    $_[0] =~ s/ \[\[\[ [|] (.{1,80}) [|] \]\]\] /pack('H*',$1)/egx;
 
     return;
 }
@@ -3642,7 +3642,7 @@ sub start_session {     # creates the WebImblaze user agent
     require IO::Socket::SSL; # if this was a use statement we could use SSL_VERIFY_NONE below instead of 0, but self tests on Windows take 10% longer to run
     require HTTP::Cookies;
 
-    push(@LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0); # to prevent: Header line too long (limit is 8192)
+    push @LWP::Protocol::http::EXTRA_SOCK_OPTS, MaxLineLength => 0; # to prevent: Header line too long (limit is 8192)
 
     $useragent = LWP::UserAgent->new(keep_alive=>1);
     $cookie_jar = HTTP::Cookies->new;
@@ -3732,7 +3732,7 @@ sub get_command_line_options {
         print_usage();
         exit;
     }
-    
+
     if ($opt_verbose) {
         $EXTRA_VERBOSE = 1;
     }
