@@ -1,0 +1,8 @@
+repeat: 3
+
+step:                   Get row {COUNTER} from test data file
+shell:                  perl -ne "print" examples/data.txt
+parseresponseNAME:      NAME{COUNTER}:([\w ]+)|regex|
+parseresponseTITLE:     TITLE{COUNTER}:([\w ]+)|regex|
+
+step:                   Row {COUNTER}: {NAME}, {TITLE}

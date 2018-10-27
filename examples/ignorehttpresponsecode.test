@@ -8,6 +8,8 @@
 
 step:                   Get Non existant page
 url:                    http://{WIC}/pagedoesnotexist
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Get Non existant page
 url:                    http://{WIC}/pagedoesnotexist

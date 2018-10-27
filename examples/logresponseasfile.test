@@ -9,4 +9,6 @@ step:                   Get Home page
 url:                    http://{WIC}
 verifypositive1:        WebInject
 logresponseasfile:      HomePage.html
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 

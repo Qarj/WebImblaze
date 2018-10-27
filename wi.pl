@@ -2341,8 +2341,8 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
     if (($#ARGV + 1) < 1) {  # no command line args were passed
         # if testcase filename is not passed on the command line, use files in config.xml
 
-        if ($config->{testcasefile}) {
-            $current_steps_file = slash_me($config->{testcasefile});
+        if ($config->{teststepfile}) {
+            $current_steps_file = slash_me($config->{teststepfile});
         } else {
             die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
         }
@@ -3765,7 +3765,7 @@ sub print_version {
 }
 
 sub print_usage {
-        print <<'EOB'
+        print <<'EOB';
 wi.pl -v|--version
 wi.pl -h|--help
 
@@ -3782,7 +3782,6 @@ Usage: wi.pl tests.test <<options>>
 -e|--verbose                      --verbose
 -u|--publish-to                   --publish-to C:\Apache24\htdocs\this_run_home
 EOB
-    ;
 
     if ($selenium_plugin_present) { WebImblazeSelenium::print_usage(); }
 

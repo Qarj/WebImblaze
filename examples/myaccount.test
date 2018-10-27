@@ -69,6 +69,8 @@ step:                   Get the profile
 section:                ACTUAL TESTS START HERE
 url:                    https://www.totaljobs.com/Authenticated/Profile.aspx
 verifypositive:         Improve your chances
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Get the account home page
 url:                    https://www.totaljobs.com/Authenticated/Default.aspx

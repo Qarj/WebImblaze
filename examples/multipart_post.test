@@ -1,6 +1,8 @@
 step:                   Get the multipart upload page
 url:                    http://webinject-check.azurewebsites.net/BulkUpload/Index
 verifypositive:         Select File
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Post the csv file
 url:                    http://webinject-check.azurewebsites.net/BulkUpload/Upload

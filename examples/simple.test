@@ -1,6 +1,8 @@
 step:                   Get webinject-check home page
 url:                    http://webinject-check.azurewebsites.net/
 verifypositive:         WebInject is a powerful free automated test tool
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Get Recipes Index
 url:                    http://webinject-check.azurewebsites.net/Recipes

@@ -8,5 +8,7 @@ step:                   Get Mobile Home page
 url:                    http://{WIC}
 verifypositive1:        WebInject
 setcookie:              MobileWebsite: 1
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 

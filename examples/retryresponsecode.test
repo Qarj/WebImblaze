@@ -11,4 +11,6 @@ url:                    http://{WIC}/pagedoesnotexist
 verifypositive:         text that will not be found
 retry:                  3
 retryresponsecode:      404
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 

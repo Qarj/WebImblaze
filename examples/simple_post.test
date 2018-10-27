@@ -1,6 +1,8 @@
 step:                   Get Search Form
 url:                    http://webinject-check.azurewebsites.net/Search/SearchForm
 verifypositive:         Search Recipes
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Submit Search
 url:                    http://webinject-check.azurewebsites.net/Search/SearchRecipes

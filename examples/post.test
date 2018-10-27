@@ -11,6 +11,8 @@
 step:                   Get Search Form
 url:                    http://{WIC}/Search/SearchForm
 verifypositive:         Search Recipes
+getallhrefs:            \.css|\.less
+getallsrcs:             \.jpg|\.png|\.js|\.gif
 
 step:                   Submit Search
 url:                    http://{WIC}/Search/SearchRecipes
