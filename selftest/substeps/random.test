@@ -25,5 +25,4 @@ varFIRST:               {RANDOM:1:NUMERIC}
 shell:                  echo On Loop {JUMPBACKS} got [{FIRST}]
 verifypositive:         Loop 50
 verifynegative:         fail fast!\[0\]
-retryfromstep:          35
-
+checkpoint:             true

@@ -6,7 +6,7 @@ assertcount1:           testemail_1_0_1_|||1
 assertcount2:           testemail_2_0_1_|||1
 assertcount3:           testemail_2_2_0_|||1
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        Test Steps Run: 14
+verifypositive1:        Test Steps Run: 10
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}1

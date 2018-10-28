@@ -3,16 +3,16 @@ varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
 assertcount:            and also mynum variable  four  will be|||8
 verifypositive:         Test Steps Failed: 3
-verifypositive2:        70-2|||retryfromstep on step 70 should be triggered twice
+verifypositive2:        70-2|||checkpoint on step 70 should be triggered twice
 verifypositive4:        jumpbacks variable will update between jumpbacks:2
 verifypositive5:        jumpbacks variable will update between jumpbacks:10
 verifypositive6:        mynum variable is  seven
 verifypositive7:        mynum variable at this point is  four
 verifypositive9:        checkpoint.test - 110-10
 verifynegative:         uninitialized value
-verifynegative1:        20-1|||Should not see step 20 more than once, retryfromstep not triggered
-verifynegative2:        30-1|||Should not see step 30 more than once, retryfromstep not triggered
-verifynegative3:        70-3|||retryfromstep on step 70 should be triggered only twice
+verifynegative1:        20-1|||Should not see step 20 more than once, checkpoint not triggered
+verifynegative2:        30-1|||Should not see step 30 more than once, checkpoint not triggered
+verifynegative3:        70-3|||checkpoint on step 70 should be triggered only twice
 verifynegative9:        checkpoint.xml - 110-11
 verifyresponsetime:     39
 

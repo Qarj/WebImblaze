@@ -18,7 +18,7 @@ verifynegative:         fail fast!critical error
 step:                   Step 40
 shell:                  echo NOP
 
-step:                   Should not sleep since retryfromstep is not triggered
+step:                   Should not sleep since checkpoint is not triggered
 shell:                  echo one one one
 shell1:                 echo six seven eight
 verifypositive:         one
@@ -49,7 +49,7 @@ step:                   Info - mynum variable at this point is {MYNUM}
 shell:                  echo NOP
 checkpoint:             true
 
-step:                   Should not jump back - globaljumpbacks limit defined in retryfromstepconfig.xml file reached
+step:                   Should not jump back - globaljumpbacks limit defined in checkpointconfig.xml file reached
 shell:                  echo one one one
 verifypositive:         two
 

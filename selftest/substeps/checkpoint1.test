@@ -15,5 +15,4 @@ retry:                  5
 step:                   Jumpback up to globaljumpbacks limit, pass on attempt two
 shell:                  echo step 30 jumpbacks {JUMPBACKS}
 verifypositive:         step 30 jumpbacks 5
-retryfromstep:          10
 

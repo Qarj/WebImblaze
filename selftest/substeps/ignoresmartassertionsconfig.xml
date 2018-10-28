@@ -1,7 +1,7 @@
 <root>
     <teststepfile>examples\simple.xml</teststepfile>
     <globalretry>20</globalretry> <!-- Global limit for the number of retries for a test run --> 
-    <globaljumpbacks>5</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
+    <globaljumpbacks>5</globaljumpbacks> <!-- Global limit for the number of checkpoint invocations for a test run --> 
     <userdefined> 
         <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
         <wic>webinject-check.azurewebsites.net</wic> <!-- WEBIMBLAZE-CHECK web site base url --> 
