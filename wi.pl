@@ -261,7 +261,7 @@ foreach (1 .. $repeat) {
             }
         }
 
-        if ($case{abort} && $case_failed) { # if abort (i.e. this case (test step) failed all after retries exhausted), then execution is aborted
+        if ($case{abort} && $case_failed) { # if abort (i.e. this step failed all after retries exhausted), then execution is aborted
             $results_stdout .= qq|EXECUTION ABORTED!!! \n|;
             $execution_aborted = 'true';
             if (set_step_index_for_test_step_to_jump_to($case{abort})) {
@@ -271,11 +271,11 @@ foreach (1 .. $repeat) {
                 last;
             }
         }
-    } # end of test case loop
+    } # end of test step loop
 
     if ($case{abort} && $case_failed) { last; } # get out of repeat loop too
 
-    $testnum = 1;  # reset testcase counter so it will reprocess test case file if repeat is set
+    $testnum = 1;  # reset test step counter so it will reprocess test step file if repeat is set
 } # end of repeat loop
 
 final_tasks();
@@ -321,7 +321,7 @@ sub display_request_response {
 sub get_testnum_display {
     my ($_testnum, $_counter) = @_;
 
-    # use $testnum_display for all testnum output, add 10,000 in case of repeat loop
+    # use $testnum_display for all testnum output, add 10,000 for repeat loop
     my $_testnum_display = $_testnum + ($_counter*10_000) - 10_000;
     $_testnum_display = sprintf '%.2f', $_testnum_display; # maximun of 2 decimal places
     $_testnum_display =~ s/0+\z// if $_testnum_display =~ /[.]/; # remove trailing non significant zeros
@@ -359,7 +359,7 @@ sub get_test_step_skip_message {
 
     if ($case{runon}) { # is this test step conditional on the target environment?
         if ( _run_this_step($case{runon}) ) {
-            # run this test case as normal since it is allowed
+            # run this test step as normal since it is allowed
         }
         else {
             return "run on $case{runon}";
@@ -368,14 +368,14 @@ sub get_test_step_skip_message {
 
     if ($case{donotrunon}) {
         if ( not _run_this_step($case{donotrunon}) ) {
-            # run this test case as normal since it is allowed
+            # run this test step as normal since it is allowed
         }
         else {
             return "do not run on $case{donotrunon}";
         }
     }
 
-    if ($case{autocontrolleronly}) { # is the autocontrolleronly value set for this testcase?
+    if ($case{autocontrolleronly}) { # is the autocontrolleronly value set for this test step?
         if ($opt_autocontroller) { # if so, was the auto controller option specified?
             # run this test case as normal since it is allowed
         }
@@ -384,7 +384,7 @@ sub get_test_step_skip_message {
         }
     }
 
-    if ($case{firstlooponly}) { # is the firstlooponly value set for this testcase?
+    if ($case{firstlooponly}) { # is the firstlooponly value set for this test step?
         if ($counter == 1) { # counter keeps track of what loop number we are on
             # run this test case as normal since it is the first pass
         }
@@ -393,9 +393,9 @@ sub get_test_step_skip_message {
         }
     }
 
-    if ($case{lastlooponly}) { # is the lastlooponly value set for this testcase?
+    if ($case{lastlooponly}) { # is the lastlooponly value set for this test step?
         if ($counter == $repeat) { # counter keeps track of what loop number we are on
-            # run this test case as normal since it is the first pass
+            # run this test step as normal since it is the first pass
         }
         else {
               return 'lastlooponly';
@@ -417,8 +417,8 @@ sub substitute_variables {
 
     ($epoch_seconds, $epoch_split) = gettimeofday;
 
-    undef %case_save; # we need a clean array for each test case
-    undef %case; # do not allow values from previous test cases to bleed over
+    undef %case_save; # we need a clean array for each test step
+    undef %case; # do not allow values from previous test steps to bleed over
     undef %late_sub; # do not substitute vars set this step with previous value
 
     foreach my $_case_attribute ( keys %{ $lean_test_steps->{case}->{$testnum} } ) {
@@ -430,7 +430,7 @@ sub substitute_variables {
         $case{$_case_attribute} = $lean_test_steps->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
         convert_back_var_variables($case{$_case_attribute});
-        $case_save{$_case_attribute} = $case{$_case_attribute}; # in case we have to retry, some parms need to be resubbed
+        $case_save{$_case_attribute} = $case{$_case_attribute}; # if we have to retry, some parms need to be resubbed
     }
 
     return;
@@ -616,7 +616,7 @@ sub pass_fail_or_retry {
 
     # check max jumpbacks - globaljumpbacks - i.e. checkpoint invocations before we give up - otherwise we risk an infinite loop
     if ( ($is_failure && !( retry_available() || jump_back_to_checkpoint_available() ) ) || $fast_fail_invoked ) {
-        # if any verification fails, test case is considered a failure UNLESS there is at least one retry available
+        # if any verification fails, test step is considered a failure UNLESS there is at least one retry available
         $results_xml .= qq|            <success>false</success>\n|;
         if ($case{errormessage}) { # add defined error message to the output
             $results_html .= qq|<b><span class="fail">TEST STEP FAILED : $case{errormessage}</span></b><br />\n|;
@@ -631,13 +631,13 @@ sub pass_fail_or_retry {
             $results_xml .= qq|            <result-message>TEST STEP FAILED</result-message>\n|;
             colour_stdout('bold red', qq|TEST STEP FAILED\n|);
             if (not $nagios_return_message) {
-                $nagios_return_message = "Test step number $testnum failed"; # only return the first test case failure to nagios
+                $nagios_return_message = "Test step number $testnum failed"; # only return the first test step failure to nagios
             }
         }
         $case_failed = 1; # for abort paramter logic
         $case_failed_count++;
     }
-    elsif (($is_failure > 0) && ($retry > 0)) { # output message if we will retry the test case
+    elsif (($is_failure > 0) && ($retry > 0)) { # output message if we will retry the test step
         $results_html .= qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
         $results_stdout .= qq|RETRYING... $retry to go \n|;
         $results_xml .= qq|            <success>false</success>\n|;
@@ -824,7 +824,7 @@ sub sleep_before_next_step {
 
     if ( (($is_failure < 1) && ($case{retry})) || (($is_failure < 1) && $checkpoint) )
     {
-        # ignore the sleep if the test case worked and it is a retry test step (including active checkpoint)
+        # ignore the sleep if the test step worked and it is a retry test step (including active checkpoint)
     }
     else
     {
@@ -1350,7 +1350,7 @@ sub _find_oldest_page_in_cache {
 
 #------------------------------------------------------------------
 sub auto_sub { # auto substitution - {DATA} and {NAME}
-# {DATA} finds .NET field value from a previous test case and puts it in the postbody - no need for manual parseresponse
+# {DATA} finds .NET field value from a previous test step and puts it in the postbody - no need for manual parseresponse
 # Example: postbody="txtUsername=testuser&txtPassword=123&__VIEWSTATE={DATA}"
 #
 # {NAME} matches a dynamic component of a field name by looking at the page source of a previous test step
@@ -1815,7 +1815,7 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
     _verify_verifyresponsetime();
 
     if ($case{verifyresponsecode}) {
-        if ($case{verifyresponsecode} == $response->code()) { # verify returned HTTP response code matches verifyresponsecode set in test case
+        if ($case{verifyresponsecode} == $response->code()) { # verify returned HTTP response code matches verifyresponsecode set in test step
             $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification </span><br />\n|;
             $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
             $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
@@ -1887,7 +1887,7 @@ sub _verify_autoassertion {
         if ( (substr $_config_attribute, 0, 13) eq 'autoassertion' ) {
             my $_verify_number = $_config_attribute; # determine index verifypositive index
             $_verify_number =~ s/^autoassertion//g; # remove autoassertion from string
-            if (!$_verify_number) {$_verify_number = '0';} # in case of autoassertion, need to treat as 0
+            if (!$_verify_number) {$_verify_number = '0';} # if autoassertion, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $config->{autoassertions}{$_config_attribute} ; # index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             if ($_verifyparms[2]) { # assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Auto Assertion $_verify_number - $_verifyparms[2]</span><br />\n|;
@@ -1937,7 +1937,7 @@ sub _verify_smartassertion {
         if ( (substr $_config_attribute, 0, 14) eq 'smartassertion' ) {
             my $_verify_number = $_config_attribute; # determine index verifypositive index
             $_verify_number =~ s/^smartassertion//g; # remove smartassertion from string
-            if (!$_verify_number) {$_verify_number = '0';} # in case of smartassertion, need to treat as 0
+            if (!$_verify_number) {$_verify_number = '0';} # if smartassertion, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $config->{smartassertions}{$_config_attribute} ; # index 0 contains the pre-condition assertion, 1 the actual assertion, 3 the tag that it is a known issue
             if ($_verifyparms[3]) { # assertion is being ignored due to known production bug or whatever
                 $results_html .= qq|<span class="skip">Skipped Smart Assertion $_verify_number - $_verifyparms[3]</span><br />\n|;
@@ -1986,7 +1986,7 @@ sub _verify_verifypositive {
         if ( (substr $_case_attribute, 0, 14) eq 'verifypositive' ) {
             my $_verify_number = $_case_attribute; # determine index verifypositive index
             $_verify_number =~ s/^verifypositive//g; # remove verifypositive from string
-            if (!$_verify_number) {$_verify_number = '0';} # in case of verifypositive, need to treat as 0
+            if (!$_verify_number) {$_verify_number = '0';} # if verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; # index 0 contains the actual string to verify, 1 the message to show if the assertion fails, 2 the tag that it is a known issue
             my $_fail_fast = _is_fail_fast(\$_verifyparms[0]); # will strip off leading fail fast! if present
             if ($_verifyparms[2]) { # assertion is being ignored due to known production bug or whatever
@@ -2039,7 +2039,7 @@ sub _verify_verifynegative {
         if ( (substr $_case_attribute, 0, 14) eq 'verifynegative' ) {
             my $_verify_number = $_case_attribute; # determine index verifypositive index
             $_verify_number =~ s/^verifynegative//g; # remove verifynegative from string
-            if (!$_verify_number) {$_verify_number = '0';} # in case of verifypositive, need to treat as 0
+            if (!$_verify_number) {$_verify_number = '0';} # if verifypositive, need to treat as 0
             my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; #index 0 contains the actual string to verify
             my $_fail_fast = _is_fail_fast(\$_verifyparms[0]); # will strip off leading !!! if present
             if ($_verifyparms[2]) { # assertion is being ignored due to known production bug or whatever
@@ -2325,19 +2325,19 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
     }
 
     if (($#ARGV + 1) < 1) {  # no command line args were passed
-        # if testcase filename is not passed on the command line, use files in config.xml
+        # if test filename is not passed on the command line, use files in config.xml
 
         if ($config->{teststepfile}) {
             $current_steps_file = slash_me($config->{teststepfile});
         } else {
-            die "\nERROR: I can't find any test case files to run.\nYou must either use a config file or pass a filename.";
+            die "\nERROR: I can't find any test step files to run.\nYou must either use a config file or pass a filename.";
         }
 
     }
 
     elsif (($#ARGV + 1) == 1) {  # one command line arg was passed
-        # use testcase filename passed on command line (config.xml is only used for other options)
-        $current_steps_file = slash_me($ARGV[0]);  # first commandline argument is the test case file
+        # use test filename passed on command line (config.xml is only used for other options)
+        $current_steps_file = slash_me($ARGV[0]);  # first commandline argument is the test file
     }
 
     if ($config->{httpauth}) {
