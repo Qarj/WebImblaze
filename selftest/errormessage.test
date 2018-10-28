@@ -1,7 +1,7 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 1
+verifypositive:         Test Steps Failed: 1
 verifypositive1:        Test failed for some reason
 verifynegative1:        Maybe the drive is full
 verifynegative2:        uninitialized value

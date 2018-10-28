@@ -1,7 +1,7 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive1:        Test Cases Failed: 0
+verifypositive1:        Test Steps Failed: 0
 verifypositive2:        MyFirstCookie: cookie_value
 verifypositive3:        MySecondCookie: another_value
 verifypositive4:        MyThirdCookie: value_of_third_cookie

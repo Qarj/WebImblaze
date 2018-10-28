@@ -1,13 +1,13 @@
 step:                   {FEATURE} - specifying that this is the automation controller
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl --autocontroller -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Run: 2
+verifypositive:         Test Steps Run: 2
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - without specifying that this is the automation controller
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Run: 1
-verifypositive1:        Skipping Test Case 20
+verifypositive:         Test Steps Run: 1
+verifypositive1:        Skipping Test Step 20
 verifypositive2:        This is not the automation controller
 verifynegative:         uninitialized value
 

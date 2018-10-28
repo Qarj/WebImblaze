@@ -16,6 +16,6 @@ verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}3sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}3.test
-verifypositive:         WebImblaze CRITICAL - Test case number 10 failed |time=
+verifypositive:         WebImblaze CRITICAL - Test step number 10 failed |time=
 verifynegative:         uninitialized value
 

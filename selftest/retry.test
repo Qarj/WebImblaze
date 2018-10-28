@@ -3,7 +3,7 @@ varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
 assertcount:            but mynum variable  seven  will not|||6
 assertcount1:           Won't retry - a fail fast was invoked|||2
-verifypositive:         Test Cases Failed: 5
+verifypositive:         Test Steps Failed: 5
 verifypositive1:        Won't retry - a fail fast was invoked
 verifypositive2:        RETRYING... 5 to go
 verifypositive3:        Retry 3 times

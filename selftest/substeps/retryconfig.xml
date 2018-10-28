@@ -1,5 +1,5 @@
 <root>
-<testcasefile>examples\simple.xml</testcasefile>
+<teststepfile>examples\simple.xml</teststepfile>
 <globalhttplog>yes</globalhttplog>
 <standaloneplot>off</standaloneplot>
 <globalretry>12</globalretry> <!-- Global limit for the number of retries for a test run --> 

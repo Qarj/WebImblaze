@@ -1,4 +1,4 @@
-# errormessage will write out a custom errormessage if the test case fails.
+# errormessage will write out a custom errormessage if the test step fails.
 
 step:                   Get Home page
 url:                    http://{WIC}

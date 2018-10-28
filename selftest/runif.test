@@ -1,9 +1,9 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  perl wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
-verifypositive1:        Test Cases Run: 2
-verifypositive2:        Skipping Test Case 20
-verifypositive3:        Skipping Test Case 40
+verifypositive1:        Test Steps Run: 2
+verifypositive2:        Skipping Test Step 20
+verifypositive3:        Skipping Test Step 40
 verifypositive4:        runif evaluated as falsy
 verifynegative1:        uninitialized value
 

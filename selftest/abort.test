@@ -1,16 +1,16 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 2
-verifypositive1:        Test Cases Run: 3
+verifypositive:         Test Steps Failed: 2
+verifypositive1:        Test Steps Run: 3
 verifypositive2:        EXECUTION ABORTED
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell1:                 .\wi.pl -o selftest\output\{FEATURE}1sub selftest\substeps\{FEATURE}1.test
 shell2:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}1subresults.xml
-verifypositive:         Test Cases Failed: 1
-verifypositive1:        Test Cases Run: 4
+verifypositive:         Test Steps Failed: 1
+verifypositive1:        Test Steps Run: 4
 verifypositive2:        EXECUTION ABORTED
 verifypositive3:        JUMPING TO TEARDOWN
 verifypositive4:        execution-aborted.true
@@ -19,8 +19,8 @@ verifynegative:         uninitialized value
 step:                   {FEATURE}
 shell1:                 .\wi.pl -o selftest\output\{FEATURE}2sub selftest\substeps\{FEATURE}2.test
 shell2:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}2subresults.xml
-verifypositive:         Test Cases Failed: 1
-verifypositive1:        Test Cases Run: 3
+verifypositive:         Test Steps Failed: 1
+verifypositive1:        Test Steps Run: 3
 verifypositive2:        EXECUTION ABORTED
 verifypositive3:        JUMPING TO TEARDOWN
 verifypositive4:        execution-aborted.true

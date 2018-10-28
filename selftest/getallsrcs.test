@@ -5,7 +5,7 @@ shell2:                 if exist selftest\output\append_element.js del selftest\
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 0
+verifypositive:         Test Steps Failed: 0
 verifypositive1:        GET Asset \[version10_small_brickwork.jpg]
 verifypositive2:        GET Asset \[version20_append_element.js]
 verifynegative:         uninitialized value

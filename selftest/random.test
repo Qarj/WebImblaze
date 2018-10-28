@@ -1,7 +1,7 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  perl wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub  -c selftest\substeps\{FEATURE}config.xml selftest{SLASH}substeps{SLASH}{FEATURE}.test
-verifypositive:         Test Cases Failed: 0
+verifypositive:         Test Steps Failed: 0
 verifynegative:         uninitialized value
 
 step:                   view http.txt

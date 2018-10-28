@@ -2,7 +2,7 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
 assertcount:            Failed Smart Assertion|||1
-verifypositive:         Test Cases Failed: 1
+verifypositive:         Test Steps Failed: 1
 verifypositive1:        Must have a Cache-Control of private or no-cache when a cookie is set
 verifynegative:         uninitialized value
 

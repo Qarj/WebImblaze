@@ -1,8 +1,8 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-assertcount:            TEST CASE PASSED|||4
-verifypositive:         Test Cases Failed: 0
+assertcount:            TEST STEP PASSED|||4
+verifypositive:         Test Steps Failed: 0
 verifypositive1:        found: scale=1.0 in response step 10
 verifypositive2:        found:  in response step 30
 verifynegative:         uninitialized value

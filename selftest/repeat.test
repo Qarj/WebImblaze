@@ -7,8 +7,8 @@ assertcount2:           - 100|||4
 assertcount3:           - 200|||4
 assertcount4:           - 300|||4
 assertcount5:           - 400|||4
-verifypositive:         Test Cases Failed: 0
-verifypositive1:        Test Cases Passed: 10
+verifypositive:         Test Steps Failed: 0
+verifypositive1:        Test Steps Passed: 10
 verifypositive2:        loop number 1
 verifypositive3:        loop number 2
 verifypositive4:        loop number 3

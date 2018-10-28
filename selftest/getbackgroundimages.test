@@ -4,7 +4,7 @@ shell1:                 if exist selftest\output\germination.jpg del selftest\ou
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 0
+verifypositive:         Test Steps Failed: 0
 verifypositive1:        GET Asset \[version1_germination.jpg]
 verifynegative:         uninitialized value
 

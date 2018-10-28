@@ -1,12 +1,12 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 5
+verifypositive:         Test Steps Failed: 5
 verifypositive1:        Skipped Assertion Count 0 - Expected count of 4
 verifypositive2:        Skipped Assertion Count 1ONE1 - Expected count of 4
 verifypositive3:        Skipped Assertion Count 5 - Expected count of 4
 verifypositive4:        Skipped Assertion Count ASSERTCOUNT - Expected count of 4
 verifypositive5:        Skipped Assertion Count ONE - Expected count of 4
-verifypositive6:        Test Cases Passed: 3
+verifypositive6:        Test Steps Passed: 3
 verifynegative:         uninitialized value
 

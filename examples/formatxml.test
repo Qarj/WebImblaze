@@ -7,10 +7,10 @@
 
 step:                   Echo some xml
 shell:                  type examples\testdata\samplexml.xml
-verifypositive:         testcasefile
+verifypositive:         teststepfile
 
 step:                   Echo some xml
 shell:                  type examples\testdata\samplexml.xml
-verifypositive:         testcasefile
+verifypositive:         teststepfile
 formatxml:              true
 

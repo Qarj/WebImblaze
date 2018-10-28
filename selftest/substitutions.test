@@ -1,6 +1,6 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Failed: 0
+verifypositive:         Test Steps Failed: 0
 verifynegative:         uninitialized value
 

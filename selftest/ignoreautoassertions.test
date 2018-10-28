@@ -2,7 +2,7 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
 assertcount:            Failed Auto Assertion|||2
-verifypositive:         Test Cases Failed: 1
+verifypositive:         Test Steps Failed: 1
 verifypositive1:        Should never see one two three four
 verifypositive2:        Should always see one fish two fish
 verifynegative:         uninitialized value

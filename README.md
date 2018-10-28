@@ -131,7 +131,7 @@ Verify Positive: "See all hiring companies"
 Passed Positive Verification
 Passed Positive Verification
 Passed HTTP Response Code Verification
-TEST CASE PASSED
+TEST STEP PASSED
 Response Time = 0.443 sec
 -------------------------------------------------------
 Test:  tests\hello.test - 20
@@ -144,7 +144,7 @@ Passed Positive Verification
 Passed Positive Verification
 Passed Negative Verification
 Passed HTTP Response Code Verification
-TEST CASE PASSED
+TEST STEP PASSED
 Response Time = 0.557 sec
 -------------------------------------------------------
 Start Time: Fri 10 Aug 2018, 12:18:39
@@ -152,9 +152,9 @@ Total Run Time: 1.581 seconds
 
 Total Response Time: 1.000 seconds
 
-Test Cases Run: 2
-Test Cases Passed: 2
-Test Cases Failed: 0
+Test Steps Run: 2
+Test Steps Passed: 2
+Test Steps Failed: 0
 Verifications Passed: 9
 Verifications Failed: 0
 

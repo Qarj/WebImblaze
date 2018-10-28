@@ -2,7 +2,7 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 assertcount:            RESTARTING SESSION \.\.\.|||1
-verifypositive:         Test Cases Failed: 1
+verifypositive:         Test Steps Failed: 1
 verifynegative:         uninitialized value
 ignoresmartassertions:  true
 

@@ -1,9 +1,9 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-assertcount:            Skipping Test Case 10|||4
+assertcount:            Skipping Test Step 10|||4
 assertcount1:           Step 20 loop counter is|||5
-verifypositive:         Test Cases Failed: 0
-verifypositive1:        Test Cases Run: 6
+verifypositive:         Test Steps Failed: 0
+verifypositive1:        Test Steps Run: 6
 verifynegative2:        uninitialized value
 

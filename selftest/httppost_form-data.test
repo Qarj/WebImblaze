@@ -2,7 +2,7 @@ step:                   {FEATURE} - parameter
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
-verifypositive:         Test Cases Failed: 0
+verifypositive:         Test Steps Failed: 0
 verifypositive1:        Carbonara
 verifynegative:         uninitialized value
 

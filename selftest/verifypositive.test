@@ -2,7 +2,7 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 assertcount:            Passed Positive Verification|||5|||Only Step 10 should have passed positive verifications
-assertcount1:           TEST CASE FAILED|||2|||Steps 20 and 30 should fail
+assertcount1:           TEST STEP FAILED|||2|||Steps 20 and 30 should fail
 assertcount2:           Failed Positive Verification|||6|||Should be failed positive verifications in steps 20 and 30
 verifypositive:         Should find text but did not
 verifypositive1:        Skipped Positive Verification 0 - Production Bug

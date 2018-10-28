@@ -1,5 +1,5 @@
 <root>
-    <testcasefile>examples/simple.xml</testcasefile>
+    <teststepfile>examples/simple.xml</teststepfile>
     <globalretry>20</globalretry> <!-- Global limit for the number of retries for a test run --> 
     <globaljumpbacks>5</globaljumpbacks> <!-- Global limit for the number of usages of retryfromstep for a test run --> 
     <userdefined> 

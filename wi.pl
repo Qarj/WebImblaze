@@ -200,7 +200,7 @@ foreach (1 .. $repeat) {
 
             my $skip_message = get_test_step_skip_message();
             if ( $skip_message ) {
-                $results_stdout .= "Skipping Test Case $testnum... ($skip_message)\n";
+                $results_stdout .= "Skipping Test Step $testnum... ($skip_message)\n";
                 write_stdout_dashes_separator();
                 next STEP; # skip running this test step
             }
@@ -624,19 +624,19 @@ sub pass_fail_or_retry {
         # if any verification fails, test case is considered a failure UNLESS there is at least one retry available, or it is a retryfromstep case
         $results_xml .= qq|            <success>false</success>\n|;
         if ($case{errormessage}) { # add defined error message to the output
-            $results_html .= qq|<b><span class="fail">TEST CASE FAILED : $case{errormessage}</span></b><br />\n|;
+            $results_html .= qq|<b><span class="fail">TEST STEP FAILED : $case{errormessage}</span></b><br />\n|;
             $results_xml .= '            <result-message>'._sub_xml_special($case{errormessage})."</result-message>\n";
-            colour_stdout('bold red', qq|TEST CASE FAILED : $case{errormessage}\n|);
+            colour_stdout('bold red', qq|TEST STEP FAILED : $case{errormessage}\n|);
             if (not $nagios_return_message) {
                 $nagios_return_message = $case{errormessage}; # only return the first error message to nagios
             }
         }
         else { #print regular error output
-            $results_html .= qq|<b><span class="fail">TEST CASE FAILED</span></b><br />\n|;
-            $results_xml .= qq|            <result-message>TEST CASE FAILED</result-message>\n|;
-            colour_stdout('bold red', qq|TEST CASE FAILED\n|);
+            $results_html .= qq|<b><span class="fail">TEST STEP FAILED</span></b><br />\n|;
+            $results_xml .= qq|            <result-message>TEST STEP FAILED</result-message>\n|;
+            colour_stdout('bold red', qq|TEST STEP FAILED\n|);
             if (not $nagios_return_message) {
-                $nagios_return_message = "Test case number $testnum failed"; # only return the first test case failure to nagios
+                $nagios_return_message = "Test step number $testnum failed"; # only return the first test case failure to nagios
             }
         }
         $case_failed = 1; # for abort paramter logic
@@ -655,7 +655,7 @@ sub pass_fail_or_retry {
         $passed_count = $passed_count - $retry_passed_count;
         $failed_count = $failed_count - $retry_failed_count;
     }
-    elsif ( $is_failure && ($case{retryfromstep} || $checkpoint) ) {# output message if we will retry the test case from step
+    elsif ( $is_failure && ($case{retryfromstep} || $checkpoint) ) {# output message if we will retry the test step from step
         my $_jump_back_to_step;
         if ($case{retryfromstep}) {
             $_jump_back_to_step = $case{retryfromstep};
@@ -678,12 +678,12 @@ sub pass_fail_or_retry {
         set_step_index_for_test_step_to_jump_to($_jump_back_to_step);
     }
     else {
-        $results_html .= qq|<b><span class="pass">TEST CASE PASSED</span></b><br />\n|;
-        $results_stdout .= qq|TEST CASE PASSED \n|;
+        $results_html .= qq|<b><span class="pass">TEST STEP PASSED</span></b><br />\n|;
+        $results_stdout .= qq|TEST STEP PASSED \n|;
         $results_xml .= qq|            <success>true</success>\n|;
-        $results_xml .= qq|            <result-message>TEST CASE PASSED</result-message>\n|;
+        $results_xml .= qq|            <result-message>TEST STEP PASSED</result-message>\n|;
         $case_passed_count++;
-        $retry = 0; # no need to retry when test case passes
+        $retry = 0; # no need to retry when test step passes
         $attempts_since_last_success = 0; # reset attempts for auto retry
     }
 
@@ -838,7 +838,7 @@ sub sleep_before_next_step {
 
     if ( (($is_failure < 1) && ($case{retry})) || (($is_failure < 1) && ($case{retryfromstep})) || (($is_failure < 1) && $checkpoint) )
     {
-        # ignore the sleep if the test case worked and it is a retry test case (including active checkpoint)
+        # ignore the sleep if the test case worked and it is a retry test step (including active checkpoint)
     }
     else
     {
@@ -846,11 +846,11 @@ sub sleep_before_next_step {
         {
             if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($config->{globaljumpbacks}-1))) )
             {
-                # do not sleep if the test case failed and we have run out of retries or jumpbacks
+                # do not sleep if the test step failed and we have run out of retries or jumpbacks
             }
             else
             {
-                # if a sleep value is set in the test case, sleep that amount
+                # if a sleep value is set in the test step, sleep that amount
                 $results_html .= qq|INVOKED SLEEP of $case{sleep} seconds<br />\n|;
                 $results_stdout .= qq|INVOKED SLEEP of $case{sleep} seconds\n|;
                 sleep $case{sleep};
@@ -970,9 +970,9 @@ sub write_final_html {  # write summary and closing tags for results file
     $results_html .= qq|Total Run Time: $total_run_time seconds <br />\n|;
     $results_html .= qq|Total Response Time: $total_response seconds <br />\n|;
     $results_html .= qq|<br />\n|;
-    $results_html .= qq|Test Cases Run: $total_run_count <br />\n|;
-    $results_html .= qq|Test Cases Passed: $case_passed_count <br />\n|;
-    $results_html .= qq|Test Cases Failed: $case_failed_count <br />\n|;
+    $results_html .= qq|Test Steps Run: $total_run_count <br />\n|;
+    $results_html .= qq|Test Steps Passed: $case_passed_count <br />\n|;
+    $results_html .= qq|Test Steps Failed: $case_failed_count <br />\n|;
     $results_html .= qq|Verifications Passed: $passed_count <br />\n|;
     $results_html .= qq|Verifications Failed: $failed_count <br />\n|;
     $results_html .= qq|<br />\n|;
@@ -1034,9 +1034,9 @@ sub write_final_stdout {  # write summary and closing text for STDOUT
     $results_stdout .= qq|Total Run Time: $total_run_time seconds\n\n|;
     $results_stdout .= qq|Total Response Time: $total_response seconds\n\n|;
 
-    $results_stdout .= qq|Test Cases Run: $total_run_count\n|;
-    $results_stdout .= qq|Test Cases Passed: $case_passed_count\n|;
-    $results_stdout .= qq|Test Cases Failed: $case_failed_count\n|;
+    $results_stdout .= qq|Test Steps Run: $total_run_count\n|;
+    $results_stdout .= qq|Test Steps Passed: $case_passed_count\n|;
+    $results_stdout .= qq|Test Steps Failed: $case_failed_count\n|;
     $results_stdout .= qq|Verifications Passed: $passed_count\n|;
     $results_stdout .= qq|Verifications Failed: $failed_count\n\n|;
 
@@ -2930,7 +2930,7 @@ sub _output_validate_error {
     $results_stdout .= qq|Line $_line_num of $current_steps_file:\n\n|;
     $results_stdout .= qq|$_line\n\n|;
     $results_stdout .= qq|Example of $_example\n|;
-    die $results_stdout."\n".'Test case file is malformed, aborted WebImblaze';
+    die $results_stdout."\n".'Test step file is malformed, aborted WebImblaze';
 }
 
 #------------------------------------------------------------------
@@ -3677,7 +3677,7 @@ sub start_session {     # creates the WebImblaze user agent
         $useragent->timeout("$config->{timeout}");  # default LWP timeout is 180 secs.
     }
 
-    if (defined $useragent_) {  # useragent set in test case file directly wins over config file value
+    if (defined $useragent_) {  # useragent set in test step file directly wins over config file value
         $config->{useragent} = $useragent_;
     }
 

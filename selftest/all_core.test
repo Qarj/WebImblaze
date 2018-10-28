@@ -4,297 +4,297 @@
 
 step:                   verifypositive
 shell:                  .\wi.pl -o selftest\output\verifypositive selftest\verifypositive.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 autoretry:              0
 
 step:                   verifynegative
 shell:                  .\wi.pl -o selftest\output\verifynegative selftest\verifynegative.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   parseresponse
 shell:                  .\wi.pl -o selftest\output\parseresponse selftest\parseresponse.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   assertcount
 shell:                  .\wi.pl -o selftest\output\assertcount selftest\assertcount.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   commandonerror
 shell:                  .\wi.pl -o selftest\output\commandonerror selftest\commandonerror.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   verifyresponsecode
 shell:                  .\wi.pl -o selftest\output\verifyresponsecode selftest\verifyresponsecode.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   verifyresponsetime
 shell:                  .\wi.pl -o selftest\output\verifyresponsetime selftest\verifyresponsetime.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   ignoreautoassertions
 shell:                  .\wi.pl -o selftest\output\ignoreautoassertions selftest\ignoreautoassertions.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   ignorehttpresponsecode
 shell:                  .\wi.pl -o selftest\output\ignorehttpresponsecode selftest\ignorehttpresponsecode.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   retry
 shell:                  .\wi.pl -o selftest\output\retry selftest\retry.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   autoretry
 shell:                  .\wi.pl -o selftest\output\autoretry selftest\autoretry.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   restartbrowseronfail
 shell:                  .\wi.pl -o selftest\output\restartbrowseronfail selftest\restartbrowseronfail.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   restartbrowser
 shell:                  .\wi.pl -o selftest\output\restartbrowser selftest\restartbrowser.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   errormessage
 shell:                  .\wi.pl -o selftest\output\errormessage selftest\errormessage.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   logastext
 shell:                  .\wi.pl -o selftest\output\logastext selftest\logastext.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   logresponseasfile
 shell:                  .\wi.pl -o selftest\output\logresponseasfile selftest\logresponseasfile.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   section
 shell:                  .\wi.pl -o selftest\output\section selftest\section.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   donotrunon
 shell:                  .\wi.pl -o selftest\output\testonly selftest\donotrunon.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   runon
 shell:                  .\wi.pl -o selftest\output\testonly selftest\runon.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   autocontrolleronly
 shell:                  .\wi.pl -o selftest\output\autocontrolleronly selftest\autocontrolleronly.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             nagios
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             result_files
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             eval
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   abort
 shell:                  .\wi.pl -o selftest\output\sanitycheck selftest\abort.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   ignoresmartassertions
 shell:                  .\wi.pl -o selftest\output\ignoresmartassertions selftest\ignoresmartassertions.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   decodequotedprintable
 shell:                  .\wi.pl -o selftest\output\decodequotedprintable selftest\decodequotedprintable.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             var
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             repeat
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             substitutions
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             useragent
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             firstlooponly
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             lastlooponly
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             getallsrcs
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             addheader
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             httppost
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             getallhrefs
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             name_data
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             getbackgroundimages
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             httppost_xml
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             httppost_form-data
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             httppost_xml-substitutions
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             httpauth
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             assertionskips
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             random
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             include
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             specialcharacters
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             checkpoint
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             runif
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             setcookie
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             sharedvar
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             ssl
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             unittest
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
 varFEATURE:             commandonfail
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
-verifypositive:         TEST CASE PASSED
-verifynegative:         TEST CASE FAILED
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
 

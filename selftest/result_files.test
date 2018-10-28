@@ -1,8 +1,8 @@
 step:                   {FEATURE} - filename prefix included as part of output path
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Cases Passed: 3
-verifypositive1:        Test Cases Failed: 0
+verifypositive:         Test Steps Passed: 3
+verifypositive1:        Test Steps Failed: 0
 verifynegative:         uninitialized value
 
 step:                   view result_filessubresults.html
