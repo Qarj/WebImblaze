@@ -118,7 +118,7 @@ cd C:\git\WebInject
 perl webinject.pl tests/hello.test
 ```
 
-If everything worked ok, then you'll see something like the following:
+If everything worked OK, then you'll see something like the following:
 
 ```
 Starting WebInject Engine...

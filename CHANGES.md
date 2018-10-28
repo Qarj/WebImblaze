@@ -20,7 +20,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * abort will now continue execution from the specified step name e.g. Teardown when triggered
 * section breaks increment auto test step numbering system to nearest 100
 * can now specify a useragent in a .test file as a separate directive applying to all steps
-* failure to specify either a url, shell or selenium paremeter will result in an actionless step
+* failure to specify either a url, shell or selenium parameter will result in an action less step
 * additional substitution modifier DATE_NOW modifies the data from the current time (instead of test start time)
 
 ### Version 2.10.0 - Jun 22, 2018
@@ -29,7 +29,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * refactored auto substitutions, added unit tests for them and fixed some bugs
 * hints and tips section added to the manual
 * minor code tidy ups
-* support ANSI color for STDOUT
+* support ANSI colour for STDOUT
 * fixed Ubuntu 18.04 LTS SSL compatibility issue
 
 ### Version 2.9.0 - Mar 3, 2018
@@ -45,7 +45,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ### Version 2.8.0 - Nov 25, 2017
 * renamed the sanitycheck parameter to abort, and changed the way that it works, including a bug fix
 * command line options for WebInject-Selenium plugin are now shown by the plugin, for a cleaner display if plugin is not installed
-* removed logic that only loaded the WebInject-Selenium plugin if Selenium tests are detected - simpflies logic for only a slight startup time hit
+* removed logic that only loaded the WebInject-Selenium plugin if Selenium tests are detected - simplifies logic for only a slight start-up time hit
 * added a selftest for SSL, updated installation instructions for Linux to ensure LWP::Protocol::https is installed
 * updated instructions for use of perlbrew with a Mac, and fixed a bug so the self tests can run on a Mac
 * added an advanced assertion examples section to the manual
@@ -54,7 +54,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * removed 8192 character line limit size in headers
 
 ### Version 2.7.0 - Aug 11, 2017
-* included the Python 3 project search-image.py (finds a subimage within a screenshot)
+* included the Python 3 project search-image.py (finds a sub image within a screenshot)
 * many of the WebInject self tests now refer to webinject-check.azurewebsites.net
 * experimental checkpoint parameter added, if successful it will replace retryfromstep 
 * unconditional SLEEPs are bad and ignored by WebInject - now however WebInject will output to STDOUT and html when a sleep is invoked
@@ -105,7 +105,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ### Version 2.2.1 - Nov 2, 2016
 * new helper function helper_keys_to_input_after renamed to helper_keys_to_element_after and made compatible with Salesforce
 * helper_keys_to_element_after can now set SELECT i.e. drop down values
-* helper_keys_to_element_after can now check and uncheck checkboxes
+* helper_keys_to_element_after can now check and uncheck check boxes
 
 ### Version 2.2.0 - Nov 1, 2016
 * new helper function helper_keys_to_input_after which searches the page for some text and sets the next input field to a desired value
@@ -146,7 +146,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * log separator now written after a test step, not before (as per original functionality)
 * WebInject now determines whether to try and render a test result based on whether it contains <html and <body tags
 * output of shell command tests were sometimes being treated as http headers, fixed
-* reduced startup time for tests that do not invoke a http session - makes the self tests much quicker
+* reduced start-up time for tests that do not invoke a http session - makes the self tests much quicker
 
 ### Version 1.97 - Jul 3, 2016
 * made core WebInject compatible with Linux (Selenium support still be to addressed)
@@ -207,7 +207,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * chromedriver log file will be written to the output folder (--verbose)
 * improved logic for overwriting pages in the cache
 * refactored sub selenium to make it a lot easier to understand
-* absolute path is now supported for config file and testcase file
+* absolute path is now supported for config file and test case file
 * fixed introduced bug - processcasefile needs to be called after startsession so the agent can be set
 
 ### Version 1.85 - Mar 5, 2016
@@ -349,13 +349,13 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * Now support any number of assertcount - e.g. assertcount5000, assertcountDISTANCE
 
 ### Version 1.42 - Nov 28, 2015
-* Include additional info about which testcase is being run - just after the log file separator
+* Include additional info about which test case is being run - just after the log file separator
 * Added retry parameter to cater for data replication latency
 * Created a globalretry setting in the config to set a maximum number of retries for a test run
 * Added sanitycheck parameter - all test execution will cease if there has been any error before the check
 * Added testonly parameter - flags that a test case should only be run against test environments
 * Added liveonly parameter
-* Added {STARTTIME} as a substitution value - timestamp of when test execution began
+* Added {STARTTIME} as a substitution value - time stamp of when test execution began
 * Support running of operating system commands through the backtick method
 * Changed the way escape works - to fix an issue with escaping __VIEWSTATE
 * Changed the way addheader works so it takes priority over maintaining cookies
@@ -364,7 +364,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * Made a tweak to enable NTLM::Authen to work
 * Made it possible to specify a custom regex in the parseresponse
 * Added autocontroller only parameter - test case will only be run if the host is an automation controller (as opposed to a developer desktop) 
-* Added the ability to specify a custom message when a specific verifypostive or verifynegative fails
+* Added the ability to specify a custom message when a specific verifypositive or verifynegative fails
 * Added the ability to decode HTML Entities for parseresponse (use in place of escape)
 * Changed {TEMP} to {OUTPUT}
 * Added {HH}, {MM} and {SS} substitutions
@@ -387,7 +387,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 * Added {CONCURRENCY} substitution - the value is the output folder name only, not full path
 * Added {HOSTNAME} substitution
 * Explicitly state not to verify SSL certificates, required for newer versions of LWP SSL
-* Added a substitution for the teststep run time, e.g. {TESTSTEPTIME:510} will substitute in the execution time of test step 510
+* Added a substitution for the test step run time, e.g. {TESTSTEPTIME:510} will substitute in the execution time of test step 510
 * Added {DATETIME} and {FORMATDATETIME} substitutions
 * Added addcookie parameter which will add a single cookie (as opposed to addheader which overwrites all existing cookies)
 * The http log separator is now written out before each test case, in addition, a final log separator is written at the end of the test run
