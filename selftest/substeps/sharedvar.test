@@ -22,9 +22,11 @@ shell:                  echo value of [{MY_SPECIAL_VAR}]
 verifypositive:         value of \[]
 readsharedvar:          MY_SPECIAL_VAR
 
+# On first execution {WILL_NOT_BE_FOUND} will not be substituted since it hasn't been read yet
 step:                   Read a shared var - value is [{WILL_NOT_BE_FOUND}]
 shell:                  REM value of [{WILL_NOT_BE_FOUND}]
 readsharedvar:          WILL_NOT_BE_FOUND
-verifypostive:          This step will not run, so it will not fail
+verifypositive:         This step will not run, so it will not fail
 runif:                  {WILL_NOT_BE_FOUND}
+retry:                  2
 

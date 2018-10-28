@@ -36,7 +36,7 @@ retry:                  6
 step:                   Info - mynum variable is {MYNUM}
 shell:                  echo NOP
 
-step:                   Should retry 5 times due to verifypostive failure
+step:                   Should retry 5 times due to verifypositive failure
 desc:                   retry variable will update between retries:{RETRY}, but mynum variable {MYNUM} will not
 shell:                  echo one one one
 shell1:                 echo three four five
@@ -53,7 +53,7 @@ url:                    http://{WIC}/pagedoesnotexist
 verifypositive:         This text will not be found
 retry:                  2
 
-step:                   Should retry 3 times due to verifypostive failure and globalretry limit of 12 retries
+step:                   Should retry 3 times due to verifypositive failure and globalretry limit of 12 retries
 shell:                  echo one one one
 verifypositive:         two
 retry:                  5

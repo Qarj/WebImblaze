@@ -11,7 +11,7 @@ shell2:                 echo Should be false _{EXPECT_FALSE}_
 verifypositive1:        Should be true _1_
 verifypositive2:        Should be false __
 
-step:                   Check eval math: _{EXPECT_TEN}_, _{EXPECT_24}_
+step:                   Check eval maths: _{EXPECT_TEN}_, _{EXPECT_24}_
 shell1:                 echo Should be 10 _{EXPECT_TEN}_
 shell2:                 echo Should be 24 _{EXPECT_24}_
 verifypositive1:        Should be 10 _10_
