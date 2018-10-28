@@ -5,7 +5,7 @@
     you to organise your tests into sections.
 
     The primary intention of this is to make the results display cleaner in the
-    WebInject Framework.
+    WebImblaze Framework.
 =--
 
 step:                   Get Home page

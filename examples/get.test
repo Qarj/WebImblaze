@@ -1,5 +1,5 @@
 --=
-    The {TOTALJOBS} substitution is defined in config.xml in the same folder webinject.pl is located
+    The {TOTALJOBS} substitution is defined in config.xml in the same folder wi.pl is located
 
     http:// is not included as part of the substitution in this example. This is because the website
     also uses https://

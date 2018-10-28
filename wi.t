@@ -328,8 +328,6 @@ assert_stdout_contains('odd_yname\.y=f\.ytra', 'auto_sub : DOTY - ensure value n
 #
 #
 
-# Lean test format will convert to classic xml style webinject
-
 # XMLin function creates a data structure like the below, the lean parse must produce the same structure
 #
 #$VAR1 = {

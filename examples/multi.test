@@ -1,4 +1,4 @@
-step: Test that WebInject can run a very basic test
+step: Test that WebImblaze can run a very basic test
 shell: echo Nothing: much
 verifypositive1: Nothing: much
 

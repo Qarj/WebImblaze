@@ -1,4 +1,4 @@
-# After execution of the first step, WebInject waits 2 seconds.
+# After execution of the first step, WebImblaze waits 2 seconds.
 
 step:                   Get Home page
 url:                    http://{WIC}

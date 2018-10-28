@@ -13,7 +13,7 @@ step:                   Get the directory listing of the current folder
 shell:                  dir
 shell1:                 echo output of shell 1
 shell20:                echo output of shell 20
-verifypositive:         .\webinject.pl
+verifypositive:         .\wi.pl
 verifypositive1:        output of shell 1
 verifypositive2:        output of shell 20
 

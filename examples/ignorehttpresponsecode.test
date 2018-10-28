@@ -1,5 +1,5 @@
 --=
-    By Default, WebInject will fail a test if the http response code indicates an error.
+    By Default, WebImblaze will fail a test if the http response code indicates an error.
 
     The ignorehttpresponsecode parameter tells WebInject not to do that assertion.
 

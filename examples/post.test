@@ -1,7 +1,7 @@
 --=
     With a post request, it is typical to first get a web page with something on it (for example, a form) first.
 
-    In this example, we get a a dummy form on a website especially created for WebInject examples.
+    In this example, we get a a dummy form on a website especially created for WebImblaze examples.
 
     Then we post to the website. The website responds with a simple confirmation page. 
 

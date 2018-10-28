@@ -3,7 +3,7 @@
 
     This is done through the perl backtick method.
 
-    If the shell command you run writes to the console, WebInject will capture it. This means you can run assertions against it.
+    If the shell command you run writes to the console, WebImblaze will capture it. This means you can run assertions against it.
 
     Potential uses in automated tests:
         * ftping files
@@ -13,5 +13,5 @@
 
 step:                   Get the directory listing of the current folder
 shell:                  dir
-verifypositive:         webinject.pl
+verifypositive:         wi.pl
 
