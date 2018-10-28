@@ -1,3 +1,13 @@
-step: Can handle 'single' and "double" quotes
-shell: echo 'single' and "double" quotes
-verifypostive: 'single' and "double" quotes
+step:               Define my own quote example
+shell://:           //echo line 1
+line 2
+line 3
+//
+verifypositive:(((: (((line 1
+line 2
+line 3
+)))
+
+step:               Can handle 'single' and "double" quotes automatically
+shell:              echo 'single' and "double" quotes
+verifypositive:     'single' and "double" quotes
