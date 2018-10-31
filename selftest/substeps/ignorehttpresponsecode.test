@@ -1,7 +1,7 @@
 step:                   should fail
-url:                    http://{WIC}/pagedoesnotexist
+url:                    http://www.fairfaxhouse.co.uk/pagedoesnotexist
 
 step:                   should pass
-url:                    http://{WIC}/pagedoesnotexist
+url:                    http://www.fairfaxhouse.co.uk/pagedoesnotexist
 ignorehttpresponsecode: true
 

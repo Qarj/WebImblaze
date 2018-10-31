@@ -7,10 +7,10 @@ shell:                  echo hello world
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    http://{WIC}/pagedoesnotexist
+url:                    https://www.gov.uk/pagedoesnotexist
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    http://{WIC}
+url:                    https://www.gov.uk/
 verifyresponsecode:     200
 

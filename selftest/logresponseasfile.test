@@ -4,7 +4,7 @@ shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substep
 
 step:                   view WEBIMBLAZE-CHECK_Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}WEBIMBLAZE-CHECK_Home_Page.html
-verifypositive:         aid in the self test of webinject
+verifypositive:         government
 verifypositive1:        html.*head.*body
 verifynegative:         uninitialized value
 
@@ -15,6 +15,6 @@ shell3:                 .\wi.pl -o selftest\output\temp\ selftest\substeps\{FEAT
 
 step:                   view WEBIMBLAZE-CHECK_Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBIMBLAZE-CHECK_Home_Page.html
-verifypositive:         aid in the self test of webinject
+verifypositive:         government
 verifypositive1:        html.*head.*body
 

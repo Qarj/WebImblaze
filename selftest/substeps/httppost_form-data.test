@@ -1,11 +1,6 @@
-step:                   Get the multipart upload page
-url:                    http://{WIC}/BulkUpload/Index
-verifypositive:         Select File
-
 step:                   Post the csv file
-url:                    http://{WIC}/BulkUpload/Upload
+url:                    http://httpbin.org/post
 posttype:               multipart/form-data
 postbody:               ( 'fileUpload' => ['selftest/testdata/searches.csv'] )
-verifypositive1:        File Upload Details
 verifypositive2:        Carbonara
 

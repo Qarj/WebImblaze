@@ -1,19 +1,21 @@
-step:                   Get all the searches - no addheader
-url:                    http://{WIC}/api/GetAllSearches
-verifypositive:         "SearchId":1,"RecipeName"
-verifynegative:         ArrayOfSearch
+step:                   Get postcode
+url:                    http://api.postcodes.io/postcodes/SW81LF
 ignoresmartassertions:  true
 
-step:                   Get all the searches - add header json
-url:                    http://{WIC}/api/GetAllSearches
-verifypositive:         "SearchId":1,"RecipeName"
-verifynegative:         ArrayOfSearch
-addheader:              Accept: application/json, text/javascript, */*; q=0.01
+step:                   Get postcode without json header
+url:                    http://api.postcodes.io/postcodes
+postbody:///:            ///
+{
+"postcodes" : ["OX49 5NU", "M32 0JG", "NE30 1DP"]
+}
+///
 
-step:                   Get all the searches - add header xml
-url:                    http://{WIC}/api/GetAllSearches
-verifypositive1:        ArrayOfSearch
-verifypositive2:        XMLSchema-instance
-verifynegative:         "SearchId":1,"RecipeName"
-addheader:              Accept: application/xml
+step:                   Get postcode with json header
+url:                    http://api.postcodes.io/postcodes
+postbody:///:            ///
+{
+"postcodes" : ["OX49 5NU", "M32 0JG", "NE30 1DP"]
+}
+///
+addheader:              Content-type: application/json
 

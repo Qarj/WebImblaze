@@ -1,11 +1,11 @@
-step:                   Get the Search form
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Search Recipes
-verifypositive1:        Recipe Name
-verifypositive2:        Max Preparation Time
+step:                   Get the test form
+url:                    http://httpbin.org/forms/post
+verifypositive:         Customer name
 
 step:                   Submit a search
-url:                    http://{WIC}/Search/SearchRecipes
-postbody:               RecipeN{NAME}=Pesto&{NAME}uisine=Italian&{NAME}PrepTime=20&__Request{NAME}Token={DATA}&BtnSubmit=Search+Recipes
-verifypositive:         Believe it or not, you just submitted a search
+url:                    http://httpbin.org/post
+postbody:               custname=Peter&{NAME}tel=555+1234&custemail=test%40example.com&size=large&topping={DATA}&topping=onion&delivery=11%3A30&comments=Thanks
+verifypositive1:        custtel
+verifypositive2:        bacon
+
 

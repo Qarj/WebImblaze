@@ -1,4 +1,4 @@
 step:                   Get a css file
-url:                    http://{WIC}/Home/Special
-getallhrefs:            ial.css
+url:                    https://postcodes.io/about
+getallhrefs:            app.css
 

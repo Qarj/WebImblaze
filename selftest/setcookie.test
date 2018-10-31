@@ -9,8 +9,8 @@ verifynegative:         uninitialized value
 
 step:                   view http.txt
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
-assertcount1:           MyFirstCookie=cookie_value|||2
-assertcount2:           MySecondCookie=another_value|||2
-assertcount3:           MyThirdCookie=value_of_third_cookie|||1
+assertcount1:           MyFirstCookie=cookie_value|||3
+assertcount2:           MySecondCookie=another_value|||3
+assertcount3:           MyThirdCookie=value_of_third_cookie|||2
 verifynegative:         uninitialized value
 

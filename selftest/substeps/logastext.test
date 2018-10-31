@@ -1,7 +1,7 @@
 step:                   log as text not used
-url:                    http://{WIC}
+url:                    https://www.gov.uk/
 
 step:                   log as text used
-url:                    http://{WIC}
+url:                    https://www.gov.uk/
 logastext:              true
 

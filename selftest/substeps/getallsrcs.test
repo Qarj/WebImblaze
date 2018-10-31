@@ -1,8 +1,8 @@
 step:                   Get an image source
-url:                    http://{WIC}/Home/Pictures
-getallsrcs:             brickwork.jpg
+url:                    http://www.fairfaxhouse.co.uk/
+getallsrcs:             logo\.jpg
 
 step:                   Get a JavaScript source
-url:                    http://{WIC}/Home/JavaScript
-getallsrcs:             element.js
+url:                    https://voltbikes.co.uk
+getallsrcs:             index.js
 

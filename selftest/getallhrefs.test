@@ -1,16 +1,16 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell1:                 if exist selftest\output\special.css del selftest\output\special.css
+shell1:                 if exist selftest\output\version10_app.css del selftest\output\version10_app.css
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        GET Asset \[version10_special.css]
+verifypositive1:        GET Asset \[version10_app.css]
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell1:                 dir selftest\output\
 shell2:                 ls selftest/output/
-verifypositive:         special.css
+verifypositive:         app.css
 verifynegative:         uninitialized value
 

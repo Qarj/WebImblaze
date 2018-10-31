@@ -1,4 +1,4 @@
 step:                   Get a background image
-url:                    http://{WIC}/Home/Pictures
-getbackgroundimages:    .jpg
+url:                    https://www.totaljobsgroup.com
+getbackgroundimages:    bg_slide_6.png
 

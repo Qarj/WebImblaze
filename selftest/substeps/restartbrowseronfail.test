@@ -1,28 +1,29 @@
-step:                   Get login page sets .AspNetCore.Antiforgery cookie
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+step:                   Page sets a cookie on first visit
+url:                    https://www.gov.uk/
+verifypositive:         Set-Cookie: TLSversion
 
-step:                   Get login page again does not set the same cookie again - it is already set
+step:                   Get page again - cookie is already set
 desc:                   Step will fail
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+url:                    https://www.gov.uk/
+verifypositive:         Set-Cookie: TLSversion
 
 step:                   Browser is restarted due to an error
 shell:                  echo NOP
 verifypositive:         Some text that is not there
 restartbrowseronfail:   true
 
-step:                   Get login page sets .AspNetCore.Antiforgery cookie since all cookies are gone
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+step:                   Page sets TLSversion cookie
+url:                    https://www.gov.uk/
+verifypositive:         Set-Cookie: TLSversion
 
 step:                   Browser is not restarted since the test step passes
 shell:                  echo Some text that is there
 verifypositive:         Some text that is there
 restartbrowseronfail:   true
 
-step:                   Get login page already has .AspNetCore.Antiforgery cookie
+step:                   Page has already set TLSversion cookie
 desc:                   Step will fail
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Set-Cookie: .AspNetCore.Antiforgery
+url:                    https://www.gov.uk/
+verifypositive:         Set-Cookie: TLSversion
+
 

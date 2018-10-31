@@ -4,8 +4,7 @@ varCUISINE:             French
 varPREPTIME:            75
 
 step:                   Post the file substituting parameters
-url:                    http://{WIC}/BulkUpload/XML
+url:                    http://httpbin.org/post
 posttype:               text/xml
 postbody:               file=>selftest\testdata\search_template.xml
-verifypositive:         /BulkUpload/Confirmation
-
+verifypositive:         <name>tartiflette

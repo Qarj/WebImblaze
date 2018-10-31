@@ -1,4 +1,4 @@
-step:                   logresponse as file
-url:                    http://{WIC}
+step:                   log response as file
+url:                    https://www.gov.uk/
 logresponseasfile:      WEBIMBLAZE-CHECK_Home_Page.html
 
