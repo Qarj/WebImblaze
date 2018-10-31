@@ -7,9 +7,16 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
-### Version 1.0.0 - Nov, 2018
-* Initial release of WebImblaze
-* addcookie feature removed (use setcookie instead)
+### Version 1.0.0 - Oct 31, 2018
+* initial release of WebImblaze
+* addcookie parameter removed (use setcookie instead)
+* removed parsing of .xml test case files (use .test instead)
+* renamed description1 to step, renamed description2 to desc
+* updated manual to reflect .test file format
+* removed parms parameter
+* if posttype is test/xml or application/soap+xml, uploaded file will have standard substitutions applied
+* removed retryfromstep parameter (use checkpoint instead)
+
 
 ---------------------------------
 ## WebInject Release History:
