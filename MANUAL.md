@@ -181,7 +181,11 @@
 
     - [eval](#eval)
 
+    - [firstlooponly](#firstlooponly)
+
     - [gotostep](#gotostep)
+
+    - [lastlooponly](#lastlooponly)
 
     - [runif](#runif)
 
@@ -2035,6 +2039,16 @@ evalBASE64_NONCE:   use MIME::Base64; encode_base64(q|{NONCE}|, '');
 <br />
 
 
+#### firstlooponly
+
+Step will only be run on first loop. Use with `repeat` directive.
+```
+firstlooponly: true
+```
+
+<br />
+
+
 #### gotostep
 
 After executing current step, continue execution from the step defined by step.
@@ -2053,6 +2067,16 @@ In practice, you would use this parameter with `runif`:
 ```
 runif:      {SOME_VARIABLE}
 gotostep:   Teardown
+```
+
+<br />
+
+
+#### lastlooponly
+
+Step will only be run on last loop. Use with `repeat` directive.
+```
+lastlooponly: true
 ```
 
 <br />
