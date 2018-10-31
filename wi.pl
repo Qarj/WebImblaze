@@ -1179,9 +1179,9 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
 sub getbackgroundimages { # style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
-        my $_match = 'style="background-image: url';
-        my $_left_delim = '\(';
-        my $_right_delim = '\)';
+        my $_match = 'background-image: url';
+        my $_left_delim = q{\(\'?\"?}; 
+        my $_right_delim = q{\'?\"?\)};
         get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
 
