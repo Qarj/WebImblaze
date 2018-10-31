@@ -533,7 +533,7 @@ sub output_test_step_description {
 
     $results_html .= qq|<b>Test:  $current_steps_file - <a href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> $testnum_display$jumpbacks_print$retries_print </a> </b><br />\n|;
     $results_stdout .= qq|Test:  $current_steps_file - $testnum_display$jumpbacks_print$retries_print \n|;
-    $results_xml .= qq|        <testcase id="$testnum_display$jumpbacks_print$retries_print">\n|;
+    $results_xml .= qq|        <teststep id="$testnum_display$jumpbacks_print$retries_print">\n|;
 
     for (qw/section step desc/) { # support section breaks
         next unless defined $case{$_};
@@ -752,7 +752,7 @@ sub output_test_step_latency {
 #------------------------------------------------------------------
 sub output_test_step_results {
 
-    $results_xml .= qq|        </testcase>\n\n|;
+    $results_xml .= qq|        </teststep>\n\n|;
     _write_xml (\$results_xml);
     undef $results_xml;
 
@@ -912,7 +912,7 @@ sub write_initial_xml {  # write opening tags for results file
         $_results_xml .= "    </wif>\n";
     }
 
-    $_results_xml .= qq|\n    <testcases file="$current_steps_file">\n\n|;
+    $_results_xml .= qq|\n    <teststeps file="$current_steps_file">\n\n|;
 
     _whack($opt_publish_full.$results_xml_file_name);
     _write_xml(\$_results_xml);
@@ -980,7 +980,7 @@ sub write_final_html {  # write summary and closing tags for results file
 #------------------------------------------------------------------
 sub write_final_xml {  # write summary and closing tags for XML results file
 
-    $results_xml .= qq|    </testcases>\n\n|;
+    $results_xml .= qq|    </teststeps>\n\n|;
 
     my $_TIMESECONDS = ($HOUR * 60 * 60) + ($MINUTE * 60) + $SECOND;
     my $_STARTDATE = "$YEAR-$MONTH-$DAYOFMONTH";
@@ -1626,7 +1626,7 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
 sub httpsend_xml { # send text/xml HTTP request and read response
     my ($_verb) = @_;
 
-    # read the xml file specified in the testcase
+    # read the xml file specified in the teststep
     my @_xml_body;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
         open my $_XML_BODY, '<', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";

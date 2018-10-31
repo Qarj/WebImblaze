@@ -18,6 +18,6 @@ verifynegative:         uninitialized value
 
 step:                   view result_filessubresults.xml
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}result_filessubresults.xml
-verifypositive1:        testcase id="20"
+verifypositive1:        teststep id="20"
 verifynegative:         uninitialized value
 
