@@ -1,7 +1,7 @@
-# errormessage will write out a custom errormessage if the test step fails.
+# errormessage will write out a custom errormessage if the test step fails
 
-step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject Test Tool
+step:                   Get home page
+url:                    http://httpbin.org/
+verifypositive1:        Content I'm definitely expecting
 errormessage:           Perhaps somebody deployed the old version of the page again
 

@@ -1,11 +1,11 @@
 # After execution of the first step, WebImblaze waits 2 seconds.
 
 step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
+url:                    http://example.com
+verifypositive1:        This domain
 sleep:                  2
 
 step:                   Get Home page again
-url:                    http://{WIC}
-verifypositive1:        WebInject
+url:                    http://example.com
+verifypositive1:        This domain
 

@@ -1,19 +1,39 @@
-step:                   View webinject-check API info
-url:                    http://webinject-check.azurewebsites.net/api
-verifypositive:         GetAllSearches
+step:                   Create a Bin
+postbody:(:             ()               
+url:                    http://postb.in/api/bin
+parseresponseBIN_ID:    binId":"([^"]+)|regex|
 
-step:                   Call GetSearch/3 with json header
-url:                    http://webinject-check.azurewebsites.net/api/GetSearch/3
-verifypositive:         "recipeName":"Pesto"
-addheader:              Accept: application/json
+step:                   Look at my bin {BIN_ID}
+url:                    http://postb.in/b/{BIN_ID}
+verifypositive:         No requests received yet
+logastext:              true
+formatxml:              true
 
-step:                   Call GetSearch/3 with xml header
-url:                    http://webinject-check.azurewebsites.net/api/GetSearch/3
-verifypositive:         <RecipeName>Pesto</RecipeName>
-addheader:              Accept: application/xml
+step:                   POST something in my bin
+url:                    http://postb.in/{BIN_ID}
+postbody:///:           ///
+{
+"postcodes" : ["OX49 5NU"]
+}
+///
 
-step:                   Post 'id=2' to /api/PostSearch
-url:                    http://webinject-check.azurewebsites.net/api/PostSearch
-postbody:               id=2
-verifypositive:         American
+step:                   PUT something in my bin
+url:                    http://postb.in/{BIN_ID}/important/record/1
+postbody:///:           ///
+{
+"secret_file" : ["Käsekreiner"]
+}
+///
+
+step:                   Take another look at my bin
+url:                    http://postb.in/b/{BIN_ID}
+verifypositive1:        OX49
+verifypositive2:        kreiner
+verifypositive3:        important/record
+logastext:              true
+formatxml:              true
+
+step:                   DELETE my bin
+method:                 delete
+url:                    http://postb.in/api/bin/{BIN_ID}
 

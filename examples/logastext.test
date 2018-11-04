@@ -7,7 +7,7 @@
 =--
 
 step:                   Get Home page
-url:                    http://{WIC}
+url:                    http://httpbin.org/
 verifynegative:         Severe error
 logastext:              true
 

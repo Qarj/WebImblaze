@@ -5,6 +5,6 @@
 =--
 
 step:                   Get a page that does not exist
-url:                    http://{WIC}/pagedoesnotexist
+url:                    http://httpbin.org/pagedoesnotexist
 verifyresponsecode:     404
 

@@ -8,14 +8,16 @@
     Note that in this example, the website URL is defined with a local test variable.
 =--
 
-step:                   Get Search Form
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Search Recipes
-getallhrefs:            \.css|\.less
-getallsrcs:             \.jpg|\.png|\.js|\.gif
+step:                   Get search form
+url:                    https://www.just-eat.co.uk
+verifypositive:         Search
 
 step:                   Submit Search
-url:                    http://{WIC}/Search/SearchRecipes
-postbody:               RecipeName=Sheperds%20Pie&Cuisine=British&MaxPrepTime=2&BtnSubmit=Search%20Recipes&__RequestVerificationToken={DATA}
-verifypositive:         Search Confirmation
+url:                    https://www.just-eat.co.uk/search/do
+postbody:               cuisine=&postcode=WC1X+8TG
+verifypositive:         london
+parseresponseREDIRECT:  Location: |\n|decode
+logastext:              true
 
+step:                   (redirect) Get search results
+url:                    https://www.just-eat.co.uk{REDIRECT}

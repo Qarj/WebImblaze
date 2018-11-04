@@ -1,5 +1,5 @@
 --=
-    When the abort="true" parameter is present on a test step, then execution will be halted if
+    When the abort parameter is present on a test step, then execution will be halted if
     any verification on that test step has failed (after all retries have been exhausted).
 
     The idea is that it allows you to stop test execution if there is a serious problem.
@@ -12,11 +12,12 @@
 =--
 
 step:                   Get Home page
-url:                    http://{WIC}
+url:                    http://httpbin.org
 verifypositive:         text that will not be found
 abort:                  true
+# a step named 'true' is not found, execution stops immediately
 
 step:                   Get Search Form
-url:                    http://{WIC}/Search/SearchForm
-verifypositive:         Search Recipes
+url:                    http://httpbin.org/SearchForm
+verifypositive:         This step will not run, so no error
 

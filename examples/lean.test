@@ -12,7 +12,7 @@ verifypositive: retry 1
 verifypositive1:q:   q much q   
 #verifypositive2: This is ignored
 verifynegative: Nothing much
-verifynegative5:WebImblaze:  WebInjectfirst line of multi line quote 
+verifynegative5:WebImblaze:  WebImblazefirst line of multi line quote 
 second line of multi line quote
 last line of multi line quoteWebImblaze
 retry: 3

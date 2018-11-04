@@ -10,8 +10,9 @@
 
 **Example:**
 ```
-C:\git\WebImblaze>wi.pl examples\post.xml
+C:\git\WebImblaze>wi.pl examples\post.test
 ```
 
-Note that in this example, a configuration file was not specified. WebImblaze will by default use config.xml in the same folder as where wi.pl is located.
+Note that in this example, a configuration file was not specified.
+WebImblaze will by default use config.xml in the same folder wi.pl is located.
  

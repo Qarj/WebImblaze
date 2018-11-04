@@ -1,3 +1,5 @@
+#Requires WebImblaze-Selenium plugin https://github.com/Qarj/WebImblaze-Selenium
+
 step:                   Get Totaljobs Home Page
 section:                Selenium Smoke Test
 selenium:               $driver->get("https://www.totaljobs.com")

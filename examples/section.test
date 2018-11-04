@@ -5,12 +5,12 @@
     you to organise your tests into sections.
 
     The primary intention of this is to make the results display cleaner in the
-    WebImblaze Framework.
+    WebImblaze Framework. See https://github.com/Qarj/WebImblaze-Framework
 =--
 
 step:                   Get Home page
 section:                Check Home Page functionality
-url:                    http://{WIC}
-verifypositive1:        WebInject
+url:                    https://www.rightmove.co.uk/
+verifypositive1:        Search
 
 

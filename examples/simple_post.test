@@ -1,11 +1,5 @@
-step:                   Get Search Form
-url:                    http://webinject-check.azurewebsites.net/Search/SearchForm
-verifypositive:         Search Recipes
-getallhrefs:            \.css|\.less
-getallsrcs:             \.jpg|\.png|\.js|\.gif
-
-step:                   Submit Search
-url:                    http://webinject-check.azurewebsites.net/Search/SearchRecipes
-postbody:               RecipeName=Sheperds%20Pie&Cuisine=British&MaxPrepTime=2&BtnSubmit=Search%20Recipes&__RequestVerificationToken={DATA}
-verifypositive:         Search Confirmation
-
+step:                   Very simple http post example
+url:                    http://httpbin.org/post
+postbody:               This is an example post body.
+verifypositive1:        an example post
+verifypositive2:        "headers"

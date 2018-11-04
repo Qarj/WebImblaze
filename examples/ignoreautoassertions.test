@@ -10,8 +10,7 @@
     then this asertion would not be run if this parameter is present on a test step.
 =--
 
-step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
+step:                   Get web page
+url:                    http://httpbin.org/
 ignoreautoassertions:   true
 

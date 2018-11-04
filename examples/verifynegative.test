@@ -16,8 +16,8 @@
     and not the rendered version of the html you would see in a browser.
 =--
 
-step:                   Get Home page
-url:                    http://{WIC}
+step:                   Get web page
+url:                    http://httpbin.org
 verifynegative:         Server too busy
 verifynegative1:        Search Recipes
 verifynegativeBUG3521:  Exammple

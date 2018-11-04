@@ -8,12 +8,11 @@
     The restart will have the effect of dumping all cookies.
 =--
 
-step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
+step:                   Get url
+url:                    https://www.just-eat.co.uk/
 restartbrowser:         true
 
-step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
+step:                   Get url again
+url:                    https://www.just-eat.co.uk/
+restartbrowser:         true
 

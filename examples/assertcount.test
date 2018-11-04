@@ -4,14 +4,14 @@
 =--
 
 step:                   Get Home page
-url:                    http://{WIC}
-assertcount:            example|||3
+url:                    http://postb.in/
+assertcount:            Four|||1
 
 step:                   Get Home page
-url:                    http://{WIC}
-assertcount:            example|||2
+url:                    http://postb.in/
+assertcount:            Four|||2
 
 step:                   Get Home page
-url:                    http://{WIC}
-assertcount:            example|||2|||The word example should appear 3 times in the html source
+url:                    http://postb.in/
+assertcount:            Four|||2|||The word Four should appear 2 times in the html source
 

@@ -10,9 +10,9 @@
     and not the rendered version of the html you would see in a browser.
 =--
 
-step:                   Get Home page - http://{WIC}
-url:                    http://{WIC}
-verifypositive:         automated tests
-verifypositive1:        WebInject
-verifypositiveHTML:     h2.Getting started..h2
+step:                   Get Home page - http://httpbin.org
+url:                    http://httpbin.org
+verifypositive:         simple
+verifypositive1:        http
+verifypositiveHTML:     <title>httpbin.org</title>
 

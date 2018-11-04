@@ -7,11 +7,9 @@
 =--
 
 step:                   Get Non existant page
-url:                    http://{WIC}/pagedoesnotexist
-getallhrefs:            \.css|\.less
-getallsrcs:             \.jpg|\.png|\.js|\.gif
+url:                    http://httpbin.org/pagedoesnotexist
 
-step:                   Get Non existant page
-url:                    http://{WIC}/pagedoesnotexist
+step:                   Get Non existant page http response codes 4xx, 5xx
+url:                    http://httpbin.org/pagedoesnotexist
 ignorehttpresponsecode: true
 

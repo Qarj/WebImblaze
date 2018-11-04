@@ -4,11 +4,25 @@
     It will not clobber existing cookies (unlike addheader).
 =--
 
-step:                   Get Mobile Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
-setcookie:              MobileWebsite: 1
+step:                   Get PostBin
+url:                    http://postb.in/
 getallhrefs:            \.css|\.less
 getallsrcs:             \.jpg|\.png|\.js|\.gif
 
+step:                   Create a bin
+postbody:':             ''
+url:                    http://postb.in/b/
+parseresponseBIN:       Location: /b/|\n|decode
+
+step:                   My Bin is {BIN}
+
+step:                   Post to my PostBin
+url:                    http://postb.in/{BIN}
+postbody:               I set a cookie too!
+setcookie:              MobileWebsite: 1
+
+step:                   See what is in my Bin
+url:                    http://postb.in/b/{BIN}
+verifypositive1:        I set a cookie
+verifypositive2:        MobileWebsite
 

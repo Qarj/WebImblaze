@@ -1,1 +1,1 @@
-<root><testcasefile>examples\simple.xml</testcasefile><globalhttplog>yes</globalhttplog></root>
+<root><teststepfile>examples\simple.xml</teststepfile><globalhttplog>yes</globalhttplog></root>

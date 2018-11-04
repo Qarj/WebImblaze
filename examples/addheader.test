@@ -6,8 +6,13 @@
     affect anything. Example is only so you can see syntax as part of a full example.
 =--
 
-step:                   Get Home page
-url:                    http://{WIC}
-verifypositive1:        WebInject
-addheader:              Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1
-
+step:                   Post some data, adding some headers
+url:                    http://httpbin.org/post
+postbody:||:            ||
+{
+"postcodes" : ["OX49 5NU"]
+}
+||
+addheader:              Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1|Content-type: application/json
+verifypositive1:         MobileWebsite
+verifypositive2:         OX49

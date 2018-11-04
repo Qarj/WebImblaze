@@ -1,10 +1,10 @@
-step:                   Get webinject-check home page
-url:                    http://webinject-check.azurewebsites.net/
-verifypositive:         WebInject is a powerful free automated test tool
+step:                   Get a website home page
+url:                    https://www.rightmove.co.uk/
+verifypositive:         Search
 getallhrefs:            \.css|\.less
 getallsrcs:             \.jpg|\.png|\.js|\.gif
 
-step:                   Get Recipes Index
-url:                    http://webinject-check.azurewebsites.net/Recipes
-verifypositive:         Create New
+step:                   Check a sub page
+url:                    https://www.rightmove.co.uk/property-to-rent.html
+verifypositive:         new home
 
