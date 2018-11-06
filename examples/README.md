@@ -8,9 +8,10 @@
 
 3. Call wi.pl specifying the relative path of the example to run
 
-**Example:**
+**Example**
 ```
-C:\git\WebImblaze>wi.pl examples\post.test
+perl wi.pl examples/post.test
+perl wi.pl examples/advanced/include.test
 ```
 
 Note that in this example, a configuration file was not specified.

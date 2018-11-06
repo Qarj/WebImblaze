@@ -1,0 +1,37 @@
+--=
+    WebImblaze Simple Demo
+=--
+
+repeat:             2
+useragent:          Custom Useragent String
+
+step:               Example get request
+varDOMAIN:          example.com
+url:                http://{DOMAIN}
+verifypositive:     Example Domain
+
+step:               Example post request
+url:                http://httpbin.org/post
+postbody:           This is an example post body.
+verifypositive:     example post
+verifypositive1:    Custom Useragent String
+verifynegative:     Oops - page not found
+
+step:               Get current directory on loop {COUNTER}
+desc:               Full step description goes here
+shell:              echo About to list the directory
+shell1:             dir
+shell2:             echo Just listed the directory
+verifypositive1:':  ' to list the '   
+#verifypositive2:   Commented out - ignored
+verifynegative://:  //first line of multi line quote 
+second line of multi line quote
+last line of multi line quote//
+verifynegative1:     File not found
+
+--=
+step: This step is commented out
+shell: echo NOP
+verifypositive: Commented out
+=--
+

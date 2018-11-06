@@ -11,3 +11,13 @@ line 3
 step:               Can handle 'single' and "double" quotes automatically
 shell:              echo 'single' and "double" quotes
 verifypositive:     'single' and "double" quotes
+
+step: Another multi line quote
+varBIG:///: ///One Fish
+Two Fish
+Three Fish///
+shell:              echo {BIG}
+verifypositive:     {BIG}
+
+step:               Set a variable to the empty string
+varEMPTY:!:         !!        

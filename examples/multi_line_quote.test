@@ -1,6 +1,0 @@
-step: Multi line quote
-varBIG:///: ///One Fish
-Two Fish
-Three Fish///
-shell: echo {BIG}
-verifypositive: {BIG}

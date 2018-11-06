@@ -1,9 +1,0 @@
-step: This is my first step, 10 
-shell: echo 10
-
-include: examples/include/include_demo_1.test
-
-step: This is my third step, 30 
-shell: echo 30
-
-include: examples/include/include_demo_2.test

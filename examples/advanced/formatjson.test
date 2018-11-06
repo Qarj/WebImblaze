@@ -6,11 +6,11 @@
 =--
 
 step:                   Echo some json
-shell:                  type examples\testdata\samplejson.json
+shell:                  type examples\advanced\testdata\samplejson.json
 verifypositive:         example book
 
 step:                   Echo some json
-shell:                  type examples\testdata\samplejson.json
+shell:                  type examples\advanced\testdata\samplejson.json
 verifypositive:         example book
 formatjson:             true
 

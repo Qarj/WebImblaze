@@ -6,11 +6,11 @@
 =--
 
 step:                   Echo some xml
-shell:                  type examples\testdata\samplexml.xml
+shell:                  type examples\advanced\testdata\samplexml.xml
 verifypositive:         teststepfile
 
 step:                   Echo some xml
-shell:                  type examples\testdata\samplexml.xml
+shell:                  type examples\advanced\testdata\samplexml.xml
 verifypositive:         teststepfile
 formatxml:              true
 
