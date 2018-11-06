@@ -7,7 +7,7 @@
 
 WebImblaze is a free Perl based tool for automated testing of web applications and web services.
 
-You can see WebImblaze example output here: http://qarj.github.io/WebInject-Example/
+You can see WebImblaze example output here: https://qarj.github.io/WebImblaze-Example/
 
 Quick Start Guide - run your first test in 5 minutes!
 -----------------------------------------------------
