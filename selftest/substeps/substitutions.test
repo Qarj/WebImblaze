@@ -132,10 +132,14 @@ verifypositive:         _:8080_
 step:                   Date modifier from test start time - Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}
 shell:                  echo Yesterday {DATE:::-1} {YEAR}-{MONTH}-{DAY}
 verifypositive:         Yesterday  \d{4}-\d{2}-\d{2}
-verifynegative:          1900-
+verifynegative:         1900-
 
 step:                   Date modifier from now - Yesterday {DATE_NOW:::-1} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}
 shell:                  echo Yesterday {DATE_NOW:::-1} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}
 verifypositive:         Yesterday  \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}
-verifynegative:          1900-
+verifynegative:         1900-
 
+step:                   Date modifier from now - expression should evaluate without error
+shell:                  echo A minute ago {DATE_NOW:::-1/24/60} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}
+verifypositive:         A minute ago  \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}
+verifynegative:         1900-

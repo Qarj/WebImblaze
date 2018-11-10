@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.0.1 - Nov 10, 2018
+* fixed substitution modifier regression
+
 ### Version 1.0.0 - Oct 31, 2018
 * initial release of WebImblaze
 * addcookie parameter removed (use setcookie instead)

@@ -2,5 +2,6 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifynegative:         uninitialized value
+verifynegative1:        uninitialized value
+verifynegative2:        isn't numeric|||eval {$1} gives different result to eval ($1)
 

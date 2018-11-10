@@ -1287,7 +1287,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.test
+include: examples/advanced/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1296,7 +1296,7 @@ EOB
 read_test_steps_file();
 assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in - 1');
 assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
-assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
+assert_stdout_contains("'20' => 'examples/advanced/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
 
 # specify include file with backslash
 before_test();
@@ -1304,7 +1304,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples\include\include_demo_1.test
+include: examples/advanced/include\include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1320,18 +1320,18 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.test
+include: examples/advanced/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
 
-include: examples/include/include_demo_2.test
+include: examples/advanced/include/include_demo_2.test
 
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'20' => 'examples/include/include_demo_1.test'", '_parse_lean_test_steps : multi include files read in - 1');
-assert_stdout_contains("'40' => 'examples/include/include_demo_2.test'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains("'20' => 'examples/advanced/include/include_demo_1.test'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains("'40' => 'examples/advanced/include/include_demo_2.test'", '_parse_lean_test_steps : multi include files read in - 1');
 
 # include file gets loaded
 before_test();
@@ -1339,7 +1339,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.test
+include: examples/advanced/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1357,7 +1357,7 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_3.test
+include: examples/advanced/include/include_demo_3.test
 
 step: This is my third step, 30 
 shell: REM 30
@@ -1379,12 +1379,12 @@ $main::unit_test_steps = <<'EOB'
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_1.test
+include: examples/advanced/include/include_demo_1.test
 
 step: This is my third step, 30 
 shell: REM 30
 
-include: examples/include/include_demo_2.test
+include: examples/advanced/include/include_demo_2.test
 EOB
     ;
 read_test_steps_file();
@@ -1423,7 +1423,7 @@ repeat: 5
 step: This is my first step, 10 
 shell: REM 10
 
-include: examples/include/include_demo_4.test
+include: examples/advanced/include/include_demo_4.test
 
 step: This is my third step, 30 
 shell: REM 30

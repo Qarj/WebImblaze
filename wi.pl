@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.0.0';
+$VERSION = '1.0.1';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -2938,10 +2938,10 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     my $_HOUR = $HOUR;
 
     if ($_[0] =~ s{[{]DATE:::([+\-*/\d]+)[}]}{}g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval{$1}*86_400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($start_time + (eval($1)*86_400));
     }
     if ($_[0] =~ s{[{]DATE_NOW:::([+\-*/\d]+)[}]}{}g) {
-        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval{$1}*86_400));
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86_400));
     }
 
     # perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}

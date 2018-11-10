@@ -1,4 +1,4 @@
-# WebImblaze 1.0.0
+# WebImblaze 1.0.1
 
 **_This project is now very different to the original WebInject so it has been renamed to WebImblaze._**
 
