@@ -1231,7 +1231,7 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
 
             $_asset_response = $useragent->request($_asset_request);
 
-            write_file( "$results_output_folder$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
+            write_file( "$opt_publish_full$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
@@ -3737,6 +3737,7 @@ sub get_command_line_options {
     } else {
         $opt_publish_full = slash_me($opt_publish_full);
     }
+    print "opt_publish_full:$opt_publish_full\n";
 
     return;
 }
