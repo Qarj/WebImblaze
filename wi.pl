@@ -3212,7 +3212,7 @@ sub httplog {  # write requests and responses to http.txt file
 
     # save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
-        write_file( "$results_output_folder$case{logresponseasfile}", {binmode => ':raw'}, $response->content ); # content just outputs the content, whereas as_string includes the response header
+        write_file( "$opt_publish_full$case{logresponseasfile}", {binmode => ':raw'}, $response->content ); # content just outputs the content, whereas as_string includes the response header
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
@@ -3737,7 +3737,6 @@ sub get_command_line_options {
     } else {
         $opt_publish_full = slash_me($opt_publish_full);
     }
-    print "opt_publish_full:$opt_publish_full\n";
 
     return;
 }
