@@ -2467,9 +2467,9 @@ Variable | Description
 **{TESTNUM}** | Id number of the current test step
 **{LENGTH}** | Length of the response for the previous test step
 **{TESTSTEPTIME:510}** | Latency for test step number 510
-**{RANDOM:5:ALPHA}** | Random string of 5 alphabetic characters in upper case
+**{RANDOM:15}** | Random string of 15 alphanumeric characters (upper case only)
+**{RANDOM:5:ALPHA}** | Random string of 5 alphabetic characters (upper case only)
 **{RANDOM:8:NUMERIC}** | Random string of 8 numeric characters
-**{RANDOM:15:ALPHANUMERIC}** | Random string of 15 alphanumeric characters
 **{COUNTER}** | What loop number we are on - corresponding to the `repeat="5"` (say) parameter at the start of the test steps
 **{JUMPBACKS}** | Number of times execution has jumped back due to invocation of `checkpoint` parameter
 **\[\[\[\|68656c6c6f\|\]\]\]** | Packs 68656c6c6f - which converts to the string `hello`. You can unpack a string (i.e. mask it to the casual observer) with the following Perl code `perl -e "print unpack('H*', 'hello')"`

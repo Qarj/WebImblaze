@@ -44,6 +44,8 @@ use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
 use lib q{.}; # current folder is not @INC from Perl 5.26
 use Data::Dumper;
+use Math::Random::ISAAC;
+my $rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used in seed
 
 local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
@@ -3031,29 +3033,25 @@ sub _get_random_string {
         $_type = ':ALPHANUMERIC';
     }
 
-    require Math::Random::ISAAC;
-
-    my $_rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used in seed
-
     my $_random;
     my $_last;
     my $_next;
     my $_first;
     foreach my $_i (1..$_length) {
-        $_next = _get_char($_rng->irand(), $_type);
+        $_next = _get_char($rng->irand(), $_type);
 
         # this clause stops two consecutive characters being the same
         # some search engines will filter out words containing more than 2 letters the same in a row
         if (defined $_last) {
             while ($_next eq $_last) {
-                $_next = _get_char($_rng->irand(), $_type);
+                $_next = _get_char($rng->irand(), $_type);
             }
         }
 
         # never generate 0 as the first character, leading zeros can be problematic
         if (not defined $_first) {
             while ($_next eq '0') {
-                $_next = _get_char($_rng->irand(), $_type);
+                $_next = _get_char($rng->irand(), $_type);
             }
             $_first = $_next;
         }
