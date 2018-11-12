@@ -1226,7 +1226,6 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
             $results_stdout .= "  GET Asset [$_version$_filename] ...";
 
             $_asset_request = HTTP::Request->new('GET',"$_asset_url");
-            print "url:$_asset_url\n";
             $cookie_jar->add_cookie_header($_asset_request); # session cookies will be needed
 
             $_asset_response = $useragent->request($_asset_request);
