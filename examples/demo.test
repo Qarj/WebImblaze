@@ -6,8 +6,8 @@ repeat:             2
 useragent:          Custom Useragent String
 
 step:               Example get request
-varDOMAIN:          example.com
-url:                http://{DOMAIN}
+varMY_SITE:         example.com
+url:                http://{MY_SITE}
 verifypositive:     Example Domain
 
 step:               Example post request
