@@ -18,6 +18,6 @@
     </windows>
     <linux>
         <chromedriver-binary>/usr/local/bin/selenium/chromedriver</chromedriver-binary>
-        <selenium-binary>/usr/local/bin/selenium/selenium-server-standalone-3.11.0.jar</selenium-binary>
+        <selenium-binary>/usr/local/bin/selenium/selenium-server-3-standalone.jar</selenium-binary>
     </linux>
 </root> 
