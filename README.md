@@ -9,8 +9,7 @@ WebImblaze is a free Perl based tool for automated testing of web applications a
 
 You can see WebImblaze example output here: https://qarj.github.io/WebImblaze-Example/
 
-Quick Start Guide - run your first test in 5 minutes!
------------------------------------------------------
+## Quick Start Guide - run your first test in 5 minutes!
 
 WebImblaze is very easy to setup and run. An example is test included.
 
@@ -94,9 +93,12 @@ https://github.com/Qarj/webinject-docker
 Note that these instructions are written with Windows in mind. 
 
 In the `tests` folder, create a file called `hello.test`.
+```
+cd c:/git/WebImblaze
+start notepad++ tests/hello.test
+```
 
-Edit the file with your favourite text editor and copy paste the following then save the file.
-
+Copy paste the following then save the file.
 ```
 step:               Get Totaljobs Home Page
 varTOTALJOBS_URL:   https://www.totaljobs.com
@@ -115,7 +117,6 @@ verifynegative1:    Page not found
 ### Run your first WebImblaze test
 
 ```
-cd C:\git\WebImblaze
 perl wi.pl tests/hello.test
 ```
 
@@ -186,29 +187,26 @@ There are some examples on the WebImblaze blog with detailed discussion: http://
 
 Examine and run the examples in the `examples` folder.
 
-Also, if you examine the files in the `selftest\substeps` folder you will get a lot of additional examples for additional parameters.
+Also, if you examine the files in the `selftest/substeps` folder you will get a lot of additional examples for additional parameters.
 
 Finally there is always the manual :)
 
 
-The Manual
-----------
+## The Manual
 
 The manual contains extensive details on how to use WebImblaze.
 
 [WebImblaze Manual - MANUAL.md](MANUAL.md)
 
 
-Examples
---------
+## Examples
 
 There are many working examples in the examples folder.
 
 For additional examples, study the self tests in the `selftest\substeps` folder.
 
 
-WebImblaze Self Test
---------------------
+## WebImblaze Self Test
 
 WebImblaze uses WebImblaze to test itself. The self tests are organised by feature name.
 If you study the self tests for a feature you are interested, you will learn more about
@@ -226,8 +224,7 @@ Or you can run just one self test like this:
 perl wi.pl selftest/verifypositive.test
 ```
 
-WebImblaze Plugins
------------------
+# WebImblaze Plugins
 
 ## WebImblaze-Framework
 Have multiple test environments? Hundreds of tests that are run many times a day?
@@ -246,8 +243,7 @@ A Chrome screenshot can be searched to see if it contains a specific (or approxi
 
 Find the project here: https://github.com/Qarj/search-image
 
-Test File Format
------------------
+## Test File Format
 WebImblaze uses a simplified test file format over WebInject.
 
 The WebInject xml style format is misleading since it isn't true xml - for simplicity
