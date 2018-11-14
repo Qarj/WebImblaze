@@ -14,7 +14,7 @@
     </smartassertions>
     <windows>
         <chromedriver-binary>C:\selenium\chromedriver.exe</chromedriver-binary>
-        <selenium-binary>C:\selenium\selenium-server-standalone-3.11.0.jar</selenium-binary>
+        <selenium-binary>C:\selenium\selenium-server-3-standalone.jar</selenium-binary>
     </windows>
     <linux>
         <chromedriver-binary>/usr/local/bin/selenium/chromedriver</chromedriver-binary>
