@@ -3,7 +3,7 @@ varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 
 step:                   view WEBIMBLAZE-CHECK_Home_Page.html
-shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBIMBLAZE-CHECK_Home_Page.html
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subWEBIMBLAZE-CHECK_Home_Page.html
 verifypositive:         government
 verifypositive1:        html.*head.*body
 verifynegative:         uninitialized value
@@ -17,4 +17,3 @@ step:                   view WEBIMBLAZE-CHECK_Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBIMBLAZE-CHECK_Home_Page.html
 verifypositive:         government
 verifypositive1:        html.*head.*body
-
