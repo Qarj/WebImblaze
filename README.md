@@ -183,7 +183,7 @@ Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebImblaze-Fr
 
 ### Creating your own tests
 
-There are some examples on the WebImblaze blog with detailed discussion: http://webinject.blogspot.co.uk/
+There are some examples on the WebImblaze blog with detailed discussion: http://webimblaze.blogspot.co.uk/
 
 Examine and run the examples in the `examples` folder.
 
