@@ -12,6 +12,7 @@ WebImblazeSelenium.pm
 tests/*.test
 tests/*.xml
 tests/*.csv
+tests/*.txt
 parse_error/
 session.config
 debug.log

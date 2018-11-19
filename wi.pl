@@ -2190,6 +2190,7 @@ sub parseresponse {  # parse values from responses for use in future request (fo
         if ( (substr $_case_attribute, 0, 13) eq 'parseresponse' ) {
 
             @_parse_args = split /[|]/, $case{$_case_attribute} ;
+            $_parse_args[1] //= 'regex';
 
             $_left_boundary = $_parse_args[0]; $_right_boundary = $_parse_args[1]; $_escape = $_parse_args[2];
 

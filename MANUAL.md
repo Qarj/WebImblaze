@@ -1303,38 +1303,38 @@ parseresponse: option value="([0-9]+)".AutoTESavedSearch1|regex|escape
 
 Example - Will find user@example.com in a response containing <email>user@example.com</email>
 ```
-parseresponse: email.([^\<]+)|regex|
+parseresponse: email.([^\<]+)
 ```
 
 Example - the {5,60} specifies that the number of characters matched must be between 5 and 60:
 ```
-parseresponse: name="(.{5,60}?)"|regex|
+parseresponse: name="(.{5,60}?)"
 ```
 
 Example - in this regex, the .* at the front tells it to return the last match, rather than the first:
 ```
-parseresponse: .*UserId="(.*?)"\<|regex|
+parseresponse: .*UserId="(.*?)"\<
 ```
 
 Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
 ```
-parseresponse: ([\d][\d]/[\d][\d]/[\d]{4,4})|regex|
+parseresponse: ([\d][\d]/[\d][\d]/[\d]{4,4})
 ```
 
 Example - match the ctl number for a field:
 ```
-parseresponse: ctl(\d\d).ctl00.btnApplyOnline|regex|
+parseresponse: ctl(\d\d).ctl00.btnApplyOnline
 ```
 
 Example - match a GUID in format "91072487-558b-43be-a981-00b6516ef59c"
 ```
-parseresponse: [a-z0-9\-]{36,36}?|regex|
+parseresponse: [a-z0-9\-]{36,36}?
 ```
 
 Example - match third occurrence
 ```
 varREGEX_THAT_GRABS_FIRST_MATCH:    "Result_Id":(\d*)
-parseresponseSEARCH_RESULT_ID_3:    (?:.*?{REGEX_THAT_GRABS_FIRST_MATCH}){3,3}|regex|
+parseresponseSEARCH_RESULT_ID_3:    (?:.*?{REGEX_THAT_GRABS_FIRST_MATCH}){3,3}
 ```
 Note here that the {3,3} is much safer than {3} since WebImblaze might have a variable called {3} that takes preference
 
@@ -2227,8 +2227,8 @@ repeat: 3
 
 step:                   Get row {COUNTER} from test data file
 shell:                  perl -ne "print" examples/data.txt
-parseresponseNAME:      NAME{COUNTER}:([\w ]+)|regex|
-parseresponseTITLE:     TITLE{COUNTER}:([\w ]+)|regex|
+parseresponseNAME:      NAME{COUNTER}:([\w ]+)
+parseresponseTITLE:     TITLE{COUNTER}:([\w ]+)
 
 step:                   Row {COUNTER}: {NAME}, {TITLE}
 ```
@@ -2999,7 +2999,7 @@ Here is an example using Windows (Linux syntax is likely slightly different).
 ```
 step:  Remove commas from {NUMBER}
 shell: echo NUMBER[{NUMBER}] | perl -pe "s/,//g;"
-parseresponseNUMBER_WITHOUT_COMMAS: NUMBER\[(\d+)]|regex|
+parseresponseNUMBER_WITHOUT_COMMAS: NUMBER\[(\d+)]
 ```
 
 <br />
