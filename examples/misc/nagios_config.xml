@@ -1,0 +1,8 @@
+<root>
+    <teststepfile>examples/misc/nagios_example_app.test</teststepfile>
+    <globalretry>50</globalretry> <!-- Global limit for the number of retries for a test run --> 
+    <globaljumpbacks>15</globaljumpbacks> <!-- Global limit for the number of checkpoint invocations for a test run -->
+    <reporttype>nagios</reporttype>
+    <timeout>200</timeout>
+    <globaltimeout>300</globaltimeout>
+</root> 

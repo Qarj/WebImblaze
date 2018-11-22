@@ -75,7 +75,7 @@ my (%parsedresult, %varvar, %late_sub);
 our $opt_proxy;
 our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_host, $opt_selenium_port, $opt_publish_full, $opt_headless, $opt_resume_session, $opt_keep_session);
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
-my ($opt_ignoreretry, $opt_no_colour, $opt_no_output, $opt_verbose, $opt_help);
+my ($opt_ignoreretry, $opt_no_colour, $output_enabled, $opt_verbose, $opt_help);
 
 my ($parser_index_, $step_id_, $repeat_, $useragent_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
 
@@ -581,7 +581,7 @@ sub output_assertions {
 #------------------------------------------------------------------
 sub execute_test_step {
 
-    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
+    print {*STDOUT} $results_stdout if $output_enabled; 
     undef $results_stdout;
 
     if ($case{method}) {
@@ -763,7 +763,7 @@ sub output_test_step_results {
     undef $results_html;
 
     write_stdout_dashes_separator();
-    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
+    print {*STDOUT} $results_stdout if $output_enabled;
     undef $results_stdout;
 
     return;
@@ -888,9 +888,11 @@ sub write_initial_html {  # write opening tags for results file
 sub _whack {
     my ($_goner) = @_;
 
-    if (-e $_goner ) {
-        unlink $_goner or die "Could not unlink $_goner\n";
-    }
+    if ($output_enabled) {
+	    if (-e $_goner ) {
+	        unlink $_goner or die "Could not unlink $_goner\n";
+	    }
+	}
 
     return;
 }
@@ -926,7 +928,7 @@ sub write_initial_xml {  # write opening tags for results file
 sub _write_xml {
     my ($_xml) = @_;
 
-    write_file("$opt_publish_full".$results_xml_file_name, {append => 1}, $_xml); # $_xml is a ref, but we do not need to dereference with slurp
+    write_file("$opt_publish_full".$results_xml_file_name, {append => 1}, $_xml) if $output_enabled; # $_xml is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -935,7 +937,7 @@ sub _write_xml {
 sub _write_html {
     my ($_html) = @_;
 
-    write_file($opt_publish_full.'Results.html', {append => 1}, $_html); # $_html is a ref, but we do not need to dereference with slurp
+    write_file($opt_publish_full.'Results.html', {append => 1}, $_html) if $output_enabled; # $_html is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -1032,7 +1034,7 @@ sub write_final_stdout {  # write summary and closing text for STDOUT
         $results_stdout .= qq|Results at: $opt_publish_full|.'Results.html'.qq|\n|;
     }
 
-    if (not $opt_no_output) { print {*STDOUT} $results_stdout; }
+    print {*STDOUT} $results_stdout if $output_enabled;
     undef $results_stdout;
 
     # plugin modes
@@ -2380,10 +2382,11 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
         }
     }
 
+    $output_enabled = not($output_enabled);
     if (defined $config->{reporttype}) {
         $report_type = lc $config->{reporttype};
         if ($report_type ne 'standard') {
-            $opt_no_output = 'true'; # no standard output for plugins like nagios
+            $output_enabled = undef; # no standard output for plugins like nagios
         }
     }
 
@@ -3268,7 +3271,7 @@ sub _write_http_log {
     $_log_separator .= "  *************************************************************  \n";
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
-    if (not $opt_no_output) {
+    if ($output_enabled) {
         open my $_HTTPLOGFILE, '>>' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
         print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", $_response_headers."\n", ${ $_response_content_ref }, $_log_separator;
         close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
@@ -3584,7 +3587,7 @@ sub _delayed_write_step_html {
             # substitute in the next test step number now that we know what it is
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
-        if (not $opt_no_output) {
+        if ($output_enabled) {
             open my $_FILE, '>:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
             print {$_FILE} decode('utf-8', $delayed_html);
             close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
@@ -3690,7 +3693,7 @@ sub get_command_line_options {
         'x|proxy=s'   => \$opt_proxy,
         'i|ignoreretry'   => \$opt_ignoreretry,
         'z|no-colour'   => \$opt_no_colour,
-        'n|no-output'   => \$opt_no_output,
+        'n|no-output'   => \$output_enabled,
         'e|verbose'   => \$opt_verbose,
         'u|publish-to=s' => \$opt_publish_full,
         'd|driver=s'   => \$opt_driver, # Selenium plugin options start here

@@ -1,0 +1,4 @@
+step:           Get example.com
+url:            http://example.com
+verifypositive: Example Domain
+
