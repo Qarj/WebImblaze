@@ -84,10 +84,6 @@ sudo cpan JSON::PP
 sudo cpan HTTP::Cookies
 ```
 
-### Docker
-
-https://github.com/Qarj/webinject-docker
-
 ### Create your first WebImblaze test
 
 Note that these instructions are written with Windows in mind. 
@@ -243,7 +239,12 @@ A Chrome screenshot can be searched to see if it contains a specific (or approxi
 
 Find the project here: https://github.com/Qarj/search-image
 
-## Test File Format
+## Nagios
+Use WebImblaze as a plugin to Nagios to monitor critical business workflows. 
+
+https://webimblaze.blogspot.com/2018/11/webimblaze-as-nagios-plugin-for.html
+
+# Test File Format
 WebImblaze uses a simplified test file format over WebInject.
 
 The WebInject xml style format is misleading since it isn't true xml - for simplicity
@@ -276,3 +277,6 @@ Note - you'll need to manually move over comments, plus the repeat parameter. It
 
 [Syntax highlighting for WebImblaze .test files](https://github.com/Qarj/WebImblaze-Framework/blob/master/MANUAL.md#syntax-highlighting-webimblaze-test-case-files)
 
+# Docker
+
+https://github.com/Qarj/webinject-docker
