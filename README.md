@@ -279,4 +279,4 @@ Note - you'll need to manually move over comments, plus the repeat parameter. It
 
 # Docker
 
-https://github.com/Qarj/webinject-docker
+https://hub.docker.com/r/qarj/webimblaze/
