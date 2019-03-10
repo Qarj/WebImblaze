@@ -1455,6 +1455,59 @@ assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break incr
 #   repeat parm needs to be renamed eventually for WebImblaze
 #   utf-8 mess - needs major attention (alternatives to slurp, maybe Path::Tiny which support utf8 slurp)
 
+before_test();
+$main::case{verifypositive1} = 'brown fox';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Pass simple verifypositive');
+
+before_test();
+$main::case{verifypositive1} = 'blue fox';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Failed Positive Verification 1', '_verify_verifypositive : Fail simple verifypositive');
+
+before_test();
+$main::case{verifypositive} = 'blue fox';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Failed Positive Verification 0', '_verify_verifypositive : Fail simple verifypositive for special case position 0');
+
+before_test();
+$main::case{verifypositiveA} = 'blue fox|||This message shown on failure';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Failed Positive Verification A', '_verify_verifypositive : Special message - 1');
+assert_stdout_contains('This message shown on failure', '_verify_verifypositive : Special message - 2');
+
+before_test();
+$main::case{verifypositive9999} = 'blue fox|||This message shown on failure|||Known issue';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Skipped Positive Verification 9999 - Known issue', '_verify_verifypositive : Known Issue');
+
+before_test();
+$main::case{verifypositive2} = 'fail fast!blue fox';
+$main::case{retry} = '5';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+set_number_of_times_to_retry_this_test_step();
+_verify_verifypositive();
+assert_stdout_contains("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 1');
+
+before_test();
+$main::case{verifypositive2} = 'fail fast!brown fox';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Fail fast - 2');
+
+before_test();
+$main::case{verifypositive2} = 'fail fast!blue fox';
+$main::case{retry} = '0';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+set_number_of_times_to_retry_this_test_step();
+_verify_verifypositive();
+assert_stdout_does_not_contain ("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 3');
+
 #
 # GLOBAL HELPER SUBS
 #
@@ -1474,7 +1527,8 @@ sub assert_stdout_contains {
     if ($main::results_stdout =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
-        is($main::results_stdout, $_must_contain, $_test_description);
+        is('see between dashes below', $_must_contain, $_test_description);
+        show_stdout();
     }
 }
 
@@ -1492,9 +1546,16 @@ sub clear_stdout {
     $main::results_stdout = '';
 }
 
+sub show_stdout {
+    print "\n----------\n".$main::results_stdout."----------\n";
+}
+
 sub before_test {
     $main::EXTRA_VERBOSE = 1;
 
+    $main::case{retry} = '0';
+    set_number_of_times_to_retry_this_test_step();
+    undef %main::case;
     $main::case{url} = 'http://example.com/jobs/search.cgi?query=Test%Automation&Location=London';
     $main::results_stdout = '';
     $main::response = '';

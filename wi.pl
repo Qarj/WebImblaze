@@ -194,7 +194,7 @@ foreach (1 .. $repeat) {
         # populate variables with values from steps file, do substitutions, and revert converted values back
         substitute_variables();
 
-        $retry = get_number_of_times_to_retry_this_test_step(); # 0 means do not retry this step
+        set_number_of_times_to_retry_this_test_step();
 
         do # retry loop
         {
@@ -439,7 +439,11 @@ sub substitute_variables {
 }
 
 #------------------------------------------------------------------
-sub get_number_of_times_to_retry_this_test_step {
+sub set_number_of_times_to_retry_this_test_step { # 0 means do not retry this step
+    $retry = _get_number_of_times_to_retry_this_test_step();
+}
+
+sub _get_number_of_times_to_retry_this_test_step {
 
     if (defined $case{autoretry}) { $auto_retry = $case{autoretry}; } # we need to capture this value if it is present since it applies to subsequent steps
 
