@@ -1462,6 +1462,12 @@ _verify_verifypositive();
 assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Pass simple verifypositive');
 
 before_test();
+$main::case{verifypositive1} = 'brown [f-x]{3} jumps';
+$main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Pass regex verifypositive');
+
+before_test();
 $main::case{verifypositive1} = 'blue fox';
 $main::response = HTTP::Response->parse('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
