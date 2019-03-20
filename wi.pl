@@ -107,7 +107,7 @@ my $assertion_skips_message = q{}; # support tagging an assertion as disabled wi
 my (@hrefs, @srcs, @bg_images, %asset); # keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my ($getallsrcs, $getallhrefs);
 my ($hrefs_version, $srcs_version) = 0;
-my $session_started; # only start up http sesion if http is being used
+my $session_started; # only start up http session if http is being used
 my $shared_folder_full;
 
 our (undef, $this_script_folder_full, undef) = fileparse(File::Spec->rel2abs( __FILE__ ));
@@ -132,7 +132,7 @@ my $results_xml_file_name;
 my $repeat;
 
 my $hostname = `hostname`; # hostname should work on Linux and Windows
-$hostname =~ s/[\r\n]//g; # strip out any rogue linefeeds or carriage returns
+$hostname =~ s/[\r\n]//g; # strip out any rogue line feeds or carriage returns
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 
@@ -235,7 +235,7 @@ foreach (1 .. $repeat) {
             getresources(); # get JavaScript, CSS, GIF, JPG and other resources
 
             parseresponse();  # grab string from response to send later
-            set_eval_variables(); # perform simple true / false statement evaluations - or math expressions
+            set_eval_variables(); # perform simple true / false statement evaluations - or maths expressions
             write_shared_variable();
 
             httplog();
@@ -325,7 +325,7 @@ sub get_testnum_display {
 
     # use $testnum_display for all testnum output, add 10,000 for repeat loop
     my $_testnum_display = $_testnum + ($_counter*10_000) - 10_000;
-    $_testnum_display = sprintf '%.2f', $_testnum_display; # maximun of 2 decimal places
+    $_testnum_display = sprintf '%.2f', $_testnum_display; # maximum of 2 decimal places
     $_testnum_display =~ s/0+\z// if $_testnum_display =~ /[.]/; # remove trailing non significant zeros
     if (not ($_testnum_display =~ s/[.]\z//) ) { # remove decimal point if nothing after
         $_testnum_display = sprintf '%.2f', $_testnum_display; # put back the non significant zero if we have a decimal point
@@ -432,7 +432,7 @@ sub substitute_variables {
         $case{$_case_attribute} = $lean_test_steps->{case}->{$testnum}->{$_case_attribute};
         convert_back_xml($case{$_case_attribute});
         convert_back_var_variables($case{$_case_attribute});
-        $case_save{$_case_attribute} = $case{$_case_attribute}; # if we have to retry, some parms need to be resubbed
+        $case_save{$_case_attribute} = $case{$_case_attribute}; # if we have to retry, some parms need to be re-subbed
     }
 
     return;
@@ -504,7 +504,7 @@ sub set_retry_to_zero_if_global_limit_exceeded {
 
     if ($config->{globalretry}) {
         if ($globalretries >= $config->{globalretry}) {
-            $retry = 0; # globalretries value exceeded - not retrying any more this run
+            $retry = 0; # global retries value exceeded - not retrying any more this run
         }
     }
 
@@ -640,10 +640,10 @@ sub pass_fail_or_retry {
                 $nagios_return_message = "Test step number $testnum failed"; # only return the first test step failure to nagios
             }
         }
-        $case_failed = 1; # for abort paramter logic
+        $case_failed = 1; # for abort parameter logic
         $case_failed_count++;
     }
-    elsif (($is_failure > 0) && ($retry > 0)) { # output message if we will retry the test step
+    elsif ($is_failure && retry_available()) { # output message if we will retry the test step
         $results_html .= qq|<b><span class="pass">RETRYING... $retry to go</span></b><br />\n|;
         $results_stdout .= qq|RETRYING... $retry to go \n|;
         $results_xml .= qq|            <success>false</success>\n|;
@@ -784,8 +784,8 @@ sub write_stdout_dashes_separator {
 #------------------------------------------------------------------
 sub increment_run_count {
 
-    if ( ( ($is_failure > 0) && ($retry > 0) ) ||
-         ( ($is_failure > 0) && jump_back_to_checkpoint_available() && !$fast_fail_invoked )
+    if ( ( $is_failure && retry_available() ) ||
+         ( $is_failure && jump_back_to_checkpoint_available() && !$fast_fail_invoked )
        ) {
         # do not count this in run count if we are retrying
     }
@@ -812,7 +812,7 @@ sub update_latency_statistics {
 #------------------------------------------------------------------
 sub restart_browser {
 
-    if ($case{restartbrowseronfail} && ($is_failure > 0)) { # restart the Selenium browser session and also the WebImblaze session
+    if ($case{restartbrowseronfail} && $is_failure) { # restart the Selenium browser session and also the WebImblaze session
         $results_stdout .= qq|RESTARTING SESSION DUE TO FAIL ... \n|;
         start_session();
     }
@@ -836,7 +836,7 @@ sub sleep_before_next_step {
     {
         if ($case{sleep})
         {
-            if ( (($is_failure > 0) && ($retry < 1)) || (($is_failure > 0) && ($jumpbacks > ($config->{globaljumpbacks}-1))) )
+            if ( ($is_failure && ($retry < 1)) || ($is_failure && ($jumpbacks > ($config->{globaljumpbacks}-1))) )
             {
                 # do not sleep if the test step failed and we have run out of retries or jumpbacks
             }
@@ -1375,9 +1375,9 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
     if ($_post_type eq 'normalpost') {
         @_post_fields = split /\&/, $_post_body ; # & is separator
     } else {
-        # assumes that double quotes on the outside, internally single qoutes
+        # assumes that double quotes on the outside, internally single quotes
         # enhancements needed
-        #   1. subsitute out blank space first between the field separators
+        #   1. substitute out blank space first between the field separators
         @_post_fields = split /\'\,/, $_post_body ; #separate the fields
     }
 
@@ -1388,7 +1388,7 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
         }
     }
 
-    # work out pagename to use for matching purposes
+    # work out page name to use for matching purposes
     $_post_url = _url_path($_post_url);
 
     my $_page_id = _find_page_in_cache($_post_url.q{$});
@@ -1437,9 +1437,9 @@ sub auto_sub { # auto substitution - {DATA} and {NAME}
     if ($_post_type eq 'normalpost') {
         $_post_body = join q{&}, @_post_fields;
     } else {
-        # assumes that double quotes on the outside, internally single qoutes
+        # assumes that double quotes on the outside, internally single quotes
         # enhancements needed
-        #   1. subsitute out blank space first between the field separators
+        #   1. substitute out blank space first between the field separators
         $_post_body = join q{',}, @_post_fields; #'
     }
     $results_stdout .= qq|\n\n POSTBODY is $_post_body \n| if $EXTRA_VERBOSE;
@@ -1456,7 +1456,7 @@ sub _remove_dot_letter_from_field_name_if_present {
     # does the field name end in .x or .y e.g. btnSubmit.x? The .x bit won't be in the saved page
     if ( $_post_field =~ m{[.]$_dot_letter[=']} ) { #' does it end in .x or .y?
         $results_stdout .= qq| DOT$_dot_letter found in $_post_field \n| if $EXTRA_VERBOSE;
-        $_post_field =~ s{[.]$_dot_letter}{}; # remove first occurence only - so value not affected
+        $_post_field =~ s{[.]$_dot_letter}{}; # remove first occurrence only - so value not affected
         return 1, $_post_field;
     }
 
@@ -1844,12 +1844,12 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
     }
     else { # verify http response code is in the 100-399 range
         if (not $case{ignorehttpresponsecode}) {
-            if (($response->as_string() =~ /HTTP\/1.([01]) ([123])/i) || $case{ignorehttpresponsecode}) {  #verify existance of string in response - unless we are ignore error codes
+            if (($response->as_string() =~ /HTTP\/1.([01]) ([123])/i) || $case{ignorehttpresponsecode}) {  #verify existence of string in response - unless we are ignore error codes
                 $results_html .= qq|<span class="pass">Passed HTTP Response Code Verification</span><br />\n|;
                 $results_xml .= qq|            <verifyresponsecode-success>true</verifyresponsecode-success>\n|;
                 $results_xml .= qq|            <verifyresponsecode-message>Passed HTTP Response Code Verification</verifyresponsecode-message>\n|;
                 $results_stdout .= qq|Passed HTTP Response Code Verification \n|;
-                # succesful response codes: 100-399
+                # successful response codes: 100-399
                 $passed_count++;
                 $retry_passed_count++;
             }
@@ -1882,7 +1882,7 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
         $results_xml .= qq|            <assertionskips-message>$assertion_skips_message</assertionskips-message>\n|;
     }
 
-    if (($case{commandonerror}) && ($is_failure > 0)) { # if an assertion failed, run a command - even if we retry
+    if ($case{commandonerror} && $is_failure) { # if an assertion failed, run a command - even if we retry
         run_special_command('commandonerror');
     }
 
@@ -2028,7 +2028,7 @@ sub _verify_verifypositive {
                     $retry_failed_count++;
                     $is_failure++;
                     if ($_fail_fast) {
-                        if ($retry > 0) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
+                        if (retry_available()) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
                         $retry=0; # we won't retry if a fail fast was invoked
                         $fast_fail_invoked = 'true';
                     }
@@ -2074,7 +2074,7 @@ sub _verify_verifynegative {
                     $retry_failed_count++;
                     $is_failure++;
                     if ($_fail_fast) {
-                        if ($retry > 0) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
+                        if (retry_available()) { $results_stdout .= "==> Won't retry - a fail fast was invoked \n"; }
                         $retry=0; # we won't retry if a fail fast was invoked
                         $fast_fail_invoked = 'true';
                     }
@@ -2346,7 +2346,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
 
     elsif (($#ARGV + 1) == 1) {  # one command line arg was passed
         # use test filename passed on command line (config.xml is only used for other options)
-        $current_steps_file = slash_me($ARGV[0]);  # first commandline argument is the test file
+        $current_steps_file = slash_me($ARGV[0]);  # first command line argument is the test file
     }
 
     if ($config->{httpauth}) {
@@ -2953,7 +2953,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
         ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86_400));
     }
 
-    # perform arbirtary user defined config substituions - done first to allow for double substitution e.g. {:8080}
+    # perform arbitrary user defined config substitutions - done first to allow for double substitution e.g. {:8080}
     my ($_value, $_KEY);
     foreach my $_key (keys %{ $config->{userdefined} } ) {
         $_value = $config->{userdefined}{$_key};
@@ -3673,7 +3673,7 @@ sub start_session {     # creates the WebImblaze user agent
         $config->{useragent} = $useragent_;
     }
 
-    if ($config->{useragent}) { # http useragent that will show up in webserver logs
+    if ($config->{useragent}) { # http useragent that will show up in web server logs
         $useragent->agent($config->{useragent});
     }
 
