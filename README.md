@@ -82,7 +82,14 @@ sudo yum install perl-GD
 sudo yum install perl-XML-Simple
 sudo cpan JSON::PP
 sudo cpan HTTP::Cookies
+sudo yum install perl-Crypt-SSLeay
+sudo yum install perl-LWP-Protocol-https
+sudo yum groupinstall "Development Tools"
+sudo yum install openssl-devel
 ```
+
+You can see if SSL is installed correctly with the command `perl -MNet::SSL -e1` - if it returns no output then all
+is ok and there is no need to install `LWP::Protocol::https` using cpan.
 
 ### Create your first WebImblaze test
 
