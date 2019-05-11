@@ -4,14 +4,14 @@
 =--
 
 step:                   Get Home page
-url:                    http://postb.in/
+url:                    https://postb.in/
 assertcount:            Four|||1
 
 step:                   Get Home page
-url:                    http://postb.in/
+url:                    https://postb.in/
 assertcount:            Four|||2
 
 step:                   Get Home page
-url:                    http://postb.in/
+url:                    https://postb.in/
 assertcount:            Four|||2|||The word Four should appear 2 times in the html source
 
