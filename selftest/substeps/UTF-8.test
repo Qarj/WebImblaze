@@ -1,0 +1,3 @@
+step:           Käsekreiner
+shell:          type \git\WebImblaze\selftest\substeps\UTF-8.test
+verifypositive: Käsekreiner
