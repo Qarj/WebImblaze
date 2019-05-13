@@ -1646,9 +1646,10 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
     my $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new($_verb,"$case{url}");
-    $request->content_type("$case{posttype}");
-    $request->content(encode('utf8', "$_substituted_postbody"));
-    print("$_substituted_postbody\n");
+    $request->content_type("$case{posttype}; charset=UTF-8");
+#    $request->content(encode('utf8', "$_substituted_postbody"));
+    $request->add_content_utf8($_substituted_postbody);
+    #print("$_substituted_postbody\n");
 
     do_http_request();
 
@@ -1743,6 +1744,12 @@ sub shell {  # send shell command and read response
 #    print "$_combined_response\n";
 #    $response->content(encode('utf8', $_combined_response)); # pretend the response is a http response - inject it into the object
     $resp_content = $_combined_response;
+
+    if ($case{readfile}) {
+        my $_readfile = read_file($case{readfile}, { binmode => ':encoding(UTF-8)'});
+        $resp_content =~ s{$}{<readfile> $case{readfile} </readfile>\n$_readfile\n\n\n};
+    }
+
     $latency = _get_latency_since($_start_timer);
 
     return;
@@ -1824,8 +1831,8 @@ sub decode_quoted_printable {
     require MIME::QuotedPrint;
 
 	if ($case{decodequotedprintable}) {
-		 my $_decoded = MIME::QuotedPrint::decode_qp(uncoded()); # decode the response output
-		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded)); # inject it back into the response
+		 $resp_content = MIME::QuotedPrint::decode_qp($resp_content); # decode the response output
+#		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded)); # inject it back into the response
 	}
 
     return;
@@ -1939,7 +1946,7 @@ sub _verify_autoassertion {
             else {
                 my $_results_xml = qq|            <$_config_attribute>\n|;
                 $_results_xml .= qq|                <assert>$_verifyparms[0]</assert>\n|;
-                if (utf8coded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $_results_xml .= qq|                <success>true</success>\n|;
                     $passed_count++;
                     $retry_passed_count++;
@@ -1989,10 +1996,10 @@ sub _verify_smartassertion {
             }
 
             # note the return statement in the previous condition, this code is executed if the assertion is not being skipped
-            if (utf8coded() =~ m/$_verifyparms[0]/si) {  # pre-condition for smart assertion - first regex must pass
+            if (uncoded() =~ m/$_verifyparms[0]/si) {  # pre-condition for smart assertion - first regex must pass
                 $results_xml .= "            <$_config_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
-                if (utf8coded() =~ m/$_verifyparms[1]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[1]/si) {  # verify existence of string in response
                     $results_xml .= qq|                <success>true</success>\n|;
                     $passed_count++;
                     $retry_passed_count++;
@@ -2092,7 +2099,7 @@ sub _verify_verifynegative {
             else {
                 $results_xml .= "            <$_case_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
-                if (utf8coded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $results_html .= qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($_verifyparms[1]) {
@@ -2171,7 +2178,7 @@ sub _verify_assertcount {
             if (!$_verify_number) {$_verify_number = '0';} # in case of verifypositive, need to treat as 0
             my @_verify_count_parms = split /[|][|][|]/, $case{$_case_attribute} ;
             my $_count = 0;
-            my $_temp_string=utf8coded(); # need to put in a temporary variable otherwise it gets stuck in infinite loop
+            my $_temp_string=uncoded(); # need to put in a temporary variable otherwise it gets stuck in infinite loop
 
             while ($_temp_string =~ m/$_verify_count_parms[0]/ig) { $_count++;} # count how many times string is found
 
@@ -2221,8 +2228,7 @@ sub _verify_assertcount {
 #------------------------------------------------------------------
 sub parseresponse {  # parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
 
-    my ($_response_to_parse, @_parse_args);
-    my ($_left_boundary, $_right_boundary, $_escape);
+    my (@_parse_args, $_left_boundary, $_right_boundary, $_escape);
 
     foreach my $_case_attribute ( sort keys %case ) {
 
@@ -2235,14 +2241,12 @@ sub parseresponse {  # parse values from responses for use in future request (fo
 
             $parsedresult{$_case_attribute} = q{}; # clear out any old value first
 
-            $_response_to_parse = utf8coded();
-
             if ($_right_boundary eq 'regex') { # custom regex feature
-                if ($_response_to_parse =~ m/$_left_boundary/s) {
+                if (uncoded() =~ m/$_left_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             } else {
-                if ($_response_to_parse =~ m/$_left_boundary(.*?)$_right_boundary/s) {
+                if (uncoded() =~ m/$_left_boundary(.*?)$_right_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             }
@@ -3269,7 +3273,10 @@ sub httplog {  # write requests and responses to http.txt file
         }
     }
 
-    my $_request_headers = $request->as_string;
+#    my $_request_headers = $request->as_string;
+    my $_request_headers = decode('utf8', $request->as_string);
+#    my $_request_headers = decode('utf8', $request->content);
+ #   my $_request_headers = $request->decoded_content;
 
     my $_request_content_length = length $request->content;
     if ($_request_content_length) {

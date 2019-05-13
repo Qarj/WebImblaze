@@ -1,17 +1,17 @@
 step:                   Create a Bin
 postbody:(:             ()               
-url:                    http://postb.in/api/bin
+url:                    https://postb.in/api/bin
 parseresponseBIN_ID:    binId":"([^"]+)|regex|
 
 step:                   Look at my bin {BIN_ID}
-url:                    http://postb.in/b/{BIN_ID}
+url:                    https://postb.in/b/{BIN_ID}
 verifypositive:         No requests received yet
 logastext:              true
 formatxml:              true
 
 step:                   POST something in my bin
-url:                    http://postb.in/{BIN_ID}
-addheader:              Content-type: application/json
+url:                    https://postb.in/{BIN_ID}
+posttype:               application/json
 postbody:///:           ///
 {
 "postcodes" : ["OX49 5NU"]
@@ -19,7 +19,7 @@ postbody:///:           ///
 ///
 
 step:                   PUT something in my bin
-url:                    http://postb.in/{BIN_ID}/important/record/1
+url:                    https://postb.in/{BIN_ID}/important/record/1
 method:                 put
 addheader:              API_Key: 1234_ABCD|Content-type: application/json
 postbody:///:           ///
@@ -29,7 +29,7 @@ postbody:///:           ///
 ///
 
 step:                   Take another look at my bin
-url:                    http://postb.in/b/{BIN_ID}
+url:                    https://postb.in/b/{BIN_ID}
 verifypositive1:        OX49 5NU
 verifypositive2:        Käsekreiner
 verifypositive3:        important/record
@@ -38,5 +38,5 @@ formatxml:              true
 
 step:                   DELETE my bin
 method:                 delete
-url:                    http://postb.in/api/bin/{BIN_ID}
+url:                    https://postb.in/api/bin/{BIN_ID}
 
