@@ -16,11 +16,8 @@ $VERSION = '1.0.2';
 
 #use Win32::Console;
 #Win32::Console::OutputCP(65001);
-use utf8::all;
-# binmode(STDOUT, ":unix:encoding(utf8):crlf");
-#binmode(STDOUT, ":utf8");
-
-#use open qw( :encoding(UTF-8) :std );
+#use utf8::all;
+binmode(STDOUT, ":unix:encoding(utf8):crlf");
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -62,7 +59,7 @@ my $rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used
 local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
 
-our ($request, $response);
+our ($request, $response, $resp_headers, $resp_content);
 my $useragent;
 
 our ($latency, $verification_latency, $screenshot_latency);
@@ -333,11 +330,13 @@ sub display_request_response {
 }
 
 sub uncoded {
-    return $response->status_line."\n".$response->headers_as_string."\n".$response->decoded_content;
+#    return $response->status_line."\n".$response->headers_as_string."\n".$response->decoded_content;
+    return $response->status_line."\n".$resp_headers."\n".$resp_content;
 }
 
 sub utf8coded {
-    return $response->status_line."\n".$response->headers_as_string."\n".Encode::encode_utf8($response->decoded_content);
+#    return $response->status_line."\n".$response->headers_as_string."\n".Encode::encode_utf8($response->decoded_content);
+    return $response->status_line."\n".encode('utf8', $resp_headers)."\n".encode('utf8', $resp_content);
 }
 
 
@@ -605,6 +604,11 @@ sub output_assertions {
 
 #------------------------------------------------------------------
 sub execute_test_step {
+    _execute_test_step();
+    $resp_headers = $response->headers_as_string;
+}
+
+sub _execute_test_step {
 
     print {*STDOUT} $results_stdout if $output_enabled; 
     undef $results_stdout;
@@ -1639,12 +1643,12 @@ sub httpsend {  # send request based on specified encoding and method (verb)
 sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or application/json HTTP request and read response
     my ($_verb) = @_;
 
-    my $_substituted_postbody; # auto substitution
-    $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
+    my $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}");
-    $request->content("$_substituted_postbody");
+    $request->content(encode('utf8', "$_substituted_postbody"));
+    print("$_substituted_postbody\n");
 
     do_http_request();
 
@@ -1666,6 +1670,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
     foreach (@_xml_body) {
         convert_back_xml($_);
         convert_back_var_variables($_);
+        $_ = encode('utf8', $_);
     }
 
     $request = HTTP::Request->new($_verb, "$case{url}");
@@ -1681,15 +1686,14 @@ sub httpsend_xml { # send text/xml HTTP request and read response
 sub httpsend_form_data {  # send multipart/form-data HTTP request and read response
     my ($_verb) = @_;
 
-    my $_substituted_postbody; # auto substitution
-    $_substituted_postbody = auto_sub("$case{postbody}", 'multipost', "$case{url}");
+    my $_substituted_postbody = encode('utf8', auto_sub("$case{postbody}", 'multipost', "$case{url}"));
 
     my %_my_content_;
     eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval,RequireCheckingReturnValueOfEval)
     if ($_verb eq 'POST') {
         $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
-        $request = PUT "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
+        $request = PUT  "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } else {
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
@@ -1710,14 +1714,13 @@ sub do_http_request {
 
     $cookie_jar->extract_cookies($response);
 
+    $resp_content = $response->decoded_content; 
+
     return;
 }
 
 #------------------------------------------------------------------
 sub shell {  # send shell command and read response
-
-
-            use utf8::all;   
 
     my $_combined_response=q{};
     $request = HTTP::Request->new('GET','CMD');
@@ -1725,26 +1728,21 @@ sub shell {  # send shell command and read response
 
     for (qw/shell shell1 shell2 shell3 shell4 shell5 shell6 shell7 shell8 shell9 shell10 shell11 shell12 shell13 shell14 shell15 shell16 shell17 shell18 shell19 shell20/) {
         if ($case{$_}) {
-
             my $_command = $case{$_};
             $_command =~ s/\%20/ /g; # turn %20 to spaces for display in log purposes
             _shell_adjust(\$_command);
             my $_command_win = $_command;
-   #         my $_command_win = encode('cp850', decode('utf8', $_command));
-   #         my $_command_win = encode('cp850', $_command);
-#            print "abcd\n";
-#            print "$_command_win\n";
             my $_command_response = (`$_command_win 2>\&1`); # run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-   #         $_command_response = encode('utf8', decode('cp850', $_command_response));
-   #         $_command_response = encode('utf8', $_command_response);
-#            print "$_command_response\n";
+            $_command_response = decode('utf8', $_command_response);
             $_combined_response =~ s{$}{<$_> $_command </$_>\n$_command_response\n\n\n}; # include it in the response
-#            print "$_combined_response\n";
         }
     }
+#    $response = HTTP::Response->parse('HTTP/1.1 100 OK'); # pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse('HTTP/1.1 100 OK'); # pretend this is an HTTP response - 100 means continue
-#    $response->content(Encode::decode('cp850',$_combined_response)); # pretend the response is a http response - inject it into the object
-    $response->content($_combined_response); # pretend the response is a http response - inject it into the object
+#    $_combined_response = decode('utf8', $_combined_response);
+#    print "$_combined_response\n";
+#    $response->content(encode('utf8', $_combined_response)); # pretend the response is a http response - inject it into the object
+    $resp_content = $_combined_response;
     $latency = _get_latency_since($_start_timer);
 
     return;

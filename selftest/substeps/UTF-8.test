@@ -1,3 +1,34 @@
-step:           Käsekreiner
-shell:          type \git\WebImblaze\selftest\substeps\UTF-8.test
-verifypositive: Käsekreiner
+step:                   Check Shell - Käsekreiner
+shell:                  perl -ne 'print' selftest/testdata/UTF-8.xml
+verifypositive1:        Käsekreiner
+
+step:                   POST UTF-8 application/x-www-form-urlencoded
+url:                    http://httpbin.org/post
+postbody:               sausage=Käsekreiner
+verifypositive1:        "sausage": "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   GET UTF-8 - Greek anthem first line
+url:                    http://httpbin.org/encoding/utf8
+verifypositive1:        Σὲ γνωρίζω ἀπὸ τὴν κόψη 
+
+step:                   POST UTF-8 application/json
+url:                    http://httpbin.org/post
+posttype:               application/json
+postbody:               { "Foods": ["Käsekreiner", "Steak"] }
+verifypositive1:        "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   POST UTF-8 multipart/form-data
+url:                    http://httpbin.org/post
+posttype:               multipart/form-data
+postbody:                ( food1 => 'Käsekreiner', food2 => 'Steak' )
+verifypositive1:        "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   POST UTF-8 text/xml
+url:                    http://httpbin.org/post
+posttype:               text/xml
+postbody:               file=>selftest\testdata\UTF-8.xml
+verifypositive1:        <name>K\\u00e4sekreiner</name>
+verifynegative1:        K\\ufffdsekreiner
