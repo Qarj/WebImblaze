@@ -1738,16 +1738,16 @@ sub shell {  # send shell command and read response
             $_combined_response =~ s{$}{<$_> $_command </$_>\n$_command_response\n\n\n}; # include it in the response
         }
     }
-#    $response = HTTP::Response->parse('HTTP/1.1 100 OK'); # pretend this is an HTTP response - 100 means continue
     $response = HTTP::Response->parse('HTTP/1.1 100 OK'); # pretend this is an HTTP response - 100 means continue
-#    $_combined_response = decode('utf8', $_combined_response);
-#    print "$_combined_response\n";
-#    $response->content(encode('utf8', $_combined_response)); # pretend the response is a http response - inject it into the object
     $resp_content = $_combined_response;
 
     if ($case{readfile}) {
         my $_readfile = read_file($case{readfile}, { binmode => ':encoding(UTF-8)'});
         $resp_content =~ s{$}{<readfile> $case{readfile} </readfile>\n$_readfile\n\n\n};
+    }
+
+    if ($case{echo}) {
+        $resp_content =~ s{$}{<echo>$case{echo}</echo\n};
     }
 
     $latency = _get_latency_since($_start_timer);

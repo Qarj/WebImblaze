@@ -10,12 +10,14 @@
 	<name>Beef Caserole</name>
 	<cuisine>British</cuisine>
 	<preptime>95</preptime>
+	<cost>£15.95<cost>
 </search>
 <search>
 	<seq>3</seq>
 	<name>Käsekreiner</name>
 	<cuisine>German</cuisine>
 	<preptime>15</preptime>
+	<cost>€3</cost>
 </search>
 <search>
 	<seq>4</seq>
