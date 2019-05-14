@@ -22,6 +22,15 @@ step:                   Check var
 echo:                   {VAR}
 verifypositive:         Käse - €30\.25, Cheese £25\.20
 
+step:                   Decode JSON - dumpjson
+readfile:               selftest/testdata/JSON_string_escaped.json
+verifypositive1:        "Double Quotes"
+verifypositive2:        \\Backslashes\\
+verifypositive3:        ウェブ インブレイズ
+dumpjson:               true
+#       "sentence2": "ウェブ インブレイズ"
+
+
 step:                   POST UTF-8 application/x-www-form-urlencoded
 url:                    http://httpbin.org/post
 postbody:               sausage=Käsekreiner

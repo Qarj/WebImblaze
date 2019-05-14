@@ -38,6 +38,7 @@ use Storable 'dclone';
 use File::Basename;
 use File::Spec;
 use File::Slurp;
+use String::Escape qw(unbackslash);
 use LWP;
 use LWP::Protocol::http;
 use HTTP::Request::Common;
@@ -1747,7 +1748,7 @@ sub shell {  # send shell command and read response
     }
 
     if ($case{echo}) {
-        $resp_content =~ s{$}{<echo>$case{echo}</echo\n};
+        $resp_content =~ s{$}{<echo>$case{echo}</echo>\n};
     }
 
     $latency = _get_latency_since($_start_timer);
@@ -1804,10 +1805,14 @@ sub run_special_command {  # for commandonerror and commandonfail
 
 #------------------------------------------------------------------
 sub dump_json {
-
+    # https://www.perlmonks.org/?node_id=759457
+#    https://stackoverflow.com/questions/50489062/how-to-display-readable-utf-8-strings-with-datadumper
 	if ($case{dumpjson}) {
-		 my $_dumped = eval { Data::Dumper::Dumper(decode_json $response->decoded_content) };
-		 $response->content($_dumped); # overwrite the existing content with the json dumped content
+        $resp_content =~ s/[^{]*(\{.*}).*/$1/s; # json must start and end with braces, throw away extra content
+        $resp_content = eval { Data::Dumper::Dumper(decode_json $resp_content) };
+        #print $resp_content;
+        print $resp_content;
+#        print "Here: \x{30a6}\x{30a7}\x{30d6} \x{30a4}\x{30f3}\x{30d6}\x{30ec}\x{30a4}\x{30ba}";
 	}
 
     return;
@@ -3273,10 +3278,7 @@ sub httplog {  # write requests and responses to http.txt file
         }
     }
 
-#    my $_request_headers = $request->as_string;
     my $_request_headers = decode('utf8', $request->as_string);
-#    my $_request_headers = decode('utf8', $request->content);
- #   my $_request_headers = $request->decoded_content;
 
     my $_request_content_length = length $request->content;
     if ($_request_content_length) {
@@ -3327,7 +3329,7 @@ sub _write_http_log {
 sub _write_step_html { ## no critic(ProhibitManyArgs)
     my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_delete, $_response_base) = @_;
 
-    my $_response_content = $response->decoded_content;
+    my $_response_content = $resp_content;
 
     _format_xml(\$_response_content);
 
