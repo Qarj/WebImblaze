@@ -1580,6 +1580,8 @@ sub before_test {
 #
 
 $main::response = '';
+$main::resp_content = '';
+$main::resp_headers = '';
 $main::EXTRA_VERBOSE = 0;
 $main::results_stdout = '';
 $main::unit_test_steps = '';
