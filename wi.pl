@@ -53,9 +53,13 @@ use Encode qw(encode decode);
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
 use lib q{.}; # current folder is not @INC from Perl 5.26
-use Data::Dumper;
 use Math::Random::ISAAC;
 my $rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used in seed
+
+use Data::Dumper;
+no warnings 'redefine';
+local *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+local $Data::Dumper::Useperl = 1; # Use the Pure Perl implementation of Dumper
 
 local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
@@ -1805,14 +1809,9 @@ sub run_special_command {  # for commandonerror and commandonfail
 
 #------------------------------------------------------------------
 sub dump_json {
-    # https://www.perlmonks.org/?node_id=759457
-#    https://stackoverflow.com/questions/50489062/how-to-display-readable-utf-8-strings-with-datadumper
 	if ($case{dumpjson}) {
         $resp_content =~ s/[^{]*(\{.*}).*/$1/s; # json must start and end with braces, throw away extra content
         $resp_content = eval { Data::Dumper::Dumper(decode_json $resp_content) };
-        #print $resp_content;
-        print $resp_content;
-#        print "Here: \x{30a6}\x{30a7}\x{30d6} \x{30a4}\x{30f3}\x{30d6}\x{30ec}\x{30a4}\x{30ba}";
 	}
 
     return;
