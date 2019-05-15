@@ -38,7 +38,6 @@ use Storable 'dclone';
 use File::Basename;
 use File::Spec;
 use File::Slurp;
-use String::Escape qw(unbackslash);
 use LWP;
 use LWP::Protocol::http;
 use HTTP::Request::Common;
