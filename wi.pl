@@ -334,16 +334,9 @@ sub display_request_response {
     return;
 }
 
-sub uncoded {
-#    return $response->status_line."\n".$response->headers_as_string."\n".$response->decoded_content;
+sub uncoded { # UTF-8 and gzip encoding removed response
     return $response->status_line."\n".$resp_headers."\n".$resp_content;
 }
-
-sub utf8coded {
-#    return $response->status_line."\n".$response->headers_as_string."\n".Encode::encode_utf8($response->decoded_content);
-    return $response->status_line."\n".encode('utf8', $resp_headers)."\n".encode('utf8', $resp_content);
-}
-
 
 sub get_testnum_display {
     my ($_testnum, $_counter) = @_;
@@ -935,7 +928,7 @@ sub _whack {
 sub write_initial_xml {  # write opening tags for results file
 
     # put a reference to the stylesheet in the results file
-    my $_results_xml = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n";
+    my $_results_xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
     $_results_xml .= '<?xml-stylesheet type="text/xsl" href="/content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
@@ -1792,17 +1785,13 @@ sub run_special_command {  # for commandonerror and commandonfail
 
     my ($_command_parameter) = @_;
 
-    my $_combined_response = uncoded(); # take the existing test response
-
     if ($case{$_command_parameter}) {
         my $_cmd = $case{$_command_parameter};
         $_cmd =~ s/\%20/ /g; # turn %20 to spaces for display in log purposes
         _shell_adjust(\$_cmd);
         my $_cmdresp = (`$_cmd 2>\&1`); # run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-        $_combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; # include it in the response
+        $resp_content =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; # include it in the response
     }
-
-    $response = HTTP::Response->parse(Encode::encode_utf8($_combined_response)); # put the test response along with the command on error response back in the response
 
     return;
 }
@@ -1821,9 +1810,8 @@ sub dump_json {
 sub decode_smtp {
 
 	if ($case{decodesmtp}) {
-		 my $_decoded = uncoded();
-		 $_decoded =~ s/(^|\v)[.][.]/$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
-		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded));
+	    $resp_content =~ s/(^|\v)[.][.]/$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
+	    $resp_content =~ s/(^|\v)[.]([^\v]+)/$1$2/g;
 	}
 
     return;
@@ -1835,8 +1823,7 @@ sub decode_quoted_printable {
     require MIME::QuotedPrint;
 
 	if ($case{decodequotedprintable}) {
-		 $resp_content = MIME::QuotedPrint::decode_qp($resp_content); # decode the response output
-#		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded)); # inject it back into the response
+		 $resp_content = decode('utf8', MIME::QuotedPrint::decode_qp($resp_content)); # decode the response output
 	}
 
     return;
@@ -3293,11 +3280,13 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
-    my $_response_content_ref = $response->content_ref( );
-    my $_response_headers = $response->headers_as_string;
+#    my $_response_content_ref = $response->content_ref( );
+#    my $_response_headers = $response->headers_as_string;
+    my $_response_content_ref = '';
+    my $_response_headers = '';
 
-    _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
-    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base);
+    _write_http_log($_step_info, $_request_headers, $_core_info);
+    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_base);
 
     $previous_test_step = $testnum_display.$jumpbacks_print.$retries_print;
 
@@ -3306,7 +3295,7 @@ sub httplog {  # write requests and responses to http.txt file
 
 #------------------------------------------------------------------
 sub _write_http_log {
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_delete) = @_;
+    my ($_step_info, $_request_headers, $_core_info) = @_;
 
     my $_log_separator = "\n";
     $_log_separator .= "      *****************************************************      \n";
@@ -3318,7 +3307,7 @@ sub _write_http_log {
     $_log_separator .= "      *****************************************************      \n\n";
     if ($output_enabled) {
         open my $_HTTPLOGFILE, '>>:encoding(UTF-8)' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
-        print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", uncoded(), $_log_separator;
+        print {$_HTTPLOGFILE} $_step_info, $_request_headers, "\n", uncoded(), $_log_separator;
         close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
     }
     return;
@@ -3326,7 +3315,7 @@ sub _write_http_log {
 
 #------------------------------------------------------------------
 sub _write_step_html { ## no critic(ProhibitManyArgs)
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_delete, $_response_base) = @_;
+    my ($_step_info, $_request_headers, $_core_info, $_response_base) = @_;
 
     my $_response_content = $resp_content;
 

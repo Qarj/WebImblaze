@@ -4,6 +4,23 @@ shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substep
 verifypositive:         Test Steps Failed: 0
 verifynegative:         uninitialized value
 
+step:                   Check http log (http.txt)
+readfile:               selftest/output/{FEATURE}subhttp.txt
+verifypositive:         ウェブ インブレイズ
+
+step:                   Check step html (70.html)
+readfile:               selftest/output/{FEATURE}sub70.html
+verifypositive:         ウェブ インブレイズ
+
+step:                   Check Results.html
+readfile:               selftest/output/{FEATURE}subResults.html
+verifypositive:         ウェブ インブレイズ
+
+step:                   Check results.xml
+readfile:               selftest/output/{FEATURE}subresults.xml
+verifypositive1:        encoding="UTF-8"
+verifypositive2:        ウェブ インブレイズ
+
 step:                   {FEATURE}-1
 shell:                  .\wi.pl -o selftest\output\{FEATURE}-1sub selftest\substeps\{FEATURE}-1.test
 verifypositive:         Test Steps Failed: 1

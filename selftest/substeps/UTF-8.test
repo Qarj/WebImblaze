@@ -28,8 +28,19 @@ verifypositive1:        "Double Quotes"
 verifypositive2:        \\Backslashes\\
 verifypositive3:        ウェブ インブレイズ
 dumpjson:               true
-#       "sentence2": "ウェブ インブレイズ"
 
+step:                   Decode SMTP - decodesmtp
+readfile:               selftest/testdata/smtp_encoded.txt
+verifypositive1:        \vLine 1
+verifynegative1:        \v.Line 1
+verifynegative2:        \.\.
+decodesmtp:             true
+
+step:                   Decode Quoted Printable - decodequotedprintable
+readfile:               selftest/testdata/quotedprintable.txt
+verifypositive1:        voilà bientôt qui te dégradent
+verifypositive2:        une âme vulgaire
+decodequotedprintable:  true
 
 step:                   POST UTF-8 application/x-www-form-urlencoded
 url:                    http://httpbin.org/post
