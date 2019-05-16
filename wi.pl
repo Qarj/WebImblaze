@@ -6,18 +6,12 @@
 # -*- coding: utf-8 -*-
 # perl
 
-use utf8;
 use v5.16;
 use strict;
 use warnings qw( FATAL utf8 );
 use vars qw/ $VERSION /;
 
 $VERSION = '1.0.2';
-
-#use Win32::Console;
-#Win32::Console::OutputCP(65001);
-#use utf8::all;
-binmode(STDOUT, ":unix:encoding(utf8):crlf");
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -34,6 +28,7 @@ binmode(STDOUT, ":unix:encoding(utf8):crlf");
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
+use utf8;
 use Storable 'dclone';
 use File::Basename;
 use File::Spec;
@@ -147,7 +142,13 @@ my $repeat;
 my $hostname = `hostname`; # hostname should work on Linux and Windows
 $hostname =~ s/[\r\n]//g; # strip out any rogue line feeds or carriage returns
 
+binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
+
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
+use if $^O eq 'MSWin32', 'Win32::API';
+#use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
+my $SetConsoleOutputCP= new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
+$SetConsoleOutputCP->Call(65001) if $is_windows;
 
 return 1 unless $0 eq __FILE__; # script exits at this point for unit tests
 get_command_line_options();
@@ -2505,7 +2506,7 @@ sub _parse_steps {
 
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = $_files_to_include->{$_include_integer_step_num};
-        my $_include_file_content = read_file( slash_me($_include_file_name,  { binmode => ':encoding(UTF-8)' } ) );
+        my $_include_file_content = read_file( slash_me($_include_file_name),  { binmode => ':encoding(UTF-8)' } );
         new_parser( \ $_include_file_content );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
@@ -3279,8 +3280,6 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
-#    my $_response_content_ref = $response->content_ref( );
-#    my $_response_headers = $response->headers_as_string;
     my $_response_content_ref = '';
     my $_response_headers = '';
 
@@ -3305,7 +3304,7 @@ sub _write_http_log {
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
     if ($output_enabled) {
-        open my $_HTTPLOGFILE, '>>:encoding(UTF-8)' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
+        open my $_HTTPLOGFILE, '>>:raw:encoding(UTF-8)' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
         print {$_HTTPLOGFILE} $_step_info, $_request_headers, "\n", uncoded(), $_log_separator;
         close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
     }
@@ -3622,7 +3621,7 @@ sub _delayed_write_step_html {
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         if ($output_enabled) {
-            open my $_FILE, '>:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
+            open my $_FILE, '>:raw:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
 #            print {$_FILE} decode('utf-8', $delayed_html);
             print {$_FILE} $delayed_html;
             close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";

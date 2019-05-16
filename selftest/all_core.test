@@ -304,3 +304,9 @@ shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.
 verifypositive:         TEST STEP PASSED
 verifynegative:         TEST STEP FAILED
 
+step:                   {FEATURE}
+varFEATURE:             UTF-8
+shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
+

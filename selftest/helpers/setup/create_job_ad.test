@@ -4,8 +4,8 @@ shell:                  echo enter job description and salary details
 verifypositive:         description and salary
 
 step:                   Submit new job ad details
-shell1:                 echo posting job with location RömerStraße 8
-shell2:                 echo job id 12345 created ok
+shell:                  echo job id 12345 created ok
+echo:                    Posting job with location RömerStraße 8
 verifypositive:         created ok
 parseresponseJOB_ID:    job id (\d*) created|regex|
 
