@@ -146,7 +146,6 @@ binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 use if $^O eq 'MSWin32', 'Win32::API';
-#use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 my $SetConsoleOutputCP= new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
 $SetConsoleOutputCP->Call(65001) if $is_windows;
 
@@ -1645,9 +1644,7 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
 
     $request = HTTP::Request->new($_verb,"$case{url}");
     $request->content_type("$case{posttype}; charset=UTF-8");
-#    $request->content(encode('utf8', "$_substituted_postbody"));
     $request->add_content_utf8($_substituted_postbody);
-    #print("$_substituted_postbody\n");
 
     do_http_request();
 
@@ -3622,7 +3619,6 @@ sub _delayed_write_step_html {
         }
         if ($output_enabled) {
             open my $_FILE, '>:raw:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
-#            print {$_FILE} decode('utf-8', $delayed_html);
             print {$_FILE} $delayed_html;
             close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
         }
