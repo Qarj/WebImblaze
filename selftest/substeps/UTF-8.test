@@ -72,3 +72,5 @@ posttype:               text/xml
 postbody:               file=>selftest\testdata\UTF-8.xml
 verifypositive1:        <name>K\\u00e4sekreiner</name>
 verifynegative1:        K\\ufffdsekreiner
+
+include: selftest/helpers/setup/create_job_ad.test

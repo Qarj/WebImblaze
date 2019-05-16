@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.0.1
+# Manual for WebImblaze version 1.0.2
 
 ## Overview
 
@@ -97,7 +97,7 @@
 
 - [Additional Test Driver Parameters](#additional-test-driver-parameters)
 
-    - [shell shell1 ... shell20](#shell)
+    - [shell shell1 ... shell20 readfile echo](#shell)
 
     - [commandonfail](#commandonfail)
 
@@ -1382,6 +1382,8 @@ retry:              3
 
 Allows you to run a OS level command using the backtick operator in Perl.
 
+Cannot be used in conjunction with `selenium` or `url` in a single test step.
+
 ```
 shell:                  cat test_data_file.txt
 shell1:                 ls -asl
@@ -1391,6 +1393,23 @@ parseresponsePASSWORD:  PASSWORD5="|"|
 
 In addition to shell, you can specify `shell1`, `shell2` ... up to `shell20`.
 The shell commands are run in numerical order starting from `shell`.
+
+Two special case parameters are also available.
+
+##### readfile
+```
+step:                   Read a file and treat it as the response
+readfile:               path/to/file.txt
+```
+
+##### echo
+```
+step:                   Echo a string and treat it as the response
+echo:                   Var1 - {VAR}, Var2 - {VAR}
+```
+
+These two parameters can be used in conjunction with `shell` and each other, but 
+not `selenium` or `url`.
 
 <br />
 

@@ -7,6 +7,10 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.0.2 - May 16, 2019
+* UTF-8 is now the default and Unicode is well supported
+* gzip content is now decoded
+
 ### Version 1.0.1 - Nov 10, 2018
 * fixed substitution modifier regression
 

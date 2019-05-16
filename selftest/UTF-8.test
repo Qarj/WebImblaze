@@ -6,7 +6,9 @@ verifynegative:         uninitialized value
 
 step:                   Check http log (http.txt)
 readfile:               selftest/output/{FEATURE}subhttp.txt
-verifypositive:         ウェブ インブレイズ
+verifypositive1:        ウェブ インブレイズ
+verifypositive2:        RömerStraße 8|||RömerStraße 8 is from the include file
+verifypositive3:        sausage=Käsekreiner\vRequest Content Length|||prove postbody is UTF-8
 
 step:                   Check step html (70.html)
 readfile:               selftest/output/{FEATURE}sub70.html
