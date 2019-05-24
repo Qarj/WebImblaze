@@ -8,10 +8,9 @@
 
 use v5.16;
 use strict;
-use warnings qw( FATAL utf8 );
 use vars qw/ $VERSION /;
 
-$VERSION = '1.0.2';
+$VERSION = '1.1.0';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1070,15 +1069,19 @@ sub write_final_stdout {  # write summary and closing text for STDOUT
         my %_exit_codes;
         if ($report_type eq 'nagios') { # report results in Nagios format 
             # predefined exit codes for Nagios
-            %_exit_codes  = ('UNKNOWN' ,-1,
-                            'OK'      , 0,
-                            'WARNING' , 1,
-                            'CRITICAL', 2,);
+            %_exit_codes  = ('OK'      , 0,
+                             'WARNING' , 1,
+                             'CRITICAL', 2,
+                             'UNKNOWN' , 3,);
 
-	    my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
+            my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
+            if ($execution_aborted eq 'true') {
+                print "WebImblaze UNKNOWN - aborted - $nagios_return_message |time=$total_response;$_end\n";
+                exit $_exit_codes{'UNKNOWN'};
+            }
             if ($case_failed_count > 0) {
-	        print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
+                print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {

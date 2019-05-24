@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.0.2
+# Manual for WebImblaze version 1.1.0
 
 ## Overview
 
@@ -640,6 +640,13 @@ In the second example, no errormessage parameter was present, so the test step n
 reported.
 
 In both scenarios, if more than one test step fails, only the first test step that failed is reported to Nagios.
+
+##### UNKNOWN
+If a test step has an abort parameter, and this is invoked, then WebImblaze will exit with the UNKNOWN exit code
+
+```
+WebImblaze UNKNOWN - aborted - Test step number 10 failed |time=0.008;100;;0
+```
 
 ##### WARNING
 Another type of message to Nagios is a warning that the globaltimeout was exceeded.
