@@ -1,0 +1,76 @@
+step:                   Check Shell - Käsekreiner
+shell:                  perl -ne "print" selftest/testdata/UTF-8.xml
+verifypositive1:        Käsekreiner
+
+step:                   Check readfile - Käsekreiner
+readfile:               selftest/testdata/UTF-8.xml
+verifypositive1:        Käsekreiner
+
+step:                   parseresponse
+readfile:               selftest/testdata/UTF-8.xml
+parseresponse1:         Σὲ (.*?) κόψη
+
+step:                   Check parseresponse
+echo:                   {1}
+verifypositive:         γνωρίζω ἀπὸ τὴν
+
+step:                   var
+readfile:               selftest/testdata/UTF-8.xml
+varVAR:                 Käse - €30.25, Cheese £25.20
+
+step:                   Check var
+echo:                   {VAR}
+verifypositive:         Käse - €30\.25, Cheese £25\.20
+
+step:                   Decode JSON - dumpjson
+readfile:               selftest/testdata/JSON_string_escaped.json
+verifypositive1:        "Double Quotes"
+verifypositive2:        \\Backslashes\\
+verifypositive3:        ウェブ インブレイズ
+dumpjson:               true
+
+step:                   Decode SMTP - decodesmtp
+readfile:               selftest/testdata/smtp_encoded.txt
+verifypositive1:        \vLine 1
+verifynegative1:        \v.Line 1
+verifynegative2:        \.\.
+decodesmtp:             true
+
+step:                   Decode Quoted Printable - decodequotedprintable
+readfile:               selftest/testdata/quotedprintable.txt
+verifypositive1:        voilà bientôt qui te dégradent
+verifypositive2:        une âme vulgaire
+decodequotedprintable:  true
+
+step:                   POST UTF-8 application/x-www-form-urlencoded
+url:                    http://httpbin.org/post
+postbody:               sausage=Käsekreiner
+verifypositive1:        "sausage": "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   GET UTF-8 - Greek anthem first line
+url:                    http://httpbin.org/encoding/utf8
+verifypositive1:        Σὲ γνωρίζω ἀπὸ τὴν κόψη 
+
+step:                   POST UTF-8 application/json
+url:                    http://httpbin.org/post
+posttype:               application/json
+postbody:               { "Foods": ["Käsekreiner", "Steak"] }
+verifypositive1:        "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   POST UTF-8 multipart/form-data
+url:                    http://httpbin.org/post
+posttype:               multipart/form-data
+postbody:                ( food1 => 'Käsekreiner', food2 => 'Steak' )
+verifypositive1:        "K\\u00e4sekreiner"
+verifynegative1:        K\\ufffdsekreiner
+
+step:                   POST UTF-8 text/xml
+url:                    http://httpbin.org/post
+posttype:               text/xml
+postbody:               file=>selftest\testdata\UTF-8.xml
+verifypositive1:        <name>K\\u00e4sekreiner</name>
+verifynegative1:        K\\ufffdsekreiner
+
+include: selftest/helpers/setup/create_job_ad.test

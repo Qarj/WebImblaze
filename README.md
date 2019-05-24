@@ -1,9 +1,10 @@
-# WebImblaze 1.0.1
+# WebImblaze 1.1.0
+
+_UTF-8 is now well supported and the default, and gzip response content is now uncompressed automatically._
+
+_In Nagios plugin mode, WebImblaze will exit with code UNKNOWN if the test step has an `abort` parameter and it is invoked._
 
 **_This project is now very different to the original WebInject so it has been renamed to WebImblaze._**
-
-**_Support for .xml test files has been removed - use .test files instead._**
-**_Convert your .xml test files using the transmute.pl tool mentioned below._**
 
 WebImblaze is a free Perl based tool for automated testing of web applications and web services.
 

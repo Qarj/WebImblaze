@@ -1,23 +1,14 @@
-# -*- coding: utf-8 -*-
-# perl
-
-use utf8;
-use v5.16;
 use diagnostics;
-use warnings qw( FATAL utf8 );
+use warnings;
 use strict;
 use Test::More qw( no_plan );
 
-use open qw( :encoding(UTF-8) :std );
-
-# http://www.drdobbs.com/scripts-as-modules/184416165
+#http://www.drdobbs.com/scripts-as-modules/184416165
 do './wi.pl';
 
 #
 # GLOBAL TEST SETUP
 #
-
-# see stacktrace: perl -d:Confess wi.pl tests/simple.test
 
 before_test();
 
@@ -52,65 +43,64 @@ is(_url_path('https://example.com/search/form?terms=cheapest'), '/search/form', 
 #
 
 before_test();
-$main::response->content('A response without an action');
+$main::resp_content = ('A response without an action');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('ACTION none', 'save_page_when_method_post_and_has_action : ACTION none');
 
 before_test();
-$main::response->content('A response with an action after post - method="post" id="3" action="submit.aspx"');
+$main::resp_content = ('A response with an action after post - method="post" id="3" action="submit.aspx"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('ACTION submit.aspx', 'save_page_when_method_post_and_has_action : ACTION after method of post');
 
 before_test();
-$main::response->content('A response with an action before post - action="submit.aspx" id="3" method="post"');
+$main::resp_content = ('A response with an action before post - action="submit.aspx" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('ACTION submit.aspx', 'save_page_when_method_post_and_has_action : ACTION before method of post');
 
 before_test();
-$main::response->content('A response with a null action - action="" id="3" method="post"');
+$main::resp_content = ('A response with a null action - action="" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
 is(stdout_contains('ACTION IS NULL'), 1, 'save_page_when_method_post_and_has_action : ACTION IS NULL');
 assert_stdout_contains('SAVING /jobs/search.cgi', 'save_page_when_method_post_and_has_action : default action to page path');
 
 before_test();
-$main::response->content('A response with full url in action="https://example.com/home/query.cgi?keyword=test" method="post"');
+$main::resp_content = ('A response with full url in action="https://example.com/home/query.cgi?keyword=test" method="post"');
 save_page_when_method_post_and_has_action ();
 is(stdout_contains('ACTION https:'), 1, 'save_page_when_method_post_and_has_action : full url in action');
 assert_stdout_contains('SAVING /home/query.cgi', 'save_page_when_method_post_and_has_action : clean action to just url path');
 
 before_test();
-#$main::response->content('action="submit.aspx" id="3" method="post"');
-$main::response->content('action="submit.aspx" id="3" method="post"');
+$main::resp_content = ('action="submit.aspx" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('NO CACHED PAGES', 'save_page_when_method_post_and_has_action : NO CACHED PAGES');
 
 before_test();
-$main::response->content('action="submit.aspx" id="3" method="post"');
+$main::resp_content = ('action="submit.aspx" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('MATCH at position 0', 'save_page_when_method_post_and_has_action : MATCH at position 0');
 
 before_test();
-$main::response->content('action="submit.aspx" id="3" method="post"');
+$main::resp_content = ('action="submit.aspx" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
-$main::response->content('action="query.aspx" id="3" method="post"');
+$main::resp_content = ('action="query.aspx" id="3" method="post"');
 save_page_when_method_post_and_has_action ();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('MATCH at position 1', 'save_page_when_method_post_and_has_action : MATCH at position 1');
 
 before_test();
-$main::response->content('action="submit.aspx" method="post"');
+$main::resp_content = ('action="submit.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
-$main::response->content('action="query.aspx" method="post"');
+$main::resp_content = ('action="query.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
-$main::response->content('action="/register.cgi" method="post"');
+$main::resp_content = ('action="/register.cgi" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('NO MATCH on 0:submit.aspx', 'save_page_when_method_post_and_has_action : NO MATCH on 0:submit.aspx');
 assert_stdout_contains('NO MATCH on 1:query.aspx', 'save_page_when_method_post_and_has_action : NO MATCH on 1:query.aspx');
 assert_stdout_contains('NO MATCHES FOUND IN CACHE', 'save_page_when_method_post_and_has_action : NO MATCHES FOUND IN CACHE - different action');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('MATCH at position 2', 'save_page_when_method_post_and_has_action : MATCH at position 2');
-$main::response->content('action="/submit.aspx" method="post"');
+$main::resp_content = ('action="/submit.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('NO MATCHES FOUND IN CACHE', 'save_page_when_method_post_and_has_action : NO MATCHES FOUND IN CACHE - slightly different action');
 save_page_when_method_post_and_has_action ();
@@ -119,41 +109,41 @@ assert_stdout_contains('MATCH at position 3', 'save_page_when_method_post_and_ha
 
 
 before_test();
-$main::response->content('action="index_0" method="post"');
+$main::resp_content = ('action="index_0" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 0 is free', 'save_page_when_method_post_and_has_action : Index 0 is free');
 
-$main::response->content('action="index_1" method="post"');
+$main::resp_content = ('action="index_1" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 1 is free', 'save_page_when_method_post_and_has_action : Index 1 is free');
 
-$main::response->content('action="index_2" method="post"');
+$main::resp_content = ('action="index_2" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 2 is free', 'save_page_when_method_post_and_has_action : Index 2 is free');
 
-$main::response->content('action="index_3" method="post"');
+$main::resp_content = ('action="index_3" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 3 is free', 'save_page_when_method_post_and_has_action : Index 3 is free');
 
-$main::response->content('action="index_4" method="post"');
+$main::resp_content = ('action="index_4" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 4 is free', 'save_page_when_method_post_and_has_action : Index 4 is free');
 
-$main::response->content('action="index_5" method="post"');
+$main::resp_content = ('action="index_5" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Index 5 is free', 'save_page_when_method_post_and_has_action : Index 5 is free');
 
-$main::response->content('action="page_7" method="post"');
+$main::resp_content = ('action="page_7" method="post"');
 clear_stdout();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Overwriting - Oldest Page Index: 0', 'save_page_when_method_post_and_has_action : Overwrite oldest page in cache - index 0');
 
-$main::response->content('action="page_8" method="post"');
+$main::resp_content = ('action="page_8" method="post"');
 clear_stdout();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Overwriting - Oldest Page Index: 1', 'save_page_when_method_post_and_has_action : Overwrite oldest page in cache - index 1');
 
-$main::response->content('action="page_9" method="post"');
+$main::resp_content = ('action="page_9" method="post"');
 clear_stdout();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Overwriting - Oldest Page Index: 2', 'save_page_when_method_post_and_has_action : Overwrite oldest page in cache - index 2');
@@ -162,7 +152,7 @@ clear_stdout();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('MATCH at position 2', 'save_page_when_method_post_and_has_action : MATCH at position 2 - save overwritten page again');
 
-$main::response->content('action="page_8" method="post"');
+$main::resp_content = ('action="page_8" method="post"');
 clear_stdout();
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('MATCH at position 1', 'save_page_when_method_post_and_has_action : MATCH at position 1 - save older overwritten page again');
@@ -176,7 +166,7 @@ assert_stdout_contains('Cache 5:index_5', 'save_page_when_method_post_and_has_ac
 
 
 before_test();
-$main::response->content('action="submit.aspx" method="post"');
+$main::resp_content = ('action="submit.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 assert_stdout_contains('Saved [\d\.]+:submit.aspx', 'save_page_when_method_post_and_has_action : confirmation page is saved');
 
@@ -224,14 +214,14 @@ assert_stdout_contains('REMOVE PATH', 'auto_sub : remove path');
 assert_stdout_contains('DESPERATE MODE - NO ANCHOR', 'auto_sub : desperate mode - no anchor');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post"');
+$main::resp_content = ('action="/search.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('MATCH at position 0', 'auto_sub : exact action match - assert 1');
 assert_stdout_does_not_contain('PAGE NAME ONLY', 'auto_sub : exact action match - assert 2');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post"');
+$main::resp_content = ('action="/search.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/premium/search.aspx');
 assert_stdout_contains('MATCH at position 0', 'auto_sub : page name only - assert 2');
@@ -239,14 +229,14 @@ assert_stdout_contains('REMOVE PATH', 'auto_sub : page name only - assert 2');
 assert_stdout_does_not_contain('DESPERATE MODE', 'auto_sub : page name only - assert 3');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post"');
+$main::resp_content = ('action="/search.aspx" method="post"');
 save_page_when_method_post_and_has_action ();
 auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com/premium/search');
 assert_stdout_contains('MATCH at position 0', 'auto_sub : desperate mode - assert 2');
 assert_stdout_contains('DESPERATE MODE', 'auto_sub : desperate mode - assert 2');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
+$main::resp_content = ('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
 save_page_when_method_post_and_has_action ();
 auto_sub('a={DATA}&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('ID MATCH 0', 'auto_sub : ID MATCH');
@@ -257,14 +247,14 @@ assert_stdout_contains('SUBBED FIELD is a=bee%20bee', 'auto_sub : normalpost {DA
 assert_stdout_contains('a=bee%20bee', 'auto_sub : normalpost {DATA} - field 1 - assert 4');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
 save_page_when_method_post_and_has_action ();
 auto_sub('a=b&c={DATA}&e={DATA}', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('c=dee', 'auto_sub : normalpost {DATA} - field 2');
 assert_stdout_contains('e=eff', 'auto_sub : normalpost {DATA} - field 3');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
+$main::resp_content = ('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
 save_page_when_method_post_and_has_action ();
 auto_sub("(  'a' => '{DATA}', 'c' => 'd', 'e' => 'f' )", 'multipost', 'http://example.com/search.aspx');
 assert_stdout_contains('ID MATCH 0', 'auto_sub : ID MATCH');
@@ -275,14 +265,14 @@ assert_stdout_contains(q|POSTBODY is \(  'a' => 'bee bee', 'c' => 'd', 'e' => 'f
 assert_stdout_contains('Auto substitution latency was ', 'auto_sub : latency display');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="c" value="dee" /> <input name="e" value="eff" />');
 save_page_when_method_post_and_has_action ();
 auto_sub(q|(  'a' => 'b', 'c' => '{DATA}', 'e' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
 assert_stdout_contains(q|'c' => 'dee'|, 'auto_sub : multipost {DATA} - field 2');
 assert_stdout_contains(q|'e' => 'eff'|, 'auto_sub : multipost {DATA} - field 3');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+$main::resp_content = ('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
 save_page_when_method_post_and_has_action ();
 auto_sub('Row1_{NAME}_Field1=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('LHS of \{NAME}: \[Row1_] ', 'auto_sub : normal post - LHS of {NAME}');
@@ -291,32 +281,32 @@ assert_stdout_contains('NAME is Col1', 'auto_sub : normal post - NAME is');
 assert_stdout_contains('SUBBED NAME is Row1_Col1_Field1=b', 'auto_sub : normal post - SUBBED NAME is');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
 save_page_when_method_post_and_has_action ();
 auto_sub('Row1_Col1_Field1=b&Row2_{NAME}_Field2=d&Row3_{NAME}_Field3=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('NAME is Col2', 'auto_sub : normal post - NAME is - field 2');
 assert_stdout_contains('NAME is Col3', 'auto_sub : normal post - NAME is - field 2');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+$main::resp_content = ('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
 save_page_when_method_post_and_has_action ();
 auto_sub('{NAME}_Field1=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('LHS of \{NAME}: \[] ', 'auto_sub : LHS of {NAME} is null');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
+$main::resp_content = ('action="/search.aspx" method="post" name="Row1_Col1_Field1" type="hidden" value="b"');
 save_page_when_method_post_and_has_action ();
 auto_sub('Row1_Col1_{NAME}=b&c=d&e=f', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('RHS of \{NAME}: \[] ', 'auto_sub : RHS of {NAME} is null');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="Row2_Col2_Field2" value="d" /> <input name="Row3_Col3_Field3" value="f" /> ');
 save_page_when_method_post_and_has_action ();
 auto_sub(q|(  'a' => 'b', 'Row2_{NAME}_Field2' => '{DATA}', '{NAME}Field3' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
 assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'Row2_Col2_Field2' => 'd', 'Row3_Col3_Field3' => 'f' \)|, 'auto_sub : multi post - NAME and DATA');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="strange_xname" value="d" /> <input name="odd_yname" value="f" /> ');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="strange_xname" value="d" /> <input name="odd_yname" value="f" /> ');
 save_page_when_method_post_and_has_action ();
 auto_sub(q|(  'a' => 'b', '{NAME}_xname.x' => '{DATA}', '{NAME}_yname.y' => '{DATA}' )|, 'multipost', 'http://example.com/search.aspx');
 assert_stdout_contains('DOTx found in ', 'auto_sub : NAME - DOTX');
@@ -326,7 +316,7 @@ assert_stdout_contains(q|DOTy restored to  'odd_yname.y'|, 'auto_sub : NAME - DO
 assert_stdout_contains(q|POSTBODY is \(  'a' => 'b', 'strange_xname.x' => 'd', 'odd_yname.y' => 'f' \)|, 'auto_sub : DOTX and DOTY');
 
 before_test();
-$main::response->content('action="/search.aspx" method="post" <input name="odd_xname" value="default" /> <input name="odd_yname" value="default" /> ');
+$main::resp_content = ('action="/search.aspx" method="post" <input name="odd_xname" value="default" /> <input name="odd_yname" value="default" /> ');
 save_page_when_method_post_and_has_action ();
 auto_sub('a=b&{NAME}xname.x=d.xtra&{NAME}yname.y=f.ytra', 'normalpost', 'http://example.com/search.aspx');
 assert_stdout_contains('odd_xname\.x=d\.xtra', 'auto_sub : DOTX - ensure value not affected');
@@ -1467,59 +1457,59 @@ assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break incr
 
 before_test();
 $main::case{verifypositive1} = 'brown fox';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Pass simple verifypositive');
 
 before_test();
 $main::case{verifypositive1} = 'brown [f-x]{3} jumps';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Pass regex verifypositive');
 
 before_test();
 $main::case{verifypositive1} = 'blue fox';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Failed Positive Verification 1', '_verify_verifypositive : Fail simple verifypositive');
 
 before_test();
 $main::case{verifypositive} = 'blue fox';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Failed Positive Verification 0', '_verify_verifypositive : Fail simple verifypositive for special case position 0');
 
 before_test();
 $main::case{verifypositiveA} = 'blue fox|||This message shown on failure';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Failed Positive Verification A', '_verify_verifypositive : Special message - 1');
 assert_stdout_contains('This message shown on failure', '_verify_verifypositive : Special message - 2');
 
 before_test();
 $main::case{verifypositive9999} = 'blue fox|||This message shown on failure|||Known issue';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Skipped Positive Verification 9999 - Known issue', '_verify_verifypositive : Known Issue');
 
 before_test();
 $main::case{verifypositive2} = 'fail fast!blue fox';
 $main::case{retry} = '5';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 set_number_of_times_to_retry_this_test_step();
 _verify_verifypositive();
 assert_stdout_contains("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 1');
 
 before_test();
 $main::case{verifypositive2} = 'fail fast!brown fox';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 _verify_verifypositive();
 assert_stdout_contains('Passed Positive Verification', '_verify_verifypositive : Fail fast - 2');
 
 before_test();
 $main::case{verifypositive2} = 'fail fast!blue fox';
 $main::case{retry} = '0';
-$main::response->content('The quick brown fox jumps over the lazy dog');
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
 set_number_of_times_to_retry_this_test_step();
 _verify_verifypositive();
 assert_stdout_does_not_contain ("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 3');
@@ -1574,7 +1564,9 @@ sub before_test {
     undef %main::case;
     $main::case{url} = 'http://example.com/jobs/search.cgi?query=Test%Automation&Location=London';
     $main::results_stdout = '';
-    $main::response = HTTP::Response->parse(' ');
+    $main::response = HTTP::Response->parse('HTTP/1.1 200 OK');
+    $main::resp_content = '';
+    $main::resp_headers = '';
 
     undef @main::cached_pages;
     undef @main::cached_page_actions;
@@ -1588,6 +1580,8 @@ sub before_test {
 #
 
 $main::response = '';
+$main::resp_content = '';
+$main::resp_headers = '';
 $main::EXTRA_VERBOSE = 0;
 $main::results_stdout = '';
 $main::unit_test_steps = '';

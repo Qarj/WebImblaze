@@ -1,0 +1,29 @@
+step:                   {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
+verifypositive:         Test Steps Failed: 0
+verifynegative:         uninitialized value
+
+step:                   Check http log (http.txt)
+readfile:               selftest/output/{FEATURE}subhttp.txt
+verifypositive1:        ウェブ インブレイズ
+verifypositive2:        RömerStraße 8|||RömerStraße 8 is from the include file
+verifypositive3:        sausage=Käsekreiner\vRequest Content Length|||prove postbody is UTF-8
+
+step:                   Check step html (70.html)
+readfile:               selftest/output/{FEATURE}sub70.html
+verifypositive:         ウェブ インブレイズ
+
+step:                   Check Results.html
+readfile:               selftest/output/{FEATURE}subResults.html
+verifypositive:         ウェブ インブレイズ
+
+step:                   Check results.xml
+readfile:               selftest/output/{FEATURE}subresults.xml
+verifypositive1:        encoding="UTF-8"
+verifypositive2:        ウェブ インブレイズ
+
+step:                   {FEATURE}-1
+shell:                  .\wi.pl -o selftest\output\{FEATURE}-1sub selftest\substeps\{FEATURE}-1.test
+verifypositive:         Test Steps Failed: 1
+verifynegative:         uninitialized value

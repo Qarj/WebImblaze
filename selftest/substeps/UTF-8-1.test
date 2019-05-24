@@ -1,0 +1,3 @@
+step:                   GET UTF-8 - Greek anthem first line
+url:                    http://httpbin.org/encoding/utf8
+verifynegative1:        Σὲ γνωρίζω ἀπὸ τὴν κόψη 

@@ -1,0 +1,6 @@
+{
+    "sentences": {
+       "sentence1": "This is a JSON \r\nString Escaped\r\nFile.\r\n\r\nEscaped fields include:\r\n - \"Double Quotes\"\r\n - \\Backslashes\\\r\n -\ttab of course\r\n",
+       "sentence2": "\u30A6\u30A7\u30D6 \u30A4\u30F3\u30D6\u30EC\u30A4\u30BA"
+    }
+}

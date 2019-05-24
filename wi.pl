@@ -6,15 +6,11 @@
 # -*- coding: utf-8 -*-
 # perl
 
-use utf8;
 use v5.16;
 use strict;
-use warnings qw( FATAL utf8 );
 use vars qw/ $VERSION /;
 
-$VERSION = '1.0.2';
-
-#use open qw( :encoding(UTF-8) :std );
+$VERSION = '1.1.0';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -31,6 +27,7 @@ $VERSION = '1.0.2';
 #    merchantability or fitness for a particular purpose.  See the
 #    GNU General Public License for more details.
 
+use utf8;
 use Storable 'dclone';
 use File::Basename;
 use File::Spec;
@@ -49,14 +46,18 @@ use Encode qw(encode decode);
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
 use lib q{.}; # current folder is not @INC from Perl 5.26
-use Data::Dumper;
 use Math::Random::ISAAC;
 my $rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used in seed
+
+use Data::Dumper;
+no warnings 'redefine';
+local *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
+local $Data::Dumper::Useperl = 1; # Use the Pure Perl implementation of Dumper
 
 local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
 
-our ($request, $response);
+our ($request, $response, $resp_headers, $resp_content);
 my $useragent;
 
 our ($latency, $verification_latency, $screenshot_latency);
@@ -140,7 +141,12 @@ my $repeat;
 my $hostname = `hostname`; # hostname should work on Linux and Windows
 $hostname =~ s/[\r\n]//g; # strip out any rogue line feeds or carriage returns
 
+binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
+
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
+use if $^O eq 'MSWin32', 'Win32::API';
+my $SetConsoleOutputCP= new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
+$SetConsoleOutputCP->Call(65001) if $is_windows;
 
 return 1 unless $0 eq __FILE__; # script exits at this point for unit tests
 get_command_line_options();
@@ -326,14 +332,9 @@ sub display_request_response {
     return;
 }
 
-sub uncoded {
-    return $response->status_line."\n".$response->headers_as_string."\n".$response->decoded_content;
+sub uncoded { # UTF-8 and gzip encoding removed response
+    return $response->status_line."\n".$resp_headers."\n".$resp_content;
 }
-
-sub utf8coded {
-    return $response->status_line."\n".$response->headers_as_string."\n".Encode::encode_utf8($response->decoded_content);
-}
-
 
 sub get_testnum_display {
     my ($_testnum, $_counter) = @_;
@@ -599,6 +600,11 @@ sub output_assertions {
 
 #------------------------------------------------------------------
 sub execute_test_step {
+    _execute_test_step();
+    $resp_headers = $response->headers_as_string;
+}
+
+sub _execute_test_step {
 
     print {*STDOUT} $results_stdout if $output_enabled; 
     undef $results_stdout;
@@ -877,7 +883,7 @@ sub write_initial_html {  # write opening tags for results file
     $results_html .= qq|<html xmlns="http://www.w3.org/1999/xhtml">\n|;
     $results_html .= qq|<head>\n|;
     $results_html .= qq|    <title>WebImblaze Test Results</title>\n|;
-    $results_html .= qq|    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />\n|;
+    $results_html .= qq|    <meta charset="UTF-8" />\n|;
     $results_html .= qq|    <style type="text/css">\n|;
     $results_html .= qq|        body {\n|;
     $results_html .= qq|            background-color: #F5F5F5;\n|;
@@ -920,7 +926,7 @@ sub _whack {
 sub write_initial_xml {  # write opening tags for results file
 
     # put a reference to the stylesheet in the results file
-    my $_results_xml = '<?xml version="1.0" encoding="ISO-8859-1"?>'."\n";
+    my $_results_xml = '<?xml version="1.0" encoding="UTF-8"?>'."\n";
     $_results_xml .= '<?xml-stylesheet type="text/xsl" href="/content/Results.xsl"?>'."\n";
     $_results_xml .= "<results>\n\n";
     $results_xml_file_name = 'results.xml';
@@ -947,7 +953,7 @@ sub write_initial_xml {  # write opening tags for results file
 sub _write_xml {
     my ($_xml) = @_;
 
-    write_file("$opt_publish_full".$results_xml_file_name, {append => 1}, $_xml) if $output_enabled; # $_xml is a ref, but we do not need to dereference with slurp
+    write_file("$opt_publish_full".$results_xml_file_name, {append => 1, binmode => ':utf8'}, $_xml) if $output_enabled; # $_xml is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -956,7 +962,7 @@ sub _write_xml {
 sub _write_html {
     my ($_html) = @_;
 
-    write_file($opt_publish_full.'Results.html', {append => 1}, $_html) if $output_enabled; # $_html is a ref, but we do not need to dereference with slurp
+    write_file($opt_publish_full.'Results.html', {append => 1, binmode => ':utf8'}, $_html) if $output_enabled; # $_html is a ref, but we do not need to dereference with slurp
 
     return;
 }
@@ -1063,15 +1069,19 @@ sub write_final_stdout {  # write summary and closing text for STDOUT
         my %_exit_codes;
         if ($report_type eq 'nagios') { # report results in Nagios format 
             # predefined exit codes for Nagios
-            %_exit_codes  = ('UNKNOWN' ,-1,
-                            'OK'      , 0,
-                            'WARNING' , 1,
-                            'CRITICAL', 2,);
+            %_exit_codes  = ('OK'      , 0,
+                             'WARNING' , 1,
+                             'CRITICAL', 2,
+                             'UNKNOWN' , 3,);
 
-	    my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
+            my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
+            if ($execution_aborted eq 'true') {
+                print "WebImblaze UNKNOWN - aborted - $nagios_return_message |time=$total_response;$_end\n";
+                exit $_exit_codes{'UNKNOWN'};
+            }
             if ($case_failed_count > 0) {
-	        print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
+                print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
                 exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {
@@ -1633,12 +1643,11 @@ sub httpsend {  # send request based on specified encoding and method (verb)
 sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or application/json HTTP request and read response
     my ($_verb) = @_;
 
-    my $_substituted_postbody; # auto substitution
-    $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
+    my $_substituted_postbody = auto_sub("$case{postbody}", 'normalpost', "$case{url}");
 
     $request = HTTP::Request->new($_verb,"$case{url}");
-    $request->content_type("$case{posttype}");
-    $request->content("$_substituted_postbody");
+    $request->content_type("$case{posttype}; charset=UTF-8");
+    $request->add_content_utf8($_substituted_postbody);
 
     do_http_request();
 
@@ -1652,7 +1661,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
     # read the xml file specified in the teststep
     my @_xml_body;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
-        open my $_XML_BODY, '<', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";
+        open my $_XML_BODY, '<:encoding(UTF-8)', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";
         @_xml_body = <$_XML_BODY>;  # read the file into an array
         close $_XML_BODY or die "\nCould not close xml file to be posted\n\n";
     }
@@ -1660,6 +1669,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
     foreach (@_xml_body) {
         convert_back_xml($_);
         convert_back_var_variables($_);
+        $_ = encode('utf8', $_);
     }
 
     $request = HTTP::Request->new($_verb, "$case{url}");
@@ -1675,15 +1685,14 @@ sub httpsend_xml { # send text/xml HTTP request and read response
 sub httpsend_form_data {  # send multipart/form-data HTTP request and read response
     my ($_verb) = @_;
 
-    my $_substituted_postbody; # auto substitution
-    $_substituted_postbody = auto_sub("$case{postbody}", 'multipost', "$case{url}");
+    my $_substituted_postbody = encode('utf8', auto_sub("$case{postbody}", 'multipost', "$case{url}"));
 
     my %_my_content_;
     eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval,RequireCheckingReturnValueOfEval)
     if ($_verb eq 'POST') {
         $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
-        $request = PUT "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
+        $request = PUT  "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } else {
         die "HTTP METHOD of DELETE not supported for multipart/form-data \n";
     }
@@ -1704,6 +1713,8 @@ sub do_http_request {
 
     $cookie_jar->extract_cookies($response);
 
+    $resp_content = $response->decoded_content; 
+
     return;
 }
 
@@ -1719,12 +1730,24 @@ sub shell {  # send shell command and read response
             my $_command = $case{$_};
             $_command =~ s/\%20/ /g; # turn %20 to spaces for display in log purposes
             _shell_adjust(\$_command);
-            my $_command_response = (`$_command 2>\&1`); # run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+            my $_command_win = $_command;
+            my $_command_response = (`$_command_win 2>\&1`); # run the cmd through the backtick method - 2>\&1 redirects error output to standard output
+            $_command_response = decode('utf8', $_command_response);
             $_combined_response =~ s{$}{<$_> $_command </$_>\n$_command_response\n\n\n}; # include it in the response
         }
     }
     $response = HTTP::Response->parse('HTTP/1.1 100 OK'); # pretend this is an HTTP response - 100 means continue
-    $response->content(Encode::encode_utf8($_combined_response)); # pretend the response is a http response - inject it into the object
+    $resp_content = $_combined_response;
+
+    if ($case{readfile}) {
+        my $_readfile = read_file($case{readfile}, { binmode => ':encoding(UTF-8)'});
+        $resp_content =~ s{$}{<readfile> $case{readfile} </readfile>\n$_readfile\n\n\n};
+    }
+
+    if ($case{echo}) {
+        $resp_content =~ s{$}{<echo>$case{echo}</echo>\n};
+    }
+
     $latency = _get_latency_since($_start_timer);
 
     return;
@@ -1762,27 +1785,22 @@ sub run_special_command {  # for commandonerror and commandonfail
 
     my ($_command_parameter) = @_;
 
-    my $_combined_response = uncoded(); # take the existing test response
-
     if ($case{$_command_parameter}) {
         my $_cmd = $case{$_command_parameter};
         $_cmd =~ s/\%20/ /g; # turn %20 to spaces for display in log purposes
         _shell_adjust(\$_cmd);
         my $_cmdresp = (`$_cmd 2>\&1`); # run the cmd through the backtick method - 2>\&1 redirects error output to standard output
-        $_combined_response =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; # include it in the response
+        $resp_content =~ s{$}{<$_>$_cmd</$_>\n$_cmdresp\n\n\n}; # include it in the response
     }
-
-    $response = HTTP::Response->parse(Encode::encode_utf8($_combined_response)); # put the test response along with the command on error response back in the response
 
     return;
 }
 
 #------------------------------------------------------------------
 sub dump_json {
-
 	if ($case{dumpjson}) {
-		 my $_dumped = eval { Data::Dumper::Dumper(decode_json $response->decoded_content) };
-		 $response->content($_dumped); # overwrite the existing content with the json dumped content
+        $resp_content =~ s/[^{]*(\{.*}).*/$1/s; # json must start and end with braces, throw away extra content
+        $resp_content = eval { Data::Dumper::Dumper(decode_json $resp_content) };
 	}
 
     return;
@@ -1792,9 +1810,8 @@ sub dump_json {
 sub decode_smtp {
 
 	if ($case{decodesmtp}) {
-		 my $_decoded = uncoded();
-		 $_decoded =~ s/(^|\v)[.][.]/$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
-		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded));
+	    $resp_content =~ s/(^|\v)[.][.]/$1\./g; # http://tools.ietf.org/html/rfc5321#section-4.5.2
+	    $resp_content =~ s/(^|\v)[.]([^\v]+)/$1$2/g;
 	}
 
     return;
@@ -1806,8 +1823,7 @@ sub decode_quoted_printable {
     require MIME::QuotedPrint;
 
 	if ($case{decodequotedprintable}) {
-		 my $_decoded = MIME::QuotedPrint::decode_qp(uncoded()); # decode the response output
-		 $response = HTTP::Response->parse(Encode::encode_utf8($_decoded)); # inject it back into the response
+		 $resp_content = decode('utf8', MIME::QuotedPrint::decode_qp($resp_content)); # decode the response output
 	}
 
     return;
@@ -1921,7 +1937,7 @@ sub _verify_autoassertion {
             else {
                 my $_results_xml = qq|            <$_config_attribute>\n|;
                 $_results_xml .= qq|                <assert>$_verifyparms[0]</assert>\n|;
-                if (utf8coded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $_results_xml .= qq|                <success>true</success>\n|;
                     $passed_count++;
                     $retry_passed_count++;
@@ -1971,10 +1987,10 @@ sub _verify_smartassertion {
             }
 
             # note the return statement in the previous condition, this code is executed if the assertion is not being skipped
-            if (utf8coded() =~ m/$_verifyparms[0]/si) {  # pre-condition for smart assertion - first regex must pass
+            if (uncoded() =~ m/$_verifyparms[0]/si) {  # pre-condition for smart assertion - first regex must pass
                 $results_xml .= "            <$_config_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
-                if (utf8coded() =~ m/$_verifyparms[1]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[1]/si) {  # verify existence of string in response
                     $results_xml .= qq|                <success>true</success>\n|;
                     $passed_count++;
                     $retry_passed_count++;
@@ -2021,7 +2037,7 @@ sub _verify_verifypositive {
             else {
                 $results_xml .= "            <$_case_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
-                if (utf8coded()  =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
+                if (uncoded()  =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $results_html .= qq|<span class="pass">Passed Positive Verification</span><br />\n|;
                     $results_xml .= qq|                <success>true</success>\n|;
                     $results_stdout .= "Passed Positive Verification \n";
@@ -2074,7 +2090,7 @@ sub _verify_verifynegative {
             else {
                 $results_xml .= "            <$_case_attribute>\n";
                 $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."</assert>\n";
-                if (utf8coded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
+                if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $results_html .= qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($_verifyparms[1]) {
@@ -2153,7 +2169,7 @@ sub _verify_assertcount {
             if (!$_verify_number) {$_verify_number = '0';} # in case of verifypositive, need to treat as 0
             my @_verify_count_parms = split /[|][|][|]/, $case{$_case_attribute} ;
             my $_count = 0;
-            my $_temp_string=utf8coded(); # need to put in a temporary variable otherwise it gets stuck in infinite loop
+            my $_temp_string=uncoded(); # need to put in a temporary variable otherwise it gets stuck in infinite loop
 
             while ($_temp_string =~ m/$_verify_count_parms[0]/ig) { $_count++;} # count how many times string is found
 
@@ -2203,8 +2219,7 @@ sub _verify_assertcount {
 #------------------------------------------------------------------
 sub parseresponse {  # parse values from responses for use in future request (for session id's, dynamic URL rewriting, etc)
 
-    my ($_response_to_parse, @_parse_args);
-    my ($_left_boundary, $_right_boundary, $_escape);
+    my (@_parse_args, $_left_boundary, $_right_boundary, $_escape);
 
     foreach my $_case_attribute ( sort keys %case ) {
 
@@ -2217,14 +2232,12 @@ sub parseresponse {  # parse values from responses for use in future request (fo
 
             $parsedresult{$_case_attribute} = q{}; # clear out any old value first
 
-            $_response_to_parse = utf8coded();
-
             if ($_right_boundary eq 'regex') { # custom regex feature
-                if ($_response_to_parse =~ m/$_left_boundary/s) {
+                if (uncoded() =~ m/$_left_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             } else {
-                if ($_response_to_parse =~ m/$_left_boundary(.*?)$_right_boundary/s) {
+                if (uncoded() =~ m/$_left_boundary(.*?)$_right_boundary/s) {
                     $parsedresult{$_case_attribute} = $1;
                 }
             }
@@ -2260,7 +2273,7 @@ sub write_shared_variable {
         my ($_var_name, $_var_value) = split /[|]/, $case{writesharedvar};
         my ($_second, $_minute, $_hour, undef, undef, undef, undef, undef, undef, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
         my $_file_full = slash_me($shared_folder_full.q{/}.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
-        write_file ( $_file_full, $_var_value);
+        write_file ( $_file_full, {binmode => ':utf8'}, $_var_value);
         $results_stdout .= " Wrote $_file_full\n";
     }
 
@@ -2276,7 +2289,7 @@ sub read_shared_variable {
         my @_sorted_vars = sort { -M $a <=> -M $b } @_vars; # -C is created, -M for modified
 
         if ($_sorted_vars[0]) { # only the most recent variable value is relevant
-            $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0]);
+            $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0], { binmode => ':encoding(UTF-8)' });
             $results_stdout .= " Read  $_sorted_vars[0]\n";
         } else {
             $varvar{'var'.$case{readsharedvar}} = q{}; # set variable to null if it does not exist
@@ -2462,7 +2475,7 @@ sub read_test_steps_file {
         $_test_steps = $unit_test_steps;
         $current_steps_file = 'unit tests test';
     } else {
-        $_test_steps = read_file( $current_steps_file );
+        $_test_steps = read_file( $current_steps_file, { binmode => ':encoding(UTF-8)' } );
     }
 
     $lean_test_steps = _parse_steps( \ $_test_steps );
@@ -2493,7 +2506,7 @@ sub _parse_steps {
 
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = $_files_to_include->{$_include_integer_step_num};
-        my $_include_file_content = read_file( slash_me($_include_file_name) );
+        my $_include_file_content = read_file( slash_me($_include_file_name),  { binmode => ':encoding(UTF-8)' } );
         new_parser( \ $_include_file_content );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
@@ -3251,7 +3264,7 @@ sub httplog {  # write requests and responses to http.txt file
         }
     }
 
-    my $_request_headers = $request->as_string;
+    my $_request_headers = decode('utf8', $request->as_string);
 
     my $_request_content_length = length $request->content;
     if ($_request_content_length) {
@@ -3267,11 +3280,11 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
-    my $_response_content_ref = $response->content_ref( );
-    my $_response_headers = $response->headers_as_string;
+    my $_response_content_ref = '';
+    my $_response_headers = '';
 
-    _write_http_log($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref);
-    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_ref, $_response_base);
+    _write_http_log($_step_info, $_request_headers, $_core_info);
+    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_base);
 
     $previous_test_step = $testnum_display.$jumpbacks_print.$retries_print;
 
@@ -3280,7 +3293,7 @@ sub httplog {  # write requests and responses to http.txt file
 
 #------------------------------------------------------------------
 sub _write_http_log {
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_delete) = @_;
+    my ($_step_info, $_request_headers, $_core_info) = @_;
 
     my $_log_separator = "\n";
     $_log_separator .= "      *****************************************************      \n";
@@ -3291,19 +3304,18 @@ sub _write_http_log {
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
     if ($output_enabled) {
-        open my $_HTTPLOGFILE, '>>' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
-        print {$_HTTPLOGFILE} $_step_info, $_request_headers, $_core_info."\n", utf8coded(), $_log_separator;
+        open my $_HTTPLOGFILE, '>>:raw:encoding(UTF-8)' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
+        print {$_HTTPLOGFILE} $_step_info, $_request_headers, "\n", uncoded(), $_log_separator;
         close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
     }
-
     return;
 }
 
 #------------------------------------------------------------------
 sub _write_step_html { ## no critic(ProhibitManyArgs)
-    my ($_step_info, $_request_headers, $_core_info, $_response_headers, $_response_content_delete, $_response_base) = @_;
+    my ($_step_info, $_request_headers, $_core_info, $_response_base) = @_;
 
-    my $_response_content = $response->decoded_content;
+    my $_response_content = $resp_content;
 
     _format_xml(\$_response_content);
 
@@ -3609,8 +3621,7 @@ sub _delayed_write_step_html {
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         if ($output_enabled) {
-            open my $_FILE, '>:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
-#            print {$_FILE} decode('utf-8', $delayed_html);
+            open my $_FILE, '>:raw:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
             print {$_FILE} $delayed_html;
             close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
         }

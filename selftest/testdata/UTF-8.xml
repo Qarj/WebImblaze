@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<search>
+	<seq>1</seq>
+	<name>Irish Stew</name>
+	<cuisine>Irish</cuisine>
+	<preptime>140</preptime>
+</search>
+<search>
+	<seq>2</seq>
+	<name>Beef Caserole</name>
+	<cuisine>British</cuisine>
+	<preptime>95</preptime>
+	<cost>£15.95<cost>
+</search>
+<search>
+	<seq>3</seq>
+	<name>Käsekreiner</name>
+	<cuisine>German</cuisine>
+	<preptime>15</preptime>
+	<cost>€3</cost>
+</search>
+<search>
+	<seq>4</seq>
+	<name>Σὲ γνωρίζω ἀπὸ τὴν κόψη</name>
+	<cuisine>Greek</cuisine>
+	<preptime>15</preptime>
+</search>
