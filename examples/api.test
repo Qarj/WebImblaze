@@ -12,6 +12,7 @@ formatxml:              true
 step:                   POST something in my bin
 url:                    https://postb.in/{BIN_ID}
 posttype:               application/json
+addheader:              Content-type: application/json
 postbody:///:           ///
 {
 "postcodes" : ["OX49 5NU"]

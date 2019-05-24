@@ -22,3 +22,6 @@ step:                   Assertion should be ignored
 shell:                  echo Some text to verify
 verifynegative:         Some text to verify|||Should not find text but did|||Production Bug
 
+step:                   Should be able to see response header
+shell:                  echo headers
+verifynegative:         100 OK|||This should fail since 100 OK is seen
