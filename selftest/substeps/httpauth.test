@@ -1,3 +1,11 @@
 step:                   Step 10
-shell:                  echo NOP
+url:                    http://httpbin.org/get
+
+#step:                   Post Bin
+#url:                    https://postb.in/1559410268250-6796569584403
+#postbody:               food=macANDcheese
+
+#step:                   Request Bin
+#url:                    http://requestbin.fullcontact.com/15y9p711
+#postbody:               food=macANDcheese
 

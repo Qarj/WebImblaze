@@ -25,4 +25,7 @@
     <httpauth>!www.example.com!8080!my_area!foo2!welcome2</httpauth>
     <httpauth>?github.com?443?darkmoon?user?pass</httpauth>
     <httpauth> tfl.gov.uk 80 south username password</httpauth>
+    <httpauth> httpbin.org 80 realm username password</httpauth>
+    <httpauth> postb.in 443 realm username password</httpauth>
+    <httpauth> requestbin.fullcontact.com 80 myrealm myusername mypassword</httpauth>
 </root> 

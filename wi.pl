@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.1.0';
+$VERSION = '1.1.1';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -2443,12 +2443,14 @@ sub _push_httpauth {
     my $_delimiter = quotemeta substr $_auth,0,1;
     my $_err_delim = substr $_auth,0,1;
 
-    my @_auth_entry = split /$_delimiter/, $_auth;
-    if ($#_auth_entry != 5) {
+    my @_auth_entry = split /$_delimiter/, substr $_auth, 1;
+    my $_size = scalar @_auth_entry;
+    if ($_size != 5) {
         print {*STDERR} "\n$_auth\nError: httpauth should have 5 fields delimited by the first character [$_err_delim]\n\n";
     }
     else {
         push @http_auth, [@_auth_entry];
+        $results_stdout .= qq|Found httpauth [@_auth_entry]\n| if $EXTRA_VERBOSE;
     }
 
     return;
@@ -3689,7 +3691,8 @@ sub start_session {     # creates the WebImblaze user agent
         # add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         # deref $elem to get the array elements.
         foreach my $_elem(@http_auth) {
-            $useragent->credentials("$_elem->[1]:$_elem->[2]", "$_elem->[3]", "$_elem->[4]" => "$_elem->[5]");
+            $useragent->credentials("$_elem->[0]:$_elem->[1]", $_elem->[2], $_elem->[3], $_elem->[4]);
+            $results_stdout .= qq|Adding credential: $_elem->[0]:$_elem->[1], $_elem->[2], $_elem->[3], $_elem->[4]\n| if $EXTRA_VERBOSE;
         }
     }
 
