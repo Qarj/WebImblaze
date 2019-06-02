@@ -383,9 +383,12 @@ Note that you specify the delimiter with the first character.
 ```
 
 You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
+```
+cpan Authen::NTLM
+```
 
 ```xml
-<httpauth>|server.companyintranet|80||ntdomain\username|password</httpauth>
+<httpauth>|server.companyintranet|80||ntdomain\\username|password</httpauth>
 ```
 
 Note: You can have as many httpauth entries as you need.
@@ -395,6 +398,24 @@ Note: You can have as many httpauth entries as you need.
     <httpauth>?github.com?443?darkmoon?user?pass</httpauth>
     <httpauth> tfl.gov.uk 80 realm username password</httpauth>
 ```
+
+_*Basic Authentication Example*_
+
+For basic authentication you need to set maxredirect to at least 1.
+
+In your config.xml file, add the following line:
+```
+    <httpauth>|postman-echo.com|443|Users|postman|password</httpauth>
+```
+
+Now create a test step file with the following step:
+```
+step:                   Postman Echo - basic-auth
+url:                    https://postman-echo.com/basic-auth
+maxredirect:            1
+```
+
+If you run it, you get an `{"authenticated":true}` response from the Postman Echo service.
 
 <br />
 
