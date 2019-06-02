@@ -27,5 +27,8 @@
     <httpauth> tfl.gov.uk 80 south username password</httpauth>
     <httpauth> httpbin.org 80 realm username password</httpauth>
     <httpauth> postb.in 443 realm username password</httpauth>
+    <httpauth>/sharepoint.local/443//DOMAIN\\username/password</httpauth>
     <httpauth> requestbin.fullcontact.com 80 myrealm myusername mypassword</httpauth>
+    <httpauth> postman-echo.com 443 Users postman password</httpauth>
+    <httpauth> jigsaw.w3.org 80 test guest guest</httpauth>
 </root> 

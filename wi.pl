@@ -3691,8 +3691,12 @@ sub start_session {     # creates the WebImblaze user agent
         # add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         # deref $elem to get the array elements.
         foreach my $_elem(@http_auth) {
-            $useragent->credentials("$_elem->[0]:$_elem->[1]", $_elem->[2], $_elem->[3], $_elem->[4]);
-            $results_stdout .= qq|Adding credential: $_elem->[0]:$_elem->[1], $_elem->[2], $_elem->[3], $_elem->[4]\n| if $EXTRA_VERBOSE;
+            my $_domain_port = $_elem->[0].':'.$_elem->[1];
+            my $_realm = $_elem->[2];
+            my $_user = $_elem->[3];
+            my $_pass = $_elem->[4];
+            $useragent->credentials($_domain_port, $_realm, $_user, $_pass);
+            $results_stdout .= q|Adding credential: |.$_domain_port.', '.$_realm.', '.$_user.', '.$_pass."\n" if $EXTRA_VERBOSE;
         }
     }
 

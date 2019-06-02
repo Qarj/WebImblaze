@@ -9,3 +9,8 @@ url:                    http://httpbin.org/get
 #url:                    http://requestbin.fullcontact.com/15y9p711
 #postbody:               food=macANDcheese
 
+#step:                   Postman Echo - basic-auth
+#url:                    https://postman-echo.com/basic-auth
+
+#step:                   JIGSAW - basic auth
+#url:                    https://jigsaw.w3.org/HTTP/Basic/

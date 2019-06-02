@@ -372,6 +372,10 @@ authentication mechanism which may be used by a server to challenge a client req
 information.  This configuration parameter takes a list of 5 delimited values that correspond to:
 `:servername:portnumber:realm-name:username:password`
 
+The port number typically will be 80 for `http://` requests, and 443 for `https://`.
+
+Sometimes the port number is specifically mentioned in the url - for example the default Apache Tomcat port is 8080.
+
 Note that you specify the delimiter with the first character.
 
 ```xml
@@ -387,7 +391,7 @@ You can use also use NTLM authentication in the following format. You'll need to
 Note: You can have as many httpauth entries as you need.
 
 ```xml
-    <httpauth>!www.example.com!8080!my_area!foo2!welcome2</httpauth>
+    <httpauth>!my.corporate.internal!8080!my_area!foo2!welcome2</httpauth>
     <httpauth>?github.com?443?darkmoon?user?pass</httpauth>
     <httpauth> tfl.gov.uk 80 realm username password</httpauth>
 ```
