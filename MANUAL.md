@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.1.0
+# Manual for WebImblaze version 1.1.1
 
 ## Overview
 
@@ -389,6 +389,14 @@ cpan Authen::NTLM
 
 ```xml
 <httpauth>|server.companyintranet|80||ntdomain\\username|password</httpauth>
+```
+
+When using NTLM is is also recommended to set a high maxredirect.
+
+```
+step:                   Get an NTLM page
+url:                    https://sharepoint.internal/login
+maxredirect:            10
 ```
 
 Note: You can have as many httpauth entries as you need.

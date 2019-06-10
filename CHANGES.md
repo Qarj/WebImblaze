@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.1.1 - June 10, 2019
+* recoded the http auth for basic and NTLM authentication, added verbose output
+
 ### Version 1.1.0 - May 24, 2019
 * UTF-8 is now the default and Unicode is well supported (though on Windows the console output is garbled)
 * gzip content is now decoded
