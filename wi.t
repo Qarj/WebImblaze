@@ -1447,13 +1447,15 @@ EOB
 read_test_steps_file();
 assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
 
-
-# support abort - step desc?
 # support testvar
 
 #issues:
 #   repeat parm needs to be renamed eventually for WebImblaze
-#   utf-8 mess - needs major attention (alternatives to slurp, maybe Path::Tiny which support utf8 slurp)
+
+
+#
+# _verify_verifypositive
+#
 
 before_test();
 $main::case{verifypositive1} = 'brown fox';
@@ -1514,6 +1516,28 @@ set_number_of_times_to_retry_this_test_step();
 _verify_verifypositive();
 assert_stdout_does_not_contain ("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 3');
 
+
+#
+# pass_fail_or_retry
+#
+
+before_test();
+$main::case{verifypositive2} = 'blue fox';
+$main::case{errormessage} = 'Could not find blue fox';
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
+_verify_verifypositive();
+pass_fail_or_retry();
+assert_stdout_contains('TEST STEP FAILED : Could not find blue fox', 'pass_fail_or_retry : Custom error message');
+
+before_test();
+$main::case{verifypositive2} = 'blue fox';
+$main::case{retry} = '2';
+$main::resp_content = ('The quick brown fox jumps over the lazy dog');
+set_number_of_times_to_retry_this_test_step();
+_verify_verifypositive();
+pass_fail_or_retry();
+assert_stdout_contains('RETRYING', 'pass_fail_or_retry : Retry available - retrying');
+
 #
 # GLOBAL HELPER SUBS
 #
@@ -1559,6 +1583,8 @@ sub show_stdout {
 sub before_test {
     $main::EXTRA_VERBOSE = 1;
 
+    _init_main_loop_variables();
+    _init_retry_loop_variables();
     $main::case{retry} = '0';
     set_number_of_times_to_retry_this_test_step();
     undef %main::case;

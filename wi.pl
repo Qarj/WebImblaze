@@ -199,9 +199,7 @@ foreach (1 .. $repeat) {
 
         $testnum_display = get_testnum_display($testnum, $counter);
 
-        $is_failure = 0;
-        $retries = 1; # increment retries after writing to the log
-        $retries_print = q{}; # the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+        _init_main_loop_variables();
 
         # populate variables with values from steps file, do substitutions, and revert converted values back
         substitute_variables();
@@ -225,10 +223,7 @@ foreach (1 .. $repeat) {
 
             set_retry_to_zero_if_global_limit_exceeded();
 
-            $is_failure = 0;
-            $fast_fail_invoked = q{};
-            $retry_passed_count = 0;
-            $retry_failed_count = 0;
+            _init_retry_loop_variables();
 
             check_for_checkpoint();
 
@@ -301,6 +296,23 @@ exit $status;
 #------------------------------------------------------------------
 #  SUBROUTINES
 #------------------------------------------------------------------
+
+sub _init_main_loop_variables {
+    $is_failure = 0;
+    $retries = 1;
+    $retries_print = q{}; # the printable value is used before writing the results to the log, so it is one behind, 0 being printed as null
+
+    return;
+}
+
+sub _init_retry_loop_variables {
+    $is_failure = 0;
+    $fast_fail_invoked = q{};
+    $retry_passed_count = 0;
+    $retry_failed_count = 0;
+
+    return;
+}
 
 sub get_formatted_datetime_for_seconds_since_epoch {
     my ($_seconds_since_epoch) = @_;
