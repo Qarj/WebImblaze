@@ -143,3 +143,9 @@ step:                   Date modifier from now - expression should evaluate with
 shell:                  echo A minute ago {DATE_NOW:::-1/24/60} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}
 verifypositive:         A minute ago  \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}
 verifynegative:         1900-
+
+step:                   Date modifier from now - expression should evaluate without error
+shell:                  echo A minute ago from GMT {DATE_GMT_NOW:::-1/24/60} {YEAR}-{MONTH}-{DAY} {HH}:{MM}:{SS}
+verifypositive:         A minute ago from GMT  \d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}
+verifynegative:         1900-
+

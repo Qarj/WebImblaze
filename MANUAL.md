@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.1.1
+# Manual for WebImblaze version 1.2.0
 
 ## Overview
 
@@ -2644,6 +2644,11 @@ If today is 31/10/2017 then 31/10/2017, 01/11/2017 and 02/11/2017 will be assert
 If you need to modify from the current time rather than the test start time, do this using `DATE_NOW`:
 ```
 step:   {DATE_NOW:::-1/23}Day_Month_Year: {DAY}_{MONTH}_{YEAR}
+```
+
+It is also possible to modify from the current GMT time (which is not affected by daylight saving) using `DATE_GMT_NOW`:
+```
+step:   {DATE_GMT_NOW:::-1/23}Day_Month_Year: {DAY}_{MONTH}_{YEAR}
 ```
 
 <br />

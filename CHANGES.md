@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.2.0 - July 31, 2019
+* added DATE_GMT_NOW substitution modifier since it is not affected by daylight saving
+
 ### Version 1.1.1 - June 10, 2019
 * recoded the http auth for basic and NTLM authentication, added verbose output
 

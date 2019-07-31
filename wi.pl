@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.1.1';
+$VERSION = '1.2.0';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -315,12 +315,14 @@ sub _init_retry_loop_variables {
 }
 
 sub get_formatted_datetime_for_seconds_since_epoch {
-    my ($_seconds_since_epoch) = @_;
+    my ($_seconds_since_epoch, $_method) = @_;
+
+    $_method //= 'localtime';
 
     my @_MONTHS = qw(01 02 03 04 05 06 07 08 09 10 11 12);
     my @_MONTHS_TEXT = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
     my @_WEEKDAYS = qw(Sun Mon Tue Wed Thu Fri Sat Sun);
-    my ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = localtime $_seconds_since_epoch;
+    my ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_MONTH, $_YEAROFFSET, $_DAYOFWEEK, $_DAYOFYEAR, $_DAYLIGHTSAVINGS) = eval "$_method $_seconds_since_epoch";
     my $_YEAR = 1900 + $_YEAROFFSET;
     my $_YY = substr $_YEAR, 2;
     my $_MONTH_TEXT = $_MONTHS_TEXT[$_MONTH];
@@ -2993,6 +2995,9 @@ sub convert_back_xml {  #converts replaced xml with substitutions
     }
     if ($_[0] =~ s{[{]DATE_NOW:::([+\-*/\d]+)[}]}{}g) {
         ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86_400));
+    }
+    if ($_[0] =~ s{[{]DATE_GMT_NOW:::([+\-*/\d]+)[}]}{}g) {
+        ($_SECOND, $_MINUTE, $_HOUR, $_DAYOFMONTH, $_DAY_TEXT, $_WEEKOFMONTH, $_MONTH, $_MONTH_TEXT, $_YEAR, $_YY) = get_formatted_datetime_for_seconds_since_epoch($epoch_seconds + (eval($1)*86_400), 'gmtime');
     }
 
     # perform arbitrary user defined config substitutions - done first to allow for double substitution e.g. {:8080}
