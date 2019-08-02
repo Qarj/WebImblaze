@@ -31,7 +31,6 @@ use utf8;
 use Storable 'dclone';
 use File::Basename;
 use File::Spec;
-use File::Slurp;
 use LWP;
 use LWP::Protocol::http;
 use HTTP::Request::Common;
@@ -965,18 +964,18 @@ sub write_initial_xml {  # write opening tags for results file
 
 #------------------------------------------------------------------
 sub _write_xml {
-    my ($_xml) = @_;
+    my ($_xml_ref) = @_;
 
-    write_file("$opt_publish_full".$results_xml_file_name, {append => 1, binmode => ':utf8'}, $_xml) if $output_enabled; # $_xml is a ref, but we do not need to dereference with slurp
+    append_utf8("$opt_publish_full".$results_xml_file_name, $_xml_ref) if $output_enabled;
 
     return;
 }
 
 #------------------------------------------------------------------
 sub _write_html {
-    my ($_html) = @_;
+    my ($_html_ref) = @_;
 
-    write_file($opt_publish_full.'Results.html', {append => 1, binmode => ':utf8'}, $_html) if $output_enabled; # $_html is a ref, but we do not need to dereference with slurp
+    append_utf8($opt_publish_full.'Results.html', $_html_ref) if $output_enabled;
 
     return;
 }
@@ -1275,7 +1274,7 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
 
             $_asset_response = $useragent->request($_asset_request);
 
-            write_file( "$opt_publish_full$_version$_filename", {binmode => ':raw'}, $_asset_response->content );
+            write_raw( "$opt_publish_full$_version$_filename", \$_asset_response->content );
 
             if ($_type eq 'hrefs') { push @hrefs, $_filename; }
             if ($_type eq 'srcs') { push @srcs, $_filename; }
@@ -1754,8 +1753,8 @@ sub shell {  # send shell command and read response
     $resp_content = $_combined_response;
 
     if ($case{readfile}) {
-        my $_readfile = read_file($case{readfile}, { binmode => ':encoding(UTF-8)'});
-        $resp_content =~ s{$}{<readfile> $case{readfile} </readfile>\n$_readfile\n\n\n};
+        my $_readfile_ref = read_utf8($case{readfile});
+        $resp_content =~ s{$}{<readfile> $case{readfile} </readfile>\n$$_readfile_ref\n\n\n};
     }
 
     if ($case{echo}) {
@@ -2287,7 +2286,7 @@ sub write_shared_variable {
         my ($_var_name, $_var_value) = split /[|]/, $case{writesharedvar};
         my ($_second, $_minute, $_hour, undef, undef, undef, undef, undef, undef, undef) = get_formatted_datetime_for_seconds_since_epoch(time);
         my $_file_full = slash_me($shared_folder_full.q{/}.$_var_name.'___'.$_hour.$_minute.$_second.'.txt');
-        write_file ( $_file_full, {binmode => ':utf8'}, $_var_value);
+        write_utf8 ( $_file_full, \$_var_value);
         $results_stdout .= " Wrote $_file_full\n";
     }
 
@@ -2303,7 +2302,7 @@ sub read_shared_variable {
         my @_sorted_vars = sort { -M $a <=> -M $b } @_vars; # -C is created, -M for modified
 
         if ($_sorted_vars[0]) { # only the most recent variable value is relevant
-            $varvar{'var'.$case{readsharedvar}} = read_file($_sorted_vars[0], { binmode => ':encoding(UTF-8)' });
+            $varvar{'var'.$case{readsharedvar}} = ${read_utf8($_sorted_vars[0])};
             $results_stdout .= " Read  $_sorted_vars[0]\n";
         } else {
             $varvar{'var'.$case{readsharedvar}} = q{}; # set variable to null if it does not exist
@@ -2379,7 +2378,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
         # if test filename is not passed on the command line, use files in config.xml
 
         if ($config->{teststepfile}) {
-            $current_steps_file = slash_me($config->{teststepfile});
+            $current_steps_file = $config->{teststepfile};
         } else {
             die "\nERROR: I can't find any test step files to run.\nYou must either use a config file or pass a filename.";
         }
@@ -2388,7 +2387,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
 
     elsif (($#ARGV + 1) == 1) {  # one command line arg was passed
         # use test filename passed on command line (config.xml is only used for other options)
-        $current_steps_file = slash_me($ARGV[0]);  # first command line argument is the test file
+        $current_steps_file = $ARGV[0];  # first command line argument is the test file
     }
 
     if ($config->{httpauth}) {
@@ -2486,15 +2485,15 @@ sub _sub_xml_special {
 #------------------------------------------------------------------
 sub read_test_steps_file {
 
-    my $_test_steps;
+    my $_test_steps_ref;
     if ($unit_test_steps) {
-        $_test_steps = $unit_test_steps;
+        $_test_steps_ref = \$unit_test_steps;
         $current_steps_file = 'unit tests test';
     } else {
-        $_test_steps = read_file( $current_steps_file, { binmode => ':encoding(UTF-8)' } );
+        $_test_steps_ref = read_utf8( $current_steps_file );
     }
 
-    $lean_test_steps = _parse_steps( \ $_test_steps );
+    $lean_test_steps = _parse_steps( $_test_steps_ref );
     $results_stdout .= Data::Dumper::Dumper($lean_test_steps) if $EXTRA_VERBOSE;
     $results_stdout .= qq| Lean test steps parsed OK\n| if $EXTRA_VERBOSE;
 
@@ -2522,8 +2521,8 @@ sub _parse_steps {
 
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = $_files_to_include->{$_include_integer_step_num};
-        my $_include_file_content = read_file( slash_me($_include_file_name),  { binmode => ':encoding(UTF-8)' } );
-        new_parser( \ $_include_file_content );
+        my $_include_file_content_ref = read_utf8( $_include_file_name );
+        new_parser( $_include_file_content_ref );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
             my $_insert_step = $_sub_step / 1000 + $_include_integer_step_num ;
@@ -3266,7 +3265,7 @@ sub httplog {  # write requests and responses to http.txt file
 
     # save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
-        write_file( "$opt_publish_full$case{logresponseasfile}", {binmode => ':raw'}, $response->decoded_content( ( charset => 'none' ) ) ); # need to remove gzip encoding but not character encoding 
+        write_raw( "$opt_publish_full$case{logresponseasfile}", \ $response->decoded_content( ( charset => 'none' ) ) ); # need to remove gzip encoding but not character encoding 
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";
@@ -3648,6 +3647,54 @@ sub _delayed_write_step_html {
 
     $delayed_file_full = $_file_full;
     $delayed_html = $_html;
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub read_utf8 {
+    my ($_file_path) = @_;
+
+    open my $_FILE, '<:encoding(UTF-8)', slash_me($_file_path) or die "\nError: Failed to open $_file_path for reading\n\n";
+    read $_FILE, my $_file_content, -s $_FILE;
+    close $_FILE or die "\nCould not close $_file_path after reading\n\n";
+
+    return \$_file_content;
+}
+
+#------------------------------------------------------------------
+sub append_utf8 {
+    my ($_file_path, $_content_ref) = @_;
+
+    return _write_to_file($_file_path, $_content_ref, '', '>>', ':encoding(UTF-8)');
+}
+
+sub write_utf8 {
+    my ($_file_path, $_content_ref, $_make_path) = @_;
+
+    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', ':encoding(UTF-8)');
+}
+
+sub write_raw {
+    my ($_file_path, $_content_ref, $_make_path) = @_;
+
+    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', '');
+}
+
+sub _write_to_file {
+    my ($_file_path, $_content_ref, $_make_path, $_write_mode, $_encode) = @_;
+
+    $_file_path = slash_me($_file_path);
+
+    $_make_path //= '';
+    if ($_make_path) {
+        exit 'need to remove filename from path';
+        File::Path::make_path($_file_path);
+    }
+
+    open my $_FILE, $_write_mode.':raw'.$_encode, $_file_path or die "\nERROR: Failed to open $_file_path for writing\n\n";
+    print {$_FILE} $$_content_ref;
+    close $_FILE or die "\nERROR: Failed to close $_file_path after writing\n\n";
 
     return;
 }
