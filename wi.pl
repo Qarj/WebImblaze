@@ -2340,15 +2340,15 @@ sub _decode_html_entities {
 
 #------------------------------------------------------------------
 sub slash_me {
-    my ($_string) = @_;
+    my ($_path) = @_;
 
     if ($is_windows) {
-        $_string =~ s{/}{\\}g;
+        $_path =~ s{/}{\\}g;
     } else {
-        $_string =~ s{\\}{/}g;
+        $_path =~ s{\\}{/}g;
     }
 
-    return $_string;
+    return $_path;
 }
 
 #------------------------------------------------------------------
@@ -2378,7 +2378,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
         # if test filename is not passed on the command line, use files in config.xml
 
         if ($config->{teststepfile}) {
-            $current_steps_file = $config->{teststepfile};
+            $current_steps_file = slash_me($config->{teststepfile});
         } else {
             die "\nERROR: I can't find any test step files to run.\nYou must either use a config file or pass a filename.";
         }
@@ -2387,7 +2387,7 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
 
     elsif (($#ARGV + 1) == 1) {  # one command line arg was passed
         # use test filename passed on command line (config.xml is only used for other options)
-        $current_steps_file = $ARGV[0];  # first command line argument is the test file
+        $current_steps_file = slash_me($ARGV[0]);  # first command line argument is the test file
     }
 
     if ($config->{httpauth}) {
@@ -3655,7 +3655,9 @@ sub _delayed_write_step_html {
 sub read_utf8 {
     my ($_file_path) = @_;
 
-    open my $_FILE, '<:encoding(UTF-8)', slash_me($_file_path) or die "\nError: Failed to open $_file_path for reading\n\n";
+    $_file_path = slash_me($_file_path);
+
+    open my $_FILE, '<:encoding(UTF-8)', $_file_path or die "\nError: Failed to open $_file_path for reading\n\n";
     read $_FILE, my $_file_content, -s $_FILE;
     close $_FILE or die "\nCould not close $_file_path after reading\n\n";
 
