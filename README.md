@@ -1,4 +1,4 @@
-# WebImblaze 1.2.0
+# WebImblaze 1.2.1
 
 _UTF-8 is now well supported and the default, and gzip response content is now uncompressed automatically._
 
@@ -17,33 +17,38 @@ WebImblaze is very easy to setup and run. An example is test included.
 ### Windows
 
 1. Install Strawberry Perl.
-    - Navigate to http://strawberryperl.com/
-    - Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+
+   - Navigate to http://strawberryperl.com/
+   - Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
 
 2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
-    ```
-    mkdir C:\git
-    ```
+
+   ```
+   mkdir C:\git
+   ```
 
 3. If you have git installed, then just clone the repository
-    ```
-    cd C:\git
-    git clone https://github.com/Qarj/WebImblaze.git
-    ```
-    
-    If you don't have git, you can get it from https://git-scm.com.
+
+   ```
+   cd C:\git
+   git clone https://github.com/Qarj/WebImblaze.git
+   ```
+
+   If you don't have git, you can get it from https://git-scm.com.
 
 That's it! You are now ready to run WebImblaze for the first time.
 
 ### Linux / Mac
 
 Clone WebImblaze with git
+
 ```
 cd /usr/local/bin
 sudo git clone https://github.com/Qarj/WebImblaze.git
 ```
 
 Fix permissions
+
 ```
 cd WebImblaze
 sudo find . -type d -exec chmod a+rwx {} \;
@@ -52,14 +57,15 @@ sudo chmod +x wi.pl
 ```
 
 Install required Perl packages
+
 ```
-sudo cpan File::Slurp
 sudo cpan XML::Simple
 sudo cpan Math::Random::ISAAC
 sudo cpan LWP::Protocol::https
 ```
 
 Check that you can see the WebImblaze help info
+
 ```
 perl wi.pl --help
 ```
@@ -69,6 +75,7 @@ Tested with Fedora 26, Ubuntu 16.04 and 18.04, Linux Mint 18.3, OS X El Capitan 
 #### CentOS 7
 
 CentOS seems to require a lot of additional setup before installing the packages above - some of the below may be redundant
+
 ```
 sudo yum install cpan
 sudo cpan
@@ -94,15 +101,17 @@ is ok and there is no need to install `LWP::Protocol::https` using cpan.
 
 ### Create your first WebImblaze test
 
-Note that these instructions are written with Windows in mind. 
+Note that these instructions are written with Windows in mind.
 
 In the `tests` folder, create a file called `hello.test`.
+
 ```
 cd c:/git/WebImblaze
 start notepad++ tests/hello.test
 ```
 
 Copy paste the following then save the file.
+
 ```
 step:               Get Totaljobs Home Page
 varTOTALJOBS_URL:   https://www.totaljobs.com
@@ -174,6 +183,7 @@ First WebImblaze read in the default config file called `config.xml` located in 
 Then it loaded `tests/hello.test` and ran the two test steps in order, numbering them `10` and `20`.
 
 Five files were created in the default output folder called `output`:
+
 - results.html is a html version of the results you saw in the command prompt - with colour.
 - results.xml is an xml version of the results.
 - http.txt contains the response headers and the html that WebImblaze received.
@@ -195,20 +205,17 @@ Also, if you examine the files in the `selftest/substeps` folder you will get a 
 
 Finally there is always the manual :)
 
-
 ## The Manual
 
 The manual contains extensive details on how to use WebImblaze.
 
 [WebImblaze Manual - MANUAL.md](MANUAL.md)
 
-
 ## Examples
 
 There are many working examples in the examples folder.
 
 For additional examples, study the self tests in the `selftest\substeps` folder.
-
 
 ## WebImblaze Self Test
 
@@ -231,6 +238,7 @@ perl wi.pl selftest/verifypositive.test
 # WebImblaze Plugins
 
 ## WebImblaze-Framework
+
 Have multiple test environments? Hundreds of tests that are run many times a day?
 
 Then the WebImblaze-Framework project is for you! Provides config management and a way to neatly organise test execution and results.
@@ -238,21 +246,25 @@ Then the WebImblaze-Framework project is for you! Provides config management and
 Find the project here: https://github.com/Qarj/WebImblaze-Framework
 
 ## WebImblaze-Selenium
+
 WebImblaze can also drive the Chrome browser using WebDriver Selenium.
 
 Find the project here: https://github.com/Qarj/WebImblaze-Selenium
 
 ## search-image
+
 A Chrome screenshot can be searched to see if it contains a specific (or approximate) sub-image.
 
 Find the project here: https://github.com/Qarj/search-image
 
 ## Nagios
-Use WebImblaze as a plugin to Nagios to monitor critical business workflows. 
+
+Use WebImblaze as a plugin to Nagios to monitor critical business workflows.
 
 https://webimblaze.blogspot.com/2018/11/webimblaze-as-nagios-plugin-for.html
 
 # Test File Format
+
 WebImblaze uses a simplified test file format over WebInject.
 
 The WebInject xml style format is misleading since it isn't true xml - for simplicity
@@ -263,16 +275,17 @@ are validated for and a comprehensive error message is given explaining the prob
 number of the problem and an example of something that works.
 
 Quick start information:
+
 - parameters must start in column 1 of each line
-- `step: ` must be on the first line of each step block
-- `step: ` replaces description1
-- `desc: ` replaces description2
-- `id: ` is reserved - it is assigned automatically in increments of 10
-- `method: ` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
-- all parameters for a step block must be grouped together without a blank line - blank lines separates steps 
+- `step:` must be on the first line of each step block
+- `step:` replaces description1
+- `desc:` replaces description2
+- `id:` is reserved - it is assigned automatically in increments of 10
+- `method:` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
+- all parameters for a step block must be grouped together without a blank line - blank lines separates steps
 - quotes are usually not needed, but if you do you can make up your own quotes (see examples/quotes.test)
-- for Selenium steps, use `selenium: ` instead of `command: ` (see examples/misc/selenium.test)
-- for command shell steps, use `shell: ` instead of `command: ` (see examples/demo.test)
+- for Selenium steps, use `selenium:` instead of `command:` (see examples/misc/selenium.test)
+- for command shell steps, use `shell:` instead of `command:` (see examples/demo.test)
 - it is possible to assemble a test file from smaller fragment files (see examples/advanced/include.test)
 
 Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor

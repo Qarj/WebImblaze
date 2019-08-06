@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.2.1 - Aug 6, 2019
+* File::Slurp package is no longer required
+
 ### Version 1.2.0 - July 31, 2019
 * added DATE_GMT_NOW substitution modifier since it is not affected by daylight saving
 
