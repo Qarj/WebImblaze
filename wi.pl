@@ -1671,13 +1671,12 @@ sub httpsend_form_urlencoded {  # send application/x-www-form-urlencoded or appl
 sub httpsend_xml { # send text/xml HTTP request and read response
     my ($_verb) = @_;
 
-    # read the xml file specified in the teststep
-    my @_xml_body;
+    my $_content_ref;
     if ( $case{postbody} =~ m/file=>(.*)/i ) {
-        open my $_XML_BODY, '<:encoding(UTF-8)', slash_me($1) or die "\nError: Failed to open text/xml file $1\n\n";
-        @_xml_body = <$_XML_BODY>;  # read the file into an array
-        close $_XML_BODY or die "\nCould not close xml file to be posted\n\n";
+        $_content_ref = read_utf8($1); # read the xml file specified in the teststep
     }
+
+    my @_xml_body = split /^/m, $$_content_ref;
 
     foreach (@_xml_body) {
         convert_back_xml($_);
