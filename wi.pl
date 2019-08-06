@@ -3638,9 +3638,7 @@ sub _delayed_write_step_html {
             $delayed_html =~ s{</h2>}{ &nbsp; &nbsp; [<a class="wi_hover_item" style="color:SlateGray;font-weight:bolder;" href="$results_filename_prefix$testnum_display$jumpbacks_print$retries_print.html"> next </a>]</h2>};
         }
         if ($output_enabled) {
-            open my $_FILE, '>:raw:encoding(UTF-8)', "$delayed_file_full" or die "\nERROR: Failed to create $delayed_file_full\n\n";
-            print {$_FILE} $delayed_html;
-            close $_FILE or die "\nERROR: Failed to close $delayed_file_full\n\n";
+            write_utf8($delayed_file_full, \$delayed_html);
         }
     }
 
