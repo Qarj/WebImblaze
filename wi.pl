@@ -3312,6 +3312,8 @@ sub httplog {  # write requests and responses to http.txt file
 sub _write_http_log {
     my ($_step_info, $_request_headers, $_core_info) = @_;
 
+    if (!$output_enabled) { return; }
+
     my $_log_separator = "\n";
     $_log_separator .= "      *****************************************************      \n";
     $_log_separator .= "    *********************************************************    \n";
@@ -3320,11 +3322,10 @@ sub _write_http_log {
     $_log_separator .= "  *************************************************************  \n";
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
-    if ($output_enabled) {
-        open my $_HTTPLOGFILE, '>>:raw:encoding(UTF-8)' ,$opt_publish_full.'http.txt' or die "\nERROR: Failed to open $opt_publish_full"."http.txt for append\n\n";
-        print {$_HTTPLOGFILE} $_step_info, $_request_headers, "\n", uncoded(), $_log_separator;
-        close $_HTTPLOGFILE or die "\nCould not close http.txt file\n\n";
-    }
+
+    my $_append_content = $_step_info . $_request_headers . "\n" . uncoded() . $_log_separator;
+    append_utf8($opt_publish_full.'http.txt', \$_append_content);
+
     return;
 }
 
