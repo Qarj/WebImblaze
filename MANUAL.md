@@ -1498,6 +1498,18 @@ addheader: Foo: bar|Boo: far
 
 Note that when you use addheader, any existing header cookies will be clobbered.
 
+Note also that HTTP::Headers class converts header field names to be title case
+by default to make them look consistent. It can do this because the RFC says that
+header field names are case insensitive. Unfortunately some people are not aware
+of this and insist on case sensitive header field names. To get around this problem
+preceed the header field name with a colon.
+
+```
+addheader: :foo-bar: value
+```
+
+In this example the header field name sent will be `foo-bar` and not `Foo-Bar`.
+
 <br />
 
 
