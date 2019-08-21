@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.2.2 - Aug 21, 2019
+* `logresponseasfile` output folder is no longer hard coded to the {PUBLISH} location
+
 ### Version 1.2.1 - Aug 6, 2019
 * File::Slurp package is no longer required
 

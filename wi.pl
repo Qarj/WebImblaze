@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.2.1';
+$VERSION = '1.2.2';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -3264,7 +3264,7 @@ sub httplog {  # write requests and responses to http.txt file
 
     # save the http response to a file - e.g. for file downloading, css
     if ($case{logresponseasfile}) {
-        write_raw( "$opt_publish_full$case{logresponseasfile}", \ $response->decoded_content( ( charset => 'none' ) ) ); # need to remove gzip encoding but not character encoding 
+        write_raw( "$case{logresponseasfile}", \ $response->decoded_content( ( charset => 'none' ) ) ); # need to remove gzip encoding but not character encoding 
     }
 
     my $_step_info = "Test Step: $testnum_display$jumpbacks_print$retries_print - ";

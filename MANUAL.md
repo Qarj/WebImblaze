@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.2.1
+# Manual for WebImblaze version 1.2.2
 
 ## Overview
 
@@ -2011,7 +2011,7 @@ Example:
 step:               Get Responsive.css
 url:                https://www.example.com/resources/css/Responsive.css
 logastext:          true
-logresponseasfile:  Captured.css
+logresponseasfile:  {PUBLISH}Captured.css
 />
 ```
 
