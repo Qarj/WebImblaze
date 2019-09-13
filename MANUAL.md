@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.2.2
+# Manual for WebImblaze version 1.2.3
 
 ## Overview
 
@@ -2558,9 +2558,6 @@ Due to the nature of the systems being tested by the author, the randomly genera
 contain two characters in a row that are the same.
 
 In addition, 0 will never be generated as the first character.
-
-The random generator used is seeded with the time from Time::HiRes on each use. See Math::Random::ISAAC on cpan for further
-information.
 
 <br />
 

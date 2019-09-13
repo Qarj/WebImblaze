@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.2.2';
+$VERSION = '1.2.3';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -45,8 +45,6 @@ use Encode qw(encode decode);
 use if $^O eq 'MSWin32', 'Win32::Console::ANSI';
 use Term::ANSIColor;
 use lib q{.}; # current folder is not @INC from Perl 5.26
-use Math::Random::ISAAC;
-my $rng = Math::Random::ISAAC->new(time*100_000); # only integer portion is used in seed
 
 use Data::Dumper;
 no warnings 'redefine';
@@ -3090,20 +3088,20 @@ sub _get_random_string {
     my $_next;
     my $_first;
     foreach my $_i (1..$_length) {
-        $_next = _get_char($rng->irand(), $_type);
+        $_next = _get_char($_type);
 
         # this clause stops two consecutive characters being the same
         # some search engines will filter out words containing more than 2 letters the same in a row
         if (defined $_last) {
             while ($_next eq $_last) {
-                $_next = _get_char($rng->irand(), $_type);
+                $_next = _get_char($_type);
             }
         }
 
         # never generate 0 as the first character, leading zeros can be problematic
         if (not defined $_first) {
             while ($_next eq '0') {
-                $_next = _get_char($rng->irand(), $_type);
+                $_next = _get_char($_type);
             }
             $_first = $_next;
         }
@@ -3117,14 +3115,16 @@ sub _get_random_string {
 
 #------------------------------------------------------------------
 sub _get_char {
-    my ($_raw_rnd, $_type) = @_;
+    my ($_type) = @_;
 
     # here we need to turn our unsigned 32 bit integer into a character of the desired type
     # supported types :ALPHANUMERIC, :ALPHA, :NUMERIC
 
     my $_min_desired_rnd = 1;
+    my $_max_possible_rnd = 4_294_967_295;
+    my $_raw_rnd = int(rand $_max_possible_rnd) + $_min_desired_rnd;
+
     my $_max_desired_rnd;
-    my $_max_possible_rnd = 4_294_967_296;
     my $_number;
     my $_char;
 

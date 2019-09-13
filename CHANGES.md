@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.2.3 - Sep 13, 2019
+* Dependency on Math::Random::ISAAC is overkill so has been removed in favour of Perl standard rand() function
+
 ### Version 1.2.2 - Aug 21, 2019
 * `logresponseasfile` output folder is no longer hard coded to the {PUBLISH} location
 
