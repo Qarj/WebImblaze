@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.2.3
+# Manual for WebImblaze version 1.3.0
 
 ## Overview
 
@@ -169,6 +169,8 @@
     - [logastext](#logastext)
 
     - [logresponseasfile](#logresponseasfile)
+
+    - [redact](#redact)
 
     - [section](#section)
 
@@ -2012,8 +2014,28 @@ step:               Get Responsive.css
 url:                https://www.example.com/resources/css/Responsive.css
 logastext:          true
 logresponseasfile:  {PUBLISH}Captured.css
-/>
 ```
+
+<br />
+
+
+#### redact
+
+Redact sensitive information from the response output.
+
+Example:
+
+```
+step:               Post username and password
+url:                https://www.example.com/login
+postdata:           username=admin&password=bigsecret&environment=prod
+redact1:            password=(.*?)&environment
+redact2:            "password": "([^"]+)"       
+```
+
+The regular expression you supply will be ran against the request headers and response content after the step has been executed.
+The string returned in the first capture group will be globally replaced. So if the first capture group results in `bigsecret`, this
+will be globally substituted to `__redacted__`.
 
 <br />
 

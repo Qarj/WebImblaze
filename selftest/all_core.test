@@ -263,6 +263,12 @@ verifypositive:         TEST STEP PASSED
 verifynegative:         TEST STEP FAILED
 
 step:                   {FEATURE}
+varFEATURE:             redact
+shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
+
+step:                   {FEATURE}
 varFEATURE:             runif
 shell:                  .\wi.pl -o selftest\output\{FEATURE} selftest\{FEATURE}.test
 verifypositive:         TEST STEP PASSED

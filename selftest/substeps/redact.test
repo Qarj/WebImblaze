@@ -1,0 +1,6 @@
+step:                   Post sensitive information
+url:                    http://httpbin.org/post
+postbody:               username=admin&password=bigsecret&environment=prod
+verifypositive:         "environment": "prod",
+redact1:                password=(.*?)&environment
+redact2:                "password": "([^"]+)"

@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.2.3';
+$VERSION = '1.3.0';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -54,7 +54,7 @@ local $Data::Dumper::Useperl = 1; # Use the Pure Perl implementation of Dumper
 local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
 
-our ($request, $response, $resp_headers, $resp_content);
+our ($request, $request_headers, $response, $resp_headers, $resp_content);
 my $useragent;
 
 our ($latency, $verification_latency, $screenshot_latency);
@@ -228,6 +228,7 @@ foreach (1 .. $repeat) {
             output_assertions();
 
             execute_test_step();
+            redact();
             display_request_response();
 
             dump_json();
@@ -3281,11 +3282,9 @@ sub httplog {  # write requests and responses to http.txt file
         }
     }
 
-    my $_request_headers = decode('utf8', $request->as_string);
-
     my $_request_content_length = length $request->content;
     if ($_request_content_length) {
-        $_request_headers .= 'Request Content Length: '.$_request_content_length." bytes\n";
+        $request_headers .= 'Request Content Length: '.$_request_content_length." bytes\n";
     }
 
     my $_core_info = "\n".$response->status_line( )."\n";
@@ -3300,8 +3299,8 @@ sub httplog {  # write requests and responses to http.txt file
     my $_response_content_ref = '';
     my $_response_headers = '';
 
-    _write_http_log($_step_info, $_request_headers, $_core_info);
-    _write_step_html($_step_info, $_request_headers, $_core_info, $_response_base);
+    _write_http_log($_step_info, $_core_info);
+    _write_step_html($_step_info, $_core_info, $_response_base);
 
     $previous_test_step = $testnum_display.$jumpbacks_print.$retries_print;
 
@@ -3310,7 +3309,7 @@ sub httplog {  # write requests and responses to http.txt file
 
 #------------------------------------------------------------------
 sub _write_http_log {
-    my ($_step_info, $_request_headers, $_core_info) = @_;
+    my ($_step_info, $_core_info) = @_;
 
     if (!$output_enabled) { return; }
 
@@ -3323,7 +3322,7 @@ sub _write_http_log {
     $_log_separator .= "    *********************************************************    \n";
     $_log_separator .= "      *****************************************************      \n\n";
 
-    my $_append_content = $_step_info . $_request_headers . "\n" . uncoded() . $_log_separator;
+    my $_append_content = $_step_info . $request_headers . "\n" . uncoded() . $_log_separator;
     append_utf8($opt_publish_full.'http.txt', \$_append_content);
 
     return;
@@ -3331,7 +3330,7 @@ sub _write_http_log {
 
 #------------------------------------------------------------------
 sub _write_step_html { ## no critic(ProhibitManyArgs)
-    my ($_step_info, $_request_headers, $_core_info, $_response_base) = @_;
+    my ($_step_info, $_core_info, $_response_base) = @_;
 
     my $_response_content = $resp_content;
 
@@ -3368,7 +3367,7 @@ sub _write_step_html { ## no critic(ProhibitManyArgs)
     $_html .= qq|        </div>\n|;
 
     $_html .= qq|        <a class="wi_hover_item" style="font-family: Verdana, sans-serif; color:SlateGray; font-weight:bolder;" href="javascript:wi_toggle('wi_toggle_request');">Request Headers</a> : \n|;
-    $_html .= qq|\n<xmp id="wi_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_request_headers.qq|\n</xmp>\n|;
+    $_html .= qq|\n<xmp id="wi_toggle_request" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$request_headers.qq|\n</xmp>\n|;
     $_html .= qq|        <a class="wi_hover_item" style="font-family: Verdana, sans-serif; color:SlateGray; font-weight:bolder;" href="javascript:wi_toggle('wi_toggle_response');">Response Headers</a>\n|;
     $_html .= qq|\n<xmp id="wi_toggle_response" style="display: none; font-size:1.5em; white-space: pre-wrap;">\n|.$_core_info.qq|\n|.$response->headers_as_string.qq|\n</xmp>\n<br /><br />\n|;
     $_html .= qq|    </wi_body>\n|;
@@ -3527,6 +3526,33 @@ sub _response_content_substitutions {
 
     if (@bg_images) {
         ${ $_response_content_ref } =~ s{style="background-image: url[(]([^)]+)}{_grabbed_background_image($1)}eg; #"
+    }
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub redact {
+
+    $request_headers = decode('utf8', $request->as_string);
+
+    foreach my $_case_attribute ( sort keys %case ) {
+        if ( (substr $_case_attribute, 0, 6) eq 'redact' ) {
+            my $_redact = $case{$_case_attribute};
+            _redact(\ $request_headers, $_redact);
+            _redact(\ $resp_content, $_redact);
+        }
+    }
+
+    return;
+}
+
+sub _redact {
+    my ($_content_ref, $_redact) = @_;
+
+    if ($ { $_content_ref } =~ m/$_redact/s) {
+        my $_redact_target = $1;
+        $ { $_content_ref } =~ s/$_redact_target/__redacted__/gs;
     }
 
     return;

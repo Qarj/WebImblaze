@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.0 - Sep 18, 2019
+* New `redact` parameter can remove sensitive information like passwords and API keys from the results
+
 ### Version 1.2.3 - Sep 13, 2019
 * Dependency on Math::Random::ISAAC is overkill so has been removed in favour of Perl standard rand() function
 

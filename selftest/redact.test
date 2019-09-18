@@ -1,0 +1,27 @@
+step:                   {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell:                  perl wi.pl -o selftest{SLASH}output{SLASH}{FEATURE}sub selftest{SLASH}substeps{SLASH}{FEATURE}.test
+verifypositive:         Test Steps Failed: 0
+verifynegative:         uninitialized value
+
+step:                   Check http.txt redacted
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
+assertcount:            __redacted__|||2|||bigsecret should be redacted twice
+verifypositive1:        __redacted__
+verifynegative1:        bigsecret
+verifynegative2:        password=bigsecret
+verifynegative3:        "password": "bigsecret"
+
+
+step:                   Check Results.html redacted
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subResults.html
+verifynegative1:        bigsecret
+
+step:                   Check results.xml redacted
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subresults.xml
+verifynegative1:        bigsecret
+
+step:                   Check 10.html redacted
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}sub10.html
+verifypositive1:        __redacted__
+verifynegative1:        bigsecret
