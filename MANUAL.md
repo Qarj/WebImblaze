@@ -1492,15 +1492,16 @@ addheader: SOAPAction: urn:example-org:demos#Method
 addheader: Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1
 ```
 
+Note that while you use addheader to set cookies, any existing cookies will be clobbered.
+Use the setcookie parameter instead.
+
 You may add multiple headers, separating each with a pipe character.
 
 ```
 addheader: Foo: bar|Boo: far
 ```
 
-Note that when you use addheader, any existing header cookies will be clobbered.
-
-Note also that HTTP::Headers class converts header field names to be title case
+Note that the HTTP::Headers class converts header field names to be title case
 by default to make them look consistent. It can do this because the RFC says that
 header field names are case insensitive. Unfortunately some people are not aware
 of this and insist on case sensitive header field names. To get around this problem
