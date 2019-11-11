@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.1 - Nov 11, 2019
+* Assertion failure custom messages are now displayed on STDOUT in yellow
+
 ### Version 1.3.0 - Sep 18, 2019
 * New `redact` parameter can remove sensitive information like passwords and API keys from the results
 

@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.0';
+$VERSION = '1.3.1';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1962,7 +1962,7 @@ sub _verify_autoassertion {
                     }
                     colour_stdout('bold yellow', "Failed Auto Assertion \n");
                     if ($_verifyparms[1]) {
-                       $results_stdout .= "$_verifyparms[1] \n";
+                        colour_stdout('bold yellow', "$_verifyparms[1] \n");
                     }
                     $failed_count++;
                     $retry_failed_count++;
@@ -2064,7 +2064,7 @@ sub _verify_verifypositive {
                     }
                     colour_stdout('bold yellow', "Failed Positive Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
-                       $results_stdout .= "$_verifyparms[1] \n";
+                        colour_stdout('bold yellow', "$_verifyparms[1] \n");
                     }
                     $failed_count++;
                     $retry_failed_count++;
@@ -2106,11 +2106,11 @@ sub _verify_verifynegative {
                     $results_xml .= qq|                <success>false</success>\n|;
                     if ($_verifyparms[1]) {
                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
-                         $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
+                        $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                     }
                     colour_stdout('bold yellow', "Failed Negative Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
-                       $results_stdout .= "$_verifyparms[1] \n";
+                        colour_stdout('bold yellow', "$_verifyparms[1] \n");
                     }
                     $failed_count++;
                     $retry_failed_count++;
