@@ -1358,6 +1358,17 @@ Example - in this regex, the .* at the front tells it to return the last match, 
 parseresponse: .*UserId="(.*?)"\<
 ```
 
+Example - in this regex, (?s) causes the . to match any character including . even when in single line mode (end hence getting last match):
+```
+parseresponse: (?s).*UserId="(.*?)"\<
+```
+See regular expression modifiers: https://www.regular-expressions.info/modifiers.html
+
+Example - another way to force the last capture to be returned, in this case `(\d+)` immediately following `"dealId":`:
+```
+parseresponse:    "dealId":(?:(\d+)(?!(?s).*"dealId":))+
+```
+
 Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
 ```
 parseresponse: ([\d][\d]/[\d][\d]/[\d]{4,4})
