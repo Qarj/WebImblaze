@@ -1,23 +1,22 @@
 step:                   Should not skip assertcount
-shell:                  echo one one one
+echo:                   one one one
 assertcountONE:         one|||4|||Expected count of 4
 
 step:                   Should not skip verifypositive
-shell:                  echo one one one one
 verifypositiveONE:      two|||Expected to find two
 
 step:                   Should not skip verifynegative
-shell:                  echo one one one one
+echo:                   one one one one
 verifynegativeONE:      one|||Did not expect to find one
 
 step:                   Should not skip autoassertion
-shell:                  echo HTTP Error 404.0 . Not Found
+echo:                   HTTP Error 404.0 . Not Found
 
 step:                   Should not skip smartassertion
-shell:                  echo Set-Cookies: 
+echo:                   Set-Cookies: new_cookie: value
 
 step:                   Should skip assertcount
-shell:                  echo one one one
+echo:                   one one one
 assertcount:            one|||4|||Expected count of 4|||Production Bug
 assertcount5:           one|||4|||Expected count of 4|||Production Bug
 assertcount1ONE1:       one|||4|||Expected count of 4|||Production Bug
@@ -25,16 +24,15 @@ assertcountASSERTCOUNT: one|||4|||Expected count of 4|||Production Bug
 assertcountONE:         one|||4|||Expected count of 4|||Production Bug
 
 step:                   Should skip verifypositive
-shell:                  echo one one one one
+echo:                   one one one one
 verifypositive:         two|||Expected to find two|||Some type of issue
 verifypositive5:        two|||Expected to find two|||Some type of issue
 verifypositive1ONE1:    two|||Expected to find two|||Some type of issue
 verifypositiveONE:      two|||Expected to find two|||Some type of issue
 
 step:                   Should skip verifynegative
-shell:                  echo one one one one
+echo:                   one one one one
 verifynegative:         one|||Did not expect to find one|||Relaxed the assertion
 verifynegative5:        one|||Did not expect to find one|||Relaxed the assertion
 verifynegative1ONE1:    one|||Did not expect to find one|||Relaxed the assertion
 verifynegativeONE:      one|||Did not expect to find one|||Relaxed the assertion
-

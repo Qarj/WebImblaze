@@ -1,15 +1,13 @@
 step:                   First test step
-shell:                  echo NOP
 
 step:                   Step passes
-shell:                  echo NOP
+echo:                   NOP
 verifypositive:         NOP
 gotostep:               Teardown
 
 step:                   Test step will not be run
-shell:                  echo Will not be seen
+echo:                   Will not be seen
 
 step:                   Teardown
 section:                Teardown
-shell:                  echo Execution will continue from here
-
+echo:                   Execution will continue from here

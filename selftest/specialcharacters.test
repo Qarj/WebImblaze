@@ -1,8 +1,11 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
-verifypositive:         Test Steps Failed: 1
-verifypositive1:        Test Steps Run: 4
+verifypositive0:        Failed Positive Verification 0
+verifypositive1:        Failed Positive Verification 1
+verifypositive2:        Failed Positive Verification 2
+verifypositive3:        Test Steps Run: 5
+verifypositive4:        Test Steps Failed: 1
 verifynegative:         uninitialized value
 
 step:                   view xml results.xml file

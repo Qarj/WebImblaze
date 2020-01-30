@@ -1,0 +1,13 @@
+# User agent set at file level wins over config.xml setting
+useragent:              File level directive
+
+step:                   Reflect user agent
+desc:                   User agent set with file level directive
+url:                    http://httpbin.org/anything
+verifypositive:         File level directive
+
+step:                   Reflect user agent
+desc:                   File level directive overridden
+url:                    http://httpbin.org/anything
+useragent:              User agent overridden
+verifypositive:         User agent overridden

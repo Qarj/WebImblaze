@@ -1,14 +1,13 @@
-step:                   Get home page
-url:                    http://{WIC}
+step:                   Reflect user agent - default
+url:                    http://httpbin.org/anything
+verifypositive:         WebImblaze
 
-step:                   Get home page
-url:                    http://{WIC}
+step:                   Reflect user agent - set custom for this and subsequent steps
+url:                    http://httpbin.org/anything
 useragent:              My Special Browser
+verifypositive:         My Special Browser
 
-step:                   Get home page
-url:                    http://{WIC}
-
-step:                   Get home page
-url:                    http://{WIC}
-useragent:              Firefox Browser
-
+step:                   Reflect user agent - still My Special Browser
+desc:                   Should pass
+url:                    http://httpbin.org/anything
+verifypositive:         My Special Browser

@@ -1,17 +1,13 @@
-step:                   Page sets a cookie on first visit
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
+step:                   Sets a cookie on first visit
+desc:                   Step will pass
+url:                    http://httpbin.org/cookies
+setcookie:              MyCookieName: value_of_cookie
+verifypositive:         "MyCookieName": "value_of_cookie"
 
-step:                   Get page again, cookie is already set
-desc:                   Step will fail
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
-
-step:                   Browser is restarted
-shell:                  echo NOP
+step:                   Browser session is restarted - restartbrowser
 restartbrowser:         true
 
-step:                   Get page after restart, cookie will be set again
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
-
+step:                   Cookie is gone now since the session restarted
+desc:                   Step will pass
+url:                    http://httpbin.org/cookies
+verifynegative:         MyCookieName: value_of_cookie

@@ -1,16 +1,13 @@
 step:                   verifyresponsecode should pass
-shell:                  echo hello world
 verifyresponsecode:     100
 
 step:                   verifyresponsecode should fail
-shell:                  echo hello world
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    https://www.gov.uk/pagedoesnotexist
+url:                    http://httpbin.org/doesnotexist
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    https://www.gov.uk/
+url:                    http://httpbin.org/status/200
 verifyresponsecode:     200
-

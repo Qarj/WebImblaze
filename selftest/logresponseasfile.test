@@ -2,9 +2,9 @@ step:                   {FEATURE} - filename prefix included as part of output p
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 
-step:                   view WEBIMBLAZE-CHECK_Home_Page.html
-shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subWEBIMBLAZE-CHECK_Home_Page.html
-verifypositive:         government
+step:                   view Home_Page.html
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subHome_Page.html
+verifypositive:         simple
 verifypositive1:        html.*head.*body
 verifynegative:         uninitialized value
 
@@ -13,7 +13,7 @@ shell1:                 if not exist selftest\output\temp\ mkdir selftest\output
 shell2:                 perl -MFile::Path=make_path -e "make_path(qq{selftest{SLASH}output{SLASH}temp{SLASH}})"
 shell3:                 .\wi.pl -o selftest\output\temp\ selftest\substeps\{FEATURE}.test
 
-step:                   view WEBIMBLAZE-CHECK_Home_Page.html
-shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}WEBIMBLAZE-CHECK_Home_Page.html
-verifypositive:         government
+step:                   view Home_Page.html
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}Home_Page.html
+verifypositive:         simple
 verifypositive1:        html.*head.*body

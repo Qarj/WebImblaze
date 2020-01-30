@@ -3,6 +3,5 @@ varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 1
 verifypositive1:        Passed Response Time Verification
-verifypositive2:        Failed Response Time Verification - should be at most 1
+verifypositive2:        Failed Response Time Verification - should be at most 0\.01
 verifynegative:         uninitialized value
-

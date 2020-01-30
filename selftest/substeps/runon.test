@@ -1,19 +1,13 @@
 step:                   Can be executed in any environment
-shell:                  echo NOP
 
 step:                   Can be executed in DEV, PAT or PROD
-shell:                  echo NOP
 runon:                  DEV|PAT|PROD
 
 step:                   Can be executed in DEV only
-shell:                  echo NOP
 runon:                  DEV
 
 step:                   Can be executed in DEV or PAT only
-shell:                  echo NOP
 runon:                  DEV|PAT
 
 step:                   Can be executed in PROD only
-shell:                  echo NOP
 runon:                  PROD
-

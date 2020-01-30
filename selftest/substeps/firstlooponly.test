@@ -1,10 +1,9 @@
 repeat:                 5
 
 step:                   Step 10 loop counter is _{COUNTER}_ 
-shell:                  echo Step 10 loop counter is _{COUNTER}_
+echo:                   Step 10 loop counter is _{COUNTER}_
 verifypositive:         Step 10 loop counter is _1_
 firstlooponly:          true
 
 step:                   Step 20 loop counter is _{COUNTER}_
-shell:                  echo Step 20 loop counter is _{COUNTER}_
-
+echo:                   Step 20 loop counter is _{COUNTER}_

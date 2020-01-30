@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.1';
+$VERSION = '1.3.2';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -2631,6 +2631,7 @@ sub parser_get_single_line_comment {
 
 sub parser_get_multi_line_comment {
 
+    my $_comment_start_line = $parser_index_ + 1;
     my $_saw_comment = 0;
     while ( 1 ) {
         if ( parser_line() =~ /^\s*--=/ ) {
@@ -2642,7 +2643,10 @@ sub parser_get_multi_line_comment {
         if ( parser_line() =~ /=--/ ) {
             return 1;
         }
-        parser_advance_line();
+        # parser_advance_line();
+        if ( not parser_advance_line() ) {
+            _output_validate_error("Possible runaway multi line comment starting line $_comment_start_line.", "well formed multi-line comment:\n\n--= Notes:\n    note 1\n    note 2\n=--\n", $_comment_start_line);
+        }
     }
 
     return;

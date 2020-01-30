@@ -1,5 +1,5 @@
 step:                   Should pass negative verification
-shell:                  echo Some texts to verify
+echo:                   Some texts to verify
 verifynegative:         Some text to verify
 verifynegative1:        Some .... to verify
 verifynegative2:        Some \w{4,4} to verify
@@ -7,7 +7,7 @@ verifynegative5000:     verofy
 verifynegativeTEXT:     Many texts
 
 step:                   Should fail negative verification
-shell:                  echo Some texts to verify
+echo:                   Some texts to verify
 verifynegative:         Some texts to verify
 verifynegative1:        Some ..... to verify
 verifynegative2:        Some \w{2,5} to verify
@@ -15,13 +15,15 @@ verifynegative5000:     verify
 verifynegativeTEXT:     Some texts
 
 step:                   Should fail negative verification and output a custom failure message
-shell:                  echo Some text to verify
+echo:                   Some text to verify
 verifynegative:         Some text to verify|||Should not find text but did
 
 step:                   Assertion should be ignored
-shell:                  echo Some text to verify
+desc:                   Should pass
+echo:                   Some text to verify
 verifynegative:         Some text to verify|||Should not find text but did|||Production Bug
 
 step:                   Should be able to see response header
-shell:                  echo headers
+desc:                   Should fail
+echo:                   headers
 verifynegative:         100 OK|||This should fail since 100 OK is seen

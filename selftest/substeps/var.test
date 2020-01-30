@@ -2,16 +2,15 @@ repeat:                 2
 
 step:                   Info - testemail: {TESTEMAIL}
 varTESTEMAIL:           testemail_{COUNTER}_{JUMPBACKS}_{RETRY}_{YEAR}{MONTH}{DAY}_{HH}{MM}{SS}@example.com
-shell:                  echo {TESTEMAIL}
+echo:                   {TESTEMAIL}
 verifypositive:         _2_{YEAR}{MONTH}{DAY}
 retry:                  3
 
 step:                   Further Processing
-shell:                  echo NOP
 checkpoint:             true
 
 step:                   Info - testemail: {TESTEMAIL}
 varTESTEMAIL:           testemail_{COUNTER}_{JUMPBACKS}_{RETRY}_{YEAR}{MONTH}{DAY}_{HH}{MM}{SS}@example.com
-shell:                  echo {TESTEMAIL}
+echo:                   {TESTEMAIL}
 verifypositive:         _2_0_{YEAR}{MONTH}{DAY}
 

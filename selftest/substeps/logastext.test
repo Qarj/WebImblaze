@@ -1,7 +1,6 @@
 step:                   log as text not used
-url:                    https://www.gov.uk/
+url:                    http://httpbin.org
 
 step:                   log as text used
-url:                    https://www.gov.uk/
+url:                    http://httpbin.org
 logastext:              true
-

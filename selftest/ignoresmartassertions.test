@@ -5,4 +5,3 @@ assertcount:            Failed Smart Assertion|||1
 verifypositive:         Test Steps Failed: 1
 verifypositive1:        Must have a Cache-Control of private or no-cache when a cookie is set
 verifynegative:         uninitialized value
-

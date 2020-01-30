@@ -1,10 +1,8 @@
 step:                   commandonerror should be run
-shell:                  echo one one one
 commandonerror:         echo commandonerror in step 10 was run
 verifypositive:         two two two
 
 step:                   commandonerror should not be run
-shell:                  echo two two two
+echo:                   two two two
 commandonerror:         echo commandonerror in step 20 was run
 verifypositive:         two two two
-

@@ -1,17 +1,16 @@
 step:                   Step fails
-shell:                  echo NOP
+echo:                   NOP
 verifypositive:         fail fast!NO OPERATION
 
 step:                   Step passes
-shell:                  echo NOP
+echo:                   NOP
 verifypositive:         NOP
 abort:                  true
 
 step:                   Step fails - execution will be aborted
-shell:                  echo NOP
+echo:                   NOP
 verifypositive:         No Operation
 abort:                  true
 
 step:                   Test step will not be run
-shell:                  echo Will not be seen
-
+echo:                   Will not be seen

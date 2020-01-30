@@ -1,29 +1,29 @@
-step:                   Page sets a cookie on first visit
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
+step:                   Sets a cookie on first visit
+url:                    http://httpbin.org/cookies
+setcookie:              MyCookieName: value_of_cookie
+verifypositive:         "MyCookieName": "value_of_cookie"
 
-step:                   Get page again - cookie is already set
+step:                   Browser session is restarted due to an error
 desc:                   Step will fail
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
-
-step:                   Browser is restarted due to an error
-shell:                  echo NOP
+echo:                   NOP
 verifypositive:         Some text that is not there
 restartbrowseronfail:   true
 
-step:                   Page sets TLSversion cookie
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
+step:                   Cookie is gone now since the session restarted
+desc:                   Step will pass
+url:                    http://httpbin.org/cookies
+setcookie:              AnotherCookie: new_cookie
+verifynegative:         MyCookieName: value_of_cookie
 
 step:                   Browser is not restarted since the test step passes
-shell:                  echo Some text that is there
+desc:                   Step will pass
+echo:                   Some text that is there
 verifypositive:         Some text that is there
 restartbrowseronfail:   true
 
-step:                   Page has already set TLSversion cookie
-desc:                   Step will fail
-url:                    https://www.gov.uk/
-verifypositive:         Set-Cookie: TLSversion
+step:                   AnotherCookie is still present since session wasn't restarted in the step before this one
+desc:                   Step will pass
+url:                    http://httpbin.org/cookies
+verifypositive:         "AnotherCookie": "new_cookie"
 
 

@@ -1,8 +1,6 @@
 step:                   Step 10 should fail
-shell:                  echo NOP
 verifypositive:         Will not be found
 
 step:                   Step 20 should fail also, however Step 10 should be reported to Nagios - first failed step
-shell:                  echo NOP
 verifypositive:         Will not be found
 

@@ -1,4 +1,3 @@
 step:                   log response as file
-url:                    https://www.gov.uk/
-logresponseasfile:      {PUBLISH}WEBIMBLAZE-CHECK_Home_Page.html
-
+url:                    http://httpbin.org/
+logresponseasfile:      {PUBLISH}Home_Page.html

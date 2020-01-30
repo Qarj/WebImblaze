@@ -1,7 +1,6 @@
 step:                   Setup variables
 section:                SETUP
 varUSERNAME:            important_user
-shell:                  echo NOP
 
 include:                selftest\helpers\setup\login.test
 
@@ -10,17 +9,15 @@ include:                selftest\helpers\setup\create_job_ad.test
 include:                selftest\helpers\setup\apply_for_job.test
 
 step:                   View job {JOB_ID}
-shell:                  echo you are viewing the job description and salary for {JOB_ID}
+echo:                   you are viewing the job description and salary for {JOB_ID}
 verifypositive:         salary for (\d)+
 
 step:                   Apply for job
-shell:                  echo you have applied for the job ok
+echo:                   you have applied for the job ok
 verifypositive:         applied for the job ok
 
 step:                   Expire job ad
 section:                TEARDOWN
-shell:                  NOP
 runon:                  PROD
 
 include:                selftest\helpers\teardown\expire_job_ad.test
-

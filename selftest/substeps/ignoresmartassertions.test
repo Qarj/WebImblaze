@@ -1,11 +1,9 @@
 step:                   Should fail due to smart assertion defined in ignoresmartassertionsconfig.xml
-shell:                  echo Set-Cookie: 
+echo:                   Set-Cookie: new_cookie=value
 
 step:                   Should pass - smartassertions are ignored
-shell:                  echo Set-Cookie: 
+echo:                   Set-Cookie: new_cookie=value
 ignoresmartassertions:  true
 
 step:                   Should pass - smart assertions are satisfied
-shell:                  echo Set-Cookie: 
-shell1:                 echo Cache-Control: private
-
+echo:                   Set-Cookie: new_cookie=value Cache-Control: private

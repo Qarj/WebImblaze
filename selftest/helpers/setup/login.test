@@ -1,10 +1,6 @@
 step:                   Get the login page
 section:                selftest\helpers\setup\login.xml [{USERNAME}]
-shell:                  echo NOP
 
 step:                   Submit {USERNAME} and password
-shell:                  echo NOP
 
 step:                   Info - logged in as {USERNAME}
-shell:                  echo NOP
-

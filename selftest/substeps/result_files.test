@@ -1,11 +1,10 @@
 step:                   Welcome to Step 10
-shell:                  echo one one one
+echo:                   one one one
 verifypositive:         one
 verifynegative:         two
 
 step:                   Step 20 welcomes you
-shell:                  echo twenty
+echo:                   twenty
 
 step:                   Step 30 says bye
-shell:                  echo This is step 30
-
+echo:                   This is step 30

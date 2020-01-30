@@ -1,9 +1,7 @@
 step:                   Will be run - truthy
-shell:                  echo NOP
 runif:                  abcd
 
 step:                   Will not be run - falsy
-shell:                  echo NOP
 runif:quote:             quotequote
 
 step:                   Set FALSE var as null
@@ -11,5 +9,4 @@ varFALSE:^:             ^^
 
 step:                   Will not be run - falsy
 desc:                   var Variable will be substituted before evaluating runif
-shell:                  echo NOP
 runif:                  {FALSE}

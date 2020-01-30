@@ -1,4 +1,3 @@
 step:                   Get a background image
-url:                    https://www.totaljobsgroup.com
-getbackgroundimages:    bg_slide_6.png
-
+url:                    https://www.w3schools.com/cssref/tryit.asp?filename=trycss_background-image
+getbackgroundimages:    paper.gif

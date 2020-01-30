@@ -1,13 +1,9 @@
 step:                   Should fail due to auto assertions defined in ignoreautoassertionsconfig.xml
-shell:                  echo one two three four
-shell1:                 echo one fish three fish
+echo:                   one two three four one fish three fish
 
 step:                   Should pass - autoassertions are ignored
-shell:                  echo one two three four
-shell1:                 echo one fish three fish
+echo:                   one two three four one fish three fish
 ignoreautoassertions:   true
 
 step:                   Should pass - autoassertions are satisfied
-shell:                  echo one two two one
-shell1:                 echo one fish two fish
-
+echo:                   one two two one one fish two fish

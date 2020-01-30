@@ -1,7 +1,6 @@
-step:                   should fail
-url:                    http://www.fairfaxhouse.co.uk/pagedoesnotexist
+step:                   Should fail
+url:                    http://httpbin.org/status/500
 
-step:                   should pass
-url:                    http://www.fairfaxhouse.co.uk/pagedoesnotexist
+step:                   Should pass
+url:                    http://httpbin.org/status/500
 ignorehttpresponsecode: true
-

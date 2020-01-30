@@ -1,10 +1,8 @@
 step:                   Custom errormessage written when test step fails
-shell:                  echo NOP
 verifypositive:         This text will not be found
 errormessage:           Test failed for some reason
 
 step:                   Custom errormessage not written when test step passes
-shell:                  echo Text present
+echo:                   Text present
 verifypositive:         Text present
 errormessage:           Maybe the drive is full
-

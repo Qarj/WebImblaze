@@ -1,39 +1,29 @@
 step:                   Should not retry since autoretry is not enabled in config or yet in script
-shell:                  echo ten
 verifypositive:         text not present
 
 step:                   Should retry twice since retry parameter wins
-shell:                  echo twenty
 verifypositive:         text not present
 autoretry:              5
 retry:                  2
 
 step:                   Will retry once only - there have been 4 attempts since last success
-shell:                  echo thirty
 verifypositive:         text not present
 
 step:                   Will not retry since autoretry is now disabled after being exhausted
-shell:                  echo forty
 verifypositive:         text not present
 
 step:                   Passing step
-shell:                  echo fifty
 
 step:                   Will retry 5 times due to autoretry being re-enabled by the passing step
-shell:                  echo sixty
 verifypositive:         text not present
 
 step:                   Passing step
-shell:                  echo seventy
 
 step:                   Will not retry due to presence of ignoreautoretry parameter
-shell:                  echo eighty
 verifypositive:         text not present
 autoretry:              10
 ignoreautoretry:        true
 
 step:                   Will not retry due to autoretry effectively being turned off by setting to 0
-shell:                  echo ninety
 verifypositive:         text not present
 autoretry:              0
-

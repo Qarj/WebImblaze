@@ -1149,6 +1149,18 @@ EOB
 eval { read_test_steps_file(); };
 assert_stdout_contains("End of file reached, but quote starting line 2 not found", '_parse_lean_test_steps : runaway quote');
 
+# runaway multi line comment - no end comment
+before_test();
+$main::unit_test_steps = <<'EOB'
+--=
+comment
+
+step: do something
+EOB
+    ;
+eval { read_test_steps_file(); };
+assert_stdout_contains("Possible runaway multi line comment starting line 1", '_parse_lean_test_steps : runaway multi line comment');
+
 # step block must start with step parameter
 before_test();
 $main::unit_test_steps = <<'EOB'

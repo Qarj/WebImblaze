@@ -3,4 +3,3 @@ url:                    http://httpbin.org/post
 posttype:               multipart/form-data
 postbody:               ( 'fileUpload' => ['selftest/testdata/searches.csv'] )
 verifypositive2:        Carbonara
-

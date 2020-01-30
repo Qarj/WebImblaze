@@ -4,7 +4,6 @@ shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substep
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subhttp.txt
 assertcount:            User-Agent: WebImblaze|||1
 assertcount1:           User-Agent: My Special Browser|||2
-assertcount2:           User-Agent: Firefox Browser|||1
 verifynegative:         uninitialized value
 
 step:                   {FEATURE} - from config file
@@ -15,3 +14,10 @@ assertcount1:           User-Agent: HTTP Test Tool|||1
 assertcount2:           User-Agent: Chrome Browser|||1
 verifynegative:         uninitialized value
 
+step:                   {FEATURE} - file level directive
+shell:                  .\wi.pl -o selftest\output\{FEATURE}2sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}2.test
+shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}2subhttp.txt
+assertcount:            User-Agent: WebImblaze|||0
+assertcount1:           User-Agent: File level directive|||1
+assertcount2:           User-Agent: User agent overridden|||1
+verifynegative:         uninitialized value

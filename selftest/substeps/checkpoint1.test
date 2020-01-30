@@ -1,18 +1,14 @@
 step:                   Step 10
-shell:                  echo NOP
 checkpoint:             true
 
 step:                   Step 20
-shell:                  echo NOP
 
 step:                   Retry 5 times, pass on attempt three
 desc:                   Will not get to a regular retry attempt three - will eventually pass
-shell1:                 echo step 30 attempt {RETRY}
-shell2:                 echo step 30 jumpbacks {JUMPBACKS}
+echo:                   step 30 attempt {RETRY} | step 30 jumpbacks {JUMPBACKS}
 verifypositive:         step 30 attempt 3|step 30 jumpbacks 5
 retry:                  5
 
 step:                   Jumpback up to globaljumpbacks limit, pass on attempt two
-shell:                  echo step 30 jumpbacks {JUMPBACKS}
+echo:                   step 30 jumpbacks {JUMPBACKS}
 verifypositive:         step 30 jumpbacks 5
-

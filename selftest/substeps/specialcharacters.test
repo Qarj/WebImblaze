@@ -1,12 +1,18 @@
 step:                   Use special characters in assertions
-shell:                  echo NOP
+desc:                   Should fail
 verifypositive:         one > two
 verifypositive1:        one < two
 verifypositive2:        one & two
 
+step:                   Use special characters in assertions
+desc:                   Should pass
+echo:                   one > two | one < two | one & two
+verifypositive7:        one > two
+verifypositive8:        one < two
+verifypositive9:        one & two
+
 step:                   less than < greater than > & ampersand
 desc:                    <&> in description too
-shell:                  echo NOP
 
 step:                   Assertions should pass
 shell:                  echo one < NUL

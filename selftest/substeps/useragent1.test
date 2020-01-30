@@ -1,7 +1,10 @@
-step:                   Get home page
-url:                    http://{WIC}
+step:                   Reflect user agent
+desc:                   User agent set in config file
+url:                    http://httpbin.org/anything
+verifypositive:         HTTP Test Tool
 
-step:                   Get home page
-url:                    http://{WIC}
+step:                   Reflect user agent - override config file
+desc:                   Should pass
+url:                    http://httpbin.org/anything
 useragent:              Chrome Browser
-
+verifypositive:         Chrome Browser
