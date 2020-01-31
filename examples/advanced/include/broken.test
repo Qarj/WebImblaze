@@ -1,0 +1,3 @@
+step: This include file fails to parse - used by the unit tests
+
+echo: This step is missing the compulsory step: parameter

@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.2';
+$VERSION = '1.3.3';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -81,7 +81,7 @@ our ($opt_driver, $opt_chromedriver_binary, $opt_selenium_binary, $opt_selenium_
 my ($opt_configfile, $opt_version, $opt_output, $opt_autocontroller);
 my ($opt_ignoreretry, $opt_no_colour, $output_enabled, $opt_verbose, $opt_help);
 
-my ($parser_index_, $step_id_, $repeat_, $useragent_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
+my ($parser_index_, $parser_file_name_, $step_id_, $repeat_, $useragent_, $parser_step_start_line_, %case_, %include_, @parser_lines_, @parser_step_parm_names_, @parser_step_parm_values_);
 
 my $report_type; # 'standard' and 'nagios' supported
 my $nagios_return_message;
@@ -2502,7 +2502,7 @@ sub _parse_steps {
     my ($_file_content_ref) = @_;
 
     undef $repeat_;
-    new_parser( $_file_content_ref );
+    new_parser( $_file_content_ref, $current_steps_file );
     _parse_lines();
     my $_files_to_include = dclone \ %include_;
     my $_case_main_file = dclone \ %case_;
@@ -2520,7 +2520,7 @@ sub _parse_steps {
     foreach my $_include_integer_step_num (keys %{ $_files_to_include } ) {
         my $_include_file_name = $_files_to_include->{$_include_integer_step_num};
         my $_include_file_content_ref = read_utf8( $_include_file_name );
-        new_parser( $_include_file_content_ref );
+        new_parser( $_include_file_content_ref, $_include_file_name );
         _parse_lines();
         foreach my $_sub_step (keys %case_ ) {
             my $_insert_step = $_sub_step / 1000 + $_include_integer_step_num ;
@@ -2567,9 +2567,10 @@ sub _parse_lines {
 }
 
 sub new_parser {
-    my ($_parser_raw_ref) = @_;
+    my ($_parser_raw_ref, $_parser_file_name) = @_;
     @parser_lines_ = split /\n/, ${$_parser_raw_ref};
     $parser_index_ = -1;
+    $parser_file_name_ = $_parser_file_name;
 
     %case_ = ();
     %include_ = ();
@@ -2968,7 +2969,7 @@ sub _output_validate_error {
     my $_line = $parser_lines_[$_line_num - 1];
     $results_stdout .= qq|Parse error line $_line_num \n\n|;
     $results_stdout .= qq|$_error_message\n\n|;
-    $results_stdout .= qq|Line $_line_num of $current_steps_file:\n\n|;
+    $results_stdout .= qq|Line $_line_num of $parser_file_name_:\n\n|;
     $results_stdout .= qq|$_line\n\n|;
     $results_stdout .= qq|Example of $_example\n|;
     die $results_stdout."\n".'Test step file is malformed, aborted WebImblaze';

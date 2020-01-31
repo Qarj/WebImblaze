@@ -7,7 +7,10 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
-### Version 1.3.2 - Jan 30, 2019
+### Version 1.3.3 - Jan 31, 2020
+* file name of include file is now given if it fails to parse instead of the master file name
+
+### Version 1.3.2 - Jan 30, 2020
 * fixed infinite loop when a multi-line comment is not closed
 * reviewed, improved and sped up self tests
 

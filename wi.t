@@ -1445,6 +1445,19 @@ eval { read_test_steps_file(); };
 assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
 assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
 
+# when include file fails to parse, give its filename
+before_test();
+$main::unit_test_steps = <<'EOB'
+step: Include file has a parser error
+
+include: examples/advanced/include/broken.test
+EOB
+    ;
+eval { read_test_steps_file(); };
+assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : parse error in include file - 1');
+assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : parse error in include file - 2');
+assert_stdout_contains("broken.test", '_parse_lean_test_steps : parse error in include file - 3');
+
 # section break increases step id to the next round 100 value
 before_test();
 $main::unit_test_steps = <<'EOB'
