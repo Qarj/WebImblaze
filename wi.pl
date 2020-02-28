@@ -55,7 +55,7 @@ local $| = 1; # don't buffer output to STDOUT
 our $EXTRA_VERBOSE = 0; # set to 1 for additional stdout messages, also used by the unit tests
 
 our ($request, $request_headers, $response, $resp_headers, $resp_content);
-my $useragent;
+our $useragent;
 
 our ($latency, $verification_latency, $screenshot_latency);
 my ($epoch_seconds, $epoch_split); # for {TIMESTAMP}, {EPOCHSECONDS} - global so all substitutions in a test step have same timestamp
@@ -64,7 +64,7 @@ my $total_run_time;
 my ($total_response, $avg_response, $max_response, $min_response);
 my %test_step_time; # record latency for use by substitutions
 
-my ($cookie_jar, @http_auth);
+our ($cookie_jar, @http_auth);
 
 our ($case_failed_count, $passed_count, $failed_count);
 our $is_failure;
@@ -86,7 +86,7 @@ my ($parser_index_, $parser_file_name_, $step_id_, $repeat_, $useragent_, $parse
 my $report_type; # 'standard' and 'nagios' supported
 my $nagios_return_message;
 
-my $testnum;
+our $testnum;
 our $testnum_display;
 my ($previous_test_step, $delayed_file_full, $delayed_html);
 our ($retry_passed_count, $retry_failed_count, $retries_print, $jumpbacks_print);
@@ -1237,7 +1237,7 @@ sub getbackgroundimages { # style="background-image: url( )"
 sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a list for a reference type
                 # get_assets ('href',q{"},q{"},'.less|.css')
 
-    my ($_match, $_left_delim, $_right_delim, $assetlist, $_type, $_version) = @_;
+    my ($_match, $_left_delim, $_right_delim, $_assetlist, $_type, $_version) = @_;
 
     require URI::URL; # so getallhrefs can determine the absolute URL of an asset, and the asset name, given a page url and an asset href
 
@@ -1246,9 +1246,11 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
 
     my $_page = uncoded();
 
-    my @_extensions = split /[|]/, $assetlist ;
+    my @_extensions = split /[|]/, $_assetlist ;
 
     foreach my $_extension (@_extensions) {
+
+        print "Extension:$_extension \n";
 
         while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) # iterate over all the matches to this extension
         {
@@ -1267,6 +1269,8 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
             $asset{$_version . $_filename} = 1; # true
 
             $results_stdout .= "  GET Asset [$_version$_filename] ...";
+
+            print("_asset_url $_asset_url \n");
 
             $_asset_request = HTTP::Request->new('GET',"$_asset_url");
             $cookie_jar->add_cookie_header($_asset_request); # session cookies will be needed

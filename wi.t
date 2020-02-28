@@ -2,9 +2,18 @@ use diagnostics;
 use warnings;
 use strict;
 use Test::More qw( no_plan );
+use File::Path qw(make_path remove_tree);
 
 #http://www.drdobbs.com/scripts-as-modules/184416165
 do './wi.pl';
+
+require HTTP::Cookies;
+require LWP;
+
+my $WEBIMBLAZE_ROOT = $main::this_script_folder_full;
+$WEBIMBLAZE_ROOT =~ s{\\}{/}g;
+my $OUTPUT = 'unittest/';
+remove_tree($WEBIMBLAZE_ROOT . $OUTPUT);
 
 #
 # GLOBAL TEST SETUP
@@ -1563,6 +1572,28 @@ _verify_verifypositive();
 pass_fail_or_retry();
 assert_stdout_contains('RETRYING', 'pass_fail_or_retry : Retry available - retrying');
 
+
+#
+# resources
+#
+
+make_path ($WEBIMBLAZE_ROOT . $OUTPUT); # here to give remove_tree more time to settle
+
+sub resources_setup {
+    $main::cookie_jar = HTTP::Cookies->new;
+    $main::useragent = LWP::UserAgent->new(keep_alive=>1);
+    $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
+}
+
+resources_setup(before_test());
+$main::case{getallhrefs} = '\.css|\.less';
+$main::resp_content = (qq{ href="examples/assets/css/simple.css" });
+getresources();
+print("results_stdout: " . $main::results_stdout . "\n");
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written');
+assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content');
+
 #
 # GLOBAL HELPER SUBS
 #
@@ -1582,10 +1613,32 @@ sub assert_stdout_contains {
     if ($main::results_stdout =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
-        is('see between dashes below', $_must_contain, $_test_description);
+        is('see between dashes below for stdout', $_must_contain, $_test_description);
         show_stdout();
     }
 }
+
+sub assert_file_exists {
+    my ($_target_file, $_test_description) = @_;
+    if (-e $_target_file) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for stdout', $_target_file, $_test_description);
+        show_stdout();
+    }
+}
+
+sub assert_file_contains {
+    my ($_target_file, $_must_contain, $_test_description) = @_;
+    my $_content_ref = read_utf8($_target_file);
+    if ($$_content_ref =~ m/$_must_contain/s) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for stdout', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
+        show_stdout();
+    }
+}
+
 
 sub assert_stdout_does_not_contain {
     my ($_must_not_contain, $_test_description) = @_;
@@ -1618,6 +1671,10 @@ sub before_test {
     $main::response = HTTP::Response->parse('HTTP/1.1 200 OK');
     $main::resp_content = '';
     $main::resp_headers = '';
+    $main::opt_publish_full = $OUTPUT;
+    undef $main::cookie_jar;
+    undef $main::useragent;
+    $main::testnum = '1';
 
     undef @main::cached_pages;
     undef @main::cached_page_actions;
@@ -1625,6 +1682,7 @@ sub before_test {
     
     return;
 }
+
 
 #
 # SUPPRESS WARNINGS FOR VARIABLES USED ONLY ONCE
@@ -1636,6 +1694,10 @@ $main::resp_headers = '';
 $main::EXTRA_VERBOSE = 0;
 $main::results_stdout = '';
 $main::unit_test_steps = '';
+$main::opt_publish_full = '';
+$main::this_script_folder_full = '';
+$main::testnum = '';
+$main::cookie_jar = '';
 undef @main::cached_pages;
 undef @main::cached_page_actions;
 undef @main::cached_page_update_times;
