@@ -1593,6 +1593,9 @@ print("results_stdout: " . $main::results_stdout . "\n");
 assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched');
 assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written');
 assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content');
+_response_content_substitutions(\ $main::resp_content);
+print("res_content: " . $main::resp_content . "\n");
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content');
 
 #
 # GLOBAL HELPER SUBS
@@ -1614,7 +1617,17 @@ sub assert_stdout_contains {
         is(1, 1, $_test_description);
     } else {
         is('see between dashes below for stdout', $_must_contain, $_test_description);
-        show_stdout();
+        show_string($main::results_stdout);
+    }
+}
+
+sub assert_resp_content_contains {
+    my ($_must_contain, $_test_description) = @_;
+    if ($main::resp_content =~ m/$_must_contain/s) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for resp_content', $_must_contain, $_test_description);
+        show_string($main::resp_content."\n");
     }
 }
 
@@ -1623,8 +1636,8 @@ sub assert_file_exists {
     if (-e $_target_file) {
         is(1, 1, $_test_description);
     } else {
-        is('see between dashes below for stdout', $_target_file, $_test_description);
-        show_stdout();
+        is('see between dashes below for stdout', $_target_file . ' to exist', $_test_description);
+        show_string($main::results_stdout);
     }
 }
 
@@ -1634,11 +1647,11 @@ sub assert_file_contains {
     if ($$_content_ref =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
-        is('see between dashes below for stdout', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
-        show_stdout();
+        is('see between dashes below for 1 - stdout, 2 - file content', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
+        show_string($main::results_stdout);
+        show_string($$_content_ref."\n");
     }
 }
-
 
 sub assert_stdout_does_not_contain {
     my ($_must_not_contain, $_test_description) = @_;
@@ -1654,8 +1667,9 @@ sub clear_stdout {
     $main::results_stdout = '';
 }
 
-sub show_stdout {
-    print "\n----------\n".$main::results_stdout."----------\n";
+sub show_string {
+    my ($_string) = @_;
+    print "\n---------------\n".$_string."---------------\n";
 }
 
 sub before_test {
