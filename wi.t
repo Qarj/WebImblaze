@@ -1589,13 +1589,24 @@ resources_setup(before_test());
 $main::case{getallhrefs} = '\.css|\.less';
 $main::resp_content = (qq{ href="examples/assets/css/simple.css" });
 getresources();
-print("results_stdout: " . $main::results_stdout . "\n");
 assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched');
 assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written');
 assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content');
 _response_content_substitutions(\ $main::resp_content);
-print("res_content: " . $main::resp_content . "\n");
 assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content');
+
+resources_setup(before_test());
+$main::case{getallsrcs} = '\.js|\.gif';
+$main::resp_content = (qq{ src="examples/assets/js/quick.js" });
+getresources();
+print("results_stdout: " . $main::results_stdout . "\n");
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'resources : version1_quick.js file written');
+assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'var i = 54' ,'resources : version1_quick.js file has correct content');
+_response_content_substitutions(\ $main::resp_content);
+print("res_content: " . $main::resp_content . "\n");
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content');
+
 
 #
 # GLOBAL HELPER SUBS
