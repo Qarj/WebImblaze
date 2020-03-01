@@ -1580,6 +1580,11 @@ assert_stdout_contains('RETRYING', 'pass_fail_or_retry : Retry available - retry
 make_path ($WEBIMBLAZE_ROOT . $OUTPUT); # here to give remove_tree more time to settle
 
 sub resources_setup {
+    my (undef, $_goner) = @_;
+    if ($_goner) {
+        $_goner = $WEBIMBLAZE_ROOT . $OUTPUT . $_goner;
+        if (-e $_goner ) { unlink $_goner };
+    }
     $main::cookie_jar = HTTP::Cookies->new;
     $main::useragent = LWP::UserAgent->new(keep_alive=>1);
     $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
@@ -1587,25 +1592,105 @@ sub resources_setup {
 
 resources_setup(before_test());
 $main::case{getallhrefs} = '\.css|\.less';
-$main::resp_content = (qq{ href="examples/assets/css/simple.css" });
+$main::resp_content = (q{ href="examples/assets/css/simple.css" });
 getresources();
-assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched');
-assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written');
-assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content');
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - double quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written - double quote');
+assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content - double quote');
 _response_content_substitutions(\ $main::resp_content);
-assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content');
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_simple.css');
+$main::case{getallhrefs} = '\.css|\.less';
+$main::resp_content = (q{ href='examples/assets/css/simple.css' });
+getresources();
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content - single quote, now double');
+$main::resp_content = (q{ href='somewhere/nonmatched.css' });
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{href="somewhere/nonmatched.css"}, 'resources : nonmatched href - single quote, now double');
 
 resources_setup(before_test());
 $main::case{getallsrcs} = '\.js|\.gif';
-$main::resp_content = (qq{ src="examples/assets/js/quick.js" });
+$main::resp_content = (q{ src="examples/assets/js/quick.js" });
 getresources();
-print("results_stdout: " . $main::results_stdout . "\n");
-assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched');
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched - double quote');
 assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'resources : version1_quick.js file written');
 assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'var i = 54' ,'resources : version1_quick.js file has correct content');
 _response_content_substitutions(\ $main::resp_content);
-print("res_content: " . $main::resp_content . "\n");
-assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content');
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_quick.js');
+$main::case{getallsrcs} = '\.js|\.gif';
+$main::resp_content = (q{ src='examples/assets/js/quick.js' });
+getresources();
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content - single quote, now double');
+$main::resp_content = (q{ src='somewhere/nonmatched.js' });
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{src="somewhere/nonmatched.js"}, 'resources : nonmatched src - single quote, now double');
+
+resources_setup(before_test());
+$main::case{getallsrcs} = '\.js|\.png';
+$main::resp_content = (q{ src="examples/assets/image/folder.png" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_folder.png"', 'resources : version1_folder.png substituted into resp_content');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style="background-image: url('examples/assets/image/folder.png');"> });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched as background image - single quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_folder.png'\);"}, 'resources : version1_folder.png substituted into resp_content - single quote');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("examples/assets/image/folder.png");'> });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched as background image - double quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written - double quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_folder.png'\);"}, 'resources : version1_folder.png substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("examples/assets/image/folder.png");'> });
+getresources(); # grab the asset
+$main::resp_content = (q{ <div style='background-image: url("some_other_bgimage.png");'> }); # assume this asset was not grabbed
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('some_other_bgimage.png'\);"}, 'resources : version1_folder.png substituted into resp_content - asset not substituted but now double then single quote');
+
+resources_setup(before_test());
+$main::case{getallhrefs} = '\.css|\.less';
+$main::case{getallsrcs} = '\.js|\.png';
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("file0.png");'> href='file1.css' href='file2.less' href='file3.css' src='file4.js' src='file5.js' });
+getresources(); # grab the asset
+assert_stdout_contains('GET Asset \[version1_file0\.png\]', 'resources : GET multi file0.png ');
+assert_stdout_contains('GET Asset \[version1_file1\.css\]', 'resources : GET multi file1.css ');
+assert_stdout_contains('GET Asset \[version1_file2\.less\]', 'resources : GET multi file2.less ');
+assert_stdout_contains('GET Asset \[version1_file3\.css\]', 'resources : GET multi file3.css ');
+assert_stdout_contains('GET Asset \[version1_file4\.js\]', 'resources : GET multi file4.js ');
+assert_stdout_contains('GET Asset \[version1_file5\.js\]', 'resources : GET multi file5.js ');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_file0.png'\);"}, 'resources : version1_file0.png substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file1.css"', 'resources : version1_file1.css substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file2.less"', 'resources : version1_file2.less substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file3.css"', 'resources : version1_file3.css substituted into resp_content - multi');
+assert_resp_content_contains('src="version1_file4.js"', 'resources : version1_file4.js substituted into resp_content - multi');
+assert_resp_content_contains('src="version1_file5.js"', 'resources : version1_file5.js substituted into resp_content - multi');
+$main::resp_content = (q{ <div style="background-image: url('notfile0.png');"> href='notfile2.less' href='notfile3.css' src='notfile4.js' }); # assume this asset was not grabbed
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('href="notfile2.css"', 'resources : not substituted - multi - but single to double quote - 2');
+assert_resp_content_contains('href="notfile3.css"', 'resources : not substituted - multi - but single to double quote - 3');
+assert_resp_content_contains('src="notfile4.js"', 'resources : not substituted - multi - but single to double quote - 4');
 
 
 #
@@ -1700,6 +1785,11 @@ sub before_test {
     undef $main::cookie_jar;
     undef $main::useragent;
     $main::testnum = '1';
+
+    undef @main::hrefs;
+    undef @main::srcs;
+    undef @main::bg_images;
+    undef %main::asset;
 
     undef @main::cached_pages;
     undef @main::cached_page_actions;

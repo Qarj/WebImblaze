@@ -108,7 +108,7 @@ my $MAX_CACHE_SIZE = 5; # maximum size of the cache
 
 my $assertion_skips = 0;
 my $assertion_skips_message = q{}; # support tagging an assertion as disabled with a message
-my (@hrefs, @srcs, @bg_images, %asset); # keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
+our (@hrefs, @srcs, @bg_images, %asset); # keep an array of all grabbed assets to substitute them into the step results html (for results visualisation)
 my ($getallsrcs, $getallhrefs);
 my ($hrefs_version, $srcs_version) = 0;
 my $session_started; # only start up http session if http is being used
@@ -1193,8 +1193,11 @@ sub getallhrefs { # getallhrefs=".less|.css"
     }
 
     my $_match = 'href=';
-    my $_delim = q{"}; #"
-    get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
+    # my $_delim = q{"}; #"
+	my $_left_delim = q{['"]+}; 
+	my $_right_delim = q{'"};
+    # get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
+    get_assets ($_match,$_left_delim,$_right_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
 
     return;
 }
@@ -1214,8 +1217,10 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
     }
 
     my $_match = 'src=';
-    my $_delim = q{"}; #"
-    get_assets ($_match, $_delim, $_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
+    # my $_delim = q{"}; #"
+	my $_left_delim = q{['"]+}; 
+	my $_right_delim = q{'"};
+    get_assets ($_match, $_left_delim, $_right_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
 
     return;
 }
@@ -1225,8 +1230,8 @@ sub getbackgroundimages { # style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
         my $_match = 'background-image: url';
-        my $_left_delim = q{\(\'?\"?}; 
-        my $_right_delim = q{\'?\"?\)};
+        my $_left_delim = q{[('"]+}; 
+        my $_right_delim = q{'")};
         get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
 
@@ -1250,10 +1255,12 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
 
     foreach my $_extension (@_extensions) {
 
-        print "Extension:$_extension \n";
+        print "Extension:$_extension $_match$_left_delim([^$_right_delim]*$_extension)\n";
 
-        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) # iterate over all the matches to this extension
+        # while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) # iterate over all the matches to this extension
+        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)}g) # iterate over all the matches to this extension
         {
+			print "Matched $1\n";
             $_start_asset_request = time;
 
             $_asset_ref = $1;
@@ -3526,15 +3533,15 @@ sub _response_content_substitutions {
     }
 
     if (@hrefs) {
-        ${ $_response_content_ref } =~ s{href="([^"]+)}{_grabbed_href($1)}eg;
+        ${ $_response_content_ref } =~ s{href=['"]([^'"]+)['"]}{_grabbed_href($1)}eg;
     }
 
     if (@srcs) {
-        ${ $_response_content_ref } =~ s{src="([^"]+)}{_grabbed_src($1)}eg;
+        ${ $_response_content_ref } =~ s{src=['"]([^'"]+)['"]}{_grabbed_src($1)}eg;
     }
 
     if (@bg_images) {
-        ${ $_response_content_ref } =~ s{style="background-image: url[(]([^)]+)}{_grabbed_background_image($1)}eg; #"
+        ${ $_response_content_ref } =~ s{style=['"]background-image: url[(]['"]([^)]+)['"][)];['"]}{_grabbed_background_image($1)}eg; #"
     }
 
     return;
@@ -3572,13 +3579,13 @@ sub _grabbed_href {
     my ($_href) = @_;
 
     foreach (@hrefs) {
-        if ($_href =~ m/$_/) {
-            return 'href="'.'version'.$hrefs_version.'_'.$_;
+        if ($_href =~ m{$_}) {
+            return qq{href="version$hrefs_version}.qq{_$_"};
         }
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'href="'.$1; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{href="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
@@ -3587,12 +3594,12 @@ sub _grabbed_src {
 
     foreach (@srcs) {
         if ($_src =~ m/$_/) {
-            return 'src="'.'version'.$srcs_version.'_'.$_;
+            return qq{src="version$srcs_version}.qq{_$_"};
         }
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'src="'.$1; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{src="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
@@ -3601,12 +3608,12 @@ sub _grabbed_background_image {
 
     foreach (@bg_images) {
         if ($_bg_image =~ m/$_/) {
-            return 'style="background-image: url('.'version1_'.$_;
+            return qq{style="background-image: url('version1_$_');"}; # will be converted to this template of single quotes inside double
         }
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return 'style="background-image: url('.$1; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{style="background-image: url('$1');"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
 }
 
 #------------------------------------------------------------------
