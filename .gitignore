@@ -7,6 +7,7 @@ results.xml
 output/
 temp/
 blocker/
+unittest/
 WebInjectSelenium.pm
 WebImblazeSelenium.pm
 tests/*.test

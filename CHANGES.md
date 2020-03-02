@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.4 - Mar 2, 2020
+* grabbing href= and src= assets for css, gifs, pngs, JavaScript etc is less buggy and works with single or double quotes
+
 ### Version 1.3.3 - Jan 31, 2020
 * file name of include file is now given if it fails to parse instead of the master file name
 

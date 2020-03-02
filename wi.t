@@ -2,9 +2,18 @@ use diagnostics;
 use warnings;
 use strict;
 use Test::More qw( no_plan );
+use File::Path qw(make_path remove_tree);
 
 #http://www.drdobbs.com/scripts-as-modules/184416165
 do './wi.pl';
+
+require HTTP::Cookies;
+require LWP;
+
+my $WEBIMBLAZE_ROOT = $main::this_script_folder_full;
+$WEBIMBLAZE_ROOT =~ s{\\}{/}g;
+my $OUTPUT = 'unittest/';
+remove_tree($WEBIMBLAZE_ROOT . $OUTPUT);
 
 #
 # GLOBAL TEST SETUP
@@ -1563,6 +1572,128 @@ _verify_verifypositive();
 pass_fail_or_retry();
 assert_stdout_contains('RETRYING', 'pass_fail_or_retry : Retry available - retrying');
 
+
+#
+# resources
+#
+
+make_path ($WEBIMBLAZE_ROOT . $OUTPUT); # here to give remove_tree more time to settle
+
+sub resources_setup {
+    my (undef, $_goner) = @_;
+    if ($_goner) {
+        $_goner = $WEBIMBLAZE_ROOT . $OUTPUT . $_goner;
+        if (-e $_goner ) { unlink $_goner };
+    }
+    $main::cookie_jar = HTTP::Cookies->new;
+    $main::useragent = LWP::UserAgent->new(keep_alive=>1);
+    $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
+}
+
+resources_setup(before_test());
+$main::case{getallhrefs} = '\.css|\.less';
+$main::resp_content = (q{ href="examples/assets/css/simple.css" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - double quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'resources : version1_simple.css file written - double quote');
+assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_simple.css', 'text-align: center' ,'resources : version1_simple.css file has correct content - double quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_simple.css');
+$main::case{getallhrefs} = '\.css|\.less';
+$main::resp_content = (q{ href='examples/assets/css/simple.css' });
+getresources();
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content - single quote, now double');
+$main::resp_content = (q{ href='somewhere/nonmatched.css' });
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{href="somewhere/nonmatched.css"}, 'resources : nonmatched href - single quote, now double');
+
+resources_setup(before_test());
+$main::case{getallsrcs} = '\.js|\.gif';
+$main::resp_content = (q{ src="examples/assets/js/quick.js" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched - double quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'resources : version1_quick.js file written');
+assert_file_contains($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_quick.js', 'var i = 54' ,'resources : version1_quick.js file has correct content');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_quick.js');
+$main::case{getallsrcs} = '\.js|\.gif';
+$main::resp_content = (q{ src='examples/assets/js/quick.js' });
+getresources();
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content - single quote, now double');
+$main::resp_content = (q{ src='somewhere/nonmatched.js' });
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{src="somewhere/nonmatched.js"}, 'resources : nonmatched src - single quote, now double');
+
+resources_setup(before_test());
+$main::case{getallsrcs} = '\.js|\.png';
+$main::resp_content = (q{ src="examples/assets/image/folder.png" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_folder.png"', 'resources : version1_folder.png substituted into resp_content');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style="background-image: url('examples/assets/image/folder.png');"> });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched as background image - single quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written - single quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_folder.png'\);"}, 'resources : version1_folder.png substituted into resp_content - single quote');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("examples/assets/image/folder.png");'> });
+getresources();
+assert_stdout_contains('GET Asset \[version1_folder\.png\]', 'resources : image.png matched as background image - double quote');
+assert_file_exists($WEBIMBLAZE_ROOT . $OUTPUT . 'version1_folder.png', 'resources : version1_folder.png file written - double quote');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_folder.png'\);"}, 'resources : version1_folder.png substituted into resp_content - double quote');
+
+resources_setup(before_test(), 'version1_folder.png');
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("examples/assets/image/folder.png");'> });
+getresources(); # grab the asset
+$main::resp_content = (q{ <div style='background-image: url("some_other_bgimage.png");'> }); # assume this asset was not grabbed
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('some_other_bgimage.png'\);"}, 'resources : asset not substituted but now double then single quote');
+
+resources_setup(before_test());
+$main::case{getallhrefs} = '\.css|\.less';
+$main::case{getallsrcs} = '\.js|\.png';
+$main::case{getbackgroundimages} = '\.tif|\.png';
+$main::resp_content = (q{ <div style='background-image: url("file0.png");'> href='file1.css' href='file2.less' href='file3.css' src='file4.js' src='file5.js' });
+getresources(); # grab the asset
+assert_stdout_contains('GET Asset \[version1_file0\.png\]', 'resources : GET multi file0.png ');
+assert_stdout_contains('GET Asset \[version1_file1\.css\]', 'resources : GET multi file1.css ');
+assert_stdout_contains('GET Asset \[version1_file2\.less\]', 'resources : GET multi file2.less ');
+assert_stdout_contains('GET Asset \[version1_file3\.css\]', 'resources : GET multi file3.css ');
+assert_stdout_contains('GET Asset \[version1_file4\.js\]', 'resources : GET multi file4.js ');
+assert_stdout_contains('GET Asset \[version1_file5\.js\]', 'resources : GET multi file5.js ');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{style="background-image: url\('version1_file0.png'\);"}, 'resources : version1_file0.png substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file1.css"', 'resources : version1_file1.css substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file2.less"', 'resources : version1_file2.less substituted into resp_content - multi');
+assert_resp_content_contains('href="version1_file3.css"', 'resources : version1_file3.css substituted into resp_content - multi');
+assert_resp_content_contains('src="version1_file4.js"', 'resources : version1_file4.js substituted into resp_content - multi');
+assert_resp_content_contains('src="version1_file5.js"', 'resources : version1_file5.js substituted into resp_content - multi');
+$main::resp_content = (q{ <div style="background-image: url('notfile0.png');"> href='notfile2.less' href='notfile3.css' src='notfile4.js' }); # assume this asset was not grabbed
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains(q{background-image: url\('notfile0.png'\)}, 'resources : not substituted - multi - but single to double quote - 2');
+assert_resp_content_contains('href="notfile2.less"', 'resources : not substituted - multi - but single to double quote - 2');
+assert_resp_content_contains('href="notfile3.css"', 'resources : not substituted - multi - but single to double quote - 3');
+assert_resp_content_contains('src="notfile4.js"', 'resources : not substituted - multi - but single to double quote - 4');
+
+
 #
 # GLOBAL HELPER SUBS
 #
@@ -1582,8 +1713,40 @@ sub assert_stdout_contains {
     if ($main::results_stdout =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
-        is('see between dashes below', $_must_contain, $_test_description);
-        show_stdout();
+        is('see between dashes below for stdout', $_must_contain, $_test_description);
+        show_string($main::results_stdout);
+    }
+}
+
+sub assert_resp_content_contains {
+    my ($_must_contain, $_test_description) = @_;
+    if ($main::resp_content =~ m/$_must_contain/s) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for resp_content', $_must_contain, $_test_description);
+        show_string($main::resp_content."\n");
+    }
+}
+
+sub assert_file_exists {
+    my ($_target_file, $_test_description) = @_;
+    if (-e $_target_file) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for stdout', $_target_file . ' to exist', $_test_description);
+        show_string($main::results_stdout);
+    }
+}
+
+sub assert_file_contains {
+    my ($_target_file, $_must_contain, $_test_description) = @_;
+    my $_content_ref = read_utf8($_target_file);
+    if ($$_content_ref =~ m/$_must_contain/s) {
+        is(1, 1, $_test_description);
+    } else {
+        is('see between dashes below for 1 - stdout, 2 - file content', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
+        show_string($main::results_stdout);
+        show_string($$_content_ref."\n");
     }
 }
 
@@ -1601,8 +1764,9 @@ sub clear_stdout {
     $main::results_stdout = '';
 }
 
-sub show_stdout {
-    print "\n----------\n".$main::results_stdout."----------\n";
+sub show_string {
+    my ($_string) = @_;
+    print "\n---------------\n".$_string."---------------\n";
 }
 
 sub before_test {
@@ -1618,6 +1782,15 @@ sub before_test {
     $main::response = HTTP::Response->parse('HTTP/1.1 200 OK');
     $main::resp_content = '';
     $main::resp_headers = '';
+    $main::opt_publish_full = $OUTPUT;
+    undef $main::cookie_jar;
+    undef $main::useragent;
+    $main::testnum = '1';
+
+    undef @main::hrefs;
+    undef @main::srcs;
+    undef @main::bg_images;
+    undef %main::asset;
 
     undef @main::cached_pages;
     undef @main::cached_page_actions;
@@ -1625,6 +1798,7 @@ sub before_test {
     
     return;
 }
+
 
 #
 # SUPPRESS WARNINGS FOR VARIABLES USED ONLY ONCE
@@ -1636,6 +1810,14 @@ $main::resp_headers = '';
 $main::EXTRA_VERBOSE = 0;
 $main::results_stdout = '';
 $main::unit_test_steps = '';
+$main::opt_publish_full = '';
+$main::this_script_folder_full = '';
+$main::testnum = '';
+$main::cookie_jar = '';
+undef @main::srcs;
+undef @main::bg_images;
+undef @main::asset;
+undef @main::hrefs;
 undef @main::cached_pages;
 undef @main::cached_page_actions;
 undef @main::cached_page_update_times;
