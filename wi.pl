@@ -1193,10 +1193,8 @@ sub getallhrefs { # getallhrefs=".less|.css"
     }
 
     my $_match = 'href=';
-    # my $_delim = q{"}; #"
 	my $_left_delim = q{['"]+}; 
 	my $_right_delim = q{'"};
-    # get_assets ($_match,$_delim,$_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
     get_assets ($_match,$_left_delim,$_right_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
 
     return;
@@ -1217,7 +1215,6 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
     }
 
     my $_match = 'src=';
-    # my $_delim = q{"}; #"
 	my $_left_delim = q{['"]+}; 
 	my $_right_delim = q{'"};
     get_assets ($_match, $_left_delim, $_right_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
@@ -1254,13 +1251,8 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
     my @_extensions = split /[|]/, $_assetlist ;
 
     foreach my $_extension (@_extensions) {
-
-        print "Extension:$_extension $_match$_left_delim([^$_right_delim]*$_extension)\n";
-
-        # while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)[$_right_delim?]}g) # iterate over all the matches to this extension
         while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)}g) # iterate over all the matches to this extension
         {
-			print "Matched $1\n";
             $_start_asset_request = time;
 
             $_asset_ref = $1;
@@ -1276,8 +1268,6 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
             $asset{$_version . $_filename} = 1; # true
 
             $results_stdout .= "  GET Asset [$_version$_filename] ...";
-
-            print("_asset_url $_asset_url \n");
 
             $_asset_request = HTTP::Request->new('GET',"$_asset_url");
             $cookie_jar->add_cookie_header($_asset_request); # session cookies will be needed
@@ -3579,7 +3569,7 @@ sub _grabbed_href {
     my ($_href) = @_;
 
     foreach (@hrefs) {
-        if ($_href =~ m{$_}) {
+        if ($_href =~ m{(^|/)$_}) {
             return qq{href="version$hrefs_version}.qq{_$_"};
         }
     }
@@ -3593,7 +3583,7 @@ sub _grabbed_src {
     my ($_src) = @_;
 
     foreach (@srcs) {
-        if ($_src =~ m/$_/) {
+        if ($_src =~ m{(^|/)$_}) {
             return qq{src="version$srcs_version}.qq{_$_"};
         }
     }
@@ -3607,7 +3597,7 @@ sub _grabbed_background_image {
     my ($_bg_image) = @_;
 
     foreach (@bg_images) {
-        if ($_bg_image =~ m/$_/) {
+        if ($_bg_image =~ m{(^|/)$_}) {
             return qq{style="background-image: url('version1_$_');"}; # will be converted to this template of single quotes inside double
         }
     }

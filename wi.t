@@ -1665,7 +1665,7 @@ $main::resp_content = (q{ <div style='background-image: url("examples/assets/ima
 getresources(); # grab the asset
 $main::resp_content = (q{ <div style='background-image: url("some_other_bgimage.png");'> }); # assume this asset was not grabbed
 _response_content_substitutions(\ $main::resp_content);
-assert_resp_content_contains(q{style="background-image: url\('some_other_bgimage.png'\);"}, 'resources : version1_folder.png substituted into resp_content - asset not substituted but now double then single quote');
+assert_resp_content_contains(q{style="background-image: url\('some_other_bgimage.png'\);"}, 'resources : asset not substituted but now double then single quote');
 
 resources_setup(before_test());
 $main::case{getallhrefs} = '\.css|\.less';
@@ -1688,7 +1688,8 @@ assert_resp_content_contains('src="version1_file4.js"', 'resources : version1_fi
 assert_resp_content_contains('src="version1_file5.js"', 'resources : version1_file5.js substituted into resp_content - multi');
 $main::resp_content = (q{ <div style="background-image: url('notfile0.png');"> href='notfile2.less' href='notfile3.css' src='notfile4.js' }); # assume this asset was not grabbed
 _response_content_substitutions(\ $main::resp_content);
-assert_resp_content_contains('href="notfile2.css"', 'resources : not substituted - multi - but single to double quote - 2');
+assert_resp_content_contains(q{background-image: url\('notfile0.png'\)}, 'resources : not substituted - multi - but single to double quote - 2');
+assert_resp_content_contains('href="notfile2.less"', 'resources : not substituted - multi - but single to double quote - 2');
 assert_resp_content_contains('href="notfile3.css"', 'resources : not substituted - multi - but single to double quote - 3');
 assert_resp_content_contains('src="notfile4.js"', 'resources : not substituted - multi - but single to double quote - 4');
 
@@ -1813,6 +1814,10 @@ $main::opt_publish_full = '';
 $main::this_script_folder_full = '';
 $main::testnum = '';
 $main::cookie_jar = '';
+undef @main::srcs;
+undef @main::bg_images;
+undef @main::asset;
+undef @main::hrefs;
 undef @main::cached_pages;
 undef @main::cached_page_actions;
 undef @main::cached_page_update_times;
