@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.4';
+$VERSION = '1.3.5';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1171,6 +1171,7 @@ sub trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
 #------------------------------------------------------------------
 sub getresources {
 
+    if ($case{method} eq 'selenium') { return; }
     getallhrefs(); # get href assets for this step and all following steps
     getallsrcs(); # get src assets for this step and all following steps
     getbackgroundimages(); # get specified web page src assets
