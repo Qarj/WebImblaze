@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.6 - Mar 10, 2020
+* added removecookie parameter
+
 ### Version 1.3.5 - Mar 4, 2020
 * bugfix - do not get html source assets for Selenium tests
 

@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.3.5
+# Manual for WebImblaze version 1.3.6
 
 ## Overview
 
@@ -104,6 +104,8 @@
     - [commandonerror](#commandonerror)
 
     - [addheader](#addheader)
+
+    - [removecookie](#removecookie)
 
     - [setcookie](#setcookie)
 
@@ -1527,6 +1529,29 @@ In this example the header field name sent will be `foo-bar` and not `Foo-Bar`.
 <br />
 
 
+#### removecookie
+
+Permanently removes a cookie for current url domain.
+
+```
+removecookie: MyCookieName
+```
+
+Separate multiple cookie key names with a semi colon.
+
+```
+removecookie: MyCookieName; OtherCookie
+```
+
+Note that if the cookie key you are trying to delete contains an equals sign, `=`, just
+specify the portion of the cookie key name before the equals sign. For example,
+if your cookie is named `UserId=email`, just specify `UserId`.
+
+Note also that the `removecookie` parameter will be processed _before_ `setcookie`.
+
+<br />
+
+
 #### setcookie
 
 Sets a new cookie for the url domain and port. The cookie will be retained for subsequent steps.
@@ -1541,6 +1566,8 @@ setcookie: MyFirstCookie: cookie_value; MySecondCookie: another_value
 ```
 
 Note that leading and trailing white space is removed. Cookie values cannot contain a colon or semicolon.
+
+Note also that the `removecookie` parameter will be processed _before_ `setcookie`.
 
 <br />
 

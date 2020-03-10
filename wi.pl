@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.5';
+$VERSION = '1.3.6';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1134,6 +1134,7 @@ sub _run_this_step {
 #------------------------------------------------------------------
 sub add_headers {
 
+    removecookie();
     setcookie();
     $cookie_jar->add_cookie_header($request);
 
@@ -1157,8 +1158,8 @@ sub setcookie {
         my @_cookies = split /;/, $case{setcookie};
         foreach my $_cookie (@_cookies) {
             my ($_key, $_value) = split /:/, $_cookie, 2;
-            $_key = trim($_key);
-            $_value = trim($_value);
+            $_key = _trim($_key);
+            $_value = _trim($_value);
             $results_stdout .= " Set cookie -> $_key: $_value\n";
             $cookie_jar->set_cookie( 0, $_key, $_value, q{/}, $_uri->host, $_uri->port, 0, 0, 86_400, 0 )
         }
@@ -1166,7 +1167,25 @@ sub setcookie {
 
     return;
 }
-sub trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
+
+#------------------------------------------------------------------
+sub removecookie {
+    if ($case{removecookie}) {
+        require URI;
+        my $_uri = URI->new($request->uri);
+
+        my @_keys = split /;/, $case{removecookie};
+        foreach my $_key (@_keys) {
+            $_key = _trim($_key);
+            $results_stdout .= " Remove cookie -> $_key\n";
+            $cookie_jar->clear( $_uri->host, q{/}, $_key ); 
+        }
+    }
+
+    return;
+}
+
+sub _trim { my $_s = shift; $_s =~ s/^\s+|\s+$//g; return $_s };
 
 #------------------------------------------------------------------
 sub getresources {
