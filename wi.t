@@ -1588,6 +1588,7 @@ sub resources_setup {
     $main::cookie_jar = HTTP::Cookies->new;
     $main::useragent = LWP::UserAgent->new(keep_alive=>1);
     $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
+    $main::case{method} = 'get';
 }
 
 resources_setup(before_test());

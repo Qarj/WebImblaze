@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.3.6
+# Manual for WebImblaze version 1.3.7
 
 ## Overview
 
@@ -45,6 +45,8 @@
     - [WebImblaze Framework (webimblazeframework)](#wif)
 
     - [Selenium Binaries Location](#selenium-binary)
+
+    - [Sys Temp](#sys-temp)
 
     - [Test Step Files (specifying in configuration file)](#teststepfile)
 
@@ -774,6 +776,20 @@ For Linux:
 
 It is possible to have the Linux and Windows values in the same config file. WebImblaze works out whether
 to use the Windows or Linux variables at run time.
+
+<br />
+
+
+#### sys-temp
+
+Override the WebImblaze default values for the {SYS_TEMP} substitution.
+
+```xml
+    <linux_sys_temp>/var/tmp/<linux_sys_temp>
+    <windows_sys_temp>D:\temp\<windows_sys_temp>
+```
+
+See the 'Constants set at test run start time' section for the WebImblaze default values.
 
 <br />
 
@@ -2639,6 +2655,7 @@ Constant | Description
 **{OUTPUTFOLDERNAME}** | Output folder name only - not the full path
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXY}** | What proxy option was specified via the command line to wi.pl
+**{SYS_TEMP}** | System temporary folder location - defaults to `/tmp/` for Linux and `C:\\temp\\` for Windows.
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file
 **{BASEURL2}** | Value of `baseurl2` specified in your config file

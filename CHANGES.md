@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.7 - Mar 24, 2020
+* added {SYS_TEMP} substitution
+
 ### Version 1.3.6 - Mar 10, 2020
 * added removecookie parameter
 

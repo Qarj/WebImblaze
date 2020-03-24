@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.6';
+$VERSION = '1.3.7';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -130,6 +130,9 @@ my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$S
 my $counter = 0; # keeping track of the loop we are up to
 
 my $output_folder_name = 'null'; # current working directory - not full path
+my $sys_temp;
+my $DEFAULT_WINDOWS_SYS_TEMP = "C:\\temp\\";
+my $DEFAULT_LINUX_SYS_TEMP = '/tmp/';
 
 our ($results_stdout, $results_html, $results_xml);
 my $results_xml_file_name;
@@ -2466,6 +2469,18 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
         $opt_selenium_binary //= $config->{$_os}->{'selenium-binary'};
     }
 
+    if ($is_windows) {
+        $sys_temp = $DEFAULT_WINDOWS_SYS_TEMP;
+        if (defined $config->{windows_sys_temp}) {
+            $sys_temp = $config->{windows_sys_temp};
+        }
+    } else {
+        $sys_temp = $DEFAULT_LINUX_SYS_TEMP;
+        if (defined $config->{linux_sys_temp}) {
+            $sys_temp = $config->{linux_sys_temp};
+        }
+    }
+
     return;
 }
 
@@ -3080,6 +3095,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{OUTPUTFOLDERNAME}/$output_folder_name/g; # name of the temporary folder being used - not full path
+    $_[0] =~ s/{SYS_TEMP}/$sys_temp/g;
     $_[0] =~ s/{OUTPUT}/$results_output_folder/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;
     $_[0] =~ s/{CWD}/$this_script_folder_full/g;
