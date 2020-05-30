@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.7';
+$VERSION = '1.3.8';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -130,9 +130,11 @@ my $start_date_time = "$DAY_TEXT $DAYOFMONTH $MONTH_TEXT $YEAR, $HOUR:$MINUTE:$S
 my $counter = 0; # keeping track of the loop we are up to
 
 my $output_folder_name = 'null'; # current working directory - not full path
-my $sys_temp;
+my ($sys_temp, $app_data);
 my $DEFAULT_WINDOWS_SYS_TEMP = "C:\\temp\\";
-my $DEFAULT_LINUX_SYS_TEMP = '/tmp/';
+my $DEFAULT_WINDOWS_APP_DATA = "C:\\ProgramData\\WebImblaze\\";
+my $DEFAULT_LINUX_SYS_TEMP = '/var/tmp/';
+my $DEFAULT_LINUX_APP_DATA = '/var/lib/WebImblaze/';
 
 our ($results_stdout, $results_html, $results_xml);
 my $results_xml_file_name;
@@ -237,6 +239,7 @@ foreach (1 .. $repeat) {
             dump_json();
             decode_smtp();
             decode_quoted_printable();
+            decode_base64_and_overwrite_response();
 
             verify();
 
@@ -436,7 +439,7 @@ sub get_test_step_skip_message {
     }
 
     if (defined $case{runif}) {
-        print"runif:[$case{runif}]\n";
+        $results_stdout .= "runif:[$case{runif}]\n";
     }
     if (defined $case{runif} and not $case{runif}) { # evaluate content - truthy or falsy
         return 'runif evaluated as falsy';
@@ -1805,11 +1808,13 @@ sub _shell_adjust {
         ${$_parm} =~ s{^[.]/}{.\\};
         ${$_parm} =~ s/{SLASH}/\\/g;
         ${$_parm} =~ s/{SHELL_ESCAPE}/\^/g;
+        ${$_parm} =~ s/{SHELL_QUOTE}/"/g;
     } else {
         ${$_parm} =~ s{\\}{\\\\}g; # need to double back slashes in Linux, otherwise they vanish (unlike Windows shell)
         ${$_parm} =~ s/{SLASH}/\//g;
         ${$_parm} =~ s{^[.][/\\]}{perl ./}; # for running perl scripts from within WebImblaze using perlbrew
         ${$_parm} =~ s/{SHELL_ESCAPE}/\\/g;
+        ${$_parm} =~ s/{SHELL_QUOTE}/'/g;
     }
 
     return;
@@ -1858,8 +1863,25 @@ sub decode_quoted_printable {
     require MIME::QuotedPrint;
 
 	if ($case{decodequotedprintable}) {
-		 $resp_content = decode('utf8', MIME::QuotedPrint::decode_qp($resp_content)); # decode the response output
+		 $resp_content = decode('utf8', MIME::QuotedPrint::decode_qp($resp_content));
 	}
+
+    return;
+}
+
+#------------------------------------------------------------------
+sub decode_base64_and_overwrite_response {
+
+    if (!$case{decodebase64}) { return; }
+
+    require MIME::Base64;
+
+    my $base64_content;
+    while ( $resp_content =~ m/^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/gm ) {
+        $base64_content .= $&;
+    }
+
+    $resp_content = decode('utf8', MIME::Base64::decode_base64($base64_content));
 
     return;
 }
@@ -2471,14 +2493,14 @@ sub process_config_file { ## no critic(ProhibitExcessComplexity) # parse config 
 
     if ($is_windows) {
         $sys_temp = $DEFAULT_WINDOWS_SYS_TEMP;
-        if (defined $config->{windows_sys_temp}) {
-            $sys_temp = $config->{windows_sys_temp};
-        }
+        $app_data = $DEFAULT_WINDOWS_APP_DATA;
+        if (defined $config->{windows_sys_temp}) { $sys_temp = $config->{windows_sys_temp}; }
+        if (defined $config->{windows_app_data}) { $app_data = $config->{windows_app_data}; }
     } else {
         $sys_temp = $DEFAULT_LINUX_SYS_TEMP;
-        if (defined $config->{linux_sys_temp}) {
-            $sys_temp = $config->{linux_sys_temp};
-        }
+        $app_data = $DEFAULT_LINUX_APP_DATA;
+        if (defined $config->{linux_sys_temp}) { $sys_temp = $config->{linux_sys_temp}; }
+        if (defined $config->{linux_app_data}) { $app_data = $config->{linux_app_data}; }
     }
 
     return;
@@ -3095,6 +3117,7 @@ sub convert_back_xml {  #converts replaced xml with substitutions
 
     $_[0] =~ s/{COUNTER}/$counter/g;
     $_[0] =~ s/{OUTPUTFOLDERNAME}/$output_folder_name/g; # name of the temporary folder being used - not full path
+    $_[0] =~ s/{APP_DATA}/$app_data/g;
     $_[0] =~ s/{SYS_TEMP}/$sys_temp/g;
     $_[0] =~ s/{OUTPUT}/$results_output_folder/g;
     $_[0] =~ s/{PUBLISH}/$opt_publish_full/g;

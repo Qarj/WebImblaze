@@ -7,6 +7,13 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.8 - May 30, 2020
+* added {APP_DATA} substitution
+* added {SHELL_QUOTE} substitution
+* added decodebase64 paramater
+* bugfix - don't print directly to STDOUT if runif `paramater` used
+* documented previously undocumented `shell` paramaters substitions {SHELL_ESCAPE}, {SHELL_QUOTE} and {SLASH}
+
 ### Version 1.3.7 - Mar 24, 2020
 * added {SYS_TEMP} substitution
 

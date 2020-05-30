@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.3.7
+# Manual for WebImblaze version 1.3.8
 
 ## Overview
 
@@ -45,6 +45,8 @@
     - [WebImblaze Framework (webimblazeframework)](#wif)
 
     - [Selenium Binaries Location](#selenium-binary)
+
+    - [App Data](#app-data)
 
     - [Sys Temp](#sys-temp)
 
@@ -151,6 +153,8 @@
 
 
 - [Test Response Output Control Parameters](#test-response-output-control-parameters)
+
+    - [decodebase64](#decodebase64)
 
     - [decodequotedprintable](#decodequotedprintable)
 
@@ -776,6 +780,20 @@ For Linux:
 
 It is possible to have the Linux and Windows values in the same config file. WebImblaze works out whether
 to use the Windows or Linux variables at run time.
+
+<br />
+
+
+#### app-data
+
+Override the WebImblaze default values for the {APP_DATA} substitution.
+
+```xml
+    <linux_app_data>/tmp/<linux_app_data>
+    <windows_app_data>D:\temp\<windows_app_data>
+```
+
+See the 'Constants set at test run start time' section for the WebImblaze default values.
 
 <br />
 
@@ -1465,6 +1483,18 @@ parseresponsePASSWORD:  PASSWORD5="|"|
 In addition to shell, you can specify `shell1`, `shell2` ... up to `shell20`.
 The shell commands are run in numerical order starting from `shell`.
 
+The `shell` parameters have additional substitutions to the standard substitutions. These are
+designed to make it possible to design shell commands that run on both Linux and Windows.
+
+Constant | Description
+:------- | :----------
+`\` | Changed to `\\` on Linux only due to extra level of (de)escaping in Bash
+**{SLASH}** | Resolves to `\` on Windows and `/` on Linux
+**{SHELL_ESCAPE}** | Resolves to `^` on Windows and `\` on Linux
+**{SHELL_QUOTE}** | Resolves to `"` on Windows and `'` on Linux
+
+Commands starting with `./` are changed to `.\` on Windows.
+
 Two special case parameters are also available.
 
 ##### readfile
@@ -1891,6 +1921,21 @@ retry: 5
 
 
 ### Test Response Output Control Parameters
+
+#### decodebase64
+
+Searches the response output for a base64 string and overwrites the response output with the
+decoded version of that string. Will only process one match and response output will be blank
+if nothing found to decode.
+
+Purpose is for decoding base64 encoded emails.
+
+```
+decodebase64: true
+```
+
+<br />
+
 
 #### decodequotedprintable
 
@@ -2655,7 +2700,8 @@ Constant | Description
 **{OUTPUTFOLDERNAME}** | Output folder name only - not the full path
 **{TESTFILENAME}** | Test file name
 **{OPT_PROXY}** | What proxy option was specified via the command line to wi.pl
-**{SYS_TEMP}** | System temporary folder location - defaults to `/tmp/` for Linux and `C:\\temp\\` for Windows.
+**{APP_DATA}** | WebImblaze app data location - defaults to `/var/lib/WebImblaze/` for Linux and `C:\ProgramData\\WebImblaze\\` for Windows
+**{SYS_TEMP}** | System temporary folder location - defaults to `/var/tmp/` for Linux and `C:\\temp\\` for Windows
 **{BASEURL}** | Value of `baseurl` specified in your config file
 **{BASEURL1}** | Value of `baseurl1` specified in your config file
 **{BASEURL2}** | Value of `baseurl2` specified in your config file
