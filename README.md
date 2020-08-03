@@ -19,7 +19,7 @@ WebImblaze is very easy to setup and run. An example is test included.
 1. Install Strawberry Perl.
 
    - Navigate to http://strawberryperl.com/
-   - Download and install the recommended version of Strawberry Perl. Choose the 64 bit version if you have 64 bit Windows (probably you do).
+   - Download and install the recommended 64 bit version of Strawberry Perl
 
 2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
 
@@ -56,20 +56,20 @@ sudo find . -type f -exec chmod a+rw {} \;
 sudo chmod +x wi.pl
 ```
 
-Install required Perl packages
-
-```
-sudo cpan XML::Simple
-sudo cpan LWP::Protocol::https
-```
-
 Check that you can see the WebImblaze help info
 
 ```
 perl wi.pl --help
 ```
 
-Tested with Fedora 26, Ubuntu 16.04 and 18.04, Linux Mint 18.3, OS X El Capitan and macOS 10.13.
+If there are error messages you might need additional Perl packages
+
+```
+sudo cpan XML::Simple
+sudo cpan LWP::Protocol::https
+```
+
+Tested with Ubuntu 16.04, 18.04, 20.04, El Capitan, High Sierra, Mojave.
 
 #### CentOS 7
 
