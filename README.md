@@ -71,9 +71,16 @@ sudo cpan LWP::Protocol::https
 
 Tested with Ubuntu 16.04, 18.04, 20.04, El Capitan, High Sierra, Mojave.
 
+#### CentOS 8
+
+Install `XML::Simple` with this method
+```
+sudo dnf install perl-XML-Simple
+```
+
 #### CentOS 7
 
-CentOS seems to require a lot of additional setup before installing the packages above - some of the below may be redundant
+CentOS requires a lot of additional setup before installing the packages above - some of the below may be redundant
 
 ```
 sudo yum install cpan
@@ -98,7 +105,7 @@ sudo yum install openssl-devel
 You can see if SSL is installed correctly with the command `perl -MNet::SSL -e1` - if it returns no output then all
 is ok and there is no need to install `LWP::Protocol::https` using cpan.
 
-### Create your first WebImblaze test
+### Create simple WebImblaze test
 
 Note that these instructions are written with Windows in mind.
 
@@ -126,7 +133,7 @@ verifypositive2:    page=2|||Should be at least two pages of results for keyword
 verifynegative1:    Page not found
 ```
 
-### Run your first WebImblaze test
+### Run simple WebImblaze test
 
 ```
 perl wi.pl tests/hello.test
@@ -137,34 +144,34 @@ If everything worked OK, then you'll see something like the following:
 ```
 Starting WebImblaze Engine...
 
--------------------------------------------------------
-Test:  tests\hello.test - 10
-Get Totaljobs Home Page
-Verify Positive: "Search for and be recommended"
-Verify Positive: "See all hiring companies"
-Passed Positive Verification
-Passed Positive Verification
-Passed HTTP Response Code Verification
-TEST STEP PASSED
-Response Time = 0.443 sec
--------------------------------------------------------
-Test:  tests\hello.test - 20
-Search for hello jobs
-Expect to see at least 2 pages of hello jobs
-Verify Negative: "Page not found"
-Verify Positive: "\d+./span.\s*.h1.Hello jobs"
-Verify Positive: "page=2"
-Passed Positive Verification
-Passed Positive Verification
-Passed Negative Verification
-Passed HTTP Response Code Verification
-TEST STEP PASSED
-Response Time = 0.557 sec
--------------------------------------------------------
-Start Time: Fri 10 Aug 2018, 12:18:39
-Total Run Time: 1.581 seconds
+------------------------------------------------------- 
+Test:  tests/hello.test - 10 
+Get Totaljobs Home Page 
+Verify Positive: "Search for and be recommended" 
+Verify Positive: "See all hiring companies" 
+Passed Positive Verification 
+Passed Positive Verification 
+Passed HTTP Response Code Verification 
+TEST STEP PASSED 
+Response Time = 0.183 sec 
+------------------------------------------------------- 
+Test:  tests/hello.test - 20 
+Search for hello jobs 
+Expect to see at least 2 pages of hello jobs 
+Verify Negative: "Page not found" 
+Verify Positive: "\d+./span.\s*.h1.Hello jobs" 
+Verify Positive: "page=2" 
+Passed Positive Verification 
+Passed Positive Verification 
+Passed Negative Verification 
+Passed HTTP Response Code Verification 
+TEST STEP PASSED 
+Response Time = 0.648 sec 
+------------------------------------------------------- 
+Start Time: Sun 09 Aug 2020, 08:35:02
+Total Run Time: 0.915 seconds
 
-Total Response Time: 1.000 seconds
+Total Response Time: 0.831 seconds
 
 Test Steps Run: 2
 Test Steps Passed: 2
@@ -172,7 +179,7 @@ Test Steps Failed: 0
 Verifications Passed: 9
 Verifications Failed: 0
 
-Results at: output\Results.html
+Results at: output/Results.html
 ```
 
 So what happened?
@@ -183,14 +190,14 @@ Then it loaded `tests/hello.test` and ran the two test steps in order, numbering
 
 Five files were created in the default output folder called `output`:
 
-- results.html is a html version of the results you saw in the command prompt - with colour.
-- results.xml is an xml version of the results.
-- http.txt contains the response headers and the html that WebImblaze received.
-- 10.html contains the http response for step 10
-- 20.html contains the http response for step 20
+- `results.html` is a html version of the results - with colour
+- `results.xml` is an xml version of the results
+- `http.txt` contains all the response headers and the actual page html
+- `10.html` contains the http response for step 10
+- `20.html` contains the http response for step 20
 
-If you double click on results.html to view in a browser, you will see hyperlinks to the individual results for steps 10 and 20.
-Click on the link for step 10 and you will see the web page that WebImblaze received rendered in the browser. You are able to
+Double click on `results.html` to view in a browser, there are links to the individual results for steps 10 and 20.
+Click on the link for step 10 and to see the web page that WebImblaze received rendered in the browser. You can
 expand the `Request Headers` and `Response Headers`. You can also click on `next` to see the next test step results.
 Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebImblaze-Framework project is needed to make them functional.)
 
