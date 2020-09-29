@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.8';
+$VERSION = '1.3.9';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -3500,6 +3500,9 @@ sub _should_display_as_text {
 
     # if html and body tags found, then display as html
     if ( ${ $_response } =~ m/<HTML.*?<BODY/is ) { return; }
+
+    # if it looks like a REACT app, we display as html
+    if ( ${ $_response } =~ m/rendered HTML is inserted here/is ) { return; }
 
     # if we didn't find html and body tags, then don't attempt to render as html
     return 'true';

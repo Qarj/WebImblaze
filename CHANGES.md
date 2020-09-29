@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.3.9 - Sep 29, 2020
+* attempts to identify REACT apps, will now render test result html rather than displaying literal html (useful for SSR)
+
 ### Version 1.3.8 - May 30, 2020
 * added {APP_DATA} substitution
 * added {SHELL_QUOTE} substitution
