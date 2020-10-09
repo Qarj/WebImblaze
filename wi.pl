@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.3.9';
+$VERSION = '1.4.0';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1995,24 +1995,24 @@ sub _verify_autoassertion {
                 my $_results_xml = qq|            <$_config_attribute>\n|;
                 $_results_xml .= qq|                <assert>$_verifyparms[0]</assert>\n|;
                 if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
-                    $_results_xml .= qq|                <success>true</success>\n|;
-                    $passed_count++;
-                    $retry_passed_count++;
-                }
-                else {
                     $results_html .= qq|<span class="fail">Failed Auto Assertion:</span>$_verifyparms[0]<br />\n|;
                     $_results_xml .= qq|                <success>false</success>\n|;
-                    if ($_verifyparms[1]) { # is there a custom assertion failure message?
-                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
-                       $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
-                    }
                     colour_stdout('bold yellow', "Failed Auto Assertion \n");
-                    if ($_verifyparms[1]) {
-                        colour_stdout('bold yellow', "$_verifyparms[1] \n");
+                    if ($_verifyparms[1]) { # is there a custom assertion failure message?
+                        my $capture1 = $1; my $capture2 = $2; my $capture3 = $3;
+                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg; 
+                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                        $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
+                        colour_stdout('bold yellow', "$_verifyparms[1]\n");
                     }
                     $failed_count++;
                     $retry_failed_count++;
                     $is_failure++;
+                }
+                else {
+                    $_results_xml .= qq|                <success>true</success>\n|;
+                    $passed_count++;
+                    $retry_passed_count++;
                 }
                 $_results_xml .= qq|            </$_config_attribute>\n|;
 

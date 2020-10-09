@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.4.0 - Oct 10, 2020
+* changed the auto assertions to negative assertions and provided a way to capture info (e.g. error references) and display in reporting
+
 ### Version 1.3.9 - Sep 29, 2020
 * attempts to identify REACT apps, will now render test result html rather than displaying literal html (useful for SSR)
 

@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.3.9
+# Manual for WebImblaze version 1.4.0
 
 ## Overview
 
@@ -587,14 +587,14 @@ In this example, you would refer to the constants in your test steps as {ADMINUS
 
 
 #### autoassertions
-It is possible to specify assertions that run automatically on every single test step.
+It is possible to specify negative assertions that run automatically on every single test step.
 
 A possible usage is to check that you have not obtained an error page.
 
 ```xml
 <autoassertions>
-   <autoassertion1>^((?!error.stacktrace).)*$|||A Java stack trace has occurred</autoassertion1>
-   <autoassertion2>^((?!jobseeker 500 error).)*$|||A jobseeker 500 error has occurred</autoassertion2>
+   <autoassertion1>error.stacktrace|||A Java stack trace has occurred</autoassertion1>
+   <autoassertion2>jobseeker 500 error|||A jobseeker 500 error has occurred</autoassertion2>
 </autoassertions>
 ```
 
@@ -606,11 +606,21 @@ on failure is specified.
 <br />
 ```xml
 <autoassertions>
-   <autoassertion1>Copyright Example Company 2016</autoassertion1>
+   <autoassertion1>^((?!Copyright Example Company 2016).)*$</autoassertion1>
 </autoassertions>
 ```
 
 This second example automatically asserts that this copyright message appears in every response.
+
+<br />
+```xml
+<autoassertions>
+   <autoassertion1>Error reference ([\w]+)|||Found error reference $capture1</autoassertion1>
+</autoassertions>
+```
+
+In this third example the error reference is captured and shown in the `results.xml` and `results.html`.
+`$capture1`, `$capture2` and `$capture3` are available.
 
 <br />
 
