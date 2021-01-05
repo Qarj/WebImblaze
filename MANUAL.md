@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.4.2
+# Manual for WebImblaze version 1.4.3
 
 ## Overview
 

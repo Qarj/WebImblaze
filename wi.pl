@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.2';
+$VERSION = '1.4.3';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1285,7 +1285,7 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
 
             $_ur_url = URI::URL->new($_asset_ref, $case{url}); # join the current page url together with the href of the asset
             $_asset_url = $_ur_url->abs; # determine the absolute address of the asset
-            $_path = $_asset_url->path; # get the path portion of the asset location
+            $_path = slash_me($_asset_url->path); # get the path portion of the asset location
             $_filename = basename($_path); # get the filename from the path
 
             if (defined $asset{$_version . $_filename}) {
