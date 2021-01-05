@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.4.1 - Jan 5, 2021
+* added an assertnear assertion for non exact value comparison
+
 ### Version 1.4.0 - Oct 10, 2020
 * changed the auto assertions to negative assertions and provided a way to capture info (e.g. error references) and display in reporting
 

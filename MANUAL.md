@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.4.0
+# Manual for WebImblaze version 1.4.1
 
 ## Overview
 
@@ -123,6 +123,8 @@
 - [Additional Assertion Parameters](#additional-assertion-parameters)
 
     - [assertcount](#assertcount)
+
+    - [assertnear](#assertnear)
 
     - [verifyresponsecode](#verifyresponsecode)
 
@@ -1708,6 +1710,21 @@ another three `|||` and writing any message after the custom error message.
 
 ```
 assertcount: uniquedata1092311|||2|||Expect 2 records only|||Production Bug
+```
+
+<br />
+
+
+#### assertnear
+
+Used to assert that a value is near enough another value.
+
+```
+assertnear: some_anchor(value to grab)|||expected_value|||max_deviance|||Optional custom error message
+```
+
+```
+assertnear: offsetLeft.(\d+)|||50|||20|||Value is further away from 50 than the max deviance of 20
 ```
 
 <br />

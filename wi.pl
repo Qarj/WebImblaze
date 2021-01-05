@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.0';
+$VERSION = '1.4.1';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -1908,6 +1908,7 @@ sub verify {  # do verification of http response and print status to HTML/XML/ST
     _verify_verifypositive();
     _verify_verifynegative();
     _verify_assertcount();
+    _verify_assertnear();
     _verify_verifyresponsetime();
 
     if ($case{verifyresponsecode}) {
@@ -2269,6 +2270,53 @@ sub _verify_assertcount {
             } # end else _verifycountparms[3]
         } # end if assertcount
     } # end foreach
+
+    return;
+}
+
+sub _verify_assertnear {
+
+    foreach my $_case_attribute ( sort keys %case ) {
+        if ( (substr $_case_attribute, 0, 14) eq 'assertnear' ) {
+            my $_verify_number = $_case_attribute; # determine index assertnear index
+            $_verify_number =~ s/^assertnear//g; # remove assertnear from string
+            if (!$_verify_number) {$_verify_number = '0';} # if assertnear, need to treat as 0
+            my @_verifyparms = split /[|][|][|]/, $case{$_case_attribute} ; # index 0 contains the regex for the value to check, 1 the value to be near, 2 the allowed deviance, 3 the message on failure
+            my $_actual = 0;
+            if (uncoded()  =~ m/$_verifyparms[0]/si) {
+                $_actual = $1;
+            }
+            my $_near = $_verifyparms[1];
+            my $_max_deviance = $_verifyparms[2];
+            my $_min = $_near - $_max_deviance;
+            my $_max = $_near + $_max_deviance;
+            my $_info = " resolving to $_actual is between $_min and $_max";
+            $results_xml .= "            <$_case_attribute>\n";
+            $results_xml .= '                <assert>'._sub_xml_special($_verifyparms[0])."$_info</assert>\n";
+            if ($_actual > $_min && $_actual < $_max ) {
+                $results_html .= qq|<span class="pass">Passed Assert Near</span><br />\n|;
+                $results_xml .= qq|                <success>true</success>\n|;
+                $results_stdout .= "Passed Assert Near \n";
+                $passed_count++;
+                $retry_passed_count++;
+            } else {
+                $results_html .= qq|<span class="fail">Failed Assert Near:</span> $_verifyparms[0]$_info<br />\n|;
+                $results_xml .= qq|                <success>false</success>\n|;
+                if ($_verifyparms[3]) { # is there a custom assertion failure message?
+                    $results_html .= qq|<span class="fail">$_verifyparms[3]</span><br />\n|;
+                    $results_xml .= '                <message>'._sub_xml_special($_verifyparms[3])."</message>\n";
+                }
+                colour_stdout('bold yellow', "Failed Assert Near $_verify_number: $_verifyparms[0]$_info\n");
+                if ($_verifyparms[3]) {
+                    colour_stdout('bold yellow', "$_verifyparms[3] \n");
+                }
+                $failed_count++;
+                $retry_failed_count++;
+                $is_failure++;
+            }
+            $results_xml .= qq|            </$_case_attribute>\n|;
+        }
+    }
 
     return;
 }
