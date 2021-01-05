@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.4.3 - Jan 5, 2021
+* fix for Linux file path handling when writing grabbed assets
+
 ### Version 1.4.2 - Jan 5, 2021
 * handle backslash in path for grabbing assets
 
