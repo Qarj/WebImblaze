@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.1';
+$VERSION = '1.4.2';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -3679,7 +3679,7 @@ sub _grabbed_href {
     my ($_href) = @_;
 
     foreach (@hrefs) {
-        if ($_href =~ m{(^|/)$_}) {
+        if ($_href =~ m{(^|/|\\)$_}) {
             return qq{href="version$hrefs_version}.qq{_$_"};
         }
     }
@@ -3693,7 +3693,7 @@ sub _grabbed_src {
     my ($_src) = @_;
 
     foreach (@srcs) {
-        if ($_src =~ m{(^|/)$_}) {
+        if ($_src =~ m{(^|/|\\)$_}) {
             return qq{src="version$srcs_version}.qq{_$_"};
         }
     }

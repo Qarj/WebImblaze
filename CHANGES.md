@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.4.2 - Jan 5, 2021
+* handle backslash in path for grabbing assets
+
 ### Version 1.4.1 - Jan 5, 2021
 * added an assertnear assertion for non exact value comparison
 

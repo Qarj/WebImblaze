@@ -1612,6 +1612,14 @@ $main::resp_content = (q{ href='somewhere/nonmatched.css' });
 _response_content_substitutions(\ $main::resp_content);
 assert_resp_content_contains(q{href="somewhere/nonmatched.css"}, 'resources : nonmatched href - single quote, now double');
 
+resources_setup(before_test(), 'version1_simple.css');
+$main::case{getallhrefs} = '\.css|\.less';
+$main::resp_content = (q{ href="examples\assets\css\simple.css" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - backslash path');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('href="version1_simple.css"', 'resources : version1_simple.css substituted into resp_content - backslash path');
+
 resources_setup(before_test());
 $main::case{getallsrcs} = '\.js|\.gif';
 $main::resp_content = (q{ src="examples/assets/js/quick.js" });
@@ -1632,6 +1640,14 @@ assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_qu
 $main::resp_content = (q{ src='somewhere/nonmatched.js' });
 _response_content_substitutions(\ $main::resp_content);
 assert_resp_content_contains(q{src="somewhere/nonmatched.js"}, 'resources : nonmatched src - single quote, now double');
+
+resources_setup(before_test(), 'version1_quick.js');
+$main::case{getallsrcs} = '\.js|\.gif';
+$main::resp_content = (q{ src="examples\assets\js\quick.js" });
+getresources();
+assert_stdout_contains('GET Asset \[version1_quick\.js\]', 'resources : quick.js matched - backslash path');
+_response_content_substitutions(\ $main::resp_content);
+assert_resp_content_contains('src="version1_quick.js"', 'resources : version1_quick.js substituted into resp_content - backslash path');
 
 resources_setup(before_test());
 $main::case{getallsrcs} = '\.js|\.png';
