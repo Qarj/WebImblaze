@@ -2725,7 +2725,7 @@ Constant | Description
 **{OUTPUT}** | Temp folder for WebImblaze, also default location of test results output, or "no output" if output is suppressed
 **{HOSTNAME}** | Name of the computer currently running WebImblaze
 **{OUTPUTFOLDERNAME}** | Output folder name only - not the full path
-**{TESTFILENAME}** | Test file name
+**{TESTFILENAME}** | Test file name, without the `.test` extension
 **{OPT_PROXY}** | What proxy option was specified via the command line to wi.pl
 **{APP_DATA}** | WebImblaze app data location - defaults to `/var/lib/WebImblaze/` for Linux and `C:\ProgramData\\WebImblaze\\` for Windows
 **{SYS_TEMP}** | System temporary folder location - defaults to `/var/tmp/` for Linux and `C:\\temp\\` for Windows
