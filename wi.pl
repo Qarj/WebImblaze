@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.3';
+$VERSION = '1.4.4';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -2105,12 +2105,10 @@ sub _verify_verifypositive {
                 else {
                     $results_html .= qq|<span class="fail">Failed Positive Verification:</span>$_verifyparms[0]<br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    if ($_verifyparms[1]) { # is there a custom assertion failure message?
-                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
-                       $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
-                    }
                     colour_stdout('bold yellow', "Failed Positive Verification $_verify_number\n");
-                    if ($_verifyparms[1]) {
+                    if ($_verifyparms[1]) { # is there a custom assertion failure message?
+                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                        $results_xml .= '                <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                         colour_stdout('bold yellow', "$_verifyparms[1] \n");
                     }
                     $failed_count++;
@@ -2151,12 +2149,12 @@ sub _verify_verifynegative {
                 if (uncoded() =~ m/$_verifyparms[0]/si) {  # verify existence of string in response
                     $results_html .= qq|<span class="fail">Failed Negative Verification</span><br />\n|;
                     $results_xml .= qq|                <success>false</success>\n|;
-                    if ($_verifyparms[1]) {
-                       $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
-                        $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
-                    }
                     colour_stdout('bold yellow', "Failed Negative Verification $_verify_number\n");
                     if ($_verifyparms[1]) {
+                        my $capture1 = $1; my $capture2 = $2; my $capture3 = $3;
+                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg;
+                        $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
+                        $results_xml .= '            <message>'._sub_xml_special($_verifyparms[1])."</message>\n";
                         colour_stdout('bold yellow', "$_verifyparms[1] \n");
                     }
                     $failed_count++;

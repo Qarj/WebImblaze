@@ -2,9 +2,9 @@ step:                   verifynegative
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 assertcount:            Passed Negative Verification|||5|||Only Step 10 should have passed negative verifications
-assertcount1:           TEST STEP FAILED|||3|||Steps 20, 30 and 50 should fail
-assertcount2:           Failed Negative Verification|||7|||Should be failed negative verifications in steps 20, 30 and 50
+assertcount1:           TEST STEP FAILED|||4|||Steps 20, 30, 50 and 60 should fail
+assertcount2:           Failed Negative Verification|||8|||Should be failed negative verifications in steps 20, 30, 50 and 60
 verifypositive:         Should not find text but did
 verifypositive1:        Skipped Negative Verification 0 - Production Bug
+verifypositive2:        Found an error with the reference 123456
 verifynegative:         uninitialized value
-

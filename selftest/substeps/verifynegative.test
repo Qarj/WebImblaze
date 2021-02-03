@@ -27,3 +27,7 @@ step:                   Should be able to see response header
 desc:                   Should fail
 echo:                   headers
 verifynegative:         100 OK|||This should fail since 100 OK is seen
+
+step:                   Should have custom error message with dynamic text
+echo:                   Error reference 123456.
+verifynegative:         Error reference ([^\.]+)|||Found an error with the reference $capture1

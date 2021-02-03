@@ -1,4 +1,4 @@
-# WebImblaze 1.4.3
+# WebImblaze 1.4.4
 
 _UTF-8 is now well supported and the default, and gzip response content is now uncompressed automatically._
 

@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.4.3
+# Manual for WebImblaze version 1.4.4
 
 ## Overview
 
@@ -606,6 +606,7 @@ not be found in the response. After the three bars, i.e. `|||`, the optional err
 on failure is specified.
 
 <br />
+
 ```xml
 <autoassertions>
    <autoassertion1>^((?!Copyright Example Company 2016).)*$</autoassertion1>
@@ -615,6 +616,7 @@ on failure is specified.
 This second example automatically asserts that this copyright message appears in every response.
 
 <br />
+
 ```xml
 <autoassertions>
    <autoassertion1>Error reference ([\w]+)|||Found error reference $capture1</autoassertion1>
@@ -1324,21 +1326,30 @@ verifynegative1:    OutOfMemoryException
 And also as per verifypositive, you can specify a custom message if that verification fails.
 
 ```
-verifynegative: additional-search-results-btn|||Additional Search Results button should not be shown
+verifynegative:     additional-search-results-btn|||Additional Search Results button should not be shown
 ```
+
+You can capture details, say an error reference, and put this in the error message.
+In this example, assume the following was returned `Error reference #2349829.`.
+
+```
+verifynegative:     Error reference ([^\.]*)|||Found error reference: $capture1
+```
+
+$capture1, $capture2 and $capture3 are available.
 
 As with verifypositive, it is possible to disable a negative assertion without removing it. You do this by adding
 another three `|||` and writing any message after the custom error message.
 
 ```
-verifynegative: Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221
+verifynegative:     Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221
 ```
 
 In addition, you can prepend a `fail fast!` flag to the start of the assertion to indicate that in the event the assertion fails,
 WebImblaze should not retry the current test step.
 
 ```
-verifynegative: fail fast!A critical error has occurred
+verifynegative:     fail fast!A critical error has occurred
 ```
 
 <br />

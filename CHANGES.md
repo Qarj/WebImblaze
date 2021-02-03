@@ -7,6 +7,9 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ---------------------------------
 ## WebImblaze Release History:
 
+### Version 1.4.4 - Feb 3, 2021
+* now possible to show dynamic details in custom verifynegative assertion message
+
 ### Version 1.4.3 - Jan 5, 2021
 * fix for Linux file path handling when writing grabbed assets
 

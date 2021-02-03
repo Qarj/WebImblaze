@@ -1,5 +1,5 @@
 step:                   Get a gzip page
-url:                    https://varvy.com/pagespeed/enable-compression.html
+url:                    https://www.internetmarketingninjas.com/tools/free-tools/pagespeed
 addheader:              Accept-Encoding: gzip
-verifypositive:         method of compressing
+verifypositive:         page speed
 errormessage:           Could not get a gzip page over SSL, fix any SSL errors first
