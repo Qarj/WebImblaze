@@ -20,6 +20,7 @@ WebImblaze is very easy to setup and run. An example is test included.
 
    - Navigate to http://strawberryperl.com/
    - Download and install the recommended 64 bit version of Strawberry Perl
+   - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs 
 
 2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
 
