@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.4';
+$VERSION = '1.4.5';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -245,7 +245,8 @@ foreach (1 .. $repeat) {
 
             getresources(); # get JavaScript, CSS, GIF, JPG and other resources
 
-            parseresponse();  # grab string from response to send later
+            parseresponse(); # grab string from response to send later
+            parsematch(); # like parseresponse, find nth match
             set_eval_variables(); # perform simple true / false statement evaluations - or maths expressions
             write_shared_variable();
 
@@ -2365,6 +2366,38 @@ sub parseresponse {  # parse values from responses for use in future request (fo
         }
     }
 
+    return;
+}
+
+#------------------------------------------------------------------
+sub parsematch {  # parse nth match from response, empty string for no match
+
+    my (@_parse_args, $_regex, $_match_num);
+
+    foreach my $_case_attribute ( sort keys %case ) {
+
+        if ( (substr $_case_attribute, 0, 10) eq 'parsematch' ) {
+
+            my $_save_var = 'parseresponse' . substr $_case_attribute, 10;
+
+            @_parse_args = split /[|][|][|]/, $case{$_case_attribute} ;
+            $_parse_args[1] //= 1;
+            $_regex = $_parse_args[0]; $_match_num = $_parse_args[1];
+
+            $parsedresult{$_save_var} = q{}; # clear out any old value first
+
+            my $_i = 0;
+            foreach my $_match (uncoded() =~ m/$_regex/gs) { # while leads to infinite loop
+                $_i += 1;
+                if ($_i == $_match_num) {
+                    $parsedresult{$_save_var} = $_match;
+                    last;
+                }
+            }
+        }
+    }
+
+    print "confirming match: $parsedresult{'parseresponseCHOSEN_JOB'} \n";
     return;
 }
 

@@ -13,6 +13,11 @@ shell:                  .\wi.pl -o selftest\output\verifynegative selftest\verif
 verifypositive:         TEST STEP PASSED
 verifynegative:         TEST STEP FAILED
 
+step:                   parsematch
+shell:                  .\wi.pl -o selftest\output\parsematch selftest\parsematch.test
+verifypositive:         TEST STEP PASSED
+verifynegative:         TEST STEP FAILED
+
 step:                   parseresponse
 shell:                  .\wi.pl -o selftest\output\parseresponse selftest\parseresponse.test
 verifypositive:         TEST STEP PASSED

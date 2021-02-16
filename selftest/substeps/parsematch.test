@@ -1,0 +1,31 @@
+step:                   Parse some text for desired match number
+echo:|:                 |
+line1
+line2
+line3
+line4
+line5
+line6
+|                   
+parsematch:             line(\d+)
+parsematch1:            line(\d+)|||1
+parsematchFIVE:         line(\d+)|||5
+parsematchSIX:          line(\d+)|||6
+parsematchSEVEN:        line(\d+)|||7
+parsematch5000:         line(\d+)|||25000
+
+step:                   Have a look at the parsed text
+echo:|:                 |
+parsematch:{}
+parsematch1:{1}
+parsematchFIVE:{FIVE}
+parsematchSIX:{SIX}
+parsematchSEVEN:{SEVEN}END
+parsematch5000:{5000}END
+|
+verifypositive:         parsematch:1
+verifypositive1:        parsematch1:1
+verifypositive2:        parsematchFIVE:5
+verifypositive3:        parsematchSIX:6
+verifypositive4:        parsematchSEVEN:END
+verifypositive5:        parsematch5000:END

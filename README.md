@@ -1,4 +1,4 @@
-# WebImblaze 1.4.4
+# WebImblaze 1.4.5
 
 _UTF-8 is now well supported and the default, and gzip response content is now uncompressed automatically._
 
@@ -18,24 +18,24 @@ WebImblaze is very easy to setup and run. An example is test included.
 
 1. Install Strawberry Perl.
 
-   - Navigate to http://strawberryperl.com/
-   - Download and install the recommended 64 bit version of Strawberry Perl
-   - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs 
+    - Navigate to http://strawberryperl.com/
+    - Download and install the recommended 64 bit version of Strawberry Perl
+    - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs
 
 2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
 
-   ```
-   mkdir C:\git
-   ```
+    ```
+    mkdir C:\git
+    ```
 
 3. If you have git installed, then just clone the repository
 
-   ```
-   cd C:\git
-   git clone https://github.com/Qarj/WebImblaze.git
-   ```
+    ```
+    cd C:\git
+    git clone https://github.com/Qarj/WebImblaze.git
+    ```
 
-   If you don't have git, you can get it from https://git-scm.com.
+    If you don't have git, you can get it from https://git-scm.com.
 
 That's it! You are now ready to run WebImblaze for the first time.
 
@@ -75,6 +75,7 @@ Tested with Ubuntu 16.04, 18.04, 20.04, El Capitan, High Sierra, Mojave.
 #### CentOS 8
 
 Install `XML::Simple` with this method
+
 ```
 sudo dnf install perl-XML-Simple
 ```
@@ -145,30 +146,30 @@ If everything worked OK, then you'll see something like the following:
 ```
 Starting WebImblaze Engine...
 
-------------------------------------------------------- 
-Test:  tests/hello.test - 10 
-Get Totaljobs Home Page 
-Verify Positive: "Search for and be recommended" 
-Verify Positive: "See all hiring companies" 
-Passed Positive Verification 
-Passed Positive Verification 
-Passed HTTP Response Code Verification 
-TEST STEP PASSED 
-Response Time = 0.183 sec 
-------------------------------------------------------- 
-Test:  tests/hello.test - 20 
-Search for hello jobs 
-Expect to see at least 2 pages of hello jobs 
-Verify Negative: "Page not found" 
-Verify Positive: "\d+./span.\s*.h1.Hello jobs" 
-Verify Positive: "page=2" 
-Passed Positive Verification 
-Passed Positive Verification 
-Passed Negative Verification 
-Passed HTTP Response Code Verification 
-TEST STEP PASSED 
-Response Time = 0.648 sec 
-------------------------------------------------------- 
+-------------------------------------------------------
+Test:  tests/hello.test - 10
+Get Totaljobs Home Page
+Verify Positive: "Search for and be recommended"
+Verify Positive: "See all hiring companies"
+Passed Positive Verification
+Passed Positive Verification
+Passed HTTP Response Code Verification
+TEST STEP PASSED
+Response Time = 0.183 sec
+-------------------------------------------------------
+Test:  tests/hello.test - 20
+Search for hello jobs
+Expect to see at least 2 pages of hello jobs
+Verify Negative: "Page not found"
+Verify Positive: "\d+./span.\s*.h1.Hello jobs"
+Verify Positive: "page=2"
+Passed Positive Verification
+Passed Positive Verification
+Passed Negative Verification
+Passed HTTP Response Code Verification
+TEST STEP PASSED
+Response Time = 0.648 sec
+-------------------------------------------------------
 Start Time: Sun 09 Aug 2020, 08:35:02
 Total Run Time: 0.915 seconds
 
@@ -191,11 +192,11 @@ Then it loaded `tests/hello.test` and ran the two test steps in order, numbering
 
 Five files were created in the default output folder called `output`:
 
-- `results.html` is a html version of the results - with colour
-- `results.xml` is an xml version of the results
-- `http.txt` contains all the response headers and the actual page html
-- `10.html` contains the http response for step 10
-- `20.html` contains the http response for step 20
+-   `results.html` is a html version of the results - with colour
+-   `results.xml` is an xml version of the results
+-   `http.txt` contains all the response headers and the actual page html
+-   `10.html` contains the http response for step 10
+-   `20.html` contains the http response for step 20
 
 Double click on `results.html` to view in a browser, there are links to the individual results for steps 10 and 20.
 Click on the link for step 10 and to see the web page that WebImblaze received rendered in the browser. You can
@@ -283,17 +284,17 @@ number of the problem and an example of something that works.
 
 Quick start information:
 
-- parameters must start in column 1 of each line
-- `step:` must be on the first line of each step block
-- `step:` replaces description1
-- `desc:` replaces description2
-- `id:` is reserved - it is assigned automatically in increments of 10
-- `method:` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
-- all parameters for a step block must be grouped together without a blank line - blank lines separates steps
-- quotes are usually not needed, but if you do you can make up your own quotes (see examples/quotes.test)
-- for Selenium steps, use `selenium:` instead of `command:` (see examples/misc/selenium.test)
-- for command shell steps, use `shell:` instead of `command:` (see examples/demo.test)
-- it is possible to assemble a test file from smaller fragment files (see examples/advanced/include.test)
+-   parameters must start in column 1 of each line
+-   `step:` must be on the first line of each step block
+-   `step:` replaces description1
+-   `desc:` replaces description2
+-   `id:` is reserved - it is assigned automatically in increments of 10
+-   `method:` is also inferred - unless you need to use `delete` or `put` in which case you need to specify it
+-   all parameters for a step block must be grouped together without a blank line - blank lines separates steps
+-   quotes are usually not needed, but if you do you can make up your own quotes (see examples/quotes.test)
+-   for Selenium steps, use `selenium:` instead of `command:` (see examples/misc/selenium.test)
+-   for command shell steps, use `shell:` instead of `command:` (see examples/demo.test)
+-   it is possible to assemble a test file from smaller fragment files (see examples/advanced/include.test)
 
 Mixing tabs and spaces for formatting causes alignment to be out whack depending on what text editor
 you view the file in. For this reason tabs are not supported for formatting.
