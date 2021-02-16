@@ -2215,6 +2215,12 @@ evalOLD_DATA:       48-50>6
 {OLD_DATA} will be falsy.
 
 ```
+evalID_NOT_FOUND:   "{CHOSEN_ID}" eq ""
+```
+
+{ID_NOT_FOUND} will be truthy if {CHOSEN_ID} is null.
+
+```
 evalSHA1:           use Digest::SHA qw(sha1_hex); sha1_hex q|sha this text|;
 ```
 
