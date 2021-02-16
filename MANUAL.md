@@ -1,4 +1,4 @@
-# Manual for WebImblaze version 1.4.4
+# Manual for WebImblaze version 1.4.5
 
 ## Overview
 
@@ -93,6 +93,8 @@
     -   [verifypositive](#verifypositive)
 
     -   [verifynegative](#verifynegative)
+
+    -   [parsematch](#parsematch)
 
     -   [parseresponse](#parseresponse)
 
@@ -1312,6 +1314,25 @@ WebImblaze should not retry the current test step.
 
 ```
 verifynegative:     fail fast!A critical error has occurred
+```
+
+<br />
+
+#### parsematch
+
+Parse the nth match of a regular expression from the response.
+If the nth match cannot be found, the empty string is returned.
+
+Example - returns fifth match:
+
+```
+parsematch5: data-id="(\d+)"|||5
+```
+
+Example - returns the first match
+
+```
+parsematch5: data-id="(\d+)"
 ```
 
 <br />
