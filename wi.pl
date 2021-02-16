@@ -2397,7 +2397,6 @@ sub parsematch {  # parse nth match from response, empty string for no match
         }
     }
 
-    print "confirming match: $parsedresult{'parseresponseCHOSEN_JOB'} \n";
     return;
 }
 
