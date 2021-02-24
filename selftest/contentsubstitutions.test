@@ -1,0 +1,13 @@
+step:                   {FEATURE}
+varFEATURE:             {TESTFILENAME}
+shell1:                 .\wi.pl -o selftest\output\{FEATURE}sub -c selftest\substeps\{FEATURE}config.xml selftest\substeps\{FEATURE}.test
+shell2:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}sub10.html
+verifypositive:         Test Steps Failed: 0
+verifypositive1:        <nobase href="
+verifypositive2:        wind_WIF_cation
+verifypositive3:        localhost
+verifypositive4:        pubsub_STOP_init.js
+verifypositive5:        HTTP-EQUIV=___WIF___
+verifypositive6:        <script>noalert
+verifypositive7:        /sitecore/_WIF_/Applications/
+verifynegative:         /sitecore/shell/Applications/

@@ -1,0 +1,32 @@
+<root>
+    <teststepfile>examples\simple.xml</teststepfile>
+    <globalretry>10</globalretry> <!-- Global limit for the number of retries for a test run --> 
+    <globaljumpbacks>10</globaljumpbacks> <!-- Global limit for the number of checkpoint invocations for a test run --> 
+    <userdefined> 
+        <totaljobs>www.totaljobs.com</totaljobs> <!-- web site base url --> 
+    </userdefined> 
+    
+    <!-- 
+    If you use the following pattern in the auto assertion regular expression,
+    then the auto assertion will fail if TEXT THAT SHOULD NOT BE FOUND is present:
+    
+    ^((?!TEXT THAT SHOULD NOT BE FOUND).)*$
+    
+    -->
+    <autoassertions> 
+       <autoassertion1>HTTP Error 404.0 . Not Found|||Page not found error</autoassertion1> 
+    </autoassertions> 
+    
+    <testonly>Allow</testonly> 
+
+    <content_subs>
+        <stop_base_href>&lt;base href=|||"&lt;nobase href="</stop_base_href>
+        <stop_js_redirects>window.location|||"wind_WIF_cation"</stop_js_redirects>
+        <stop_krux>cdn.krxd.net|||"localhost"</stop_krux>
+        <stop_pub_sub>pubsub-init.js|||"pubsub_STOP_init.js"</stop_pub_sub>
+        <stop_refresh>HTTP-EQUIV="REFRESH"|||"HTTP-EQUIV=___WIF___"</stop_refresh>
+        <stop_script_alert>&lt;script&gt;alert|||"&lt;script&gt;noalert"</stop_script_alert>
+        <stop_sitecore_redirects>/sitecore/shell/Applications/|||"/sitecore/_WIF_/Applications/"</stop_sitecore_redirects>
+    </content_subs>
+
+</root> 

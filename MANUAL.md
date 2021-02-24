@@ -52,6 +52,8 @@
 
     -   [Test Step Files (specifying in configuration file)](#teststepfile)
 
+    -   [Response Content Substitutions](#content_subs)
+
 -   [Command Line Options](#command-line-options)
 
     -   [Command Line Options - full description](#command-line-options---full-description)
@@ -825,6 +827,38 @@ A configuration file containing a test step file to process (my_tests.test) may 
 Note: You can also use relative path names to point to test step files located in other directories or subdirectories.
 
 Don't specify more than one test step file, it won't work!
+
+<br />
+
+#### content_subs
+
+You can add a `content_subs` section to the config file to replace content in the step html files.
+
+You might want to do this to make visualising the results easier. For example, disabling alerts or stopping client
+side redirects.
+
+You can make up abitary names for each substitution - example `stop_refresh`.
+
+The target content and replacement are separated by three bars, `|||`.
+
+The target content is treated as a regular expression.
+
+Remember to encode symbols for xml - example the `<script>` tag is encoded as `&lt;script&gt;`.
+
+```xml
+    <content_subs>
+        <stop_base_href>&lt;base href=|||"&lt;nobase href="</stop_base_href>
+        <stop_js_redirects>window.location|||"wind_WIF_cation"</stop_js_redirects>
+        <stop_krux>cdn.krxd.net|||"localhost"</stop_krux>
+        <stop_pub_sub>pubsub-init.js|||"pubsub_STOP_init.js"</stop_pub_sub>
+        <stop_refresh>HTTP-EQUIV="REFRESH"|||"HTTP-EQUIV=___WIF___"</stop_refresh>
+        <stop_script_alert>&lt;script&gt;alert|||"&lt;script&gt;noalert"</stop_script_alert>
+        <stop_sitecore_redirects>/sitecore/shell/Applications/|||"/sitecore/_WIF_/Applications/"</stop_sitecore_redirects>
+    </content_subs>
+```
+
+Very important note - replace content on the RHS must be surrounded by double quotes - otherwise the
+replacement will be ignored and the targeted content will be deleted rather than replaced.
 
 <br />
 
