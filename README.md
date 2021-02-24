@@ -1,6 +1,6 @@
 # WebImblaze 1.4.5
 
-_UTF-8 is now well supported and the default, and gzip response content is now uncompressed automatically._
+_Syntax Highlighting with Visual Studio Code is now supported - search for `WebImblaze` in Extensions._
 
 _In Nagios plugin mode, WebImblaze will exit with code UNKNOWN if the test step has an `abort` parameter and it is invoked._
 
@@ -282,6 +282,8 @@ The goal of the format is to simplify test specification and remove clutter. Com
 are validated for and a comprehensive error message is given explaining the problem, line
 number of the problem and an example of something that works.
 
+Use VSCode and install the WebImblaze Syntax Highlighting extension for best results.
+
 Quick start information:
 
 -   parameters must start in column 1 of each line
@@ -304,7 +306,7 @@ Full information is in the manual.
 [Perl script for converting .xml test case files to .test files](https://github.com/Qarj/WebImblaze-Framework/blob/master/MANUAL.md#convert-webinject-xml-test-case-files-to-new-test-format)
 Note - you'll need to manually move over comments, plus the repeat parameter. It only works with two or more test steps, and two or more include steps (if present).
 
-[Syntax highlighting for WebImblaze .test files](https://github.com/Qarj/WebImblaze-Framework/blob/master/MANUAL.md#syntax-highlighting-webimblaze-test-case-files)
+[Notepad++ syntax highlighting for WebImblaze .test files](https://github.com/Qarj/WebImblaze-Framework/blob/master/MANUAL.md#syntax-highlighting-webimblaze-test-case-files)
 
 # Docker
 
