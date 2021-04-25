@@ -8,6 +8,10 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ## WebImblaze Release History:
 
+### Version 1.4.7 - Apr 25, 2021
+
+-   very minor change - redact is now processed later, just before writing to http log
+
 ### Version 1.4.6 - Apr 14, 2021
 
 -   very minor change - user defined variables from the config file are now substituted before processing the DATE::: substitution modifier

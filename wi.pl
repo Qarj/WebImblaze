@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.6';
+$VERSION = '1.4.7';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -233,7 +233,6 @@ foreach (1 .. $repeat) {
             output_assertions();
 
             execute_test_step();
-            redact();
             display_request_response();
 
             dump_json();
@@ -250,6 +249,7 @@ foreach (1 .. $repeat) {
             set_eval_variables(); # perform simple true / false statement evaluations - or maths expressions
             write_shared_variable();
 
+            redact();
             httplog();
 
             pass_fail_or_retry();

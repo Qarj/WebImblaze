@@ -1,4 +1,4 @@
-# WebImblaze 1.4.6
+# WebImblaze 1.4.7
 
 _Syntax Highlighting with Visual Studio Code is now supported - search for `WebImblaze` in Extensions._
 
