@@ -2,6 +2,6 @@ step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        Test Steps Run: 8
+verifypositive1:        Test Steps Run: 10
 verifynegative:         uninitialized value
 
