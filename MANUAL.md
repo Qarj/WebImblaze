@@ -2293,6 +2293,12 @@ evalBASE64_NONCE:   use MIME::Base64; encode_base64(q|{NONCE}|, '');
 
 {BASE64_NONCE} will not have carriage return due to `''` parameter.
 
+```
+evalSUBBED:         sub sb { my ($_s) = @_; $_s =~ s|%20|+|g; return $_s; } sb (q|abc%20qrs|);
+```
+
+will substitute text - in this example replacing `%20` with `+`.
+
 <br />
 
 #### firstlooponly
