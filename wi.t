@@ -3,6 +3,9 @@ use warnings;
 use strict;
 use Test::More qw( no_plan );
 use File::Path qw(make_path remove_tree);
+use vars qw/ $VERSION /;
+
+$VERSION = '0.0.1';
 
 #http://www.drdobbs.com/scripts-as-modules/184416165
 do './wi.pl';
