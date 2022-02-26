@@ -20,6 +20,9 @@ jobs:
             - name: Install LWP
               run: cpanm LWP
 
+            - name: Install LWP::Protocol::https
+              run: cpanm LWP::Protocol::https
+
             - name: Install XML::Simple
               run: cpanm XML::Simple
 
