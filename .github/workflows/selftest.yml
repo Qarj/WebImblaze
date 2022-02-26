@@ -33,6 +33,7 @@ jobs:
               run: perl wi.pl selftest/all_core.test
 
             - name: Archive test report
+              if: always()
               uses: actions/upload-artifact@v2
               with:
                   name: html-results-report
