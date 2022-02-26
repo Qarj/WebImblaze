@@ -160,7 +160,7 @@ Version 1.42 onwards - HTTPS://github.com/Qarj/WebImblaze
 -   fixed edge cases for var assignment in conjunction with retry and repeat
 -   ampersands will now be correctly encoded in the xml results rather than changed to the literal {AMPERSAND}
 -   logic has been adjusted for decision to run or skip test step - now done after all variable substitutions
--   examples now point to webinject-check website
+-   examples now point to the webinject-check site
 
 ### Version 2.8.0 - Nov 25, 2017
 

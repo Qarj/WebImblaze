@@ -12,7 +12,7 @@ _In Nagios plugin mode, WebImblaze will exit with code UNKNOWN if the test step 
 
 WebImblaze is a free Perl based tool for automated testing of web applications and web services.
 
-You can see WebImblaze example output here: https://qarj.github.io/WebImblaze-Example/
+You can see WebImblaze example output here: [Example output](https://qarj.github.io/WebImblaze-Example/)
 
 ## Quick Start Guide - run your first test in 5 minutes!
 
@@ -22,24 +22,24 @@ WebImblaze is very easy to setup and run. An example is test included.
 
 1. Install Strawberry Perl.
 
-    - Navigate to http://strawberryperl.com/
+    - Navigate to [Strawberry Perl](http://strawberryperl.com/)
     - Download and install the recommended 64 bit version of Strawberry Perl
     - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs
 
 2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
 
-    ```
+    ```batch
     mkdir C:\git
     ```
 
 3. If you have git installed, then just clone the repository
 
-    ```
+    ```batch
     cd C:\git
     git clone https://github.com/Qarj/WebImblaze.git
     ```
 
-    If you don't have git, you can get it from https://git-scm.com.
+    If you don't have git, you can get it from [git](https://git-scm.com).
 
 That's it! You are now ready to run WebImblaze for the first time.
 
@@ -47,14 +47,14 @@ That's it! You are now ready to run WebImblaze for the first time.
 
 Clone WebImblaze with git
 
-```
+```sh
 cd /usr/local/bin
 sudo git clone https://github.com/Qarj/WebImblaze.git
 ```
 
 Fix permissions
 
-```
+```sh
 cd WebImblaze
 sudo find . -type d -exec chmod a+rwx {} \;
 sudo find . -type f -exec chmod a+rw {} \;
@@ -63,13 +63,13 @@ sudo chmod +x wi.pl
 
 Check that you can see the WebImblaze help info
 
-```
+```sh
 perl wi.pl --help
 ```
 
 If there are error messages you might need additional Perl packages
 
-```
+```sh
 sudo cpan XML::Simple
 sudo cpan LWP::Protocol::https
 ```
@@ -80,7 +80,7 @@ Tested with Ubuntu 16.04, 18.04, 20.04, El Capitan, High Sierra, Mojave.
 
 Install `XML::Simple` with this method
 
-```
+```sh
 sudo dnf install perl-XML-Simple
 ```
 
@@ -88,7 +88,7 @@ sudo dnf install perl-XML-Simple
 
 CentOS requires a lot of additional setup before installing the packages above - some of the below may be redundant
 
-```
+```sh
 sudo yum install cpan
 sudo cpan
 install CPAN
@@ -109,7 +109,7 @@ sudo yum install openssl-devel
 ```
 
 You can see if SSL is installed correctly with the command `perl -MNet::SSL -e1` - if it returns no output then all
-is ok and there is no need to install `LWP::Protocol::https` using cpan.
+is OK and there is no need to install `LWP::Protocol::https` using cpan.
 
 ### Create simple WebImblaze test
 
@@ -117,14 +117,14 @@ Note that these instructions are written with Windows in mind.
 
 In the `tests` folder, create a file called `hello.test`.
 
-```
+```sh
 cd c:/git/WebImblaze
 start notepad++ tests/hello.test
 ```
 
 Copy paste the following then save the file.
 
-```
+```lang-text
 step:               Get Totaljobs Home Page
 varTOTALJOBS_URL:   https://www.totaljobs.com
 url:                {TOTALJOBS_URL}
@@ -141,13 +141,13 @@ verifynegative1:    Page not found
 
 ### Run simple WebImblaze test
 
-```
+```sh
 perl wi.pl tests/hello.test
 ```
 
 If everything worked OK, then you'll see something like the following:
 
-```
+```lang-text
 Starting WebImblaze Engine...
 
 -------------------------------------------------------
@@ -196,11 +196,11 @@ Then it loaded `tests/hello.test` and ran the two test steps in order, numbering
 
 Five files were created in the default output folder called `output`:
 
--   `results.html` is a html version of the results - with colour
--   `results.xml` is an xml version of the results
--   `http.txt` contains all the response headers and the actual page html
--   `10.html` contains the http response for step 10
--   `20.html` contains the http response for step 20
+-   `results.html` is a HTML version of the results - with colour
+-   `results.xml` is a XML version of the results
+-   `http.txt` contains all the response headers and the actual page HTML
+-   `10.html` contains the HTTP response for step 10
+-   `20.html` contains the HTTP response for step 20
 
 Double click on `results.html` to view in a browser, there are links to the individual results for steps 10 and 20.
 Click on the link for step 10 and to see the web page that WebImblaze received rendered in the browser. You can
@@ -237,7 +237,7 @@ how that feature works.
 
 You can run all the self tests with the following command:
 
-```
+```sh
 perl wi.pl selftest/all_core.test
 ```
 
@@ -255,25 +255,25 @@ Have multiple test environments? Hundreds of tests that are run many times a day
 
 Then the WebImblaze-Framework project is for you! Provides config management and a way to neatly organise test execution and results.
 
-Find the project here: https://github.com/Qarj/WebImblaze-Framework
+Find the project here: [WebImblaze Framework](https://github.com/Qarj/WebImblaze-Framework)
 
 ## WebImblaze-Selenium
 
 WebImblaze can also drive the Chrome browser using WebDriver Selenium.
 
-Find the project here: https://github.com/Qarj/WebImblaze-Selenium
+Find the project here: [WebImblaze-Selenium](https://github.com/Qarj/WebImblaze-Selenium)
 
 ## search-image
 
 A Chrome screenshot can be searched to see if it contains a specific (or approximate) sub-image.
 
-Find the project here: https://github.com/Qarj/search-image
+Find the project here: [search-image](https://github.com/Qarj/search-image)
 
 ## Nagios
 
 Use WebImblaze as a plugin to Nagios to monitor critical business workflows.
 
-https://webimblaze.blogspot.com/2018/11/webimblaze-as-nagios-plugin-for.html
+[WebImblaze as Nagios plugin](https://webimblaze.blogspot.com/2018/11/webimblaze-as-nagios-plugin-for.html)
 
 # Test File Format
 
@@ -314,4 +314,4 @@ Note - you'll need to manually move over comments, plus the repeat parameter. It
 
 # Docker
 
-https://hub.docker.com/r/qarj/webimblaze/
+[Docker](https://hub.docker.com/r/qarj/webimblaze/)
