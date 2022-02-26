@@ -14,7 +14,7 @@ WebImblaze is a free Perl based tool for automated testing of web applications a
 
 You can see WebImblaze example output here: [Example output](https://qarj.github.io/WebImblaze-Example/)
 
-## Quick Start Guide - run your first test in 5 minutes!
+## Quick Start Guide - run your first test in 5 minutes
 
 WebImblaze is very easy to setup and run. An example is test included.
 
@@ -209,7 +209,7 @@ Ignore the `Summary`, `Batch Summary` and `Run Results` links (the WebImblaze-Fr
 
 ### Creating your own tests
 
-There are some examples on the WebImblaze blog with detailed discussion: http://webimblaze.blogspot.co.uk/
+There are some examples on the WebImblaze blog with detailed discussion: [Examples](http://webimblaze.blogspot.co.uk/)
 
 Examine and run the examples in the `examples` folder.
 
@@ -243,13 +243,13 @@ perl wi.pl selftest/all_core.test
 
 Or you can run just one self test like this:
 
-```
+```sh
 perl wi.pl selftest/verifypositive.test
 ```
 
-# WebImblaze Plugins
+## WebImblaze Plugins
 
-## WebImblaze-Framework
+### WebImblaze-Framework
 
 Have multiple test environments? Hundreds of tests that are run many times a day?
 
@@ -257,25 +257,25 @@ Then the WebImblaze-Framework project is for you! Provides config management and
 
 Find the project here: [WebImblaze Framework](https://github.com/Qarj/WebImblaze-Framework)
 
-## WebImblaze-Selenium
+### WebImblaze-Selenium
 
 WebImblaze can also drive the Chrome browser using WebDriver Selenium.
 
 Find the project here: [WebImblaze-Selenium](https://github.com/Qarj/WebImblaze-Selenium)
 
-## search-image
+### search-image
 
 A Chrome screenshot can be searched to see if it contains a specific (or approximate) sub-image.
 
 Find the project here: [search-image](https://github.com/Qarj/search-image)
 
-## Nagios
+### Nagios
 
 Use WebImblaze as a plugin to Nagios to monitor critical business workflows.
 
 [WebImblaze as Nagios plugin](https://webimblaze.blogspot.com/2018/11/webimblaze-as-nagios-plugin-for.html)
 
-# Test File Format
+## Test File Format
 
 WebImblaze uses a simplified test file format over WebInject.
 
@@ -312,6 +312,6 @@ Note - you'll need to manually move over comments, plus the repeat parameter. It
 
 [Notepad++ syntax highlighting for WebImblaze .test files](https://github.com/Qarj/WebImblaze-Framework/blob/master/MANUAL.md#syntax-highlighting-webimblaze-test-case-files)
 
-# Docker
+## Docker
 
 [Docker](https://hub.docker.com/r/qarj/webimblaze/)

@@ -1,12 +1,12 @@
 # Manual for WebImblaze version 1.4.7
 
-## Overview
+Overview
 
 -   [Architecture Diagram](#architecture-diagram)
 
 -   [Summary](#summary)
 
-## Configuration
+Configuration
 
 -   [config.xml](#configxml)
 
@@ -62,7 +62,7 @@
 
     -   [More Examples of Command-line Usage](#more-examples-of-command-line-usage)
 
-## File level directives
+File level directives
 
 -   [include](#include)
 
@@ -70,7 +70,7 @@
 
 -   [useragent](#useragent---directive)
 
-## Test Steps
+Test Steps
 
 -   [Test Step Summary](#test-step-summary)
 
@@ -78,7 +78,7 @@
 
 -   [Test step internal numbering](#test-step-internal-numbering)
 
-## Step Parameters
+Step Parameters
 
 -   [Core Parameters](#core-parameters)
 
@@ -212,7 +212,7 @@
 
     -   [writesharedvar](#writesharedvar)
 
-## Full Examples
+Full Examples
 
 -   [Simple form](#simple-form)
 
@@ -220,7 +220,7 @@
 
 -   [Data driven](#data-driven)
 
-## Valid test step files
+Valid test step files
 
 -   [parameters](#parameters)
 
@@ -232,7 +232,7 @@
 
 -   [comments](#comments)
 
-## Variables and Constants
+Variables and Constants
 
 -   [Variables and Constants Overview](#variables-and-constants-overview)
 
@@ -246,7 +246,7 @@
 
 -   [Setting Custom Variables](#setting-custom-variables)
 
-## Auto Substitutions
+Auto Substitutions
 
 -   [Auto Substitutions](#auto-substitutions-overview)
 
@@ -254,7 +254,7 @@
 
 -   [{DATA}](#data)
 
-## Pass/Fail Criteria
+Pass/Fail Criteria
 
 -   [Verifications](#verifications)
 
@@ -262,7 +262,7 @@
 
 -   [Test Step Pass/Fail Status](#test-step-passfail-status)
 
-## Test results output
+Test results output
 
 -   [results.html](#resultshtml)
 
@@ -274,7 +274,7 @@
 
 -   [Individual step html files](#individual-step-html-files)
 
-## Session Handling and State Management
+Session Handling and State Management
 
 -   [State Management Summary](#state-management-summary)
 
@@ -286,13 +286,13 @@
 
 -   [Session ID in HTTP response header](#session-id-in-http-response-header)
 
-## Additional Info
+Additional Info
 
 -   [Parallel Automated Test Execution](#parallel-automated-test-execution)
 
 -   [Advanced Assertions](#advanced-assertions)
 
-## Hints and tips
+Hints and tips
 
 -   [Modify a variable using regular expressions](#modify-a-variable-using-regular-expressions)
 
@@ -384,7 +384,7 @@ Note that you specify the delimiter with the first character.
 
 You can use also use NTLM authentication in the following format. You'll need to use Authen::NTLM at least version 1.05 for this to work.
 
-```
+```sh
 cpan Authen::NTLM
 ```
 
@@ -527,7 +527,7 @@ Example - in the config file:
 
 In the test step specify:
 
-```
+```yml
 runon: DEV|PAT
 ```
 
@@ -538,7 +538,7 @@ On the other hand, tests that have the donotrunon will be treated inversely.
 
 So with the same config file as above, if we have this parameter:
 
-```
+```yml
 donotrunon: DEV|PAT
 ```
 
@@ -629,7 +629,7 @@ The condition is set as part of the smart assertion.
 
 In the example above, the condition is specified first, before the `|||`.
 
-The condition in this step is that the `Set\-Cookie: ` regular expression finds at least one
+The condition in this step is that the `Set\-Cookie:` regular expression finds at least one
 match in the response output.
 
 If the condition is met, then the regular expression after the `|||` is executed.
@@ -668,13 +668,13 @@ end of testing, a single line is output according to Nagios standards.
 
 If one or more test failed, you'll get an output like the following:
 
-```
+```txt
 WebImblaze CRITICAL - Nagios should see this error message |time=0.007;100;;0
 ```
 
 or
 
-```
+```txt
 WebImblaze CRITICAL - Test step number 10 failed |time=0.008;100;;0
 ```
 
@@ -689,7 +689,7 @@ In both scenarios, if more than one test step fails, only the first test step th
 
 If a test step has an abort parameter, and this is invoked, then WebImblaze will exit with the UNKNOWN exit code
 
-```
+```txt
 WebImblaze UNKNOWN - aborted - Test step number 10 failed |time=0.008;100;;0
 ```
 
@@ -697,7 +697,7 @@ WebImblaze UNKNOWN - aborted - Test step number 10 failed |time=0.008;100;;0
 
 Another type of message to Nagios is a warning that the globaltimeout was exceeded.
 
-```
+```txt
 WebImblaze WARNING - All tests passed successfully but global timeout (0.01 seconds) has been reached |time=0.026;0.01;;0
 ```
 
@@ -708,13 +708,13 @@ globaltimeout for more information.
 
 Finally, if WebImblaze ran the tests without any issues, then a message like this is produced:
 
-```
+```txt
 WebImblaze OK - All tests passed successfully in 0.007 seconds |time=0.007;100;;0
 ```
 
 When running with the Nagios reporttype, it is recommended to use the `--no-output` option as follows:
 
-```
+```sh
 perl wi.pl --no-output selftest/substeps/nagios.test -c selftest/substeps/nagiosconfig.xml
 ```
 
@@ -1028,7 +1028,7 @@ Here are some examples to illustrate using wi.pl from the command-line:
 
 The "include" directive will import another test file.
 
-```
+```yml
 include: examples/include/include_demo_1.test
 ```
 
@@ -1040,7 +1040,7 @@ So if `include_demo_1.test` had 5 steps, they could be numbered 01, 02, 03, 04 a
 Then when they get included in the master test step file, they will become 10.01, 10.02, 10.03, 10.04 and 10.05 (given
 this example).
 
-```
+```yml
 include: includes/create_new_user.test
 
 include: includes/login.test
@@ -1059,7 +1059,7 @@ There is a "repeat" directive you can set on a line by itself.
 
 For example, to have a test step file run 5 times, your file should have
 
-```
+```yml
 repeat: 5
 ```
 
@@ -1072,8 +1072,8 @@ but it cannot be part of a step. It can only appear once in the file.
 
 Sets the useragent at a test file level.
 
-```
-useragent:  My file level useragent
+```yml
+useragent: My file level useragent
 ```
 
 The useragent can be set in `config.xml`, at the file level and at the step level.
@@ -1161,7 +1161,7 @@ step: Get Search Form
 
 Optional further description.
 
-```
+```yml
 desc: Check that new user analytics fired
 ```
 
@@ -1253,9 +1253,9 @@ In the example above, `GetJobs.xml` could look like the following.
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <search>
-	<seq>1</seq>
-	<title>{TITLE}</title>
-	<location>{LOCATION}</location>
+    <seq>1</seq>
+    <title>{TITLE}</title>
+    <location>{LOCATION}</location>
 </search>
 ```
 
@@ -1445,7 +1445,7 @@ Example - in this regex, (?s) causes the . to match any character including . ev
 parseresponse: (?s).*UserId="(.*?)"\<
 ```
 
-See regular expression modifiers: https://www.regular-expressions.info/modifiers.html
+See regular expression modifiers: [Modifiers](https://www.regular-expressions.info/modifiers.html)
 
 Example - another way to force the last capture to be returned, in this case `(\d+)` immediately following `"dealId":`:
 
@@ -1585,7 +1585,7 @@ not `selenium` or `url`.
 Will run the specified command only if the test step is declared as having failed - after all
 retries exhausted.
 
-```
+```yml
 commandonfail: python emailsupportteam.py
 ```
 
@@ -1995,7 +1995,7 @@ if nothing found to decode.
 
 Purpose is for decoding base64 encoded emails.
 
-```
+```yml
 decodebase64: true
 ```
 
@@ -2433,7 +2433,7 @@ step: Teardown
 
 Will read a variable created by a previous instance of `wi.pl`, or indeed, even one running concurrently.
 
-```
+```yml
 readsharedvar: SESSION_COOKIE
 ```
 
@@ -2580,7 +2580,7 @@ Results at: output\Results.html
 
 Parameters must begin on the first column of the line.
 
-The parameter name must end with a colon followed by at least one space, `: `.
+The parameter name must end with a colon followed by at least one space.
 
 ```yml
 step: This is is valid
@@ -2960,9 +2960,6 @@ then post the completed form. The form field names and hidden data can be found 
 Pages with forms will have a `method="post" action="Some/Destination"` in the html. This helps WebImblaze identify
 which page in its cache to get the appropriate information from.
 
-You can enable the debug output of this feature by doing a replace all on wi.pl: Replace `#autosub_debug `
-with nothing or just spaces.
-
 ## Pass/Fail Criteria
 
 ### Verifications
@@ -3162,7 +3159,7 @@ To parse the Session ID from a header that contains:
 
 You would add the following parameter to your test step:
 
-```
+```yml
 parseresponse: JSESSIONID=|;
 ```
 
@@ -3239,7 +3236,7 @@ Note that in this example that back tracking is turned off by the `?>` to preven
 
 If your regular expression requires back tracking, then you should remove the `?>`. If you do this you should
 modify your target regular expression so that it is more exact, otherwise WebImblaze will hang if it can't find
-all occurrences. https://www.regular-expressions.info/catastrophic.html
+all occurrences. [Catastrophic](https://www.regular-expressions.info/catastrophic.html)
 
 <br />
 

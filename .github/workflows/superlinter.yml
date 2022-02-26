@@ -23,7 +23,7 @@ jobs:
                   JAVASCRIPT_DEFAULT_STYLE: prettier
                   LINTER_RULES_PATH: /
                   MARKDOWN_CONFIG_FILE: ./.github/linters/.markdown-lint.yml
-                  NATURAL_LANGUAGE_CONFIG_FILE: ./.github/linters/.textlintrc
+                  NATURAL_LANGUAGE_CONFIG_FILE: ./.github/linters/.textlintrc.json
                   PERL_CONFIG_FILE: ./.github/linters/.perlcriticrc
                   PYTHON_BLACK_CONFIG_FILE: ./.github/linters/.python-black
                   PYTHON_ISORT_CONFIG_FILE: ./.github/linters/.isort.cfg
