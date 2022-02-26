@@ -13,8 +13,9 @@
 
 # http://stackoverflow.com/questions/4720168/image-in-image-algorithm
 
-import cv2
 import sys
+
+import cv2
 from PIL import Image, ImageDraw
 
 if len(sys.argv) > 2:
