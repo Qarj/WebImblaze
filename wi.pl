@@ -147,7 +147,8 @@ binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 use if $^O eq 'MSWin32', 'Win32::API';
-my $SetConsoleOutputCP= new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
+my $SetConsoleOutputCP;
+$SetConsoleOutputCP = new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
 $SetConsoleOutputCP->Call(65001) if $is_windows;
 
 return 1 unless $0 eq __FILE__; # script exits at this point for unit tests
