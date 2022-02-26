@@ -29,7 +29,7 @@ jobs:
             - name: Check Perl version
               run: perl --version
 
-            - name: Check WebInImblaze
+            - name: Check WebImblaze
               run: perl wi.pl --version
 
             - name: Self test

@@ -408,7 +408,7 @@ Note: You can have as many httpauth entries as you need.
     <httpauth> tfl.gov.uk 80 realm username password</httpauth>
 ```
 
-_*Basic Authentication Example*_
+**Basic Authentication Example**
 
 For basic authentication you need to set maxredirect to at least 1.
 
@@ -543,19 +543,6 @@ donotrunon: DEV|PAT
 ```
 
 Then the test step will be skipped.
-
-<br />
-
-#### autocontrolleronly
-
-Allows you to designate certain servers as an automation controller.
-This enables you to specify that certain test steps should only be run from the automation controller.
-
-```xml
-<automationcontrolleronly>Allow</automationcontrolleronly>
-```
-
-In the test step that you only want to run on automation controllers, specify the parameter `automationcontrolleronly="true"`
 
 <br />
 
