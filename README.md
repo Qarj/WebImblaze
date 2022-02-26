@@ -124,7 +124,7 @@ start notepad++ tests/hello.test
 
 Copy paste the following then save the file.
 
-```lang-text
+```yml
 step:               Get Totaljobs Home Page
 varTOTALJOBS_URL:   https://www.totaljobs.com
 url:                {TOTALJOBS_URL}
