@@ -1,5 +1,8 @@
 # WebImblaze 1.4.7
 
+[![GitHub Super-Linter](https://github.com/Qarj/cookie-pot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Tests](https://github.com/Qarj/WebImblaze/workflows/Unit%20tests/badge.svg)
+
 _Syntax Highlighting with Visual Studio Code is now supported - search for `WebImblaze` in Extensions._
 
 _In Nagios plugin mode, WebImblaze will exit with code UNKNOWN if the test step has an `abort` parameter and it is invoked._
