@@ -17,6 +17,7 @@ jobs:
             - name: Lint Code Base
               uses: github/super-linter@v4
               env:
+                  CSS_FILE_NAME: ./.github/linters/.stylelintrc.json
                   DEFAULT_BRANCH: main
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   JAVASCRIPT_DEFAULT_STYLE: prettier

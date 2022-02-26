@@ -1,12 +1,12 @@
 # WebImblaze changelog
 
-This project is a fork of WebInject version 1.41, http://webinject.org/.
+This project is a fork of WebInject version 1.41, [WebInject](http://webinject.org/).
 
-Version 1.42 onwards - HTTPS://github.com/Qarj/WebImblaze
+Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 
 ---
 
-## WebImblaze Release History:
+## WebImblaze Release History
 
 ### Version 1.4.7 - Apr 25, 2021
 
@@ -129,7 +129,7 @@ Version 1.42 onwards - HTTPS://github.com/Qarj/WebImblaze
 
 ---
 
-## WebInject Release History:
+## WebInject Release History
 
 ### Version 2.11.0 - Aug 10, 2018
 
