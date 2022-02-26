@@ -1,0 +1,33 @@
+---
+name: Self test
+
+on: push
+
+jobs:
+    test:
+        name: Self test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup Perl
+              uses: shogo82148/actions-setup-perl@v1
+              with:
+                  install-modules-with: cpanm
+                  install-modules-args: --with-develop --with-configure
+
+            - name: Install LWP
+              run: cpanm LWP
+
+            - name: Install XML::Simple
+              run: cpanm XML::Simple
+
+            - name: Check Perl version
+              run: perl --version
+
+            - name: Check WebInImblaze
+              run: perl wi.pl --version
+
+            - name: Self test
+              run: perl wi.pl selftest/all_core.test

@@ -1,7 +1,8 @@
 # WebImblaze 1.4.7
 
-[![GitHub Super-Linter](https://github.com/Qarj/cookie-pot/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
-![Tests](https://github.com/Qarj/WebImblaze/workflows/Unit%20tests/badge.svg)
+[![GitHub Super-Linter](https://github.com/Qarj/WebImblaze/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+![Unit tests](https://github.com/Qarj/WebImblaze/workflows/Unit%20tests/badge.svg)
+![Self test](https://github.com/Qarj/WebImblaze/workflows/Self%20test/badge.svg)
 
 _Syntax Highlighting with Visual Studio Code is now supported - search for `WebImblaze` in Extensions._
 
