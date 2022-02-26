@@ -31,3 +31,9 @@ jobs:
 
             - name: Self test
               run: perl wi.pl selftest/all_core.test
+
+            - name: Archive test report
+              uses: actions/upload-artifact@v2
+              with:
+                  name: html-results-report
+                  path: output/Results.html
