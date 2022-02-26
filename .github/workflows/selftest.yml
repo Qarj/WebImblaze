@@ -38,3 +38,25 @@ jobs:
               with:
                   name: html-results-report
                   path: output/Results.html
+
+            - name: Zip main test output
+              if: always()
+              run: zip -r output-main.zip output
+
+            - name: Archive main test output
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: main-test-output
+                  path: output-main.zip
+
+            - name: Zip substeps test output
+              if: always()
+              run: zip -r output-substeps.zip selftest/output
+
+            - name: Archive substeps test output
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: substeps-test-output
+                  path: output-substeps.zip
