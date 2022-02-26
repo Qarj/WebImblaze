@@ -18,7 +18,7 @@ jobs:
                   install-modules-args: --with-develop --with-configure
 
             - name: Install LWP
-               run: cpanm LWP
+              run: cpanm LWP
 
             - name: Check Perl version
               run: perl --version
