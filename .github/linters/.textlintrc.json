@@ -3,6 +3,8 @@
         "comments": true
     },
     "rules": {
-        "terminology": false
+        "terminology": {
+            "severity": "warning"
+        }
     }
 }
