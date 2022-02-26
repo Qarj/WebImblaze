@@ -13,6 +13,12 @@ jobs:
 
             - name: Setup Perl
               uses: shogo82148/actions-setup-perl@v1
+              with:
+                  install-modules-with: cpanm
+                  install-modules-args: --with-develop --with-configure
+
+            - name: Install LWP
+               run: cpanm LWP
 
             - name: Check Perl version
               run: perl --version
