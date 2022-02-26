@@ -394,10 +394,10 @@ cpan Authen::NTLM
 
 When using NTLM is is also recommended to set a high maxredirect.
 
-```txt
-step:                   Get an NTLM page
-url:                    https://sharepoint.internal/login
-maxredirect:            10
+```yml
+step: Get an NTLM page
+url: https://sharepoint.internal/login
+maxredirect: 10
 ```
 
 Note: You can have as many httpauth entries as you need.
@@ -420,10 +420,10 @@ In your config.xml file, add the following line:
 
 Now create a test step file with the following step:
 
-```txt
-step:                   Postman Echo - basic-auth
-url:                    https://postman-echo.com/basic-auth
-maxredirect:            1
+```yml
+step: Postman Echo - basic-auth
+url: https://postman-echo.com/basic-auth
+maxredirect: 1
 ```
 
 If you run it, you get an `{"authenticated":true}` response from the Postman Echo service.
@@ -880,7 +880,7 @@ perl wi.pl examples/simple.test
 
 The command-line options are:
 
-```txt
+```yml
 -c|--config config_file           --config config.xml
 -o|--output output_location       --output output/
 -a|--autocontroller               --autocontroller
@@ -1102,9 +1102,9 @@ See the "Pass/Fail Criteria" section of this manual for more information.
 
 A minimal test step file may look something like, say `minimal.test`:
 
-```txt
+```yml
 step: Check test.html
-url:  http://myserver/test/test.html
+url: http://myserver/test/test.html
 ```
 
 In this example, WebImblaze will get the specified URL and ensure it passes:
@@ -1125,7 +1125,7 @@ Include steps are numbered with the decimal point starting from .01 in multiples
 So if you have an include directive for the second step, the sub steps will be called
 20.01, 20.02, 20.03 and so on.
 
-```txt
+```yml
 step:       This is step 10
 
 # Login script with 3 steps - will be called 20.01, 20.02, 20.03
@@ -1147,7 +1147,7 @@ test execution repeats.
 
 Name of the test step.
 
-```txt
+```yml
 step: Get Search Form
 ```
 
@@ -1173,7 +1173,7 @@ desc: Check that new user analytics fired
 
 Full HTTP URL to request. You can use an IP Address or Host Name.
 
-```txt
+```yml
 url: http://www.example.com/search.aspx
 ```
 
@@ -1184,23 +1184,23 @@ url: http://www.example.com/search.aspx
 This parameter specifies the content type encoding used in submitting a form to the server ("Content-Type" field
 in the HTTP Header). The possible values are:
 
-```txt
+```yml
 posttype: application/x-www-form-urlencoded
 ```
 
-```txt
+```yml
 posttype: multipart/form-data
 ```
 
-```txt
+```yml
 posttype: text/xml
 ```
 
-```txt
+```yml
 posttype: application/soap+xml
 ```
 
-```txt
+```yml
 posttype: application/json
 ```
 
@@ -1214,10 +1214,10 @@ This is the data (body) of the request to be sent to the server. (For "post" or 
 
 If you are sending "application/x-www-form-urlencoded" data, this parameter contains the string of text data you wish to send.
 
-```txt
-method:     put
-posttype:   application/x-www-form-urlencoded
-postbody:   txtUsername=admin&txtPassword=password1
+```yml
+method: put
+posttype: application/x-www-form-urlencoded
+postbody: txtUsername=admin&txtPassword=password1
 ```
 
 If you are sending "multipart/form-data" (used for form-based file upload as specified in RFC 1867), this parameter contains
@@ -1225,23 +1225,23 @@ a string that represents the Perl code used to define the "Content" parameter of
 will be evaluated by the Perl interpreter using "eval". More details about the syntax can be found in the Perl documentation
 of the HTTP::Request::Common module.
 
-```txt
+```yml
 posttype: multipart/form-data
 postbody: ( 'companyName' => 'Example', 'companyId' => '55201', 'companyLogo' => ['testdata\logos\Example.jpg'] )
 ```
 
 JSON can be sent as follows.
 
-```txt
+```yml
 posttype: application/json
-postbody: {"application": "search", "searchtype": "postcode", "criteria": "WC1X 8TG"}
+postbody: { 'application': 'search', 'searchtype': 'postcode', 'criteria': 'WC1X 8TG' }
 ```
 
 If you are sending "text/xml" or "application/soap+xml" (used for web services), this parameter contains a link to an external file
 that contains the text (xml payload) that will be sent in the body of your request. This is done using the `file=>` syntax.
 Example: `postbody="file=>soap_payload.xml"`
 
-```txt
+```yml
 posttype:   text/xml
 postbody:   file=>testdata\GetJobs.xml
 addheader:  SOAPAction: "http://www.example.com/ns/1.0/GetNewJobs"
@@ -1272,16 +1272,16 @@ to specify a custom message for each verification that fails. See the examples.
 
 Example - check for "Saved OK" in response:
 
-```txt
+```yml
 verifypositive: Saved OK
 ```
 
 Example - check for various Webtrends tags in response, and output a custom message if it isn't found:
 
-```txt
-verifypositive:     WT897234|||Webtrends Profile Saved tag not found
-verifypositive1:    WT897264|||Webtrends New User tag not found
-verifypositive2:    WT897292|||Webtrends Full Profile tag not found
+```yml
+verifypositive: WT897234|||Webtrends Profile Saved tag not found
+verifypositive1: WT897264|||Webtrends New User tag not found
+verifypositive2: WT897292|||Webtrends Full Profile tag not found
 ```
 
 Note: Because your verification string is used as a regex, the following characters within it must be escaped with a
@@ -1293,14 +1293,14 @@ verifypositive20, verifypositive5000, verifypositiveHTML or whatever.
 It is also possible to disable an assertion without removing it. This is useful if you have a temporary problem. You do this by adding
 another three `|||` and writing any message after the custom error message.
 
-```txt
+```yml
 verifypositive: Record 5520|||Record 5520 is within 15 miles so should show|||Production Bug
 ```
 
 In addition, you can prepend a `fail fast!` flag to the start of the assertion to indicate that in the event the assertion fails,
 WebImblaze should not retry the current test step.
 
-```txt
+```yml
 verifypositive: fail fast!All Canary Tests Passed OK
 ```
 
@@ -1316,21 +1316,21 @@ backslash: `{}[]()^$.|*+?\`
 
 As per verifypositive, you can have as many verifynegatives as you want, so long as they all start with verifynegative.
 
-```txt
-verifynegative:     The system cannot find the file specified
-verifynegative1:    OutOfMemoryException
+```yml
+verifynegative: The system cannot find the file specified
+verifynegative1: OutOfMemoryException
 ```
 
 And also as per verifypositive, you can specify a custom message if that verification fails.
 
-```txt
-verifynegative:     additional-search-results-btn|||Additional Search Results button should not be shown
+```yml
+verifynegative: additional-search-results-btn|||Additional Search Results button should not be shown
 ```
 
 You can capture details, say an error reference, and put this in the error message.
 In this example, assume the following was returned `Error reference #2349829.`.
 
-```txt
+```yml
 verifynegative:     Error reference ([^\.]*)|||Found error reference: $capture1
 ```
 
@@ -1339,15 +1339,15 @@ $capture1, $capture2 and $capture3 are available.
 As with verifypositive, it is possible to disable a negative assertion without removing it. You do this by adding
 another three `|||` and writing any message after the custom error message.
 
-```txt
-verifynegative:     Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221
+```yml
+verifynegative: Record 5550|||Record 5550 is across county border - should not show|||Bug introduced with build 15221
 ```
 
 In addition, you can prepend a `fail fast!` flag to the start of the assertion to indicate that in the event the assertion fails,
 WebImblaze should not retry the current test step.
 
-```txt
-verifynegative:     fail fast!A critical error has occurred
+```yml
+verifynegative: fail fast!A critical error has occurred
 ```
 
 <br />
@@ -1359,13 +1359,13 @@ If the nth match cannot be found, the empty string is returned.
 
 Example - returns fifth match:
 
-```txt
+```yml
 parsematch5: data-id="(\d+)"|||5
 ```
 
 Example - returns the first match
 
-```txt
+```yml
 parsematch5: data-id="(\d+)"
 ```
 
@@ -1399,49 +1399,49 @@ Note: Newlines (\n) are also valid boundaries and are useful when you need to us
 
 Example - match from the first instance of START until END is found:
 
-```txt
+```yml
 parseresponse: START|END|
 ```
 
 Example - match from the first instance of START until END is found, then escape the matched text:
 
-```txt
+```yml
 parseresponse: START|END|escape
 ```
 
 Example - custom regex - parsed characters are the ones matched inside the parentheses:
 
-```txt
+```yml
 parseresponse: a id="\w*" class="first" href="/careers-advice/(\d*)"|regex|escape
 ```
 
 Example - when what we know is on the RHS - this pattern extracts option values:
 
-```txt
+```yml
 parseresponse: option value="([0-9]+)".AutoTESavedSearch1|regex|escape
 ```
 
 Example - Will find user@example.com in a response containing <email>user@example.com</email>
 
-```txt
+```yml
 parseresponse: email.([^\<]+)
 ```
 
 Example - the {5,60} specifies that the number of characters matched must be between 5 and 60:
 
-```txt
+```yml
 parseresponse: name="(.{5,60}?)"
 ```
 
 Example - in this regex, the .\* at the front tells it to return the last match, rather than the first:
 
-```txt
+```yml
 parseresponse: .*UserId="(.*?)"\<
 ```
 
 Example - in this regex, (?s) causes the . to match any character including . even when in single line mode (end hence getting last match):
 
-```txt
+```yml
 parseresponse: (?s).*UserId="(.*?)"\<
 ```
 
@@ -1449,31 +1449,31 @@ See regular expression modifiers: https://www.regular-expressions.info/modifiers
 
 Example - another way to force the last capture to be returned, in this case `(\d+)` immediately following `"dealId":`:
 
-```txt
+```yml
 parseresponse:    "dealId":(?:(\d+)(?!(?s).*"dealId":))+
 ```
 
 Example - match a date in 31/12/2010 format (will also match invalid dates like 42/79/2010):
 
-```txt
+```yml
 parseresponse: ([\d][\d]/[\d][\d]/[\d]{4,4})
 ```
 
 Example - match the ctl number for a field:
 
-```txt
+```yml
 parseresponse: ctl(\d\d).ctl00.btnApplyOnline
 ```
 
 Example - match a GUID in format "91072487-558b-43be-a981-00b6516ef59c"
 
-```txt
+```yml
 parseresponse: [a-z0-9\-]{36,36}?
 ```
 
 Example - match third occurrence
 
-```txt
+```yml
 varREGEX_THAT_GRABS_FIRST_MATCH:    "Result_Id":(\d*)
 parseresponseSEARCH_RESULT_ID_3:    (?:.*?{REGEX_THAT_GRABS_FIRST_MATCH}){3,3}
 ```
@@ -1482,13 +1482,13 @@ Note here that the {3,3} is much safer than {3} since WebImblaze might have a va
 
 Example - match last occurrence, the `.*` at the beginning is the key
 
-```txt
+```yml
 parseresponseLAST_JOB: .*data-jobid="([\d]+)"
 ```
 
 Example - match second last occurrence
 
-```txt
+```yml
 parseresponseSECOND_LAST_JOB: .*data-jobid="([\d]+)".*data-jobid="[\d]+"
 ```
 
@@ -1499,7 +1499,7 @@ parseresponseSECOND_LAST_JOB: .*data-jobid="([\d]+)".*data-jobid="[\d]+"
 
 Full Example - parse the redirect location from the response header
 
-```txt
+```yml
 step:                   Search for WebDriver Jobs
 url:                    http://www.example.com/JobSearch/Results.aspx?Keywords=WebDriver
 parseresponseREDIRECT:  Location: |\n|decode
@@ -1517,7 +1517,7 @@ parseresponse1, parseresponse5000 and parseresponseUSERID.
 
 Set a variable that can be used in the same test step.
 
-```txt
+```yml
 step:               Creating new user: {TESTEMAIL}
 varTESTEMAIL:       newuser_{JUMPBACKS}_{RETRY}_{COUNTER}@example.com
 url:                http://{MYWEBSITE}/RegisterUser
@@ -1537,11 +1537,11 @@ Allows you to run a OS level command using the backtick operator in Perl.
 
 Cannot be used in conjunction with `selenium` or `url` in a single test step.
 
-```txt
-shell:                  cat test_data_file.txt
-shell1:                 ls -asl
-parseresponseUSERNAME:  USERNAME5="|"|
-parseresponsePASSWORD:  PASSWORD5="|"|
+```yml
+shell: cat test_data_file.txt
+shell1: ls -asl
+parseresponseUSERNAME: USERNAME5="|"|
+parseresponsePASSWORD: PASSWORD5="|"|
 ```
 
 In addition to shell, you can specify `shell1`, `shell2` ... up to `shell20`.
@@ -1563,16 +1563,16 @@ Two special case parameters are also available.
 
 ##### readfile
 
-```txt
-step:                   Read a file and treat it as the response
-readfile:               path/to/file.txt
+```yml
+step: Read a file and treat it as the response
+readfile: path/to/file.txt
 ```
 
 ##### echo
 
-```txt
-step:                   Echo a string and treat it as the response
-echo:                   Var1 - {VAR}, Var2 - {VAR}
+```yml
+step: Echo a string and treat it as the response
+echo: Var1 - {VAR}, Var2 - {VAR}
 ```
 
 These two parameters can be used in conjunction with `shell` and each other, but
@@ -1596,7 +1596,7 @@ commandonfail: python emailsupportteam.py
 Will run the specified command if an assertion fails - regardless of whether the test step
 will be retried or not.
 
-```txt
+```yml
 commandonerror: ./log_failure_statistic.py
 ```
 
@@ -1606,11 +1606,11 @@ commandonerror: ./log_failure_statistic.py
 
 This is used to add an addition header to an outgoing HTTP request.
 
-```txt
+```yml
 addheader: SOAPAction: urn:example-org:demos#Method
 ```
 
-```txt
+```yml
 addheader: Cookie: SoftLoggedInCookie=${SOFT_LOG_COOKIE}; MobileWebsite=1
 ```
 
@@ -1619,7 +1619,7 @@ Use the setcookie parameter instead.
 
 You may add multiple headers, separating each with a pipe character.
 
-```txt
+```yml
 addheader: Foo: bar|Boo: far
 ```
 
@@ -1629,7 +1629,7 @@ header field names are case insensitive. Unfortunately some people are not aware
 of this and insist on case sensitive header field names. To get around this problem
 preceed the header field name with a colon.
 
-```txt
+```yml
 addheader: :foo-bar: value
 ```
 
@@ -1647,7 +1647,7 @@ removecookie: MyCookieName
 
 Separate multiple cookie key names with a semi colon.
 
-```txt
+```yml
 removecookie: MyCookieName; OtherCookie
 ```
 
@@ -1663,13 +1663,13 @@ Note also that the `removecookie` parameter will be processed _before_ `setcooki
 
 Sets a new cookie for the URL domain and port. The cookie will be retained for subsequent steps.
 
-```txt
+```yml
 setcookie: MyCookieName: value_of_cookie
 ```
 
 Separate multiple cookies with a semicolon:
 
-```txt
+```yml
 setcookie: MyFirstCookie: cookie_value; MySecondCookie: another_value
 ```
 
@@ -1684,7 +1684,7 @@ Note also that the `removecookie` parameter will be processed _before_ `setcooki
 Change the user agent per test step. Once the user agent is changed in this way,
 it will stay changed for subsequent test steps.
 
-```txt
+```yml
 useragent: My user agent
 ```
 
@@ -1694,7 +1694,7 @@ useragent: My user agent
 
 Changes the maximum number of times WebImblaze will redirect for GET requests.
 
-```txt
+```yml
 maxredirect: 5
 ```
 
@@ -1715,13 +1715,13 @@ not captured.
 
 HTTP request method, can be "put" or "delete" only.
 
-```txt
-method:     delete
+```yml
+method: delete
 ```
 
-```txt
-method:     put
-postbody:   txtUsername=admin&txtPassword=password1
+```yml
+method: put
+postbody: txtUsername=admin&txtPassword=password1
 ```
 
 Internally "post" will be inferred if a `postbody` is found. Otherwise "get" will be
@@ -1736,24 +1736,24 @@ assumed.
 Used to assert that the specified text only appears a given number of times within the response. Can optionally give a custom message
 if the assertion fails.
 
-```txt
+```yml
 assertcount: Distance:|||1|||Should only be one job shown
 ```
 
 You can have as many assertcount parameters as you want.
 
-```txt
+```yml
 assertcount5000: Distance:|||1|||Should only be one job shown
 ```
 
-```txt
+```yml
 assertcountDISTANCE: Distance:|||1|||Should only be one job shown
 ```
 
 `assertcount` can be disabled without removing it. You do this by adding
 another three `|||` and writing any message after the custom error message.
 
-```txt
+```yml
 assertcount: uniquedata1092311|||2|||Expect 2 records only|||Production Bug
 ```
 
@@ -1763,11 +1763,11 @@ assertcount: uniquedata1092311|||2|||Expect 2 records only|||Production Bug
 
 Used to assert that a value is near enough another value.
 
-```txt
+```yml
 assertnear: some_anchor(value to grab)|||expected_value|||max_deviance|||Optional custom error message
 ```
 
-```txt
+```yml
 assertnear: offsetLeft.(\d+)|||50|||20|||Value is further away from 50 than the max deviance of 20
 ```
 
@@ -1778,7 +1778,7 @@ assertnear: offsetLeft.(\d+)|||50|||20|||Value is further away from 50 than the 
 HTTP response code for verification. Verification fails if the HTTP response code you specified does not match the HTTP response
 code you receive.
 
-```txt
+```yml
 verifyresponsecode: 500
 ```
 
@@ -1788,7 +1788,7 @@ verifyresponsecode: 500
 
 Asserts that the response time is no greater than the specified time.
 
-```txt
+```yml
 verifyresponsetime: 2.505
 ```
 
@@ -1798,7 +1798,7 @@ In this example, the assertion will fail if the response time is greater than 2.
 
 #### ignoreautoassertions
 
-```txt
+```yml
 ignoreautoassertions: true
 ```
 
@@ -1810,7 +1810,7 @@ See the config file section for information on auto assertions.
 
 #### ignoresmartassertions
 
-```txt
+```yml
 ignoresmartassertions: true
 ```
 
@@ -1822,7 +1822,7 @@ See the config file section for information on smart assertions.
 
 #### ignorehttpresponsecode
 
-```txt
+```yml
 ignorehttpresponsecode: true
 ```
 
@@ -1837,13 +1837,13 @@ Specifying this parameter allows us to ignore this verification.
 
 See the description of [autoretry](#configautoretry) in the config file section for the full description of this feature.
 
-```txt
+```yml
 autoretry: 5
 ```
 
 Sets auto retry to 5 from this step onwards.
 
-```txt
+```yml
 autoretry: 0
 ```
 
@@ -1857,7 +1857,7 @@ In a video game when you fail, you are often returned to the last checkpoint to 
 
 This is the same concept. You set a checkpoint as follows:
 
-```txt
+```yml
 checkpoint: true
 ```
 
@@ -1873,7 +1873,7 @@ at what points checkpoints are placed in the workflow.
 
 To turn checkpoints off for subsequent steps, set the checkpoint parameter to `false`:
 
-```txt
+```yml
 checkpoint: false
 ```
 
@@ -1883,7 +1883,7 @@ checkpoint: false
 
 Ignores auto retry for this step only.
 
-```txt
+```yml
 ignoreautoretry: true
 ```
 
@@ -1895,7 +1895,7 @@ This is used to retry a test step that has failed. You specify the maximum numbe
 to retry the test step. Use this parameter if you need to wait for a database to update in
 an asynchronous manner, but you don't know how long it will take.
 
-```txt
+```yml
 retry: 5
 ```
 
@@ -1906,7 +1906,7 @@ In this example, if any of the verifypositives fail, or the assertcount fails, t
 will wait 5 seconds, then retry the test step - up to 10 times. (After each failure, WebImblaze will
 wait 5 seconds.) If and when the test step passes, WebImblaze will not wait 5 seconds before proceeding.
 
-```txt
+```yml
 retry: 10
 sleep: 5
 ```
@@ -1914,7 +1914,7 @@ sleep: 5
 Note that if a `fail fast!` flag is present on a verifypositive or verifynegative assertion, the test step
 will not be retried.
 
-```txt
+```yml
 verifynegative: fail fast!ErrorPage.aspx|||Error detected
 ```
 
@@ -1931,7 +1931,7 @@ When present, will restart the WebImblaze session if any of the verifications fa
 
 If a Selenium WebDriver browser session is also present, that will be restarted too.
 
-```txt
+```yml
 restartbrowseronfail: true
 ```
 
@@ -1939,13 +1939,13 @@ This has the effect of dumping all cookies and getting the session back to a kno
 
 This is useful if a request only partially succeeded thereby putting the session into an incorrect state.
 
-```txt
-step:                   Submit login details
-url:                    http://{BASEURL}
-postbody:               username=admin&password=12345
-verifypositive:         Welcome admin
-retry:                  5
-restartbrowseronfail:   true
+```yml
+step: Submit login details
+url: http://{BASEURL}
+postbody: username=admin&password=12345
+verifypositive: Welcome admin
+retry: 5
+restartbrowseronfail: true
 ```
 
 <br />
@@ -1956,7 +1956,7 @@ Will restart the WebImblaze http session after execution of the current step.
 
 If a Selenium WebDriver browser session is also present, that will be restarted too.
 
-```txt
+```yml
 restartbrowser: true
 ```
 
@@ -1971,14 +1971,14 @@ throttle the rate it sends requests.
 
 Sleep 5 seconds before proceeding:
 
-```txt
+```yml
 sleep: 5
 ```
 
 Since there is a retry parameter present in this example, WebImblaze will only sleep 5 seconds
 if the test step fails any of the verifypositives or the assertcount.
 
-```txt
+```yml
 sleep: 5
 retry: 5
 ```
@@ -2006,7 +2006,7 @@ decodebase64: true
 Decodes a quoted-printable response and replaces the response with the decoded version. The decoded
 version will be available to the parseresponse parameter.
 
-```txt
+```yml
 decodequotedprintable: true
 ```
 
@@ -2018,7 +2018,7 @@ Note: This feature was added to deal with intermediate email files in quoted-pri
 
 Decodes the so called double dot encoding (see RFC 5321 Section-4.5.2) used by SMTP.
 
-```txt
+```yml
 decodesmtp: true
 ```
 
@@ -2035,7 +2035,7 @@ In the example of your JSON containing an email that is also quoted printable, i
 `decodequotedprintable`, it will be possible to see the rendered HTML email when viewing the test step
 result in a browser.
 
-```txt
+```yml
 dumpjson: true
 ```
 
@@ -2049,10 +2049,10 @@ If a test step fails, this custom 'errormessage' will be appended to the 'TEST S
 (on STDOUT and the HTML Report). This may be useful to give a bit more information on what a failed
 test means, like "couldn't connect to the application" or "couldn't access the login page".
 
-```txt
-retry:          20
-sleep:          5
-errormessage:   Job still not in index after 20 tries, perhaps indexer is offline
+```yml
+retry: 20
+sleep: 5
+errormessage: Job still not in index after 20 tries, perhaps indexer is offline
 ```
 
 <br />
@@ -2061,7 +2061,7 @@ errormessage:   Job still not in index after 20 tries, perhaps indexer is offlin
 
 Improves readability of json responses.
 
-```txt
+```yml
 formatjson: true
 ```
 
@@ -2073,7 +2073,7 @@ Inserts carriage returns at various places using a simple regular expression.
 
 Improves readability of xml responses.
 
-```txt
+```yml
 formatxml: true
 ```
 
@@ -2088,7 +2088,7 @@ Gets the hrefs referred to in the html response, and writes them to the output f
 
 Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
-```txt
+```yml
 getallhrefs: \.css|\.less
 ```
 
@@ -2116,7 +2116,7 @@ Gets the srcs referred to in the html response, and writes them to the output fo
 
 Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
-```txt
+```yml
 getallsrcs: \.jpg|\.png|\.js|\.gif
 ```
 
@@ -2130,7 +2130,7 @@ Gets the background images referred to in the html response, and writes them to 
 
 Multiple patterns are separated with a `|`. The pattern specifies the end of the filenames to match.
 
-```txt
+```yml
 getbackgroundimages: .jpg
 ```
 
@@ -2148,7 +2148,7 @@ Only gets background images for the current step.
 
 Putting this parameter on a test step will put tags around the test step in the http.txt file.
 
-```txt
+```yml
 logastext: true
 ```
 
@@ -2164,7 +2164,7 @@ Saves the test step response in a file.
 
 Example:
 
-```txt
+```yml
 step:               Get Responsive.css
 url:                https://www.example.com/resources/css/Responsive.css
 logastext:          true
@@ -2179,7 +2179,7 @@ Redact sensitive information from the response output.
 
 Example:
 
-```txt
+```yml
 step:               Post username and password
 url:                https://www.example.com/login
 postdata:           username=admin&password=bigsecret&environment=prod
@@ -2199,7 +2199,7 @@ Indicates in the results.xml that a section break occurs before this test.
 
 Use in your Test Automation Framework when displaying the results.xml with a style sheet.
 
-```txt
+```yml
 section: Ensure it is not possible to apply for the same job twice
 ```
 
@@ -2213,7 +2213,7 @@ You can flag test steps as being "autocontrolleronly". Then when you invoke WebI
 a command-line option to indicate you are invoking it from the automation controller. WebImblaze will
 then run test steps flagged as being "autocontrolleronly", which will otherwise be skipped.
 
-```txt
+```yml
 autocontrolleronly: true
 ```
 
@@ -2238,7 +2238,7 @@ wi.pl -a
 
 As per runon, but the opposite.
 
-```txt
+```yml
 donotrunon: PAT|PROD
 ```
 
@@ -2257,44 +2257,44 @@ In your config.xml, if you had the following, then the test step would be skippe
 The `eval` parameter is designed to be used in conjunction with `runif`. Though
 it can also be used to do simple calculations.
 
-```txt
-evalRESULT:         5*3
+```yml
+evalRESULT: 5*3
 ```
 
 {RESULT} will be 15.
 
-```txt
-evalOLD_DATA:       48-50>6
+```yml
+evalOLD_DATA: 48-50>6
 ```
 
 {OLD_DATA} will be falsy.
 
-```txt
+```yml
 evalID_NOT_FOUND:   "{CHOSEN_ID}" eq ""
 ```
 
 {ID_NOT_FOUND} will be truthy if {CHOSEN_ID} is null.
 
-```txt
-evalSHA1:           use Digest::SHA qw(sha1_hex); sha1_hex q|sha this text|;
+```yml
+evalSHA1: use Digest::SHA qw(sha1_hex); sha1_hex q|sha this text|;
 ```
 
 {SHA1} will be `c1afc46a1e23b4006d66fb94a38929d9410de27f`.
 
-```txt
-evalNONCE:          use Digest::MD5 qw(md5_hex); md5_hex q|{RANDOM:5}|;
+```yml
+evalNONCE: use Digest::MD5 qw(md5_hex); md5_hex q|{RANDOM:5}|;
 ```
 
 then in the next step
 
-```txt
-evalBASE64_NONCE:   use MIME::Base64; encode_base64(q|{NONCE}|, '');
+```yml
+evalBASE64_NONCE: use MIME::Base64; encode_base64(q|{NONCE}|, '');
 ```
 
 {BASE64_NONCE} will not have carriage return due to `''` parameter.
 
-```txt
-evalSUBBED:         sub sb { my ($_s) = @_; $_s =~ s|%20|+|g; return $_s; } sb (q|abc%20qrs|);
+```yml
+evalSUBBED: sub sb { my ($_s) = @_; $_s =~ s|%20|+|g; return $_s; } sb (q|abc%20qrs|);
 ```
 
 will substitute text - in this example replacing `%20` with `+`.
@@ -2305,7 +2305,7 @@ will substitute text - in this example replacing `%20` with `+`.
 
 Step will only be run on first loop. Use with `repeat` directive.
 
-```txt
+```yml
 firstlooponly: true
 ```
 
@@ -2315,13 +2315,13 @@ firstlooponly: true
 
 After executing current step, continue execution from the step defined by step.
 
-```txt
+```yml
 gotostep: Teardown
 ```
 
 If there is a step with step `Teardown`, execution will continue from there.
 
-```txt
+```yml
 step: Teardown
 ```
 
@@ -2329,9 +2329,9 @@ If a matching step cannot be found, execution will end immediately without faili
 
 In practice, you would use this parameter with `runif`:
 
-```txt
-runif:      {SOME_VARIABLE}
-gotostep:   Teardown
+```yml
+runif: { SOME_VARIABLE }
+gotostep: Teardown
 ```
 
 <br />
@@ -2340,7 +2340,7 @@ gotostep:   Teardown
 
 Step will only be run on last loop. Use with `repeat` directive.
 
-```txt
+```yml
 lastlooponly: true
 ```
 
@@ -2353,28 +2353,28 @@ if the parameter is 'truthy'.
 
 This test step is run, since 'abcd' is truthy.
 
-```txt
-runif:      abcd
+```yml
+runif: abcd
 ```
 
 This test step is not run, since the empty string '' is falsy.
 
-```txt
-runif:':    ''
+```yml
+runif:': ''
 ```
 
 Note in the above example we had to specify a quote character to make an empty string.
 
 This test step is not run, since '0' is falsy.
 
-```txt
-runif:      0
+```yml
+runif: 0
 ```
 
 In practice, you would use this parameter with a variable:
 
-```txt
-runif:      {SOME_VARIABLE}
+```yml
+runif: { SOME_VARIABLE }
 ```
 
 <br />
@@ -2384,8 +2384,8 @@ runif:      {SOME_VARIABLE}
 You can specify that selected test steps are skipped depending on the environment defined in the
 config file. See the environment section of the configuration file section for information on how to configure the config file.
 
-```txt
-runon:      PAT|PROD
+```yml
+runon: PAT|PROD
 ```
 
 In your config.xml, if you had the following, then the test step would be skipped:
@@ -2408,21 +2408,21 @@ test step fails (after all retries have been exhausted), then the test run is ab
 This feature is very useful if your automation regression suite takes a long time to run. If a very basic test,
 like getting the home page, fails, then there little point running the rest of the tests.
 
-```txt
-abort:  true
+```yml
+abort: true
 ```
 
 You can also jump to the tear down section of your tests so you can do any necessary data clean up.
 
-```txt
-abort:  Teardown
+```yml
+abort: Teardown
 ```
 
 In the above example, if the abort is invoked, then it will continue execution from the first step
 it finds called "Teardown", as in:
 
-```txt
-step:   Teardown
+```yml
+step: Teardown
 ```
 
 <br />
@@ -2448,7 +2448,7 @@ Note that the `readsharedvar` will be performed regardless of whether runif pass
 
 Will write a shared variable to the file system. Another instance of `wi.pl` running under the same account will be able to read it.
 
-```txt
+```yml
 writesharedvar: SESSION_COOKIE|SessionID: {PARSED_COOKIE};
 ```
 
@@ -2460,7 +2460,7 @@ Will create a shared variable called `SESSION_COOKIE` with the contents after th
 
 #### Simple form
 
-```txt
+```yml
 step:                   Get the admin login page
 desc:                   Check page is available
 url:                    http://example.com/test/login.jsp
@@ -2478,7 +2478,7 @@ verifynegative:         Login details incorrect
 
 #### Multipart form
 
-```txt
+```yml
 step:                   Multipart POST example
 desc:                   Check file upload
 url:                    http://cgi-lib.berkeley.edu/ex/fup.cgi
@@ -2490,7 +2490,7 @@ verifypositive:         File uploaded OK
 
 #### Data driven
 
-```txt
+```yml
 repeat: 3
 
 step:                   Get row {COUNTER} from test data file
@@ -2503,7 +2503,7 @@ step:                   Row {COUNTER}: {NAME}, {TITLE}
 
 `examples/data.txt` could look like:
 
-```txt
+```yml
 NAME1:Sarah Wu
 TITLE1:Manager
 
@@ -2516,7 +2516,7 @@ TITLE3:Supervisor
 
 Then the output would look like
 
-```txt
+```yml
 perl wi.pl examples/data_driven.test
 
 Starting WebImblaze Engine...
@@ -2582,7 +2582,7 @@ Parameters must begin on the first column of the line.
 
 The parameter name must end with a colon followed by at least one space, `: `.
 
-```txt
+```yml
 step: This is is valid
 
  step: not valid
@@ -2596,7 +2596,7 @@ Note that tabs are not allowed between the colon and the start of the parameter 
 
 Each step block must be separated by at least one blank line.
 
-```txt
+```yml
 step: Get page 1
 url:  http://www.example.com/page1
 
@@ -2614,13 +2614,13 @@ are processed before execution begins.
 They can appear anywhere in the file, but must be separated from steps by at least
 one blank line.
 
-```txt
-useragent:  Custom
+```yml
+useragent: Custom
 
-step:       Get example
-url:        http://www.example.com
+step: Get example
+url: http://www.example.com
 
-repeat:     2
+repeat: 2
 ```
 
 #### quotes
@@ -2630,14 +2630,14 @@ and trailing blank space for parameter values.
 
 Example - verifypositive will have the value of `my text`.
 
-```txt
-verifypositive:     my text
+```yml
+verifypositive: my text
 ```
 
 Example - verifypositive will have the value of `'my text'` - i.e. single quotes included.
 
-```txt
-verifypositive:     'my text'
+```yml
+verifypositive: 'my text'
 ```
 
 The fact that a single or double quote normally represents a quote is ignored, it is
@@ -2655,27 +2655,27 @@ by a space. (No whitespace is allowed in the quote).
 
 Example - verifypositive will have the value of `my text` (leading and trailing space included).
 
-```txt
-verifypositive:/:   / my text /
+```yml
+verifypositive:/: / my text /
 ```
 
 Example - varNULL will have the value of `` (empty string)
 
-```txt
-varNULL:(:          ()
+```yml
+varNULL:(: ()
 ```
 
 If your quote contains `(`, `{`, `[` , or `<`, for the end quote it will be flipped, e.g. `[` becomes `]`.
 
 Multi character quotes are also supported.
 
-```txt
-verifypositive:///:     ///my text///
+```yml
+verifypositive:///: ///my text///
 ```
 
 When doing a multi-line quote, you _must_ have the beginning quote on the first line.
 
-```txt
+```yml
 postbody:_BIGQUOTE_:   _BIGQUOTE_
 <xml>
     <tag>data</tag>
@@ -2687,9 +2687,9 @@ _BIGQUOTE_
 
 A single line comment is done with the hash symbol, `#`.
 
-```txt
-step:   Get home page
-url:    http://example.com
+```yml
+step: Get home page
+url: http://example.com
 #verifypostive1: domain
 verifypositve2: permission
 ```
@@ -2698,7 +2698,7 @@ Here, `verifypositive1` is ignored.
 
 Multi line comments are have the opening tag `--=` and the closing tag `=--`.
 
-```txt
+```yml
 --=
     HOME PAGE CHECKS
     ----------------
@@ -2794,8 +2794,8 @@ The values of the constants are set at the run start time. They will not change 
 
 If you a have a test step that uses the parameter:
 
-```txt
-url:    http://myserver/test/login.jsp
+```yml
+url: http://myserver/test/login.jsp
 ```
 
 You could create this line in your config.xml file:
@@ -2806,7 +2806,7 @@ You could create this line in your config.xml file:
 
 You can then rewrite the test step parameter as:
 
-```txt
+```yml
 url:    {BASEURL}/test/login.jsp
 ```
 
@@ -2837,13 +2837,13 @@ These constants also do not change value during the test run.
 
 However they can be modified on a temporary basis to generate different dates during the substitution.
 
-```txt
+```yml
 step:   {DATE:::-2*3}Day_Month_Year: {DAY}_{MONTH}_{YEAR}
 ```
 
 In this example, 6 days are subtracted from the test run start date - for the step parameter only.
 
-```txt
+```yml
 step:   Time in one hour: {DATE:::+1/24}Hour_Minute_Second: {HH}_{MM}_{SS}
 ```
 
@@ -2857,7 +2857,7 @@ The expression can contain the digits 0 to 9 and the operators + - \* /.
 
 Consider this example:
 
-```txt
+```yml
 verifypositive1: {DAY}/{MONTH}/{YEAR}
 verifypositive2: {DATE:::1}{DAY}/{MONTH}/{YEAR}
 verifypositive3: {DATE:::2}{DAY}/{MONTH}/{YEAR}
@@ -2867,13 +2867,13 @@ If today is 31/10/2017 then 31/10/2017, 01/11/2017 and 02/11/2017 will be assert
 
 If you need to modify from the current time rather than the test start time, do this using `DATE_NOW`:
 
-```txt
+```yml
 step:   {DATE_NOW:::-1/23}Day_Month_Year: {DAY}_{MONTH}_{YEAR}
 ```
 
 It is also possible to modify from the current GMT time (which is not affected by daylight saving) using `DATE_GMT_NOW`:
 
-```txt
+```yml
 step:   {DATE_GMT_NOW:::-1/23}Day_Month_Year: {DAY}_{MONTH}_{YEAR}
 ```
 
@@ -2886,7 +2886,7 @@ convenient to change data in a single place that is easy to reference from multi
 
 The following example of a test step file shows how you can use them:
 
-```txt
+```yml
 step:           Set variables
 varLOGIN_url:   http://myserver/login.php
 varLOGIN1:      bob
@@ -2927,13 +2927,13 @@ the `{NAME}` auto substitution, WebImblaze will work out the missing component f
 
 So you can have a postbody like:
 
-```txt
+```yml
 postbody: {NAME}txtUsername=TestUser&{NAME}txtPassword=secure&{NAME}BtnSubmit=Submit
 ```
 
 instead of:
 
-```txt
+```yml
 postbody: ctl01$CentralPanel$txtUsername=TestUser&ctl01$CentralPanel$txtPassword=secure&ctl02$BottomPanel$BtnSubmit=Submit
 ```
 
@@ -2948,7 +2948,7 @@ Typical examples include when you have to deal with `__VIEWSTATE`, `__EVENTVALID
 
 This means you can write a postbody like this:
 
-```txt
+```yml
 postbody: RecipeName=Pesto&Cuisine=Italian&PrepTime=20&__RequestVerificationToken={DATA}&SomeOtherHiddenField={DATA}&BtnSubmit=Search+Recipes
 ```
 
@@ -2992,11 +2992,11 @@ Response Code is in the success range (100-399).
 
 If you are testing an error page, you will need to use this parameter.
 
-```txt
+```yml
 verifyresponsecode: 404
 ```
 
-```txt
+```yml
 verifyresponsecode: 500
 ```
 
@@ -3131,7 +3131,7 @@ as a hidden form field within the HTML source:
 To maintain state, you need to grab this value so you can resend it in subsequent requests. To do this, you would add the
 following parameter to your test step:
 
-```txt
+```yml
 parseresponse: __VIEWSTATE" value="|"|escape
 ```
 
@@ -3141,7 +3141,7 @@ their URL hex values (.NET requires this).
 
 Whenever you use the {} variable in a subsequent test step, it will be substituted with the last value you parsed:
 
-```txt
+```yml
 postbody: value=123&__VIEWSTATE={}
 ```
 
@@ -3171,7 +3171,7 @@ assign to the system variable named {}.
 
 Now whenever you use the {} variable in a subsequent test step, it will be substituted with the last value you parsed:
 
-```txt
+```yml
 url: http://myserver/search.jsp?value=123&JSESSIONID={}
 ```
 
@@ -3190,7 +3190,7 @@ WebImblaze can be run in parallel / concurrently with no problem.
 The only thing to keep in mind is to be sure to
 specify different output locations for each instance of WebImblaze.
 
-```txt
+```yml
 perl wi.pl test1.test -o output/test1
 perl wi.pl test2.test -o output/test2
 perl wi.pl test3.test -o output/test3
@@ -3206,13 +3206,11 @@ contains some patterns that are easy to apply to your test suites.
 
 Imagine we have a dashboard that contains statistics on jobs processed per day. Say data returned looks like this:
 
-```txt
+```yml
 01/01/2018 00:35 00:52 67945 589 2
 02/01/2018 00:35 00:52 98231 129 9
 03/01/2018 00:35 00:52 88331 381 0
 04/01/2018 00:35 00:52 76235 239 35
-
-...
 ```
 
 Statistics for the last 20 days are shown. Note the last 3 numbers for each row, the first number is the number
@@ -3225,7 +3223,7 @@ We can make a regular expression to match the first row like this: `\d{5,} \d{3,
 
 If we want to ensure that there are 20 rows that match this pattern, you could use this test step:
 
-```txt
+```yml
 step:                   Check job processing dashboard statistics
 varREGEX_THAT_GRABS_FIRST_MATCH='\d{5,} \d{3,} \d{1,}
 varMINIMUM_OCCURRENCES: 20
@@ -3253,8 +3251,8 @@ You can use a Perl one-liner by executing a shell command through WebImblaze.
 
 Here is an example using Windows (Linux syntax is likely slightly different).
 
-```txt
-step:  Remove commas from {NUMBER}
+```yml
+step: Remove commas from {NUMBER}
 shell: echo NUMBER[{NUMBER}] | perl -pe "s/,//g;"
 parseresponseNUMBER_WITHOUT_COMMAS: NUMBER\[(\d+)]
 ```
@@ -3263,19 +3261,19 @@ parseresponseNUMBER_WITHOUT_COMMAS: NUMBER\[(\d+)]
 
 ### Post a message to a Slack Channel
 
-```txt
-step:           Post result to Slack Channel
-url:            https://hooks.slack.com/services/J91AC2JRL/C8RAJAZZQ/iR3q4C19XKmgjggrSuuZxCJ2
-postbody:       {"text": "Total Searches Yesterday\n www.example.com: {WEBSITE_SEARCHES}]"}
-posttype:       application/json
-formatjson:     true
+```yml
+step: Post result to Slack Channel
+url: https://hooks.slack.com/services/J91AC2JRL/C8RAJAZZQ/iR3q4C19XKmgjggrSuuZxCJ2
+postbody: { 'text': "Total Searches Yesterday\n www.example.com: {WEBSITE_SEARCHES}]" }
+posttype: application/json
+formatjson: true
 ```
 
 <br />
 
 ### Conditionally run a test step based on multiple criteria
 
-```txt
+```yml
 step:               Check we have all statistics
 evalHAVE_ALL_STATS: {SEARCHES}&&{BOUNCES}
 shell:              REM NOP
