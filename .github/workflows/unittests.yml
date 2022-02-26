@@ -20,6 +20,9 @@ jobs:
             - name: Install LWP
               run: cpanm LWP
 
+            - name: Install XML::Simple
+              run: cpanm XML::Simple
+
             - name: Check Perl version
               run: perl --version
 
