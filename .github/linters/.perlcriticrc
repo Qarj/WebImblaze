@@ -7,6 +7,7 @@ verbose  = %f:%l:%c [%s %p] %m near '%r'\n
 [-ControlStructures::ProhibitDeepNests]
 [-ControlStructures::ProhibitPostfixControls]
 [-ErrorHandling::RequireCarping]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
 [-InputOutput::ProhibitBacktickOperators]
 [-InputOutput::RequireCheckedSyscalls]
 [-Modules::RequireExplicitPackage]

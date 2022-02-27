@@ -645,7 +645,7 @@ assert_stdout_contains(q{'verifypositiveC' => ' sure '}, '_parse_lean_test_steps
 assert_stdout_contains(q{'verifypositiveD' => ' sure '}, '_parse_lean_test_steps : single line quote - single char &');
 assert_stdout_contains(q{'verifypositiveE' => ' sure '}, '_parse_lean_test_steps : single line quote - single char =');
 assert_stdout_contains(q{'verifypositiveF' => ' sure '}, '_parse_lean_test_steps : single line quote - single char "');
-assert_stdout_contains(q{'verifypositiveG' => ' sure '}, "_parse_lean_test_steps : single line quote - single char '");
+assert_stdout_contains(q{'verifypositiveG' => ' sure '}, q{_parse_lean_test_steps : single line quote - single char '});
 assert_stdout_contains(q{'verifypositiveH' => ' sure '}, '_parse_lean_test_steps : single line quote - single char `');
 assert_stdout_contains(q{'verifypositiveI' => ' sure '}, '_parse_lean_test_steps : single line quote - single char 0');
 
@@ -1594,6 +1594,7 @@ sub resources_setup {
     $main::useragent = LWP::UserAgent->new(keep_alive=>1);
     $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
     $main::case{method} = 'get';
+    return
 }
 
 resources_setup(before_test());
@@ -1619,7 +1620,7 @@ assert_resp_content_contains(q{href="somewhere/nonmatched.css"}, 'resources : no
 
 resources_setup(before_test(), 'version1_simple.css');
 $main::case{getallhrefs} = '\.css|\.less';
-$main::resp_content = (q{ href="examples\assets\css\simple.css" });
+$main::resp_content = (' href="examples\assets\css\simple.css" ');
 getresources();
 assert_stdout_contains('GET Asset \[version1_simple\.css\]', 'resources : simple.css matched - backslash path');
 _response_content_substitutions(\ $main::resp_content);
