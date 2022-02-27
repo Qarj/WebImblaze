@@ -1739,6 +1739,7 @@ sub assert_stdout_contains {
         is('see between dashes below for stdout', $_must_contain, $_test_description);
         show_string($main::results_stdout);
     }
+    return;
 }
 
 sub assert_resp_content_contains {
@@ -1749,6 +1750,7 @@ sub assert_resp_content_contains {
         is('see between dashes below for resp_content', $_must_contain, $_test_description);
         show_string($main::resp_content."\n");
     }
+    return;
 }
 
 sub assert_file_exists {
@@ -1759,18 +1761,20 @@ sub assert_file_exists {
         is('see between dashes below for stdout', $_target_file . ' to exist', $_test_description);
         show_string($main::results_stdout);
     }
+    return;
 }
 
 sub assert_file_contains {
     my ($_target_file, $_must_contain, $_test_description) = @_;
     my $_content_ref = read_utf8($_target_file);
-    if ($$_content_ref =~ m/$_must_contain/s) {
+    if (${ $_content_ref } =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
         is('see between dashes below for 1 - stdout, 2 - file content', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
         show_string($main::results_stdout);
-        show_string($$_content_ref."\n");
+        show_string(${ $_content_ref }."\n");
     }
+    return;
 }
 
 sub assert_stdout_does_not_contain {
@@ -1781,15 +1785,18 @@ sub assert_stdout_does_not_contain {
     } else {
         is(1, 1, $_test_description);
     }
+    return;
 }
 
 sub clear_stdout {
-    $main::results_stdout = '';
+    $main::results_stdout = q{};
+    return;
 }
 
 sub show_string {
     my ($_string) = @_;
     print "\n---------------\n".$_string."---------------\n";
+    return;
 }
 
 sub before_test {
@@ -1801,10 +1808,10 @@ sub before_test {
     set_number_of_times_to_retry_this_test_step();
     undef %main::case;
     $main::case{url} = 'http://example.com/jobs/search.cgi?query=Test%Automation&Location=London';
-    $main::results_stdout = '';
+    $main::results_stdout = q{};
     $main::response = HTTP::Response->parse('HTTP/1.1 200 OK');
-    $main::resp_content = '';
-    $main::resp_headers = '';
+    $main::resp_content = q{};
+    $main::resp_headers = q{};
     $main::opt_publish_full = $OUTPUT;
     undef $main::cookie_jar;
     undef $main::useragent;
@@ -1827,16 +1834,16 @@ sub before_test {
 # SUPPRESS WARNINGS FOR VARIABLES USED ONLY ONCE
 #
 
-$main::response = '';
-$main::resp_content = '';
-$main::resp_headers = '';
+$main::response = q{};
+$main::resp_content = q{};
+$main::resp_headers = q{};
 $main::EXTRA_VERBOSE = 0;
-$main::results_stdout = '';
-$main::unit_test_steps = '';
-$main::opt_publish_full = '';
-$main::this_script_folder_full = '';
-$main::testnum = '';
-$main::cookie_jar = '';
+$main::results_stdout = q{};
+$main::unit_test_steps = q{};
+$main::opt_publish_full = q{};
+$main::this_script_folder_full = q{};
+$main::testnum = q{};
+$main::cookie_jar = q{};
 undef @main::srcs;
 undef @main::bg_images;
 undef @main::asset;
