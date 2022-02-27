@@ -3440,8 +3440,8 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
-    my $_response_content_ref = '';
-    my $_response_headers = '';
+    my $_response_content_ref = q{};
+    my $_response_headers = q{};
 
     _write_http_log($_step_info, $_core_info);
     _write_step_html($_step_info, $_core_info, $_response_base);
@@ -3473,7 +3473,7 @@ sub _write_http_log {
 }
 
 #------------------------------------------------------------------
-sub _write_step_html { ## no critic(ProhibitManyArgs)
+sub _write_step_html {
     my ($_step_info, $_core_info, $_response_base) = @_;
 
     my $_response_content = $resp_content;
@@ -3851,7 +3851,7 @@ sub write_utf8 {
 sub write_raw {
     my ($_file_path, $_content_ref, $_make_path) = @_;
 
-    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', '');
+    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', q{});
 }
 
 sub _write_to_file {
@@ -3859,7 +3859,7 @@ sub _write_to_file {
 
     $_file_path = slash_me($_file_path);
 
-    $_make_path //= '';
+    $_make_path //= q{};
     if ($_make_path) {
         exit 'need to remove filename from path';
         # File::Path::make_path($_file_path);

@@ -195,7 +195,7 @@ auto_sub('a=b&c=d&e=f', 'normalpost', 'http://example.com');
 assert_stdout_contains('There are 3 fields in the postbody', 'auto_sub : normal post has 3 fields');
 
 before_test();
-auto_sub('', 'normalpost', 'http://example.com');
+auto_sub(q{}, 'normalpost', 'http://example.com');
 assert_stdout_contains('There are 0 fields in the postbody', 'auto_sub : normal post has 0 fields');
 
 before_test();
@@ -203,7 +203,7 @@ auto_sub('a=b', 'normalpost', 'http://example.com');
 assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : normal post has 1 field');
 
 before_test();
-auto_sub("( 'name' => 'Upload' )", 'multipost', 'http://example.com');
+auto_sub(q{( 'name' => 'Upload' )}, 'multipost', 'http://example.com');
 assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : multi post has 1 field');
 
 before_test();
