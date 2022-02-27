@@ -1753,7 +1753,7 @@ sub do_http_request {
 
     $cookie_jar->extract_cookies($response);
 
-    $resp_content = $response->decoded_content; 
+    $resp_content = $response->decoded_content;
 
     return;
 }
@@ -1841,7 +1841,7 @@ sub run_special_command {  # for commandonerror and commandonfail
 #------------------------------------------------------------------
 sub dump_json {
 	if ($case{dumpjson}) {
-        $resp_content =~ s/[^{]*(\{.*}).*/$1/s; # json must start and end with braces, throw away extra content
+        $resp_content =~ s/[^{]*([{].*}).*/$1/s; # json must start and end with braces, throw away extra content
         $resp_content = eval { Data::Dumper::Dumper(decode_json $resp_content) };
 	}
 
@@ -2003,7 +2003,7 @@ sub _verify_autoassertion {
                     colour_stdout('bold yellow', "Failed Auto Assertion \n");
                     if ($_verifyparms[1]) { # is there a custom assertion failure message?
                         my $capture1 = $1; my $capture2 = $2; my $capture3 = $3;
-                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg; 
+                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg;
                         $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                         $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
                         colour_stdout('bold yellow', "$_verifyparms[1]\n");
@@ -3388,7 +3388,7 @@ sub set_late_var_list {
 sub set_eval_variables { # e.g. evalDIFF="10-5"
     foreach my $_case_attribute ( sort keys %case ) {
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
-            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## no critic(ProhibitStringyEval)
+            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}";
         }
     }
 
@@ -3716,7 +3716,7 @@ sub _grabbed_href {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{href="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{href="$1"};
 }
 
 #------------------------------------------------------------------
@@ -3730,7 +3730,7 @@ sub _grabbed_src {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{src="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{src="$1"};
 }
 
 #------------------------------------------------------------------
@@ -3744,7 +3744,7 @@ sub _grabbed_background_image {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{style="background-image: url('$1');"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{style="background-image: url('$1');"};
 }
 
 #------------------------------------------------------------------
@@ -3839,7 +3839,7 @@ sub read_utf8 {
 sub append_utf8 {
     my ($_file_path, $_content_ref) = @_;
 
-    return _write_to_file($_file_path, $_content_ref, '', '>>', ':encoding(UTF-8)');
+    return _write_to_file($_file_path, $_content_ref, q{}, '>>', ':encoding(UTF-8)');
 }
 
 sub write_utf8 {
@@ -3862,11 +3862,11 @@ sub _write_to_file {
     $_make_path //= '';
     if ($_make_path) {
         exit 'need to remove filename from path';
-        File::Path::make_path($_file_path);
+        # File::Path::make_path($_file_path);
     }
 
     open my $_FILE, $_write_mode.':raw'.$_encode, $_file_path or die "\nERROR: Failed to open $_file_path for writing\n\n";
-    print {$_FILE} $$_content_ref;
+    print {$_FILE} ${ $_content_ref };
     close $_FILE or die "\nERROR: Failed to close $_file_path after writing\n\n";
 
     return;
@@ -3928,7 +3928,7 @@ sub start_session {     # creates the WebImblaze user agent
         # add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         # deref $elem to get the array elements.
         foreach my $_elem(@http_auth) {
-            my $_domain_port = $_elem->[0].':'.$_elem->[1];
+            my $_domain_port = $_elem->[0].q{:}.$_elem->[1];
             my $_realm = $_elem->[2];
             my $_user = $_elem->[3];
             my $_pass = $_elem->[4];
