@@ -993,11 +993,11 @@ shell2: echo off
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : Edge cases - 1');
-assert_stdout_contains("'30' =>", '_parse_lean_test_steps : Edge cases - 2');
-assert_stdout_contains("'shell2' => 'echo off'", '_parse_lean_test_steps : Edge cases - 3');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : Edge cases - 4');
-assert_stdout_does_not_contain("'40' =>", '_parse_lean_test_steps : Edge cases - 5');
+assert_stdout_contains(q{'verifynegative' => 'Severe error'}, '_parse_lean_test_steps : Edge cases - 1');
+assert_stdout_contains(q{'30' =>}, '_parse_lean_test_steps : Edge cases - 2');
+assert_stdout_contains(q{'shell2' => 'echo off'}, '_parse_lean_test_steps : Edge cases - 3');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : Edge cases - 4');
+assert_stdout_does_not_contain(q{'40' =>}, '_parse_lean_test_steps : Edge cases - 5');
 
 # repeat
 before_test();
@@ -1009,7 +1009,7 @@ shell: REM repeat
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'repeat' => '42'", '_parse_lean_test_steps : repeat directive - 1');
+assert_stdout_contains(q{'repeat' => '42'}, '_parse_lean_test_steps : repeat directive - 1');
 
 # useragent
 before_test();
@@ -1021,7 +1021,7 @@ shell: REM repeat
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'useragent' => 'My custom user agent'", '_parse_lean_test_steps : useragent directive - 1');
+assert_stdout_contains(q{'useragent' => 'My custom user agent'}, '_parse_lean_test_steps : useragent directive - 1');
 
 # validate that parameter name only contains \w
 before_test();
@@ -1031,8 +1031,8 @@ she!!: echo Hello World
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 1');
-assert_stdout_contains("Parameter name must contain only", '_parse_lean_test_steps : validate malformed parameter name - she!!: - 2');
+assert_stdout_contains(q{Parse error line 2 }, '_parse_lean_test_steps : validate malformed parameter name - she!!: - 1');
+assert_stdout_contains(q{Parameter name must contain only}, '_parse_lean_test_steps : validate malformed parameter name - she!!: - 2');
 assert_stdout_contains('Example of well formed .*verifypositive7:', '_parse_lean_test_steps : validate malformed parameter name - she!!: - 3');
 
 # validate that parameter name starts at first character
@@ -1043,7 +1043,7 @@ step: Malformed paramater name
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Parse error line 2 ", '_parse_lean_test_steps : validate parameter name starts in column 1');
+assert_stdout_contains(q{Parse error line 2 }, '_parse_lean_test_steps : validate parameter name starts in column 1');
 
 # quote must end with a colon
 before_test();
@@ -1053,8 +1053,8 @@ shell: echo Hello World
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Parse error line 1 ", '_parse_lean_test_steps : validate malformed quote - no colon - 1');
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon - 2');
+assert_stdout_contains(q{Parse error line 1 }, '_parse_lean_test_steps : validate malformed quote - no colon - 1');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - no colon - 2');
 
 # quote cannot contain a space
 before_test();
@@ -1064,7 +1064,7 @@ shell: echo Hello World
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - space');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - space');
 
 # quote must end with colon space
 before_test();
@@ -1074,7 +1074,7 @@ shell: echo Hello World
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space after final colon');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - no space after final colon');
 
 # quote must not contain colon
 before_test();
@@ -1084,7 +1084,7 @@ shell::: :quoted text:
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no colon in quote');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - no colon in quote');
 
 # quote must not contain white space - space
 before_test();
@@ -1094,7 +1094,7 @@ shell:1 2: 1 2quoted text1 2
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no space in quote');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - no space in quote');
 
 # quote must not contain white space - tab
 before_test();
@@ -1104,7 +1104,7 @@ url:1	2: 1	2https://www.cwjobs.co.uk1	2
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote must end with a colon", '_parse_lean_test_steps : validate malformed quote - no tab in quote');
+assert_stdout_contains(q{Quote must end with a colon}, '_parse_lean_test_steps : validate malformed quote - no tab in quote');
 
 # quote must start on parameter line
 before_test();
@@ -1115,7 +1115,7 @@ JJhttps://www.totaljobs.comJJ
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Quote declared but opening quote not found", '_parse_lean_test_steps : validate opening quote is present');
+assert_stdout_contains(q{Quote declared but opening quote not found}, '_parse_lean_test_steps : validate opening quote is present');
 
 # unquoted value cannot be just white space
 before_test();
@@ -1125,7 +1125,7 @@ verifypostive:
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("No value found - must use quotes if value is only white space", '_parse_lean_test_steps : unquoted must not be only white space');
+assert_stdout_contains(q{No value found - must use quotes if value is only white space}, '_parse_lean_test_steps : unquoted must not be only white space');
 
 # repeat value must be numeric only without quotes
 before_test();
@@ -1137,7 +1137,7 @@ verifypositive: SYS 49152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Repeat directive value must be a whole number without quotes", '_parse_lean_test_steps : repeat directive must be numeric');
+assert_stdout_contains(q{Repeat directive value must be a whole number without quotes}, '_parse_lean_test_steps : repeat directive must be numeric');
 
 # repeat value must not begin with 0
 before_test();
@@ -1149,7 +1149,7 @@ verifypositive: SYS 49152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Repeat directive value must be a whole number without quotes. It must not begin with 0", '_parse_lean_test_steps : repeat directive must not begin with 0');
+assert_stdout_contains(q{Repeat directive value must be a whole number without quotes. It must not begin with 0}, '_parse_lean_test_steps : repeat directive must not begin with 0');
 
 # runaway quote - no end quote
 before_test();
@@ -1161,7 +1161,7 @@ end of file - no end quote!
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("End of file reached, but quote starting line 2 not found", '_parse_lean_test_steps : runaway quote');
+assert_stdout_contains(q{End of file reached, but quote starting line 2 not found}, '_parse_lean_test_steps : runaway quote');
 
 # runaway multi line comment - no end comment
 before_test();
@@ -1173,7 +1173,7 @@ step: do something
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Possible runaway multi line comment starting line 1", '_parse_lean_test_steps : runaway multi line comment');
+assert_stdout_contains(q{Possible runaway multi line comment starting line 1}, '_parse_lean_test_steps : runaway multi line comment');
 
 # step block must start with step parameter
 before_test();
@@ -1183,8 +1183,8 @@ step: Value must be present
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : first parameter is step - 1');
-assert_stdout_contains("Parse error line 1", '_parse_lean_test_steps : first parameter is step - 2');
+assert_stdout_contains(q{First parameter of step block must be step:}, '_parse_lean_test_steps : first parameter is step - 1');
+assert_stdout_contains(q{Parse error line 1}, '_parse_lean_test_steps : first parameter is step - 2');
 
 # id is a reserved parameter
 before_test();
@@ -1195,8 +1195,8 @@ id: 152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Parameter id is reserved", '_parse_lean_test_steps : id is reserved - 1');
-assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : id is reserved - 2');
+assert_stdout_contains(q{Parameter id is reserved}, '_parse_lean_test_steps : id is reserved - 1');
+assert_stdout_contains(q{Parse error line 3}, '_parse_lean_test_steps : id is reserved - 2');
 
 # command is a reserved parameter
 before_test();
@@ -1207,7 +1207,7 @@ command: echo Stuff
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Parameter command is reserved", '_parse_lean_test_steps : command is reserved');
+assert_stdout_contains(q{Parameter command is reserved}, '_parse_lean_test_steps : command is reserved');
 
 # method can be delete
 before_test();
@@ -1218,7 +1218,7 @@ method: delete
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'delete'", '_parse_lean_test_steps : method can be delete');
+assert_stdout_contains(q{'method' => 'delete'}, '_parse_lean_test_steps : method can be delete');
 
 # method can be put
 before_test();
@@ -1230,7 +1230,7 @@ postbody: abd=efg&hijk=lmnop
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'put'", '_parse_lean_test_steps : method can be put');
+assert_stdout_contains(q{'method' => 'put'}, '_parse_lean_test_steps : method can be put');
 
 # method cannot be get - only put and delete accepted
 before_test();
@@ -1241,7 +1241,7 @@ method: get
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred", '_parse_lean_test_steps : method can only be delete or put');
+assert_stdout_contains(q{Method parameter can only contain values of 'delete' or 'put'. Other values will be inferred}, '_parse_lean_test_steps : method can only be delete or put');
 
 # duplicate attribute found
 before_test();
@@ -1252,8 +1252,8 @@ url: https://www.totaljobs.com/job/792168
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Duplicate parameter url found", '_parse_lean_test_steps : duplicate parameter - 1');
-assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : duplicate parameter - 2');
+assert_stdout_contains(q{Duplicate parameter url found}, '_parse_lean_test_steps : duplicate parameter - 1');
+assert_stdout_contains(q{Parse error line 3}, '_parse_lean_test_steps : duplicate parameter - 2');
 
 # tab before value - no quote is an error
 before_test();
@@ -1263,7 +1263,7 @@ url:    https://www.totaljobs.com/job/49152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Tab character found on column 6 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - no quote');
+assert_stdout_contains(q{Tab character found on column 6 of line 1. Please use spaces}, '_parse_lean_test_steps : tab before value - no quote');
 
 # tab before value - with quote one liner is an error
 before_test();
@@ -1273,7 +1273,7 @@ url:    https://www.totaljobs.com/job/49152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote one liner');
+assert_stdout_contains(q{Tab character found on column 9 of line 1. Please use spaces}, '_parse_lean_test_steps : tab before value - with quote one liner');
 
 # tab before value - with quote multi line is an error
 before_test();
@@ -1284,7 +1284,7 @@ url:    https://www.totaljobs.com/job/49152
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Tab character found on column 9 of line 1. Please use spaces", '_parse_lean_test_steps : tab before value - with quote multi line');
+assert_stdout_contains(q{Tab character found on column 9 of line 1. Please use spaces}, '_parse_lean_test_steps : tab before value - with quote multi line');
 
 # tab can appear in value
 before_test();
@@ -1295,7 +1295,7 @@ url:      https://www.totaljobs.com/job/49152
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("parsed OK", '_parse_lean_test_steps : tab can appear in value');
+assert_stdout_contains(q{parsed OK}, '_parse_lean_test_steps : tab can appear in value');
 
 # special characters can be used
 before_test();
@@ -1305,7 +1305,7 @@ shell: echo hello and also £€
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("parsed OK", '_parse_lean_test_steps : special chars do not croak');
+assert_stdout_contains(q{parsed OK}, '_parse_lean_test_steps : special chars do not croak');
 
 # specify one include file
 before_test();
@@ -1320,9 +1320,9 @@ shell: REM 30
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in - 1');
-assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in - 2');
-assert_stdout_contains("'20' => 'examples/advanced/include/include_demo_1.test'", '_parse_lean_test_steps : include file names read in - 3');
+assert_stdout_contains(q{parsed OK}, '_parse_lean_test_steps : include file names read in - 1');
+assert_stdout_contains(q{'include' =>}, '_parse_lean_test_steps : include file names read in - 2');
+assert_stdout_contains(q{'20' => 'examples/advanced/include/include_demo_1.test'}, '_parse_lean_test_steps : include file names read in - 3');
 
 # specify include file with backslash
 before_test();
@@ -1337,8 +1337,8 @@ shell: REM 30
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("parsed OK", '_parse_lean_test_steps : include file names read in with backslash - 1');
-assert_stdout_contains("'include' =>", '_parse_lean_test_steps : include file names read in with backslash - 2');
+assert_stdout_contains(q{parsed OK}, '_parse_lean_test_steps : include file names read in with backslash - 1');
+assert_stdout_contains(q{'include' =>}, '_parse_lean_test_steps : include file names read in with backslash - 2');
 
 # specify two include files
 before_test();
@@ -1356,8 +1356,8 @@ include: examples/advanced/include/include_demo_2.test
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'20' => 'examples/advanced/include/include_demo_1.test'", '_parse_lean_test_steps : multi include files read in - 1');
-assert_stdout_contains("'40' => 'examples/advanced/include/include_demo_2.test'", '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains(q{'20' => 'examples/advanced/include/include_demo_1.test'}, '_parse_lean_test_steps : multi include files read in - 1');
+assert_stdout_contains(q{'40' => 'examples/advanced/include/include_demo_2.test'}, '_parse_lean_test_steps : multi include files read in - 1');
 
 # include file gets loaded
 before_test();
@@ -1372,10 +1372,10 @@ shell: REM 30
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file read in - 1');
-assert_stdout_contains("'shell' => 'echo include demo 1'", '_parse_lean_test_steps : include file read in - 2');
-assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file read in - 3');
-assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include file read in - 4');
+assert_stdout_contains(q{'20.01' =>}, '_parse_lean_test_steps : include file read in - 1');
+assert_stdout_contains(q{'shell' => 'echo include demo 1'}, '_parse_lean_test_steps : include file read in - 2');
+assert_stdout_contains(q{'30' =>}, '_parse_lean_test_steps : include file read in - 3');
+assert_stdout_contains(q{'shell' => 'REM 30'}, '_parse_lean_test_steps : include file read in - 4');
 
 # include file with multiple steps gets loaded
 before_test();
@@ -1390,14 +1390,14 @@ shell: REM 30
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include file multi steps read in - 1');
-assert_stdout_contains("'20.02' =>", '_parse_lean_test_steps : include file multi steps read in - 2');
-assert_stdout_contains("'shell' => 'echo include demo 3 first'", '_parse_lean_test_steps : include file multi steps read in - 3');
-assert_stdout_contains("'shell' => 'echo include demo 3 second'", '_parse_lean_test_steps : include file multi steps read in - 4');
-assert_stdout_contains("'step' => 'Demo 3 include step .01'", '_parse_lean_test_steps : include file multi steps read in - 5');
-assert_stdout_contains("'step' => 'Demo 3 include step .02'", '_parse_lean_test_steps : include file multi steps read in - 6');
-assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include file multi steps read in - 7');
-assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include file multi steps read in - 8');
+assert_stdout_contains(q{'20.01' =>}, '_parse_lean_test_steps : include file multi steps read in - 1');
+assert_stdout_contains(q{'20.02' =>}, '_parse_lean_test_steps : include file multi steps read in - 2');
+assert_stdout_contains(q{'shell' => 'echo include demo 3 first'}, '_parse_lean_test_steps : include file multi steps read in - 3');
+assert_stdout_contains(q{'shell' => 'echo include demo 3 second'}, '_parse_lean_test_steps : include file multi steps read in - 4');
+assert_stdout_contains(q{'step' => 'Demo 3 include step .01'}, '_parse_lean_test_steps : include file multi steps read in - 5');
+assert_stdout_contains(q{'step' => 'Demo 3 include step .02'}, '_parse_lean_test_steps : include file multi steps read in - 6');
+assert_stdout_contains(q{'30' =>}, '_parse_lean_test_steps : include file multi steps read in - 7');
+assert_stdout_contains(q{'shell' => 'REM 30'}, '_parse_lean_test_steps : include file multi steps read in - 8');
 
 # include multi files gets loaded
 before_test();
@@ -1414,14 +1414,14 @@ include: examples/advanced/include/include_demo_2.test
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'20.01' =>", '_parse_lean_test_steps : include multi file read in - 1');
-assert_stdout_contains("'shell' => 'echo include demo 1'", '_parse_lean_test_steps : include multi file read in - 2');
-assert_stdout_contains("'step' => 'This is include step .01'", '_parse_lean_test_steps : include multi file read in - 3');
-assert_stdout_contains("'30' =>", '_parse_lean_test_steps : include multi file read in - 4');
-assert_stdout_contains("'shell' => 'REM 30'", '_parse_lean_test_steps : include multi file read in - 5');
-assert_stdout_contains("'40.01' =>", '_parse_lean_test_steps : include multi file read in - 6');
-assert_stdout_contains("'shell' => 'echo include demo 2'", '_parse_lean_test_steps : include multi file read in - 7');
-assert_stdout_contains("'step' => 'Another include step .01'", '_parse_lean_test_steps : include multi file read in - 8');
+assert_stdout_contains(q{'20.01' =>}, '_parse_lean_test_steps : include multi file read in - 1');
+assert_stdout_contains(q{'shell' => 'echo include demo 1'}, '_parse_lean_test_steps : include multi file read in - 2');
+assert_stdout_contains(q{'step' => 'This is include step .01'}, '_parse_lean_test_steps : include multi file read in - 3');
+assert_stdout_contains(q{'30' =>}, '_parse_lean_test_steps : include multi file read in - 4');
+assert_stdout_contains(q{'shell' => 'REM 30'}, '_parse_lean_test_steps : include multi file read in - 5');
+assert_stdout_contains(q{'40.01' =>}, '_parse_lean_test_steps : include multi file read in - 6');
+assert_stdout_contains(q{'shell' => 'echo include demo 2'}, '_parse_lean_test_steps : include multi file read in - 7');
+assert_stdout_contains(q{'step' => 'Another include step .01'}, '_parse_lean_test_steps : include multi file read in - 8');
 
 # repeat cannot be encountered twice - primary file
 before_test();
@@ -1438,8 +1438,8 @@ repeat: 2
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 1');
-assert_stdout_contains("Parse error line 9", '_parse_lean_test_steps : repeat is declared once only - 2');
+assert_stdout_contains(q{Repeat directive can only be given once globally}, '_parse_lean_test_steps : repeat is declared once only - 1');
+assert_stdout_contains(q{Parse error line 9}, '_parse_lean_test_steps : repeat is declared once only - 2');
 
 # repeat cannot be encountered twice - include file
 before_test();
@@ -1456,8 +1456,8 @@ shell: REM 30
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("Repeat directive can only be given once globally", '_parse_lean_test_steps : repeat is declared once only - 3');
-assert_stdout_contains("Parse error line 5", '_parse_lean_test_steps : repeat is declared once only - 4');
+assert_stdout_contains(q{Repeat directive can only be given once globally}, '_parse_lean_test_steps : repeat is declared once only - 3');
+assert_stdout_contains(q{Parse error line 5}, '_parse_lean_test_steps : repeat is declared once only - 4');
 
 # when include file fails to parse, give its filename
 before_test();
@@ -1468,9 +1468,9 @@ include: examples/advanced/include/broken.test
 EOB
     ;
 eval { read_test_steps_file(); };
-assert_stdout_contains("First parameter of step block must be step:", '_parse_lean_test_steps : parse error in include file - 1');
-assert_stdout_contains("Parse error line 3", '_parse_lean_test_steps : parse error in include file - 2');
-assert_stdout_contains("broken.test", '_parse_lean_test_steps : parse error in include file - 3');
+assert_stdout_contains(q{First parameter of step block must be step:}, '_parse_lean_test_steps : parse error in include file - 1');
+assert_stdout_contains(q{Parse error line 3}, '_parse_lean_test_steps : parse error in include file - 2');
+assert_stdout_contains(q{broken.test}, '_parse_lean_test_steps : parse error in include file - 3');
 
 # section break increases step id to the next round 100 value
 before_test();
@@ -1484,7 +1484,7 @@ shell: REM 100
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'100' => ", '_parse_lean_test_steps : section break increases step id to next round 100');
+assert_stdout_contains(q{'100' => }, '_parse_lean_test_steps : section break increases step id to next round 100');
 
 # support testvar
 
@@ -1539,7 +1539,7 @@ $main::case{retry} = '5';
 $main::resp_content = ('The quick brown fox jumps over the lazy dog');
 set_number_of_times_to_retry_this_test_step();
 _verify_verifypositive();
-assert_stdout_contains("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 1');
+assert_stdout_contains(q{Won't retry - a fail fast was invoked}, '_verify_verifypositive : Fail fast - 1');
 
 before_test();
 $main::case{verifypositive2} = 'fail fast!brown fox';
@@ -1553,7 +1553,7 @@ $main::case{retry} = '0';
 $main::resp_content = ('The quick brown fox jumps over the lazy dog');
 set_number_of_times_to_retry_this_test_step();
 _verify_verifypositive();
-assert_stdout_does_not_contain ("Won't retry - a fail fast was invoked", '_verify_verifypositive : Fail fast - 3');
+assert_stdout_does_not_contain(q{Won't retry - a fail fast was invoked}, '_verify_verifypositive : Fail fast - 3');
 
 
 #
