@@ -25,7 +25,7 @@ Clone WebImblaze with git
 ```sh
 mkdir $HOME/git
 cd $HOME/git
-sudo git clone https://github.com/Qarj/WebImblaze.git
+git clone https://github.com/Qarj/WebImblaze.git
 ```
 
 Fix permissions
