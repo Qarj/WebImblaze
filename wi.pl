@@ -9,7 +9,6 @@
 use v5.16;
 use strict;
 use vars qw/ $VERSION /;
-use warnings;
 
 $VERSION = '1.4.7';
 
