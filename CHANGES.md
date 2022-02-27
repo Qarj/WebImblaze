@@ -8,6 +8,10 @@ Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 
 ## WebImblaze Release History
 
+### Version 1.4.8 - Feb 27, 2022
+
+-   linting changes, added GitHub actions
+
 ### Version 1.4.7 - Apr 25, 2021
 
 -   very minor change - redact is now processed later, just before writing to http log

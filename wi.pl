@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.7';
+$VERSION = '1.4.8';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
