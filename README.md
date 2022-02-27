@@ -32,7 +32,15 @@ Fix permissions
 
 ```sh
 cd $HOME/git/WebImblaze
-sudo chmod +x wi.pl
+chmod +x wi.pl
+```
+
+Install additional Perl packages, choose `[local::lib]` when configuring cpan.
+
+```sh
+cpan XML::Simple
+cpan LWP::Protocol::https
+source $HOME/.bashrc
 ```
 
 Check that you can see the WebImblaze help info
@@ -40,15 +48,6 @@ Check that you can see the WebImblaze help info
 ```sh
 perl wi.pl --help
 ```
-
-If there are error messages you might need additional Perl packages
-
-```sh
-sudo cpan XML::Simple
-sudo cpan LWP::Protocol::https
-```
-
-Tested with Ubuntu 16.04, 18.04, 20.04, El Capitan, High Sierra, Mojave.
 
 #### CentOS 8
 

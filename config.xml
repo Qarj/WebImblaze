@@ -17,7 +17,7 @@
         <selenium-binary>C:\selenium\selenium-server-3-standalone.jar</selenium-binary>
     </windows>
     <linux>
-        <chromedriver-binary>/usr/local/bin/selenium/chromedriver</chromedriver-binary>
-        <selenium-binary>/usr/local/bin/selenium/selenium-server-3-standalone.jar</selenium-binary>
+        <chromedriver-binary>$ENV{"HOME"}/selenium/chromedriver</chromedriver-binary>
+        <selenium-binary>$ENV{"HOME"}/selenium/selenium-server-3-standalone.jar</selenium-binary>
     </linux>
 </root> 
