@@ -18,46 +18,20 @@ You can see WebImblaze example output here: [Example output](https://qarj.github
 
 WebImblaze is very easy to setup and run. An example is test included.
 
-### Windows
-
-1. Install Strawberry Perl.
-
-    - Navigate to [Strawberry Perl](http://strawberryperl.com/)
-    - Download and install the recommended 64 bit version of Strawberry Perl
-    - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs
-
-2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
-
-    ```batch
-    mkdir C:\git
-    ```
-
-3. If you have git installed, then just clone the repository
-
-    ```batch
-    cd C:\git
-    git clone https://github.com/Qarj/WebImblaze.git
-    ```
-
-    If you don't have git, you can get it from [git](https://git-scm.com).
-
-That's it! You are now ready to run WebImblaze for the first time.
-
-### Linux / Mac
+### Debian / Ubuntu / Mac
 
 Clone WebImblaze with git
 
 ```sh
-cd /usr/local/bin
+mkdir $HOME/git
+cd $HOME/git
 sudo git clone https://github.com/Qarj/WebImblaze.git
 ```
 
 Fix permissions
 
 ```sh
-cd WebImblaze
-sudo find . -type d -exec chmod a+rwx {} \;
-sudo find . -type f -exec chmod a+rw {} \;
+cd $HOME/git/WebImblaze
 sudo chmod +x wi.pl
 ```
 
@@ -111,15 +85,40 @@ sudo yum install openssl-devel
 You can see if SSL is installed correctly with the command `perl -MNet::SSL -e1` - if it returns no output then all
 is OK and there is no need to install `LWP::Protocol::https` using cpan.
 
+### Windows
+
+1. Install Strawberry Perl.
+
+    - Navigate to [Strawberry Perl](http://strawberryperl.com/)
+    - Download and install the recommended 64 bit version of Strawberry Perl
+    - Optional: Move Strawberry Perl to start of Windows path if installation contains other Perl installs
+
+2. It doesn't matter where you put WebImblaze, for simplicity, put it in `C:\git`
+
+    ```batch
+    mkdir C:\git
+    ```
+
+3. If you have git installed, then just clone the repository
+
+    ```batch
+    cd C:\git
+    git clone https://github.com/Qarj/WebImblaze.git
+    ```
+
+    If you don't have git, you can get it from [git](https://git-scm.com).
+
 ### Create simple WebImblaze test
 
-Note that these instructions are written with Windows in mind.
+Note that these instructions are written with Linux in mind.
+
+Ensure you have installed the `WebImblaze` vscode extension for syntax highlighting.
 
 In the `tests` folder, create a file called `hello.test`.
 
 ```sh
-cd c:/git/WebImblaze
-start notepad++ tests/hello.test
+cd $HOME/git/WebImblaze
+code tests/hello.test
 ```
 
 Copy paste the following then save the file.
@@ -134,7 +133,8 @@ verifypositive2:    See all hiring companies
 step:               Search for hello jobs
 desc:               Expect to see at least 2 pages of hello jobs
 url:                {TOTALJOBS_URL}/jobs/hello
-verifypositive1:    \d+./span.\s*.h1.Hello jobs|||Expected to see a count of hello jobs
+addheader:          Referer: www.totaljobs.com
+verifypositive1:    Hello jobs|||Expected to see a count of hello jobs
 verifypositive2:    page=2|||Should be at least two pages of results for keyword hello
 verifynegative1:    Page not found
 ```
@@ -147,7 +147,7 @@ perl wi.pl tests/hello.test
 
 If everything worked OK, then you'll see something like the following:
 
-```lang-text
+```txt
 Starting WebImblaze Engine...
 
 -------------------------------------------------------
@@ -159,25 +159,25 @@ Passed Positive Verification
 Passed Positive Verification
 Passed HTTP Response Code Verification
 TEST STEP PASSED
-Response Time = 0.183 sec
+Response Time = 0.122 sec
 -------------------------------------------------------
 Test:  tests/hello.test - 20
 Search for hello jobs
 Expect to see at least 2 pages of hello jobs
 Verify Negative: "Page not found"
-Verify Positive: "\d+./span.\s*.h1.Hello jobs"
+Verify Positive: "Hello jobs"
 Verify Positive: "page=2"
 Passed Positive Verification
 Passed Positive Verification
 Passed Negative Verification
 Passed HTTP Response Code Verification
 TEST STEP PASSED
-Response Time = 0.648 sec
+Response Time = 0.122 sec
 -------------------------------------------------------
-Start Time: Sun 09 Aug 2020, 08:35:02
-Total Run Time: 0.915 seconds
+Start Time: Sun 27 Feb 2022, 19:38:05
+Total Run Time: 0.302 seconds
 
-Total Response Time: 0.831 seconds
+Total Response Time: 0.244 seconds
 
 Test Steps Run: 2
 Test Steps Passed: 2
