@@ -207,7 +207,7 @@ auto_sub(q{( 'name' => 'Upload' )}, 'multipost', 'http://example.com');
 assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : multi post has 1 field');
 
 before_test();
-auto_sub("( 'fileUpload' => ['examples/multipart_post.csv'], 'name' => 'Upload' )", 'multipost', 'http://example.com');
+auto_sub(q{( 'fileUpload' => ['examples/multipart_post.csv'], 'name' => 'Upload' )}, 'multipost', 'http://example.com');
 assert_stdout_contains('There are 1 fields in the postbody', 'auto_sub : multi post has 2 fields');
 
 before_test();
@@ -217,7 +217,7 @@ assert_stdout_contains('Field 2: c=d', 'auto_sub : field 2 display');
 assert_stdout_contains('Field 3: e=f', 'auto_sub : field 3 display');
 
 before_test();
-auto_sub("(  'a' => 'b', 'c' => 'd', 'e' => 'f' )", 'multipost', 'http://example.com');
+auto_sub(q{(  'a' => 'b', 'c' => 'd', 'e' => 'f' )}, 'multipost', 'http://example.com');
 assert_stdout_contains(q|Field 1: \(  'a' => 'b|, 'auto_sub : multipost field 1 display');
 assert_stdout_contains(q|Field 2:  'c' => 'd|, 'auto_sub : multimpost field 2 display');
 assert_stdout_contains(q|Field 3:  'e' => 'f|, 'auto_sub : multimpost field 3 display'); #'
@@ -270,7 +270,7 @@ assert_stdout_contains('e=eff', 'auto_sub : normalpost {DATA} - field 3');
 before_test();
 $main::resp_content = ('action="/search.aspx" method="post" name="a" type="hidden" value="bee bee"');
 save_page_when_method_post_and_has_action ();
-auto_sub("(  'a' => '{DATA}', 'c' => 'd', 'e' => 'f' )", 'multipost', 'http://example.com/search.aspx');
+auto_sub(q{(  'a' => '{DATA}', 'c' => 'd', 'e' => 'f' )}, 'multipost', 'http://example.com/search.aspx');
 assert_stdout_contains('ID MATCH 0', 'auto_sub : ID MATCH');
 assert_stdout_contains('Multi field a has \{DATA\}', 'auto_sub : multi field has {DATA}');
 assert_stdout_contains('DATA is bee', 'auto_sub : multipost {DATA} - field 1 - assert 1');
@@ -381,19 +381,19 @@ EOB
     ;
 read_test_steps_file();
 assert_stdout_contains('Lean test steps parsed OK', 'read_test_steps_file : lean style format parsed ok');
-assert_stdout_does_not_contain("'repeat' => '1'", '_parse_lean_test_steps : repeat is not defaulted');
-assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Step 10 found');
-assert_stdout_contains("'step' => 'Test that WebImblaze can run a very basic test'", '_parse_lean_test_steps : Step 10, step name found');
-assert_stdout_contains("'shell' => 'REM Nothing: much'", '_parse_lean_test_steps : Step 10, command found');
-assert_stdout_contains("'verifypositive1' => 'Nothing: much'", '_parse_lean_test_steps : Step 10, verifypositive1 found');
-assert_stdout_contains("'20' =>", '_parse_lean_test_steps : Step 20 found');
-assert_stdout_contains("'step' => 'Another step - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, desc1 found');
-assert_stdout_contains("'desc' => 'Sub description'", '_parse_lean_test_steps : Step 20, desc2 found');
-assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : Step 20, method found');
-assert_stdout_contains("'shell' => 'REM Not much more - retry [{]RETRY}'", '_parse_lean_test_steps : Step 20, command found');
-assert_stdout_contains("'retry' => '3'", '_parse_lean_test_steps : Step 20, retry found');
-assert_stdout_contains("'verifynegative' => 'Nothing much'", '_parse_lean_test_steps : Step 20, verifynegative found');
-assert_stdout_contains("'verifypositive' => 'retry 1'", '_parse_lean_test_steps : Step 20, verifypositive found');
+assert_stdout_does_not_contain(q{'repeat' => '1'}, '_parse_lean_test_steps : repeat is not defaulted');
+assert_stdout_contains(q{'10' =>}, '_parse_lean_test_steps : Step 10 found');
+assert_stdout_contains(q{'step' => 'Test that WebImblaze can run a very basic test'}, '_parse_lean_test_steps : Step 10, step name found');
+assert_stdout_contains(q{'shell' => 'REM Nothing: much'}, '_parse_lean_test_steps : Step 10, command found');
+assert_stdout_contains(q{'verifypositive1' => 'Nothing: much'}, '_parse_lean_test_steps : Step 10, verifypositive1 found');
+assert_stdout_contains(q{'20' =>}, '_parse_lean_test_steps : Step 20 found');
+assert_stdout_contains(q{'step' => 'Another step - retry [{]RETRY}'}, '_parse_lean_test_steps : Step 20, desc1 found');
+assert_stdout_contains(q{'desc' => 'Sub description'}, '_parse_lean_test_steps : Step 20, desc2 found');
+assert_stdout_contains(q{'method' => 'shell'}, '_parse_lean_test_steps : Step 20, method found');
+assert_stdout_contains(q{'shell' => 'REM Not much more - retry [{]RETRY}'}, '_parse_lean_test_steps : Step 20, command found');
+assert_stdout_contains(q{'retry' => '3'}, '_parse_lean_test_steps : Step 20, retry found');
+assert_stdout_contains(q{'verifynegative' => 'Nothing much'}, '_parse_lean_test_steps : Step 20, verifynegative found');
+assert_stdout_contains(q{'verifypositive' => 'retry 1'}, '_parse_lean_test_steps : Step 20, verifypositive found');
 
 # can have a lean test case file with a single step
 before_test();
@@ -403,7 +403,7 @@ shell: echo Short
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'10' =>", '_parse_lean_test_steps : Can have just one test step');
+assert_stdout_contains(q{'10' =>}, '_parse_lean_test_steps : Can have just one test step');
 
 # can have quotes
 before_test();
@@ -427,8 +427,8 @@ shell: echo next
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'10' =>", '_parse_lean_test_steps : step ids are auto generated - 10');
-assert_stdout_contains("'20' =>", '_parse_lean_test_steps : step ids are auto generated - 20');
+assert_stdout_contains(q{'10' =>}, '_parse_lean_test_steps : step ids are auto generated - 10');
+assert_stdout_contains(q{'20' =>}, '_parse_lean_test_steps : step ids are auto generated - 20');
 
 # method="cmd" is auto generated
 before_test();
@@ -442,8 +442,8 @@ shell5: echo next1
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'shell20' => 'echo auto2'", '_parse_lean_test_steps : shell not converted back to command');
-assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : shell method detected - 1');
+assert_stdout_contains(q{'shell20' => 'echo auto2'}, '_parse_lean_test_steps : shell not converted back to command');
+assert_stdout_contains(q{'method' => 'shell'}, '_parse_lean_test_steps : shell method detected - 1');
 
 # method="cmd" is auto generated - shell1
 before_test();
@@ -456,7 +456,7 @@ shell1: echo next1
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'shell'", '_parse_lean_test_steps : shell method detected - 2');
+assert_stdout_contains(q{'method' => 'shell'}, '_parse_lean_test_steps : shell method detected - 2');
 
 # method="selenium" is auto generated
 before_test();
@@ -470,8 +470,8 @@ selenium5: $driver->get('https://www.totaljobs.com/register')
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'selenium'", '_parse_lean_test_steps : Selenium method detected');
-assert_stdout_contains("'selenium20' => '.driver->get_all_cookies..'", '_parse_lean_test_steps : selenium not converted back to command');
+assert_stdout_contains(q{'method' => 'selenium'}, '_parse_lean_test_steps : Selenium method detected');
+assert_stdout_contains(q{'selenium20' => '.driver->get_all_cookies..'}, '_parse_lean_test_steps : selenium not converted back to command');
 
 # method="get" is auto generated
 before_test();
@@ -481,7 +481,7 @@ url: https://www.totaljobs.com
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'get'", '_parse_lean_test_steps : get method detected');
+assert_stdout_contains(q{'method' => 'get'}, '_parse_lean_test_steps : get method detected');
 
 # method="post" is auto generated
 before_test();
@@ -492,7 +492,7 @@ postbody: RecipeName=Sheperds%20Pie&Cuisine=British
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'method' => 'post'", '_parse_lean_test_steps : post method detected');
+assert_stdout_contains(q{'method' => 'post'}, '_parse_lean_test_steps : post method detected');
 
 # single line comment is a hash
 before_test();
@@ -503,8 +503,8 @@ url: https://www.totaljobs.com
 EOB
     ;
 read_test_steps_file();
-assert_stdout_does_not_contain("'verifypositive'", '_parse_lean_test_steps : single line comment first char');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment does not generate null parameter');
+assert_stdout_does_not_contain(q{'verifypositive'}, '_parse_lean_test_steps : single line comment first char');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : single line comment does not generate null parameter');
 
 # multi line comment starts with --= and ends with =--
 before_test();
@@ -521,8 +521,8 @@ verifypositive: Not found
 EOB
     ;
 read_test_steps_file();
-assert_stdout_does_not_contain("'Not found'", '_parse_lean_test_steps : multi line comment');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment does not generate null parameter');
+assert_stdout_does_not_contain(q{'Not found'}, '_parse_lean_test_steps : multi line comment');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : multi line comment does not generate null parameter');
 
 # multi line comment can exist in a test step
 before_test();
@@ -537,9 +537,9 @@ verifynegative: negative
 EOB
     ;
 read_test_steps_file();
-assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : can have multi line comment in step');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line comment in step does not generate null parameter');
-assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : can have multi line comment in step - parm after comment is active');
+assert_stdout_does_not_contain(q{'verifypositive' => 'positive'}, '_parse_lean_test_steps : can have multi line comment in step');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : multi line comment in step does not generate null parameter');
+assert_stdout_contains(q{'verifynegative' => 'negative'}, '_parse_lean_test_steps : can have multi line comment in step - parm after comment is active');
 
 # multi line comment and single line comment beside each other
 before_test();
@@ -557,11 +557,11 @@ verifynegative: negative
 EOB
     ;
 read_test_steps_file();
-assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment ignore in mixed comments');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : multi line and single line comment does not generate null parameter');
-assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi and single line comments mixed ok - 1');
-assert_stdout_contains("'verifypositive' => 'sure'", '_parse_lean_test_steps : multi and single line comments mixed ok - 2');
-assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line and single line comment - should only be one step');
+assert_stdout_does_not_contain(q{'verifypositive' => 'positive'}, '_parse_lean_test_steps : multi comment ignore in mixed comments');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : multi line and single line comment does not generate null parameter');
+assert_stdout_contains(q{'verifynegative' => 'negative'}, '_parse_lean_test_steps : multi and single line comments mixed ok - 1');
+assert_stdout_contains(q{'verifypositive' => 'sure'}, '_parse_lean_test_steps : multi and single line comments mixed ok - 2');
+assert_stdout_does_not_contain(q{'20' =>}, '_parse_lean_test_steps : multi line and single line comment - should only be one step');
 
 # multi line comment can end anywhere on line
 before_test();
@@ -575,8 +575,8 @@ verifynegative: negative
 EOB
     ;
 read_test_steps_file();
-assert_stdout_does_not_contain("'verifypositive' => 'positive'", '_parse_lean_test_steps : multi comment can end anywhere on line - 1');
-assert_stdout_contains("'verifynegative' => 'negative'", '_parse_lean_test_steps : multi comment can end anywhere on line - 2');
+assert_stdout_does_not_contain(q{'verifypositive' => 'positive'}, '_parse_lean_test_steps : multi comment can end anywhere on line - 1');
+assert_stdout_contains(q{'verifynegative' => 'negative'}, '_parse_lean_test_steps : multi comment can end anywhere on line - 2');
 
 # not a multi line comment - should not be removed
 before_test();
@@ -589,9 +589,9 @@ verifynegative1: negative  =--
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => 'sure --= thing'", '_parse_lean_test_steps : not a multiline quote - 1');
-assert_stdout_contains("'verifypositive2' => 'positive'", '_parse_lean_test_steps : not a multiline quote - 2');
-assert_stdout_contains("'verifynegative1' => .negative  =--", '_parse_lean_test_steps : not a multiline quote - 3');
+assert_stdout_contains(q{'verifypositive1' => 'sure --= thing'}, '_parse_lean_test_steps : not a multiline quote - 1');
+assert_stdout_contains(q{'verifypositive2' => 'positive'}, '_parse_lean_test_steps : not a multiline quote - 2');
+assert_stdout_contains(q{'verifynegative1' => .negative  =--}, '_parse_lean_test_steps : not a multiline quote - 3');
 
 # quoted string - one line
 before_test();
@@ -602,7 +602,7 @@ verifypositive:q:    q sure q
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive' => ' sure '", '_parse_lean_test_steps : single line quote - single char');
+assert_stdout_contains(q{'verifypositive' => ' sure '}, '_parse_lean_test_steps : single line quote - single char');
 
 # quoted string - one line special characters
 before_test();
@@ -630,24 +630,24 @@ verifypositiveI:0:    0 sure 0
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => ' sure '", '_parse_lean_test_steps : single line quote - single char $');
-assert_stdout_contains("'verifypositive2' => ' sure '", '_parse_lean_test_steps : single line quote - single char ^');
-assert_stdout_contains("'verifypositive3' => ' sure '", '_parse_lean_test_steps : single line quote - single char .');
-assert_stdout_contains("'verifypositive4' => ' sure '", '_parse_lean_test_steps : single line quote - single char *');
-assert_stdout_contains("'verifypositive5' => ' sure '", '_parse_lean_test_steps : single line quote - single char +');
-assert_stdout_contains("'verifypositive6' => ' sure '", '_parse_lean_test_steps : single line quote - single char ?');
-assert_stdout_contains("'verifypositive7' => ' sure '", '_parse_lean_test_steps : single line quote - single char \\');
-assert_stdout_contains("'verifypositive8' => ' sure '", '_parse_lean_test_steps : single line quote - single char |');
-assert_stdout_contains("'verifypositive9' => ' sure '", '_parse_lean_test_steps : single line quote - single char -');
-assert_stdout_contains("'verifypositiveA' => ' sure '", '_parse_lean_test_steps : single line quote - single char /');
-assert_stdout_contains("'verifypositiveB' => ' sure '", '_parse_lean_test_steps : single line quote - single char #');
-assert_stdout_contains("'verifypositiveC' => ' sure '", '_parse_lean_test_steps : single line quote - single char @');
-assert_stdout_contains("'verifypositiveD' => ' sure '", '_parse_lean_test_steps : single line quote - single char &');
-assert_stdout_contains("'verifypositiveE' => ' sure '", '_parse_lean_test_steps : single line quote - single char =');
-assert_stdout_contains("'verifypositiveF' => ' sure '", '_parse_lean_test_steps : single line quote - single char "');
-assert_stdout_contains("'verifypositiveG' => ' sure '", "_parse_lean_test_steps : single line quote - single char '");
-assert_stdout_contains("'verifypositiveH' => ' sure '", '_parse_lean_test_steps : single line quote - single char `');
-assert_stdout_contains("'verifypositiveI' => ' sure '", '_parse_lean_test_steps : single line quote - single char 0');
+assert_stdout_contains(q{'verifypositive1' => ' sure '}, '_parse_lean_test_steps : single line quote - single char $');
+assert_stdout_contains(q{'verifypositive2' => ' sure '}, '_parse_lean_test_steps : single line quote - single char ^');
+assert_stdout_contains(q{'verifypositive3' => ' sure '}, '_parse_lean_test_steps : single line quote - single char .');
+assert_stdout_contains(q{'verifypositive4' => ' sure '}, '_parse_lean_test_steps : single line quote - single char *');
+assert_stdout_contains(q{'verifypositive5' => ' sure '}, '_parse_lean_test_steps : single line quote - single char +');
+assert_stdout_contains(q{'verifypositive6' => ' sure '}, '_parse_lean_test_steps : single line quote - single char ?');
+assert_stdout_contains(q{'verifypositive7' => ' sure '}, '_parse_lean_test_steps : single line quote - single char \\');
+assert_stdout_contains(q{'verifypositive8' => ' sure '}, '_parse_lean_test_steps : single line quote - single char |');
+assert_stdout_contains(q{'verifypositive9' => ' sure '}, '_parse_lean_test_steps : single line quote - single char -');
+assert_stdout_contains(q{'verifypositiveA' => ' sure '}, '_parse_lean_test_steps : single line quote - single char /');
+assert_stdout_contains(q{'verifypositiveB' => ' sure '}, '_parse_lean_test_steps : single line quote - single char #');
+assert_stdout_contains(q{'verifypositiveC' => ' sure '}, '_parse_lean_test_steps : single line quote - single char @');
+assert_stdout_contains(q{'verifypositiveD' => ' sure '}, '_parse_lean_test_steps : single line quote - single char &');
+assert_stdout_contains(q{'verifypositiveE' => ' sure '}, '_parse_lean_test_steps : single line quote - single char =');
+assert_stdout_contains(q{'verifypositiveF' => ' sure '}, '_parse_lean_test_steps : single line quote - single char "');
+assert_stdout_contains(q{'verifypositiveG' => ' sure '}, "_parse_lean_test_steps : single line quote - single char '");
+assert_stdout_contains(q{'verifypositiveH' => ' sure '}, '_parse_lean_test_steps : single line quote - single char `');
+assert_stdout_contains(q{'verifypositiveI' => ' sure '}, '_parse_lean_test_steps : single line quote - single char 0');
 
 # quoted string - empty string quote
 before_test();
@@ -658,7 +658,7 @@ verifypositive1:_: __
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => ''", '_parse_lean_test_steps : empty string quote - single char _');
+assert_stdout_contains(q{'verifypositive1' => ''}, '_parse_lean_test_steps : empty string quote - single char _');
 
 # quoted string - quote char is colon
 before_test();
@@ -669,7 +669,7 @@ verifypositive1:;: ;hey;
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => 'hey'", '_parse_lean_test_steps : quote character is semicolon ');
+assert_stdout_contains(q{'verifypositive1' => 'hey'}, '_parse_lean_test_steps : quote character is semicolon ');
 
 # unquoted string - preceeding and trailing spaces ignored
 before_test();
@@ -681,8 +681,8 @@ verifypositive2: world
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => 'hello'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 1');
-assert_stdout_contains("'verifypositive2' => 'world'", '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 2');
+assert_stdout_contains(q{'verifypositive1' => 'hello'}, '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 1');
+assert_stdout_contains(q{'verifypositive2' => 'world'}, '_parse_lean_test_steps : before and after spaces ignored for unquoted string - 2');
 
 # multi char single line quotes
 before_test();
@@ -695,9 +695,9 @@ verifypositive3:=--:   =-- hello =--
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 1');
-assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 2');
-assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : multi char single line quotes - 3');
+assert_stdout_contains(q{'verifypositive1' => ' hello '}, '_parse_lean_test_steps : multi char single line quotes - 1');
+assert_stdout_contains(q{'verifypositive2' => ' hello '}, '_parse_lean_test_steps : multi char single line quotes - 2');
+assert_stdout_contains(q{'verifypositive3' => ' hello '}, '_parse_lean_test_steps : multi char single line quotes - 3');
 
 # mirrored chars for quote
 before_test();
@@ -710,9 +710,9 @@ verifypositive3:[<:   [< hello ]>
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - ()');
-assert_stdout_contains("'verifypositive2' => ' hello '", '_parse_lean_test_steps : mirror char for quotes - {{}}');
-assert_stdout_contains("'verifypositive3' => ' hello '", '_parse_lean_test_steps : mirror char for quotes [<]>');
+assert_stdout_contains(q{'verifypositive1' => ' hello '}, '_parse_lean_test_steps : mirror char for quotes - ()');
+assert_stdout_contains(q{'verifypositive2' => ' hello '}, '_parse_lean_test_steps : mirror char for quotes - {{}}');
+assert_stdout_contains(q{'verifypositive3' => ' hello '}, '_parse_lean_test_steps : mirror char for quotes [<]>');
 
 # multiline quotes - classic
 before_test();
@@ -726,11 +726,11 @@ verifypositive1: first
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line value - 1');
-assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line value - 2');
-assert_stdout_contains("'postbody' => [^|]+second line", '_parse_lean_test_steps : multi line value - 3');
-assert_stdout_contains("'postbody' => [^|]+third line'", '_parse_lean_test_steps : multi line value - 4');
-assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi line value - 5');
+assert_stdout_contains(q{'verifypositive1' => 'first'}, '_parse_lean_test_steps : multi line value - 1');
+assert_stdout_contains(q{'postbody' => ' first line }, '_parse_lean_test_steps : multi line value - 2');
+assert_stdout_contains(q{'postbody' => [^|]+second line}, '_parse_lean_test_steps : multi line value - 3');
+assert_stdout_contains(q{'postbody' => [^|]+third line'}, '_parse_lean_test_steps : multi line value - 4');
+assert_stdout_does_not_contain(q{LOGIC ERROR}, '_parse_lean_test_steps : multi line value - 5');
 
 # multiline quotes - minimum
 before_test();
@@ -743,10 +743,10 @@ verifypositive1: first
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive1' => 'first'", '_parse_lean_test_steps : multi line min value - 1');
-assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi line min value - 2');
-assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi line min value - 3');
-assert_stdout_contains("'postbody' => [^|]+second line'", '_parse_lean_test_steps : multi line min value - 4');
+assert_stdout_contains(q{'verifypositive1' => 'first'}, '_parse_lean_test_steps : multi line min value - 1');
+assert_stdout_does_not_contain(q{LOGIC ERROR}, '_parse_lean_test_steps : multi line min value - 2');
+assert_stdout_contains(q{'postbody' => ' first line }, '_parse_lean_test_steps : multi line min value - 3');
+assert_stdout_contains(q{'postbody' => [^|]+second line'}, '_parse_lean_test_steps : multi line min value - 4');
 
 # multi scenarios
 before_test();
@@ -771,15 +771,15 @@ first content line
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'step' => 'Multi 10'", '_parse_lean_test_steps : multi scenarios - 1');
-assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : multi scenarios - 2');
-assert_stdout_contains("'postbody' => ' first line ", '_parse_lean_test_steps : multi scenarios - 3');
-assert_stdout_contains("second line'", '_parse_lean_test_steps : multi scenarios - 4');
-assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : multi scenarios - 5');
-assert_stdout_does_not_contain("LOGIC ERROR", '_parse_lean_test_steps : multi scenarios - 6');
-assert_stdout_does_not_contain("'ignore' => 'this'", '_parse_lean_test_steps : multi scenarios - 7');
-assert_stdout_contains("'step' => 'Multi 20'", '_parse_lean_test_steps : multi scenarios - 8');
-assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : multi scenarios - 9');
+assert_stdout_contains(q{'step' => 'Multi 10'}, '_parse_lean_test_steps : multi scenarios - 1');
+assert_stdout_contains(q{'url' => 'https://www.totaljobs.com'}, '_parse_lean_test_steps : multi scenarios - 2');
+assert_stdout_contains(q{'postbody' => ' first line }, '_parse_lean_test_steps : multi scenarios - 3');
+assert_stdout_contains(q{second line'}, '_parse_lean_test_steps : multi scenarios - 4');
+assert_stdout_does_not_contain(q{'30' =>}, '_parse_lean_test_steps : multi scenarios - 5');
+assert_stdout_does_not_contain(q{LOGIC ERROR}, '_parse_lean_test_steps : multi scenarios - 6');
+assert_stdout_does_not_contain(q{'ignore' => 'this'}, '_parse_lean_test_steps : multi scenarios - 7');
+assert_stdout_contains(q{'step' => 'Multi 20'}, '_parse_lean_test_steps : multi scenarios - 8');
+assert_stdout_contains(q{'url' => 'https://www.cwjobs.co.uk'}, '_parse_lean_test_steps : multi scenarios - 9');
 assert_stdout_contains('first content line ', '_parse_lean_test_steps : multi scenarios - 10');
 assert_stdout_contains(' second content line', '_parse_lean_test_steps : multi scenarios - 11');
 
@@ -800,11 +800,11 @@ url: https://www.cwjobs.co.uk
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'url' => 'https://www.totaljobs.com'", '_parse_lean_test_steps : blank lines between steps - 1');
-assert_stdout_contains("'step' => 'Multiple blank lines between steps'", '_parse_lean_test_steps : blank lines between steps - 2');
-assert_stdout_contains("'url' => 'https://www.cwjobs.co.uk'", '_parse_lean_test_steps : blank lines between steps - 3');
-assert_stdout_contains("'step' => 'Step 2'", '_parse_lean_test_steps : blank lines between steps - 4');
-assert_stdout_does_not_contain("'30' =>", '_parse_lean_test_steps : blank lines between steps - 5');
+assert_stdout_contains(q{'url' => 'https://www.totaljobs.com'}, '_parse_lean_test_steps : blank lines between steps - 1');
+assert_stdout_contains(q{'step' => 'Multiple blank lines between steps'}, '_parse_lean_test_steps : blank lines between steps - 2');
+assert_stdout_contains(q{'url' => 'https://www.cwjobs.co.uk'}, '_parse_lean_test_steps : blank lines between steps - 3');
+assert_stdout_contains(q{'step' => 'Step 2'}, '_parse_lean_test_steps : blank lines between steps - 4');
+assert_stdout_does_not_contain(q{'30' =>}, '_parse_lean_test_steps : blank lines between steps - 5');
 
 # single line comment within quote
 before_test();
@@ -820,10 +820,10 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : single line comment in quote - 1');
-assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : single line comment in quote - 2');
-assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : single line comment in quote - 3');
-assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : single line comment in quote - 4');
+assert_stdout_contains(q{'verifynegative' => 'bad stuff'}, '_parse_lean_test_steps : single line comment in quote - 1');
+assert_stdout_does_not_contain(q{'20' =>}, '_parse_lean_test_steps : single line comment in quote - 2');
+assert_stdout_contains(q{'verifypositive' => '}, '_parse_lean_test_steps : single line comment in quote - 3');
+assert_stdout_does_not_contain(q{'assert_count' =>}, '_parse_lean_test_steps : single line comment in quote - 4');
 
 # single line comment not in quote
 before_test();
@@ -838,8 +838,8 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("Got a single line comment index 0", '_parse_lean_test_steps : single line comment not in quote - 1');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : single line comment not in quote - 2');
+assert_stdout_contains(q{Got a single line comment index 0}, '_parse_lean_test_steps : single line comment not in quote - 1');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : single line comment not in quote - 2');
 
 # various single line comments
 before_test();
@@ -859,8 +859,8 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("Got a single line comment index 5", '_parse_lean_test_steps : various single line comments - 1');
-assert_stdout_does_not_contain("'' =>", '_parse_lean_test_steps : various single line comments - 2');
+assert_stdout_contains(q{Got a single line comment index 5}, '_parse_lean_test_steps : various single line comments - 1');
+assert_stdout_does_not_contain(q{'' =>}, '_parse_lean_test_steps : various single line comments - 2');
 
 # multi line comment within quote
 before_test();
@@ -882,14 +882,14 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifynegative' => 'bad stuff'", '_parse_lean_test_steps : multi line comment in quote - 1');
-assert_stdout_does_not_contain("'20' =>", '_parse_lean_test_steps : multi line comment in quote - 2');
-assert_stdout_contains("'verifypositive' => '", '_parse_lean_test_steps : multi line comment in quote - 3');
-assert_stdout_does_not_contain("'assert_count' =>", '_parse_lean_test_steps : multi line comment in quote - 4');
-assert_stdout_contains("'verifypositive' => .*not: a comment", '_parse_lean_test_steps : multi line comment in quote - 5');
-assert_stdout_contains("'verifypositive' => .*more: content", '_parse_lean_test_steps : multi line comment in quote - 6');
-assert_stdout_does_not_contain("'this' => 'too'", '_parse_lean_test_steps : multi line comment in quote - 7');
-assert_stdout_contains("'verifypositive' => .*also: content", '_parse_lean_test_steps : multi line comment in quote - 8');
+assert_stdout_contains(q{'verifynegative' => 'bad stuff'}, '_parse_lean_test_steps : multi line comment in quote - 1');
+assert_stdout_does_not_contain(q{'20' =>}, '_parse_lean_test_steps : multi line comment in quote - 2');
+assert_stdout_contains(q{'verifypositive' => '}, '_parse_lean_test_steps : multi line comment in quote - 3');
+assert_stdout_does_not_contain(q{'assert_count' =>}, '_parse_lean_test_steps : multi line comment in quote - 4');
+assert_stdout_contains(q{'verifypositive' => .*not: a comment}, '_parse_lean_test_steps : multi line comment in quote - 5');
+assert_stdout_contains(q{'verifypositive' => .*more: content}, '_parse_lean_test_steps : multi line comment in quote - 6');
+assert_stdout_does_not_contain(q{'this' => 'too'}, '_parse_lean_test_steps : multi line comment in quote - 7');
+assert_stdout_contains(q{'verifypositive' => .*also: content}, '_parse_lean_test_steps : multi line comment in quote - 8');
 
 # multi line quote with blank lines
 before_test();
@@ -909,8 +909,8 @@ verifynegative: bad stuff
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : multi line quote with blank lines - 1');
-assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : multi line quote with blank lines - 2');
+assert_stdout_contains(q{'verifypositive' => .*one fish}, '_parse_lean_test_steps : multi line quote with blank lines - 1');
+assert_stdout_contains(q{'verifypositive' => .*two fish}, '_parse_lean_test_steps : multi line quote with blank lines - 2');
 
 # ends with multi line quote
 before_test();
@@ -924,8 +924,8 @@ two fish
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifypositive' => .*one fish", '_parse_lean_test_steps : ends with multi line quote - 1');
-assert_stdout_contains("'verifypositive' => .*two fish", '_parse_lean_test_steps : ends with multi line quote - 2');
+assert_stdout_contains(q{'verifypositive' => .*one fish}, '_parse_lean_test_steps : ends with multi line quote - 1');
+assert_stdout_contains(q{'verifypositive' => .*two fish}, '_parse_lean_test_steps : ends with multi line quote - 2');
 
 # test within a test
 before_test();
@@ -946,10 +946,10 @@ verifynegative: Severe error
 EOB
     ;
 read_test_steps_file();
-assert_stdout_contains("'verifynegative' => 'Severe error'", '_parse_lean_test_steps : test within a test - 1');
-assert_stdout_contains("'postbody' => .*step: Ends", '_parse_lean_test_steps : test within a test - 2');
-assert_stdout_contains("'postbody' => .*shell: echo NOP", '_parse_lean_test_steps : test within a test - 3');
-assert_stdout_contains("'postbody' => .*verifypositive:\\[\\[: \\[\\[", '_parse_lean_test_steps : test within a test - 4');
+assert_stdout_contains(q{'verifynegative' => 'Severe error'}, '_parse_lean_test_steps : test within a test - 1');
+assert_stdout_contains(q{'postbody' => .*step: Ends}, '_parse_lean_test_steps : test within a test - 2');
+assert_stdout_contains(q{'postbody' => .*shell: echo NOP}, '_parse_lean_test_steps : test within a test - 3');
+assert_stdout_contains(q{'postbody' => .*verifypositive:\\[\\[: \\[\\[}, '_parse_lean_test_steps : test within a test - 4');
 
 # edge cases
 before_test();
