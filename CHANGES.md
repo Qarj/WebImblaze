@@ -1,12 +1,16 @@
-# WebImblaze change log
+# WebImblaze changelog
 
-This project is a fork of WebInject version 1.41, http://webinject.org/.
+This project is a fork of WebInject version 1.41, [WebInject](http://webinject.org/).
 
-Version 1.42 onwards - https://github.com/Qarj/WebImblaze
+Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 
 ---
 
-## WebImblaze Release History:
+## WebImblaze Release History
+
+### Version 1.4.8 - Feb 27, 2022
+
+-   linting changes, added GitHub actions
 
 ### Version 1.4.7 - Apr 25, 2021
 
@@ -18,7 +22,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.4.5 - Feb 16, 2021
 
--   added parsematch parameter for returning the nth match of a regex
+-   added parsematch parameter for returning the nth match of a regular expression
 
 ### Version 1.4.4 - Feb 3, 2021
 
@@ -42,7 +46,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.3.9 - Sep 29, 2020
 
--   attempts to identify REACT apps, will now render test result html rather than displaying literal html (useful for SSR)
+-   attempts to identify REACT apps, will now render test result HTML rather than displaying literal HTML (useful for SSR)
 
 ### Version 1.3.8 - May 30, 2020
 
@@ -62,7 +66,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.3.5 - Mar 4, 2020
 
--   bugfix - do not get html source assets for Selenium tests
+-   bugfix - do not get HTML source assets for Selenium tests
 
 ### Version 1.3.4 - Mar 2, 2020
 
@@ -70,7 +74,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.3.3 - Jan 31, 2020
 
--   file name of include file is now given if it fails to parse instead of the master file name
+-   filename of include file is now given if it fails to parse instead of the master filename
 
 ### Version 1.3.2 - Jan 30, 2020
 
@@ -129,7 +133,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ---
 
-## WebInject Release History:
+## WebInject Release History
 
 ### Version 2.11.0 - Aug 10, 2018
 
@@ -138,7 +142,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   abort will now continue execution from the specified step name e.g. Teardown when triggered
 -   section breaks increment auto test step numbering system to nearest 100
 -   can now specify a useragent in a .test file as a separate directive applying to all steps
--   failure to specify either a url, shell or selenium parameter will result in an action less step
+-   failure to specify either a URL, shell or selenium parameter will result in an action less step
 -   additional substitution modifier DATE_NOW modifies the data from the current time (instead of test start time)
 
 ### Version 2.10.0 - Jun 22, 2018
@@ -155,19 +159,19 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 -   new dumpjson parameter for decoding emails sent to test email management systems like mailhog and inbucket
 -   improved getallhrefs and getallsrcs feature - see manual
--   html actual result now written as UTF-8
+-   HTML actual result now written as UTF-8
 -   auto substitutions feature has existed for a long time, now documented in the manual
 -   fixed edge cases for var assignment in conjunction with retry and repeat
 -   ampersands will now be correctly encoded in the xml results rather than changed to the literal {AMPERSAND}
 -   logic has been adjusted for decision to run or skip test step - now done after all variable substitutions
--   examples now point to webinject-check website
+-   examples now point to the webinject-check site
 
 ### Version 2.8.0 - Nov 25, 2017
 
--   renamed the sanitycheck parameter to abort, and changed the way that it works, including a bug fix
--   command line options for WebInject-Selenium plugin are now shown by the plugin, for a cleaner display if plugin is not installed
+-   renamed the sanitycheck parameter to abort, and changed the way that it works, including a bugfix
+-   command-line options for WebInject-Selenium plugin are now shown by the plugin, for a cleaner display if plugin is not installed
 -   removed logic that only loaded the WebInject-Selenium plugin if Selenium tests are detected - simplifies logic for only a slight start-up time hit
--   added a selftest for SSL, updated installation instructions for Linux to ensure LWP::Protocol::https is installed
+-   added a selftest for SSL, updated installation instructions for Linux to ensure LWP::Protocol::HTTPS is installed
 -   updated instructions for use of perlbrew with a Mac, and fixed a bug so the self tests can run on a Mac
 -   added an advanced assertion examples section to the manual
 -   now support so called substitution modifiers to alter the date (which is NOW by default)
@@ -179,7 +183,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   included the Python 3 project search-image.py (finds a sub image within a screenshot)
 -   many of the WebInject self tests now refer to webinject-check.azurewebsites.net
 -   experimental checkpoint parameter added, if successful it will replace retryfromstep
--   unconditional SLEEPs are bad and ignored by WebInject - now however WebInject will output to STDOUT and html when a sleep is invoked
+-   unconditional SLEEPs are bad and ignored by WebInject - now however WebInject will output to STDOUT and HTML when a sleep is invoked
 -   support masked strings (for config files)
 -   runif parameter added to only run a step if the parameter evaluates to truthy
 -   added setcookie feature and deprecated addcookie, setcookie will permanently set a cookie for the rest of the session
@@ -236,7 +240,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 -   new helper function helper_keys_to_input_after renamed to helper_keys_to_element_after and made compatible with Salesforce
 -   helper_keys_to_element_after can now set SELECT i.e. drop down values
--   helper_keys_to_element_after can now check and uncheck check boxes
+-   helper_keys_to_element_after can now check and uncheck checkboxes
 
 ### Version 2.2.0 - Nov 1, 2016
 
@@ -272,7 +276,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.99 - Jul 19, 2016
 
--   added back --no-output command line option
+-   added back --no-output command-line option
 -   added back Nagios plugin mode support
 
 ### Version 1.98 - Jul 18, 2016
@@ -280,14 +284,14 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   removed xnode feature for running a single test step
 -   fixed selftest compatibility for Perl 5.24.0
 -   log separator now written after a test step, not before (as per original functionality)
--   WebInject now determines whether to try and render a test result based on whether it contains <html and <body tags
+-   WebInject now determines whether to try and render a test result based on whether it contains <HTML and <body tags
 -   output of shell command tests were sometimes being treated as http headers, fixed
 -   reduced start-up time for tests that do not invoke a http session - makes the self tests much quicker
 
 ### Version 1.97 - Jul 3, 2016
 
 -   made core WebInject compatible with Linux (Selenium support still be to addressed)
--   renamed http.log to http.txt - http.txt can be served by web servers without adding a mime type
+-   renamed http.log to http.txt - http.txt can be served by web servers without adding a MIME type
 -   added environments donotrunon feature
 -   set exit code of 1 if one or more test steps failed
 -   fixed seeding of random numbers
@@ -298,14 +302,14 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 ### Version 1.96 - Jun 12, 2016
 
 -   replaced liveonly and testonly parameters with all-purpose runon
--   bug fix - searchimage filename should show in results xsl if not found
+-   bugfix - searchimage filename should show in results xsl if not found
 
 ### Version 1.95 - May 30, 2016
 
 -   {RANDOM:10} was meant to produce 10 random alphanumeric characters but did not do anything - fixed
 -   in certain circumstances `<`, `>` and `&` was being written within results.xml tags - now substituted with {LESSTHAN}, {GREATERTHAN} and {AMPERSAND} respectively
 -   there is now no need to escape `<` when used in test case attributes
--   stopped Response.pm croaking webinject.pl when the request url is empty
+-   stopped Response.pm croaking webinject.pl when the request URL is empty
 -   renamed image_in_image.py to search-image.py (and separated it to its own project on GitHub)
 
 ### Version 1.94 - May 21, 2016
@@ -329,7 +333,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 -   improved date time format for start_time in results.xml
 -   restructured results.xml format for verifypositive, verifynegative, autoassertions, smartassertions and searchimage
--   create a html file for every single test step e.g. 10.html, 20.html
+-   create a HTML file for every single test step e.g. 10.HTML, 20.HTML
 
 ### Version 1.90 - Apr 5, 2016
 
@@ -337,7 +341,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.89 - Apr 4, 2016
 
--   escape modifier on parseresponse changed to use a uri escape regex
+-   escape modifier on parseresponse changed to use a uri escape regular expression
 
 ### Version 1.88 - Mar 31, 2016
 
@@ -432,7 +436,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.68 - Jan 30, 2016
 
--   verification and screenshot time for Selenium WebDriver tests now output to STDOUT, results.html and results.xml
+-   verification and screenshot time for Selenium WebDriver tests now output to STDOUT, results.HTML and results.xml
 
 ### Version 1.67 - Jan 27, 2016
 
@@ -448,7 +452,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.64 - Jan 24, 2016
 
--   bug fix - httppost_xml was changing the response format even when not requested via formatxml
+-   bugfix - httppost_xml was changing the response format even when not requested via formatxml
 -   added info about running WebInject in parallel
 
 ### Version 1.63 - Jan 24, 2016
@@ -466,7 +470,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.60 - Jan 23, 2016
 
--   reverted baseurl support to only baseurl, baseurl1 and baseurl2 the same as WebInject 1.41 (baseurl is superseded by userdefined config)
+-   reverted baseURL support to only baseURL, baseURL1 and baseURL2 the same as WebInject 1.41 (baseURL is superseded by userdefined config)
 
 ### Version 1.59 - Jan 23, 2016
 
@@ -547,14 +551,14 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   Added sanitycheck parameter - all test execution will cease if there has been any error before the check
 -   Added testonly parameter - flags that a test case should only be run against test environments
 -   Added liveonly parameter
--   Added {STARTTIME} as a substitution value - time stamp of when test execution began
+-   Added {STARTTIME} as a substitution value - timestamp of when test execution began
 -   Support running of operating system commands through the backtick method
 -   Changed the way escape works - to fix an issue with escaping \_\_VIEWSTATE
 -   Changed the way addheader works so it takes priority over maintaining cookies
 -   Added "application/json" to the error message that is output if you've carried out a POST using an invalid Content Type
--   Added logastext parameter - writes html and xmp tags around the response in the http log
+-   Added logastext parameter - writes HTML and xmp tags around the response in the http log
 -   Made a tweak to enable NTLM::Authen to work
--   Made it possible to specify a custom regex in the parseresponse
+-   Made it possible to specify a custom regular expression in the parseresponse
 -   Added autocontroller only parameter - test case will only be run if the host is an automation controller (as opposed to a developer desktop)
 -   Added the ability to specify a custom message when a specific verifypositive or verifynegative fails
 -   Added the ability to decode HTML Entities for parseresponse (use in place of escape)
@@ -567,7 +571,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   Added {TESTNUM} substitution
 -   Added {OUTSUM} substitution - simple hash of the output folder - was added to increase uniqueness of data when running in parallel
 -   Added section parameter - for specifying a section break in the results
--   Added assertcount parameter - asserts that you find a particular regex exactly the specified number of times
+-   Added assertcount parameter - asserts that you find a particular regular expression exactly the specified number of times
 -   Added onceonly parameter - when WebInject loops, onceonly test cases will be ignored
 -   Added firstlooponly and lastlooponly parameters - test cases will only be run on the first or last loop (for setup and teardown)
 -   Added {DATA} substitution - will automatically pull data values from the previous test step result with the same host and path, e.g. the \_\_VIEWSTATE value
@@ -593,7 +597,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   Added support for automatic assertions to be run against every single test case - the auto assertions are specified in the config file
 -   Added support for arbitrary user defined substitutions from the config file so you can specify things like {DOMAIN}, {TEAMNAME}, {WEBSITEURL} or whatever
 -   Added {NOW} substitution - the current time, updated with every retry
--   Flush html results to disk immediately before making the web call for each test case
+-   Flush HTML results to disk immediately before making the web call for each test case
 -   Added -i WebInject.pl start up option, all retry and retryfromstep will be ignored
 -   Added a way of tagging production issues without having to comment out / remove the test case
 -   Added support for as many parseresponses as you desire so you can now go parseresponseMYVARIABLE="..." and refer to it as {MYVARIABLE}
@@ -642,13 +646,13 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 1.35 - April 4, 2005
 
--   New command line option (-o) to specify location for writing output files (http.log, results.html, and results.xml)
+-   New command-line option (-o) to specify location for writing output files (http.log, results.HTML, and results.xml)
 -   Nagios plugin performance data support
 -   Allows multiple 'httpauth' elements in config files to support multiple sets of HTTP Authentication credentials
 -   New 'verifyresponsecode' test case parameter for HTTP Response Code verification
--   Additional 'baseurl' elements supported in the config file
+-   Additional 'baseURL' elements supported in the config file
 -   Additional verification parameters supported in test cases
--   Added -V command line option (same as -v) to print version info (necessary for it to run with Moodss)
+-   Added -V command-line option (same as -v) to print version info (necessary for it to run with Moodss)
 -   Code refactoring
 
 ### Version 1.34 - Feb 10, 2005
@@ -662,7 +666,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 -   Nagios Plugin compatibility
 -   Support for multipart/form-data encoded POSTs (file uploads)
--   Updated results.html output so it is valid XHTML
+-   Updated results.HTML output so it is valid XHTML
 
 ### Version 1.32 - Jan 14, 2005
 
@@ -680,18 +684,18 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   Source code compiles with the "use strict" pragma
 -   Ability to run engine from a different directory using alternate test case and config files
 -   Comments allowed in config file using <comment></comment> tags
--   Other config.xml options are still used when you pass a test case filename as a command line argument
+-   Other config.xml options are still used when you pass a test case filename as a command-line argument
 -   New config option to change response delay timeout <timeout></timeout>
 -   New test case parameter to add a custom error message
 -   Added separators to http.log for readability
--   Enhanced command line options/switches
+-   Enhanced command-line options/switches
 -   Nagios Plugin compatibility (beta)
--   More verbose error handling when running from command line
+-   More verbose error handling when running from command-line
 -   Ability to handle reserved XML character "<" within test cases by escaping it with a backslash "<"
--   Changed output when using XPath notation from command line
+-   Changed output when using XPath notation from command-line
 -   Bugfix for proxy support
 -   Bugfix for sending a parsed value in a POST body
--   Bugfix for erroneous errors when running from command line
+-   Bugfix for erroneous errors when running from command-line
 -   Bugfix for warnings that appeared when running with Perl in -w mode
 -   Code refactoring
 
@@ -711,7 +715,7 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 -   New test case file parameter 'repeat', to run a test case file multiple times
 -   Added GUI options for Minimal Output and Response Timer Output
 -   New config.xml parameter to define a custom User-Agent string to be sent in HTTP headers
--   Added XPath Node selection to optional command line parameters
+-   Added XPath-node selection to optional command-line parameters
 -   Bugfix for GUI Restart button
 
 ### Version 1.10 - June 23, 2004
@@ -741,15 +745,15 @@ Version 1.42 onwards - https://github.com/Qarj/WebImblaze
 
 ### Version 0.92 - March 05, 2004
 
--   Minor bug fixes
+-   Minor bugfixes
 -   Added status light to GUI
 -   New config.xml parameter for HTTP proxy support
--   New config.xml parameter for Baseurl constant
+-   New config.xml parameter for BaseURL constant
 
 ### Version 0.91 - Feb 23, 2004
 
 -   Decoupled GUI (webinjectgui) from Test Engine (webinject) so engine can run standalone
--   Testcase name can be passed on command line as well as via config.xml
+-   Testcase name can be passed on command-line as well as via config.xml
 -   Code cleanup
 -   Output sent to STDOUT as well as reports (for standalone mode)
 

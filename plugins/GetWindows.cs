@@ -49,7 +49,7 @@ namespace GetWindows
             IntPtr hShellWindow = GetShellWindow();
             Dictionary<IntPtr, string> dictWindows = new Dictionary<IntPtr, string>();
 
-            EnumWindows(delegate(IntPtr hWnd, int lParam)
+            EnumWindows(delegate (IntPtr hWnd, int lParam)
             {
                 if (hWnd == hShellWindow) return true;
                 if (!IsWindowVisible(hWnd)) return true; //comment out this line to find window handle when not running interactively

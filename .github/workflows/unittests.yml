@@ -1,0 +1,33 @@
+---
+name: Unit tests
+
+on: push
+
+jobs:
+    test:
+        name: Unit tests
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup Perl
+              uses: shogo82148/actions-setup-perl@v1
+              with:
+                  install-modules-with: cpanm
+                  install-modules-args: --with-develop --with-configure
+
+            - name: Install LWP
+              run: cpanm LWP
+
+            - name: Install XML::Simple
+              run: cpanm XML::Simple
+
+            - name: Check Perl version
+              run: perl --version
+
+            - name: Check WebImblaze
+              run: perl wi.pl --version
+
+            - name: Unit tests
+              run: perl wi.t

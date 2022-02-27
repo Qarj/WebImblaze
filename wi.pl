@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 # $Id$
 # $Revision$
@@ -10,7 +10,7 @@ use v5.16;
 use strict;
 use vars qw/ $VERSION /;
 
-$VERSION = '1.4.7';
+$VERSION = '1.4.8';
 
 #    This project is a fork of WebInject version 1.41, http://webinject.org/.
 #    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
@@ -131,8 +131,8 @@ my $counter = 0; # keeping track of the loop we are up to
 
 my $output_folder_name = 'null'; # current working directory - not full path
 my ($sys_temp, $app_data);
-my $DEFAULT_WINDOWS_SYS_TEMP = "C:\\temp\\";
-my $DEFAULT_WINDOWS_APP_DATA = "C:\\ProgramData\\WebImblaze\\";
+my $DEFAULT_WINDOWS_SYS_TEMP = 'C:\\temp\\';
+my $DEFAULT_WINDOWS_APP_DATA = 'C:\\ProgramData\\WebImblaze\\';
 my $DEFAULT_LINUX_SYS_TEMP = '/var/tmp/';
 my $DEFAULT_LINUX_APP_DATA = '/var/lib/WebImblaze/';
 
@@ -143,12 +143,13 @@ my $repeat;
 my $hostname = `hostname`; # hostname should work on Linux and Windows
 $hostname =~ s/[\r\n]//g; # strip out any rogue line feeds or carriage returns
 
-binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
+binmode(STDOUT, ':unix:encoding(UTF-8):crlf');
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 use if $^O eq 'MSWin32', 'Win32::API';
-my $SetConsoleOutputCP= new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
-$SetConsoleOutputCP->Call(65001) if $is_windows;
+my $set_console_output_cp;
+$set_console_output_cp = new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
+$set_console_output_cp->Call(65_001) if $is_windows;
 
 return 1 unless $0 eq __FILE__; # script exits at this point for unit tests
 get_command_line_options();
@@ -475,7 +476,7 @@ sub substitute_variables {
 
 #------------------------------------------------------------------
 sub set_number_of_times_to_retry_this_test_step { # 0 means do not retry this step
-    $retry = _get_number_of_times_to_retry_this_test_step();
+    return $retry = _get_number_of_times_to_retry_this_test_step();
 }
 
 sub _get_number_of_times_to_retry_this_test_step {
@@ -620,12 +621,12 @@ sub output_assertions {
 #------------------------------------------------------------------
 sub execute_test_step {
     _execute_test_step();
-    $resp_headers = $response->headers_as_string;
+    return $resp_headers = $response->headers_as_string;
 }
 
 sub _execute_test_step {
 
-    print {*STDOUT} $results_stdout if $output_enabled; 
+    print {*STDOUT} $results_stdout if $output_enabled;
     undef $results_stdout;
 
     if ($case{method}) {
@@ -1185,7 +1186,7 @@ sub removecookie {
         foreach my $_key (@_keys) {
             $_key = _trim($_key);
             $results_stdout .= " Remove cookie -> $_key\n";
-            $cookie_jar->clear( $_uri->host, q{/}, $_key ); 
+            $cookie_jar->clear( $_uri->host, q{/}, $_key );
         }
     }
 
@@ -1220,7 +1221,7 @@ sub getallhrefs { # getallhrefs=".less|.css"
     }
 
     my $_match = 'href=';
-	my $_left_delim = q{['"]+}; 
+	my $_left_delim = q{['"]+};
 	my $_right_delim = q{'"};
     get_assets ($_match,$_left_delim,$_right_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
 
@@ -1242,7 +1243,7 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
     }
 
     my $_match = 'src=';
-	my $_left_delim = q{['"]+}; 
+	my $_left_delim = q{['"]+};
 	my $_right_delim = q{'"};
     get_assets ($_match, $_left_delim, $_right_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
 
@@ -1254,7 +1255,7 @@ sub getbackgroundimages { # style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
         my $_match = 'background-image: url';
-        my $_left_delim = q{[('"]+}; 
+        my $_left_delim = q{[('"]+};
         my $_right_delim = q{'")};
         get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
@@ -1670,7 +1671,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
          else { print {*STDERR} qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
        }
     else {
-        $case{posttype} = "application/x-www-form-urlencoded";
+        $case{posttype} = 'application/x-www-form-urlencoded';
         httpsend_form_urlencoded($_verb);  # use "x-www-form-urlencoded" if no encoding is specified
     }
 
@@ -1703,7 +1704,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
         $_content_ref = read_utf8($1); # read the xml file specified in the teststep
     }
 
-    my @_xml_body = split /^/m, $$_content_ref;
+    my @_xml_body = split m/^/, ${ $_content_ref };
 
     foreach (@_xml_body) {
         convert_back_xml($_);
@@ -1727,7 +1728,7 @@ sub httpsend_form_data {  # send multipart/form-data HTTP request and read respo
     my $_substituted_postbody = encode('utf8', auto_sub("$case{postbody}", 'multipost', "$case{url}"));
 
     my %_my_content_;
-    eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval,RequireCheckingReturnValueOfEval)
+    eval "\%_my_content_ = $_substituted_postbody";
     if ($_verb eq 'POST') {
         $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
@@ -1752,7 +1753,7 @@ sub do_http_request {
 
     $cookie_jar->extract_cookies($response);
 
-    $resp_content = $response->decoded_content; 
+    $resp_content = $response->decoded_content;
 
     return;
 }
@@ -1840,7 +1841,7 @@ sub run_special_command {  # for commandonerror and commandonfail
 #------------------------------------------------------------------
 sub dump_json {
 	if ($case{dumpjson}) {
-        $resp_content =~ s/[^{]*(\{.*}).*/$1/s; # json must start and end with braces, throw away extra content
+        $resp_content =~ s/[^{]*([{].*}).*/$1/s; # json must start and end with braces, throw away extra content
         $resp_content = eval { Data::Dumper::Dumper(decode_json $resp_content) };
 	}
 
@@ -2002,7 +2003,7 @@ sub _verify_autoassertion {
                     colour_stdout('bold yellow', "Failed Auto Assertion \n");
                     if ($_verifyparms[1]) { # is there a custom assertion failure message?
                         my $capture1 = $1; my $capture2 = $2; my $capture3 = $3;
-                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg; 
+                        $_verifyparms[1] =~ s/(\$\w+)/$1/eeg;
                         $results_html .= qq|<span class="fail">$_verifyparms[1]</span><br />\n|;
                         $_results_xml .= qq|                <message>$_verifyparms[1]</message>\n|;
                         colour_stdout('bold yellow', "$_verifyparms[1]\n");
@@ -3387,7 +3388,7 @@ sub set_late_var_list {
 sub set_eval_variables { # e.g. evalDIFF="10-5"
     foreach my $_case_attribute ( sort keys %case ) {
        if ( (substr $_case_attribute, 0, 4) eq 'eval' ) {
-            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}"; ## no critic(ProhibitStringyEval)
+            $varvar{'var'.substr $_case_attribute, 4} = eval "$case{$_case_attribute}";
         }
     }
 
@@ -3439,8 +3440,8 @@ sub httplog {  # write requests and responses to http.txt file
         $_core_info .= 'Expires: '.scalar(localtime( $response->fresh_until( ) ))."\n";
     }
 
-    my $_response_content_ref = '';
-    my $_response_headers = '';
+    my $_response_content_ref = q{};
+    my $_response_headers = q{};
 
     _write_http_log($_step_info, $_core_info);
     _write_step_html($_step_info, $_core_info, $_response_base);
@@ -3472,7 +3473,7 @@ sub _write_http_log {
 }
 
 #------------------------------------------------------------------
-sub _write_step_html { ## no critic(ProhibitManyArgs)
+sub _write_step_html {
     my ($_step_info, $_core_info, $_response_base) = @_;
 
     my $_response_content = $resp_content;
@@ -3715,7 +3716,7 @@ sub _grabbed_href {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{href="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{href="$1"};
 }
 
 #------------------------------------------------------------------
@@ -3729,7 +3730,7 @@ sub _grabbed_src {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{src="$1"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{src="$1"};
 }
 
 #------------------------------------------------------------------
@@ -3743,7 +3744,7 @@ sub _grabbed_background_image {
     }
 
     # we did not grab that asset, so we will substitute it with itself
-    return qq{style="background-image: url('$1');"}; ## no critic(RegularExpressions::ProhibitCaptureWithoutTest)
+    return qq{style="background-image: url('$1');"};
 }
 
 #------------------------------------------------------------------
@@ -3838,7 +3839,7 @@ sub read_utf8 {
 sub append_utf8 {
     my ($_file_path, $_content_ref) = @_;
 
-    return _write_to_file($_file_path, $_content_ref, '', '>>', ':encoding(UTF-8)');
+    return _write_to_file($_file_path, $_content_ref, q{}, '>>', ':encoding(UTF-8)');
 }
 
 sub write_utf8 {
@@ -3850,7 +3851,7 @@ sub write_utf8 {
 sub write_raw {
     my ($_file_path, $_content_ref, $_make_path) = @_;
 
-    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', '');
+    return _write_to_file($_file_path, $_content_ref, $_make_path, '>', q{});
 }
 
 sub _write_to_file {
@@ -3858,14 +3859,14 @@ sub _write_to_file {
 
     $_file_path = slash_me($_file_path);
 
-    $_make_path //= '';
+    $_make_path //= q{};
     if ($_make_path) {
         exit 'need to remove filename from path';
-        File::Path::make_path($_file_path);
+        # File::Path::make_path($_file_path);
     }
 
     open my $_FILE, $_write_mode.':raw'.$_encode, $_file_path or die "\nERROR: Failed to open $_file_path for writing\n\n";
-    print {$_FILE} $$_content_ref;
+    print {$_FILE} ${ $_content_ref };
     close $_FILE or die "\nERROR: Failed to close $_file_path after writing\n\n";
 
     return;
@@ -3909,7 +3910,7 @@ sub start_session {     # creates the WebImblaze user agent
     #$useragent->timeout(200); # it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  # don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
-    eval ## no critic(RequireCheckingReturnValueOfEval)
+    eval
     {
        $useragent->ssl_opts(verify_hostname=>0); # stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
        $useragent->ssl_opts(SSL_verify_mode=>0); # from Perl 5.16.3 need this to prevent ugly warnings
@@ -3927,7 +3928,7 @@ sub start_session {     # creates the WebImblaze user agent
         # add the credentials to the user agent here. The foreach gives the reference to the tuple ($elem), and we
         # deref $elem to get the array elements.
         foreach my $_elem(@http_auth) {
-            my $_domain_port = $_elem->[0].':'.$_elem->[1];
+            my $_domain_port = $_elem->[0].q{:}.$_elem->[1];
             my $_realm = $_elem->[2];
             my $_user = $_elem->[3];
             my $_pass = $_elem->[4];

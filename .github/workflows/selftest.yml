@@ -1,0 +1,65 @@
+---
+name: Self test
+
+on: push
+
+jobs:
+    test:
+        name: Self test
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: Setup Perl
+              uses: shogo82148/actions-setup-perl@v1
+              with:
+                  install-modules-with: cpanm
+                  install-modules-args: --with-develop --with-configure
+
+            - name: Install LWP::Protocol::https
+              run: cpanm LWP::Protocol::https
+
+            - name: Install LWP
+              run: cpanm LWP
+
+            - name: Install XML::Simple
+              run: cpanm XML::Simple
+
+            - name: Check Perl version
+              run: perl --version
+
+            - name: Check WebImblaze
+              run: perl wi.pl --version
+
+            - name: Self test
+              run: perl wi.pl selftest/all_core.test
+
+            - name: Archive test report
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: html-results-report
+                  path: output/Results.html
+
+            - name: Zip main test output
+              if: always()
+              run: zip -r output-main.zip output
+
+            - name: Archive main test output
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: main-test-output
+                  path: output-main.zip
+
+            - name: Zip substeps test output
+              if: always()
+              run: zip -r output-substeps.zip selftest/output
+
+            - name: Archive substeps test output
+              if: always()
+              uses: actions/upload-artifact@v2
+              with:
+                  name: substeps-test-output
+                  path: output-substeps.zip
