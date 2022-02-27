@@ -476,7 +476,7 @@ sub substitute_variables {
 
 #------------------------------------------------------------------
 sub set_number_of_times_to_retry_this_test_step { # 0 means do not retry this step
-    $retry = _get_number_of_times_to_retry_this_test_step();
+    return $retry = _get_number_of_times_to_retry_this_test_step();
 }
 
 sub _get_number_of_times_to_retry_this_test_step {
@@ -621,12 +621,12 @@ sub output_assertions {
 #------------------------------------------------------------------
 sub execute_test_step {
     _execute_test_step();
-    $resp_headers = $response->headers_as_string;
+    return $resp_headers = $response->headers_as_string;
 }
 
 sub _execute_test_step {
 
-    print {*STDOUT} $results_stdout if $output_enabled; 
+    print {*STDOUT} $results_stdout if $output_enabled;
     undef $results_stdout;
 
     if ($case{method}) {
@@ -1186,7 +1186,7 @@ sub removecookie {
         foreach my $_key (@_keys) {
             $_key = _trim($_key);
             $results_stdout .= " Remove cookie -> $_key\n";
-            $cookie_jar->clear( $_uri->host, q{/}, $_key ); 
+            $cookie_jar->clear( $_uri->host, q{/}, $_key );
         }
     }
 
@@ -1221,7 +1221,7 @@ sub getallhrefs { # getallhrefs=".less|.css"
     }
 
     my $_match = 'href=';
-	my $_left_delim = q{['"]+}; 
+	my $_left_delim = q{['"]+};
 	my $_right_delim = q{'"};
     get_assets ($_match,$_left_delim,$_right_delim,$getallhrefs, 'hrefs', 'version'.$hrefs_version.'_');
 
@@ -1243,7 +1243,7 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
     }
 
     my $_match = 'src=';
-	my $_left_delim = q{['"]+}; 
+	my $_left_delim = q{['"]+};
 	my $_right_delim = q{'"};
     get_assets ($_match, $_left_delim, $_right_delim, $getallsrcs, 'srcs', 'version'.$srcs_version.'_');
 
@@ -1255,7 +1255,7 @@ sub getbackgroundimages { # style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
         my $_match = 'background-image: url';
-        my $_left_delim = q{[('"]+}; 
+        my $_left_delim = q{[('"]+};
         my $_right_delim = q{'")};
         get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
@@ -1671,7 +1671,7 @@ sub httpsend {  # send request based on specified encoding and method (verb)
          else { print {*STDERR} qq|ERROR: Bad Form Encoding Type, I only accept "application/x-www-form-urlencoded", "application/json", "multipart/form-data", "text/xml", "application/soap+xml" \n|; }
        }
     else {
-        $case{posttype} = "application/x-www-form-urlencoded";
+        $case{posttype} = 'application/x-www-form-urlencoded';
         httpsend_form_urlencoded($_verb);  # use "x-www-form-urlencoded" if no encoding is specified
     }
 
@@ -1704,7 +1704,7 @@ sub httpsend_xml { # send text/xml HTTP request and read response
         $_content_ref = read_utf8($1); # read the xml file specified in the teststep
     }
 
-    my @_xml_body = split /^/m, $$_content_ref;
+    my @_xml_body = split m/^/, ${ $_content_ref };
 
     foreach (@_xml_body) {
         convert_back_xml($_);
