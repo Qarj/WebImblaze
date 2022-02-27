@@ -9,6 +9,7 @@
 use v5.16;
 use strict;
 use vars qw/ $VERSION /;
+use warnings;
 
 $VERSION = '1.4.7';
 
@@ -131,8 +132,8 @@ my $counter = 0; # keeping track of the loop we are up to
 
 my $output_folder_name = 'null'; # current working directory - not full path
 my ($sys_temp, $app_data);
-my $DEFAULT_WINDOWS_SYS_TEMP = "C:\\temp\\";
-my $DEFAULT_WINDOWS_APP_DATA = "C:\\ProgramData\\WebImblaze\\";
+my $DEFAULT_WINDOWS_SYS_TEMP = 'C:\\temp\\';
+my $DEFAULT_WINDOWS_APP_DATA = 'C:\\ProgramData\\WebImblaze\\';
 my $DEFAULT_LINUX_SYS_TEMP = '/var/tmp/';
 my $DEFAULT_LINUX_APP_DATA = '/var/lib/WebImblaze/';
 
@@ -143,13 +144,13 @@ my $repeat;
 my $hostname = `hostname`; # hostname should work on Linux and Windows
 $hostname =~ s/[\r\n]//g; # strip out any rogue line feeds or carriage returns
 
-binmode(STDOUT, ":unix:encoding(UTF-8):crlf");
+binmode(STDOUT, ':unix:encoding(UTF-8):crlf');
 
 our $is_windows = $^O eq 'MSWin32' ? 1 : 0;
 use if $^O eq 'MSWin32', 'Win32::API';
-my $SetConsoleOutputCP;
-$SetConsoleOutputCP = new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
-$SetConsoleOutputCP->Call(65001) if $is_windows;
+my $set_console_output_cp;
+$set_console_output_cp = new Win32::API( 'kernel32.dll', 'SetConsoleOutputCP', 'N','N' ) if $is_windows;
+$set_console_output_cp->Call(65_001) if $is_windows;
 
 return 1 unless $0 eq __FILE__; # script exits at this point for unit tests
 get_command_line_options();
