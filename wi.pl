@@ -1728,7 +1728,7 @@ sub httpsend_form_data {  # send multipart/form-data HTTP request and read respo
     my $_substituted_postbody = encode('utf8', auto_sub("$case{postbody}", 'multipost', "$case{url}"));
 
     my %_my_content_;
-    eval "\%_my_content_ = $_substituted_postbody"; ## no critic(ProhibitStringyEval,RequireCheckingReturnValueOfEval)
+    eval "\%_my_content_ = $_substituted_postbody";
     if ($_verb eq 'POST') {
         $request = POST "$case{url}", Content_Type => "$case{posttype}", Content => \%_my_content_;
     } elsif ($_verb eq 'PUT') {
@@ -3910,7 +3910,7 @@ sub start_session {     # creates the WebImblaze user agent
     #$useragent->timeout(200); # it is possible to override the default timeout of 360 seconds
     $useragent->max_redirect('0');  # don't follow redirects for GET's (POST's already don't follow, by default)
     #push @{ $useragent->requests_redirectable }, 'POST'; # allow redirects for POST (if used in conjunction with maxredirect parameter) - does not appear to work with Login requests, perhaps cookies are not dealt with
-    eval ## no critic(RequireCheckingReturnValueOfEval)
+    eval
     {
        $useragent->ssl_opts(verify_hostname=>0); # stop SSL Certs from being validated - only works on newer versions of of LWP so in an eval
        $useragent->ssl_opts(SSL_verify_mode=>0); # from Perl 5.16.3 need this to prevent ugly warnings

@@ -22,6 +22,7 @@ verbose  = %f:%l:%c [%s %p] %m near '%r'\n
 [-TestingAndDebugging::RequireUseWarnings]
 [-ValuesAndExpressions::ProhibitMagicNumbers]
 [-ValuesAndExpressions::ProhibitVersionStrings]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
 [-Variables::ProhibitMatchVars]
 [-Variables::ProhibitPackageVars]
 [-Variables::ProhibitPunctuationVars]
