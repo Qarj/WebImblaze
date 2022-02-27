@@ -1770,7 +1770,7 @@ sub assert_file_contains {
     if (${ $_content_ref } =~ m/$_must_contain/s) {
         is(1, 1, $_test_description);
     } else {
-        is('see between dashes below for 1 - stdout, 2 - file content', $_target_file . ' to contain "' . $_must_contain . '"', $_test_description);
+        is('see between dashes below for 1 - stdout, 2 - file content', $_target_file . ' to contain "' . $_must_contain . q{"}, $_test_description);
         show_string($main::results_stdout);
         show_string(${ $_content_ref }."\n");
     }
@@ -1825,7 +1825,7 @@ sub before_test {
     undef @main::cached_pages;
     undef @main::cached_page_actions;
     undef @main::cached_page_update_times;
-    
+
     return;
 }
 
