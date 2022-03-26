@@ -39,8 +39,8 @@ Install additional Perl packages, choose `[local::lib]` when configuring cpan.
 
 ```sh
 cpan XML::Simple
-cpan LWP::Protocol::https
 source $HOME/.bashrc
+cpan LWP::Protocol::https
 ```
 
 Check that you can see the WebImblaze help info
