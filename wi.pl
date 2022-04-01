@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+# MODIFIED FROM UPSTREAM TO INCLUDE PERFDATA OUTPUT FOR ALL STEPS
+
 # $Id$
 # $Revision$
 # $Date$
@@ -85,6 +87,7 @@ my ($parser_index_, $parser_file_name_, $step_id_, $repeat_, $useragent_, $parse
 
 my $report_type; # 'standard' and 'nagios' supported
 my $nagios_return_message;
+my $result_perfdata;
 
 our $testnum;
 our $testnum_display;
@@ -781,7 +784,9 @@ sub output_test_step_latency {
     $results_html .= qq|Response Time = $latency sec <br />\n|;
     $results_stdout .= qq|Response Time = $latency sec \n|;
     $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
-
+    my $stepnum = $testnum / 10;
+    $result_perfdata .= qq|step$stepnum=${latency}s;;;; |;
+    
     if ($case{method} eq 'selenium') {
         $results_html .= qq|Verification Time = $verification_latency sec <br />\n|;
         $results_html .= qq|Screenshot Time = $screenshot_latency sec <br />\n|;
@@ -1097,19 +1102,19 @@ sub write_final_stdout {  # write summary and closing text for STDOUT
             my $_end = defined $config->{globaltimeout} ? "$config->{globaltimeout};;0" : ';;0';
 
             if ($execution_aborted eq 'true') {
-                print "WebImblaze UNKNOWN - aborted - $nagios_return_message |time=$total_response;$_end\n";
+                print "WebImblaze UNKNOWN - aborted - $nagios_return_message |time=${total_response}s;$_end $result_perfdata\n";
                 exit $_exit_codes{'UNKNOWN'};
             }
             if ($case_failed_count > 0) {
-                print "WebImblaze CRITICAL - $nagios_return_message |time=$total_response;$_end\n";
+                print "WebImblaze CRITICAL - $nagios_return_message |time=${total_response}s;$_end $result_perfdata\n";
                 exit $_exit_codes{'CRITICAL'};
             }
             elsif ( ($config->{globaltimeout}) && ($total_response > $config->{globaltimeout}) ) {
-                print "WebImblaze WARNING - All tests passed successfully but global timeout ($config->{globaltimeout} seconds) has been reached |time=$total_response;$_end\n";
+                print "WebImblaze WARNING - All tests passed successfully but global timeout ($config->{globaltimeout} seconds) has been reached |time=${total_response}s;$_end $result_perfdata\n";
                 exit $_exit_codes{'WARNING'};
             }
             else {
-                print "WebImblaze OK - All tests passed successfully in $total_response seconds |time=$total_response;$_end\n";
+                print "WebImblaze OK - All tests passed successfully in $total_response seconds |time=${total_response}s;$_end $result_perfdata\n";
                 exit $_exit_codes{'OK'};
             }
         }
