@@ -1,7 +1,5 @@
 #!/usr/bin/env perl
 
-# MODIFIED FROM UPSTREAM TO INCLUDE PERFDATA OUTPUT FOR ALL STEPS
-
 # $Id$
 # $Revision$
 # $Date$
@@ -784,9 +782,10 @@ sub output_test_step_latency {
     $results_html .= qq|Response Time = $latency sec <br />\n|;
     $results_stdout .= qq|Response Time = $latency sec \n|;
     $results_xml .= qq|            <responsetime>$latency</responsetime>\n|;
+    # @TODO this seems suboptimal...
     my $stepnum = $testnum / 10;
     $result_perfdata .= qq|step$stepnum=${latency}s;;;; |;
-    
+
     if ($case{method} eq 'selenium') {
         $results_html .= qq|Verification Time = $verification_latency sec <br />\n|;
         $results_html .= qq|Screenshot Time = $screenshot_latency sec <br />\n|;
