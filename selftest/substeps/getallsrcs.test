@@ -1,6 +1,6 @@
 step:                   Get an image source
-url:                    http://www.fairfaxhouse.co.uk/
-getallsrcs:             logo\.jpg
+url:                    https://voltbikes.co.uk
+getallsrcs:             warranty\.png
 
 step:                   Get a JavaScript source
 url:                    https://voltbikes.co.uk

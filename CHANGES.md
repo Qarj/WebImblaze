@@ -8,6 +8,10 @@ Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 
 ## WebImblaze Release History
 
+### Version 1.5.0 - Apr 11, 2022
+
+-   merge PR from Marno van der Molen: add perfdata output per step for nagios
+
 ### Version 1.4.8 - Feb 27, 2022
 
 -   linting changes, added GitHub actions

@@ -1,19 +1,19 @@
 step:                   {FEATURE}
 varFEATURE:             {TESTFILENAME}
-shell1:                 if exist selftest\output\version10_logo.png del selftest\output\version10_logo.jpg
-shell2:                 if exist selftest\output\version20_index.js del selftest\output\version20_index.js
+shell1:                 del selftest\output\version10_*.png
+shell2:                 del selftest\output\version20_index.js
 
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        GET Asset \[version10_logo.jpg]
+verifypositive1:        GET Asset \[version10_.*?warranty.png]
 verifypositive2:        GET Asset \[version20_index.js]
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell1:                 dir selftest\output\
 shell2:                 ls selftest/output/
-verifypositive1:        logo.jpg
+verifypositive1:        warranty.png
 verifypositive2:        index.js
 verifynegative:         uninitialized value
 
