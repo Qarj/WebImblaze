@@ -1614,7 +1614,7 @@ Note that the HTTP::Headers class converts header field names to be title case
 by default to make them look consistent. It can do this because the RFC says that
 header field names are case insensitive. Unfortunately some people are not aware
 of this and insist on case sensitive header field names. To get around this problem
-preceed the header field name with a colon.
+precede the header field name with a colon.
 
 ```yml
 addheader: :foo-bar: value
@@ -2878,13 +2878,13 @@ step:           Set variables
 varLOGIN_url:   http://myserver/login.php
 varLOGIN1:      bob
 varPASSWD1:     sponge
-varSUCCESSFULL_TEST_TEXT:   Welcome Bob
+varSUCCESSFUL_TEST_TEXT:   Welcome Bob
 
 step:           Login test step
 desc:           Check login success message
 url:            {LOGIN_URL}
 postbody:       login={LOGIN1}&passwd={PASSWD1}
-verifypositive: {SUCCESSFULL_TEST_TEXT}
+verifypositive: {SUCCESSFUL_TEST_TEXT}
 ```
 
 <br />

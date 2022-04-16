@@ -25,13 +25,14 @@ jobs:
               run: pwd && ls -asl
 
             - name: Put .perlcriticrc in the home folder
-              run: cp .github/linters/.perlcriticrc $HOME
+              run: cp .github/linters/.perlcriticrc "$HOME"
 
             - name: Mega Lint Code Base
               uses: megalinter/megalinter@v5
               env:
                   CSS_FILE_NAME: ./.github/linters/.stylelintrc.json
                   DEFAULT_BRANCH: main
+                  DISABLE_LINTERS: PYTHON_FLAKE8,SPELL_CSPELL
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   JAVASCRIPT_DEFAULT_STYLE: prettier
                   LINTER_RULES_PATH: /

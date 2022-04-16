@@ -4,8 +4,6 @@ This project is a fork of WebInject version 1.41, [WebInject](http://webinject.o
 
 Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 
----
-
 ## WebImblaze Release History
 
 ### Version 1.5.0 - Apr 11, 2022
@@ -58,7 +56,7 @@ Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 -   added {SHELL_QUOTE} substitution
 -   added decodebase64 paramater
 -   bugfix - don't print directly to STDOUT if runif `paramater` used
--   documented previously undocumented `shell` paramaters substitions {SHELL_ESCAPE}, {SHELL_QUOTE} and {SLASH}
+-   documented previously undocumented `shell` parameters substitions {SHELL_ESCAPE}, {SHELL_QUOTE} and {SLASH}
 
 ### Version 1.3.7 - Mar 24, 2020
 

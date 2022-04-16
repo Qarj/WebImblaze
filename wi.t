@@ -671,7 +671,7 @@ EOB
 read_test_steps_file();
 assert_stdout_contains(q{'verifypositive1' => 'hey'}, '_parse_lean_test_steps : quote character is semicolon ');
 
-# unquoted string - preceeding and trailing spaces ignored
+# unquoted string - preceding and trailing spaces ignored
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Empty string quote
