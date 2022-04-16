@@ -35,7 +35,7 @@ jobs:
               env:
                   CSS_FILE_NAME: ./.github/linters/.stylelintrc.json
                   DEFAULT_BRANCH: main
-                  DISABLE_LINTERS: PYTHON_FLAKE8,SPELL_CSPELL
+                  DISABLE_LINTERS: PYTHON_FLAKE8,SPELL_CSPELL,MARKDOWN_MARKDOWN_LINK_CHECK
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                   JAVASCRIPT_DEFAULT_STYLE: prettier
                   LINTER_RULES_PATH: /
