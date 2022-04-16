@@ -1,6 +1,7 @@
 # WebImblaze 1.5.0
 
 [![GitHub Super-Linter](https://github.com/Qarj/WebImblaze/workflows/Lint%20Code%20Base/badge.svg)](https://github.com/marketplace/actions/super-linter)
+[![Mega-Linter](https://github.com/Qarj/WebImblaze/workflows/Mega%20Lint%20Code%20Base/badge.svg)](https://github.com/megalinter/megalinter)
 ![Unit tests](https://github.com/Qarj/WebImblaze/workflows/Unit%20tests/badge.svg)
 ![Self test](https://github.com/Qarj/WebImblaze/workflows/Self%20test/badge.svg)
 
