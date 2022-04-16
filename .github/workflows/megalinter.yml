@@ -1,10 +1,17 @@
 ---
 name: Mega Lint Code Base
 
-on: push
+on:
+    push:
+    pull_request:
+        branches: [master, main]
+
+concurrency:
+    group: ${{ github.ref }}-${{ github.workflow }}
+    cancel-in-progress: true
 
 jobs:
-    super-lint:
+    mega-lint:
         name: Mega Lint Code Base
         runs-on: ubuntu-latest
         steps:
@@ -18,7 +25,7 @@ jobs:
               run: pwd && ls -asl
 
             - name: Put .perlcriticrc in the home folder
-              run: cp ./.perlcriticrc $HOME
+              run: cp .github/linters/.perlcriticrc $HOME
 
             - name: Mega Lint Code Base
               uses: megalinter/megalinter@v5
@@ -30,7 +37,17 @@ jobs:
                   LINTER_RULES_PATH: /
                   MARKDOWN_CONFIG_FILE: ./.github/linters/.markdown-lint.yml
                   NATURAL_LANGUAGE_CONFIG_FILE: ./.github/linters/.textlintrc.json
-                  PERL_PERLCRITIC: './.github/linters/.perlcriticrc'
+                  PERL_PERLCRITIC: ./.github/linters/.perlcriticrc
                   PYTHON_BLACK_CONFIG_FILE: ./.github/linters/.python-black
                   PYTHON_ISORT_CONFIG_FILE: ./.github/linters/.isort.cfg
                   VALIDATE_YAML: false
+
+            # Upload MegaLinter artifacts
+            - name: Archive production artifacts
+              if: ${{ success() }} || ${{ failure() }}
+              uses: actions/upload-artifact@v2
+              with:
+                  name: MegaLinter reports
+                  path: |
+                      report
+                      mega-linter.log

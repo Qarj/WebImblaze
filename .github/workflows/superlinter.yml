@@ -18,7 +18,7 @@ jobs:
               run: pwd && ls -asl
 
             - name: Put .perlcriticrc in the home folder
-              run: cp ./.perlcriticrc $HOME
+              run: cp .github/linters/.perlcriticrc $HOME
 
             - name: Lint Code Base
               uses: github/super-linter@v4
