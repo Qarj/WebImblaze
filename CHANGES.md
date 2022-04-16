@@ -763,5 +763,3 @@ Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 -   Contains SSL/TLS support
 -   Perl/Tk GUI
 -   Automatic cookie handling
-
----
