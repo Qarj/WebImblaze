@@ -671,7 +671,7 @@ EOB
 read_test_steps_file();
 assert_stdout_contains(q{'verifypositive1' => 'hey'}, '_parse_lean_test_steps : quote character is semicolon ');
 
-# unquoted string - preceeding and trailing spaces ignored
+# unquoted string - preceding and trailing spaces ignored
 before_test();
 $main::unit_test_steps = <<'EOB'
 step: Empty string quote
@@ -1588,13 +1588,13 @@ sub resources_setup {
     my (undef, $_goner) = @_;
     if ($_goner) {
         $_goner = $WEBIMBLAZE_ROOT . $OUTPUT . $_goner;
-        if (-e $_goner ) { unlink $_goner };
+        if (-e $_goner ) { unlink $_goner }
     }
     $main::cookie_jar = HTTP::Cookies->new;
     $main::useragent = LWP::UserAgent->new(keep_alive=>1);
     $main::case{url} = "file:///$WEBIMBLAZE_ROOT/basic.html";
     $main::case{method} = 'get';
-    return
+    return;
 }
 
 resources_setup(before_test());

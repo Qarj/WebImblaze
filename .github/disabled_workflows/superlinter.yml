@@ -14,6 +14,15 @@ jobs:
             - name: Check GITHUB_WORKSPACE var
               run: echo "$GITHUB_WORKSPACE"
 
+            - name: Check the current working directory
+              run: pwd && ls -asl
+
+            - name: Put .perlcriticrc in the home folder
+              run: cp .github/linters/.perlcriticrc "$HOME"
+
+            - name: Put .perlcriticrc in the project root folder
+              run: cp .github/linters/.perlcriticrc ./
+
             - name: Lint Code Base
               uses: github/super-linter@v4
               env:
@@ -24,7 +33,9 @@ jobs:
                   LINTER_RULES_PATH: /
                   MARKDOWN_CONFIG_FILE: ./.github/linters/.markdown-lint.yml
                   NATURAL_LANGUAGE_CONFIG_FILE: ./.github/linters/.textlintrc.json
+                  PERL_PERLCRITIC: ./.github/linters/.perlcriticrc
                   PERLCRITIC: ./.github/linters/.perlcriticrc
+                  PERL_PERLCRITIC_OPTIONS: '--profile ./.github/linters/.perlcriticrc'
                   PYTHON_BLACK_CONFIG_FILE: ./.github/linters/.python-black
                   PYTHON_ISORT_CONFIG_FILE: ./.github/linters/.isort.cfg
                   VALIDATE_YAML: false

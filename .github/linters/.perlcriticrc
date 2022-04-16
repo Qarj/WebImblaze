@@ -1,9 +1,11 @@
 severity = 1
-verbose  = %f:%l:%c [%s %p] %m near '%r'\n
+verbose = %f:%l:%c [%s %p] %m near '%r'\n
 
 [-BuiltinFunctions::ProhibitStringyEval]
 [-CodeLayout::RequireTidyCode]
 [-CodeLayout::ProhibitParensWithBuiltins]
+[-Community::DiscouragedModules]
+[-Community::EmptyReturn]
 [-ControlStructures::ProhibitDeepNests]
 [-ControlStructures::ProhibitPostfixControls]
 [-ErrorHandling::RequireCarping]
