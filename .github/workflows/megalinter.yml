@@ -27,6 +27,9 @@ jobs:
             - name: Put .perlcriticrc in the home folder
               run: cp .github/linters/.perlcriticrc "$HOME"
 
+            - name: Put .perlcriticrc in the project root folder
+              run: cp .github/linters/.perlcriticrc ./
+
             - name: Mega Lint Code Base
               uses: megalinter/megalinter@v5
               env:

@@ -133,8 +133,6 @@ Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 -   if posttype is test/xml or application/soap+xml, uploaded file will have standard substitutions applied
 -   removed retryfromstep parameter (use checkpoint instead)
 
----
-
 ## WebInject Release History
 
 ### Version 2.11.0 - Aug 10, 2018
