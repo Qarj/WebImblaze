@@ -1,5 +1,5 @@
 step:                   Get a gzip page
-url:                    https://www.internetmarketingninjas.com/tools/free-tools/pagespeed
+url:                    https://www.internetmarketingninjas.com/tools/pagespeed/
 addheader:              Accept-Encoding: gzip
-verifypositive:         page speed
+verifypositive:         tool
 errormessage:           Could not get a gzip page over SSL, fix any SSL errors first

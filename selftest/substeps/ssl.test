@@ -1,6 +1,6 @@
-step:                   Get page over SSL
-url:                    https://www.totaljobs.com
-errormessage:           Could not get www.totaljobs.com over SSL, maybe need to cpan LWP::Protocol::https
+# step:                   Get page over SSL
+# url:                    https://www.totaljobs.com
+# errormessage:           Could not get www.totaljobs.com over SSL, maybe need to cpan LWP::Protocol::https
 
 step:                   2 Postcodes
 url:                    https://api.postcodes.io/postcodes
