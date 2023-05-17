@@ -1,6 +1,6 @@
 step:                   Should fail
-url:                    http://httpbin.org/status/500
+url:                    https://echo-http-requests.appspot.com/echo/404
 
 step:                   Should pass
-url:                    http://httpbin.org/status/500
+url:                    https://echo-http-requests.appspot.com/echo/404
 ignorehttpresponsecode: true
