@@ -1,13 +1,13 @@
 step:                   Reflect user agent - default
-url:                    http://httpbin.org/anything
+url:                    https://echo-http-requests.appspot.com/echo
 verifypositive:         WebImblaze
 
 step:                   Reflect user agent - set custom for this and subsequent steps
-url:                    http://httpbin.org/anything
+url:                    https://echo-http-requests.appspot.com/echo
 useragent:              My Special Browser
 verifypositive:         My Special Browser
 
 step:                   Reflect user agent - still My Special Browser
 desc:                   Should pass
-url:                    http://httpbin.org/anything
+url:                    https://echo-http-requests.appspot.com/echo
 verifypositive:         My Special Browser

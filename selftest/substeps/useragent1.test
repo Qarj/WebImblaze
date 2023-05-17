@@ -1,10 +1,10 @@
 step:                   Reflect user agent
 desc:                   User agent set in config file
-url:                    http://httpbin.org/anything
+url:                    https://echo-http-requests.appspot.com/echo
 verifypositive:         HTTP Test Tool
 
 step:                   Reflect user agent - override config file
 desc:                   Should pass
-url:                    http://httpbin.org/anything
+url:                    https://echo-http-requests.appspot.com/echo
 useragent:              Chrome Browser
 verifypositive:         Chrome Browser
