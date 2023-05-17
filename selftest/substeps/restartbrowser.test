@@ -1,13 +1,13 @@
 step:                   Sets a cookie on first visit
 desc:                   Step will pass
-url:                    http://httpbin.org/cookies
+url:                    https://postman-echo.com/get?foo1=bar1
 setcookie:              MyCookieName: value_of_cookie
-verifypositive:         "MyCookieName": "value_of_cookie"
+verifypositive:         MyCookieName=value_of_cookie
 
 step:                   Browser session is restarted - restartbrowser
 restartbrowser:         true
 
 step:                   Cookie is gone now since the session restarted
 desc:                   Step will pass
-url:                    http://httpbin.org/cookies
-verifynegative:         MyCookieName: value_of_cookie
+url:                    https://postman-echo.com/get?foo1=bar1
+verifynegative:         MyCookieName=value_of_cookie
