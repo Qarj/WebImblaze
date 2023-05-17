@@ -1,9 +1,9 @@
 step:                   Get the test form
-url:                    http://httpbin.org/forms/post
+url:                    https://httpbin.org/forms/post
 verifypositive:         Customer name
 
 step:                   Submit a search
-url:                    http://httpbin.org/post
+url:                    https://httpbin.org/post
 postbody:               custname=Peter&{NAME}tel=555+1234&custemail=test%40example.com&size=large&topping={DATA}&topping=onion&delivery=11%3A30&comments=Thanks
 verifypositive1:        custtel
 verifypositive2:        bacon
