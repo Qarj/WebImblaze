@@ -4,7 +4,7 @@ varCUISINE:             French
 varPREPTIME:            75
 
 step:                   Post the file substituting parameters
-url:                    http://httpbin.org/post
+url:                    https://echo-http-requests.appspot.com/echo
 posttype:               text/xml
 postbody:               file=>selftest\testdata\search_template.xml
 verifypositive:         <name>tartiflette
