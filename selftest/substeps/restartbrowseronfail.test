@@ -1,7 +1,7 @@
 step:                   Sets a cookie on first visit
-url:                    http://httpbin.org/cookies
+url:                    https://postman-echo.com/get?foo1=bar1
 setcookie:              MyCookieName: value_of_cookie
-verifypositive:         "MyCookieName": "value_of_cookie"
+verifypositive:         MyCookieName=value_of_cookie
 
 step:                   Browser session is restarted due to an error
 desc:                   Step will fail
@@ -11,7 +11,7 @@ restartbrowseronfail:   true
 
 step:                   Cookie is gone now since the session restarted
 desc:                   Step will pass
-url:                    http://httpbin.org/cookies
+url:                    https://postman-echo.com/get?foo1=bar1
 setcookie:              AnotherCookie: new_cookie
 verifynegative:         MyCookieName: value_of_cookie
 
@@ -23,7 +23,7 @@ restartbrowseronfail:   true
 
 step:                   AnotherCookie is still present since session wasn't restarted in the step before this one
 desc:                   Step will pass
-url:                    http://httpbin.org/cookies
-verifypositive:         "AnotherCookie": "new_cookie"
+url:                    https://postman-echo.com/get?foo1=bar1
+verifypositive:         AnotherCookie=new_cookie
 
 
