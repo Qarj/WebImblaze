@@ -1,6 +1,6 @@
 step:                   log as text not used
-url:                    http://httpbin.org
+url:                    https://echo-http-requests.appspot.com/echo
 
 step:                   log as text used
-url:                    http://httpbin.org
+url:                    https://echo-http-requests.appspot.com/echo
 logastext:              true
