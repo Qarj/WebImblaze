@@ -1,3 +1,4 @@
 step:                   log response as file
 url:                    https://postman-echo.com/get?foo1=bar1
 logresponseasfile:      {PUBLISH}Home_Page.html
+retry:                  3

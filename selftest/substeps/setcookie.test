@@ -1,10 +1,9 @@
 step:                   Get the test form
-url:                    http://httpbin.org/forms/post
+url:                    https://echo-http-requests.appspot.com/echo
 setcookie:              MyFirstCookie: cookie_value; MySecondCookie: another_value
-verifypositive:         Customer name
 
 step:                   Submit a search
-url:                    http://httpbin.org/post
+url:                    https://echo-http-requests.appspot.com/echo
 postbody:               custname=Peter&custtel=555+1234&custemail=test%40example.com&size=large&topping=bacon&topping=onion&delivery=11%3A30&comments=Thanks
 setcookie:              MyThirdCookie :  value_of_third_cookie  
 verifypositive:         bacon
