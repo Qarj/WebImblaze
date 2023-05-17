@@ -1,7 +1,4 @@
 step:                   Get an image source
-url:                    https://voltbikes.co.uk
-getallsrcs:             warranty\.png
+url:                    https://www.totaljobsgroup.com/
+getallsrcs:             /assets/images/icon-instagram.svg
 
-step:                   Get a JavaScript source
-url:                    https://voltbikes.co.uk
-getallsrcs:             index.js
