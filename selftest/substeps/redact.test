@@ -1,6 +1,6 @@
 step:                   Post sensitive information
-url:                    http://httpbin.org/post
+url:                    https://echo-http-requests.appspot.com/echo
 postbody:               username=admin&password=bigsecret&environment=prod
-verifypositive:         "environment": "prod",
+verifypositive:         environment=prod
 redact1:                password=(.*?)&environment
 redact2:                "password": "([^"]+)"

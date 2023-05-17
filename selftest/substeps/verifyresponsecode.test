@@ -5,9 +5,9 @@ step:                   verifyresponsecode should fail
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    http://httpbin.org/doesnotexist
+url:                    https://echo-http-requests.appspot.com/doesnotexist
 verifyresponsecode:     404
 
 step:                   verifyresponsecode should pass
-url:                    http://httpbin.org/status/200
+url:                    https://echo-http-requests.appspot.com/echo
 verifyresponsecode:     200
