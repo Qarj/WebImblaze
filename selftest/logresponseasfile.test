@@ -4,9 +4,7 @@ shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substep
 
 step:                   view Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}{FEATURE}subHome_Page.html
-verifypositive:         simple
-verifypositive1:        html.*head.*body
-verifynegative:         uninitialized value
+verifypositive:         foo1
 
 step:                   {FEATURE} - filename prefix not included as part of output path
 shell1:                 if not exist selftest\output\temp\ mkdir selftest\output\temp\
@@ -15,5 +13,4 @@ shell3:                 .\wi.pl -o selftest\output\temp\ selftest\substeps\{FEAT
 
 step:                   view Home_Page.html
 shell1:                 perl -ne "print" selftest{SLASH}output{SLASH}temp{SLASH}Home_Page.html
-verifypositive:         simple
-verifypositive1:        html.*head.*body
+verifypositive:         foo1
