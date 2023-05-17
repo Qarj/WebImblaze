@@ -5,12 +5,12 @@ shell1:                 rm selftest\output\version1_paper.gif
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        GET Asset \[version1_paper.gif]
+verifypositive1:        GET Asset \[version1_img_girl.jpg]
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell1:                 dir selftest\output\
 shell2:                 ls selftest/output/
-verifypositive1:        version1_paper.gif
+verifypositive1:        version1_img_girl.jpg
 verifynegative1:        uninitialized value
 

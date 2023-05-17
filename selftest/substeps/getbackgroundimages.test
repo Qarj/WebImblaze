@@ -1,3 +1,8 @@
+useragent:              Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36
+
+step:                   Get w3schools
+url:                    https://www.w3schools.com/
+
 step:                   Get a background image
-url:                    https://www.w3schools.com/cssref/tryit.asp?filename=trycss_background-image
-getbackgroundimages:    paper.gif
+url:                    https://www.w3schools.com/html/tryit.asp?filename=tryhtml_images_background3
+getbackgroundimages:    img_girl.jpg

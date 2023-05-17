@@ -1258,8 +1258,8 @@ sub getallsrcs { # getallsrcs=".js|.png|.jpg|.gif"
 sub getbackgroundimages { # style="background-image: url( )"
 
     if ($case{getbackgroundimages}) {
-        my $_match = 'background-image: url';
-        my $_left_delim = q{[('"]+};
+        my $_match = 'background-image:\s+url\s*[(]';
+        my $_left_delim = q{['"]};
         my $_right_delim = q{'")};
         get_assets ($_match, $_left_delim, $_right_delim, $case{getbackgroundimages}, 'bg-images', 'version1_');
     }
@@ -1283,7 +1283,7 @@ sub get_assets {  ## no critic(ProhibitManyArgs) # get page assets matching a li
     my @_extensions = split /[|]/, $_assetlist ;
 
     foreach my $_extension (@_extensions) {
-        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)}g) # iterate over all the matches to this extension
+        while ($_page =~ m{$_match$_left_delim([^$_right_delim]*$_extension)}gis) # iterate over all the matches to this extension
         {
             $_start_asset_request = time;
 
