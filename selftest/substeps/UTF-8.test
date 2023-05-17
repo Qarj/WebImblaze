@@ -43,34 +43,36 @@ verifypositive2:        une âme vulgaire
 decodequotedprintable:  true
 
 step:                   POST UTF-8 application/x-www-form-urlencoded
-url:                    http://httpbin.org/post
+url:                    http://echo-http-requests.appspot.com/echo
 postbody:               sausage=Käsekreiner
-verifypositive1:        "sausage": "K\\u00e4sekreiner"
+verifypositive1:        K\\u00e4sekreiner
 verifynegative1:        K\\ufffdsekreiner
 
 step:                   GET UTF-8 - Greek anthem first line
-url:                    http://httpbin.org/encoding/utf8
-verifypositive1:        Σὲ γνωρίζω ἀπὸ τὴν κόψη 
+posttype:               application/x-www-form-urlencoded
+postbody:               anthem=Σὲ γνωρίζω ἀπὸ τὴν κόψη
+url:                    http://echo-http-requests.appspot.com/echo
+verifypositive1:        \\u03a3\\u1f72 \\u03b3\\u03bd\\u03c9\\u03c1\\u1f77\\u03b6\\u03c9 \\u1f00\\u03c0\\u1f78 \\u03c4\\u1f74\\u03bd \\u03ba\\u1f79\\u03c8\\u03b7
 
 step:                   POST UTF-8 application/json
-url:                    http://httpbin.org/post
+url:                    http://echo-http-requests.appspot.com/echo
 posttype:               application/json
 postbody:               { "Foods": ["Käsekreiner", "Steak"] }
-verifypositive1:        "K\\u00e4sekreiner"
+verifypositive1:        K\\u00e4sekreiner
 verifynegative1:        K\\ufffdsekreiner
 
 step:                   POST UTF-8 multipart/form-data
-url:                    http://httpbin.org/post
+url:                    http://echo-http-requests.appspot.com/echo
 posttype:               multipart/form-data
 postbody:                ( food1 => 'Käsekreiner', food2 => 'Steak' )
-verifypositive1:        "K\\u00e4sekreiner"
+verifypositive1:        K\\u00e4sekreiner
 verifynegative1:        K\\ufffdsekreiner
 
 step:                   POST UTF-8 text/xml
-url:                    http://httpbin.org/post
+url:                    http://echo-http-requests.appspot.com/echo
 posttype:               text/xml
 postbody:               file=>selftest\testdata\UTF-8.xml
-verifypositive1:        <name>K\\u00e4sekreiner</name>
+verifypositive1:        K\\u00e4sekreiner
 verifynegative1:        K\\ufffdsekreiner
 
 include: selftest/helpers/setup/create_job_ad.test
