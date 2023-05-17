@@ -1,5 +1,5 @@
 step:                   Post the file
-url:                    http://httpbin.org/post
+url:                    https://postman-echo.com/post
 posttype:               text/xml
 postbody:               file=>selftest\testdata\searches.xml
 verifypositive:         Irish Stew
