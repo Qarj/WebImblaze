@@ -12,12 +12,12 @@ shell8:                 rm selftest/output/version*.svg
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        GET Asset \[version10_icon-instagram.svg]
+verifypositive1:        GET Asset \[version10_colorpicker2000.png]
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
 shell1:                 dir selftest\output\
 shell2:                 ls selftest/output/
-verifypositive1:        icon-instagram.svg
+verifypositive1:        colorpicker2000.png
 verifynegative:         uninitialized value
 
