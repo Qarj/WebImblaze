@@ -37,7 +37,7 @@ jobs:
 
             - name: Archive test report
               if: always()
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               with:
                   name: html-results-report
                   path: output/Results.html
@@ -48,7 +48,7 @@ jobs:
 
             - name: Archive main test output
               if: always()
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               with:
                   name: main-test-output
                   path: output-main.zip
@@ -59,7 +59,7 @@ jobs:
 
             - name: Archive substeps test output
               if: always()
-              uses: actions/upload-artifact@v2
+              uses: actions/upload-artifact@v4
               with:
                   name: substeps-test-output
                   path: output-substeps.zip
