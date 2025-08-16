@@ -9,11 +9,12 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout code
-              uses: actions/checkout@v2
+              uses: actions/checkout@v4
 
             - name: Setup Perl
               uses: shogo82148/actions-setup-perl@v1
               with:
+                  perl-version: '5.38'
                   install-modules-with: cpanm
                   install-modules-args: --with-develop --with-configure
 
