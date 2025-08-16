@@ -11,6 +11,6 @@ verifynegative:         uninitialized value
 step:                   {FEATURE}
 shell1:                 dir selftest\output\
 shell2:                 ls selftest/output/
-verifypositive:         app.css
+verifypositive:         style.css
 verifynegative:         uninitialized value
 
