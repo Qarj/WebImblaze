@@ -18,11 +18,11 @@ jobs:
                   install-modules-with: cpanm
                   install-modules-args: --with-develop --with-configure
 
-            - name: Install LWP::Protocol::https
-              run: cpanm LWP::Protocol::https
-
             - name: Install LWP
               run: cpanm LWP
+
+            - name: Install LWP::Protocol::https
+              run: cpanm LWP::Protocol::https
 
             - name: Install XML::Simple
               run: cpanm XML::Simple
