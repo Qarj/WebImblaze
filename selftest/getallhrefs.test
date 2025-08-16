@@ -5,7 +5,7 @@ shell1:                 if exist selftest\output\version10_app.css del selftest\
 step:                   {FEATURE}
 shell:                  .\wi.pl -o selftest\output\{FEATURE}sub selftest\substeps\{FEATURE}.test
 verifypositive:         Test Steps Failed: 0
-verifypositive1:        GET Asset \[version10_app.css]
+verifypositive1:        GET Asset \[version10_style.css]
 verifynegative:         uninitialized value
 
 step:                   {FEATURE}
