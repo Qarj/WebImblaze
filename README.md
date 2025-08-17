@@ -8,7 +8,7 @@ _Syntax Highlighting with Visual Studio Code is now supported - search for `WebI
 
 _In Nagios plugin mode, WebImblaze will exit with code UNKNOWN if the test step has an `abort` parameter and it is invoked._
 
-**_This project is now very different to the original WebInject so it has been renamed to WebImblaze._**
+**_This project is based on [WebInject](https://github.com/cgoldberg/Webinject) and has been renamed to WebImblaze._**
 
 WebImblaze is a free Perl based tool for automated testing of web applications and web services.
 
