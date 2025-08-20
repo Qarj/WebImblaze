@@ -1,6 +1,6 @@
 # WebImblaze changelog
 
-This project is a fork of WebInject version 1.41, [WebInject](http://webinject.org/).
+This project is a fork of [WebInject](https://github.com/cgoldberg/Webinject) version 1.41.
 
 Version 1.42 onwards - [WebImblaze](https://github.com/Qarj/WebImblaze)
 

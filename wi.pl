@@ -12,10 +12,10 @@ use vars qw/ $VERSION /;
 
 $VERSION = '1.5.0';
 
-#    This project is a fork of WebInject version 1.41, http://webinject.org/.
-#    Copyright 2004-2006 Corey Goldberg (corey@goldb.org)
+#    This project is a fork of WebInject version 1.41: https://github.com/cgoldberg/Webinject.
+#    Copyright 2004-2006 Corey Goldberg (https://github.com/cgoldberg)
 #    
-#    WebImblaze https://github.com/Qarj/WebImblaze
+#    WebImblaze: https://github.com/Qarj/WebImblaze
 #
 #    WebImblaze is free software; you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
