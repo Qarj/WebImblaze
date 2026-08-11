@@ -1,5 +1,5 @@
 step:                   Get a gzip page
-url:                    https://www.internetmarketingninjas.com/tools/pagespeed/
+url:                    https://www.stepstonegroup.com/
 addheader:              Accept-Encoding: gzip
-verifypositive:         tool
+verifypositive:         stepstone
 errormessage:           Could not get a gzip page over SSL, fix any SSL errors first
