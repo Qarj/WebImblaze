@@ -1,5 +1,5 @@
 step:                   Get a gzip page
-url:                    https://www.stepstonegroup.com/
+url:                    https://www.boroughdentalcare.co.uk/
 addheader:              Accept-Encoding: gzip
-verifypositive:         stepstone
+verifypositive:         dentist
 errormessage:           Could not get a gzip page over SSL, fix any SSL errors first
